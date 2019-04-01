@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ object.code }}{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <h2>{{ object.code }}: {{ object.name }}</h2>
+
+    <p>{{ object.description }}</p>
+
+
+  </div>
+{% endblock content %}
+
