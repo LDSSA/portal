@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 from django.conf import settings
 
@@ -23,9 +22,27 @@ class Unit(models.Model):
 
 
 class Grade(models.Model):
-    student = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    student = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                on_delete=models.CASCADE,
+                                related_name='grades')
     unit = models.ForeignKey(Unit,
                              on_delete=models.CASCADE,
                              related_name='grades')
     grade = models.FloatField(null=True)
 
+
+# TODO will we store this here?
+# class Notebook(models.Model):
+#     unit = models.ForeignKey(Unit,
+#                              on_delete=models.CASCADE,
+#                              related_name='exercise_nbs')
+#     filename = models.TextField(blank=True)
+#
+#
+# class GradeCells(models.Model):
+#     notebook = models.ForeignKey(Notebook,
+#                                  on_delete=models.CASCADE,
+#                                  related_name='grade_cells')
+#     grade_id = models.CharField(max_length=256)
+#     points = models.FloatField()
+#     checksum = models.CharField(max_length=256)
