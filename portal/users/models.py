@@ -1,3 +1,6 @@
+from cryptography.hazmat.primitives import serialization as crypto_serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.backends import default_backend as crypto_default_backend
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
@@ -10,6 +13,27 @@ class User(AbstractUser):
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
     student = models.BooleanField(default=True)
+    deploy_private_key = models.TextField(blank=True)
+    deploy_public_key = models.TextField(blank=True)
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
+
+    def save(self, *args, **kwargs):
+        if not self.deploy_private_key and not self.deploy_public_key:
+            key = rsa.generate_private_key(
+                backend=crypto_default_backend(),
+                public_exponent=65537,
+                key_size=2048
+            )
+            self.deploy_private_key = key.private_bytes(
+                crypto_serialization.Encoding.PEM,
+                crypto_serialization.PrivateFormat.PKCS8,
+                crypto_serialization.NoEncryption())
+            self.deploy_public_key = key.public_key().public_bytes(
+                crypto_serialization.Encoding.OpenSSH,
+                crypto_serialization.PublicFormat.OpenSSH
+            )
+
+        super().save(*args, **kwargs)
+

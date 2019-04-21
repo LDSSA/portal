@@ -1,10 +1,9 @@
-from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render
-from django.urls import reverse
-from django.views.generic import DetailView, ListView, RedirectView, UpdateView
+from django.views.generic import DetailView, ListView, UpdateView
+from rest_framework import viewsets
+from rest_framework import  mixins
 
-from portal.academy import models
+from portal.academy import models, serializers
 
 
 class UnitDetailView(LoginRequiredMixin, DetailView):
@@ -24,3 +23,19 @@ class UnitUpdateView(LoginRequiredMixin, UpdateView):
     model = models.Unit
     fields = ["code"]
 
+
+class GradingViewSet(mixins.CreateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.ListModelMixin,
+                     viewsets.GenericViewSet):
+    queryset = models.Grade.objects.all()
+    serializer_class = serializers.GradeSerializer
+
+
+class ChecksumViewSet(mixins.RetrieveModelMixin,
+                      mixins.UpdateModelMixin,
+                      mixins.ListModelMixin,
+                      viewsets.GenericViewSet):
+    queryset = models.Unit.objects.all()
+    serializer_class = serializers.ChecksumSerializer

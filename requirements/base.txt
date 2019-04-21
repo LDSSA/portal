@@ -4,6 +4,7 @@ Pillow==5.4.1  # https://github.com/python-pillow/Pillow
 rcssmin==1.0.6  # https://github.com/ndparker/rcssmin
 argon2-cffi==19.1.0  # https://github.com/hynek/argon2_cffi
 redis>=2.10.6, < 3  # pyup: < 3 # https://github.com/antirez/redis
+cryptography==2.6.1
 
 # Django
 # ------------------------------------------------------------------------------
