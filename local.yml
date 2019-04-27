@@ -15,6 +15,7 @@ services:
       - mailhog
     volumes:
       - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
     env_file:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
@@ -39,3 +40,8 @@ services:
     image: mailhog/mailhog:v1.0.0
     ports:
       - "8025:8025"
+
+networks:
+  default:
+    external:
+      name: portal

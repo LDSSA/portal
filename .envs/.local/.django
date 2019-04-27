@@ -7,3 +7,5 @@ IPYTHONDIR=/app/.ipython
 # ------------------------------------------------------------------------------
 REDIS_URL=redis://redis:6379/0
 
+GRADING_FCN=portal.academy.services.perform_grading_local
+BASE_URL=http://django:8000/

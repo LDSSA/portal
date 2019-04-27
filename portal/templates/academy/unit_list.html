@@ -10,39 +10,32 @@
   <table class="table table-hover">
     <thead>
       <tr>
-        <th scope="col"></th>
         <th scope="col">Code</th>
         <th scope="col">Name</th>
         <th scope="col">Due Date</th>
         <th scope="col">Instructor</th>
+        <th scope="col">Grade</th>
       </tr>
     </thead>
     <tbody>
-     {% for unit in object_list %}
-      <tr  class="clickable" data-toggle="collapse" id="row-{{ unit.code }}" data-target=".row-{{ unit.code }}">
-        <th scope="row"><i class="fas fa-plus"></i></th>
-        <td>
+     {% for unit, grade in object_list %}
+      <tr  id="row-{{ unit.code }}">
+        <th>
           <a href="{% url 'academy:unit-detail' unit.pk %}">
-            {{ unit.pk }}
+            {{ unit.specialization.code }}/{{ unit.pk }}
           </a>
-        </td>
+        </th>
         <td>{{ unit.name }}</td>
         <td>{{ unit.due_date }}</td>
         <td>{{ unit.instructor.name }}</td>
-      </tr>
-      <tr class="collapse row-{{ unit.code }}">
-        <td></td>
-        <td colspan=4>
-          <ul class="list-group">
-            {% for assignment in unit.assignments.all %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              {{ assignment.code }} {{ assignment.name }}
-              <span class="badge badge-primary badge-pill">0</span>
-            </li>
-            {% endfor %}
-          </ul>
+        <td>
+          {% if grade.status == 'graded' %}
+              {{ grade.score }}
+          {% else %}
+              {{ grade.status }}
+          {% endif %}
         </td>
-       </tr>
+      </tr>
       {% endfor %}
     </tbody>
   </table>

@@ -14,6 +14,14 @@ if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(ROOT_DIR.path('.env')))
 
+
+# GRADING
+GRADING_USERNAME = 'grader'
+GRADING_FCN = env.str(
+    'GRADING_FCN',
+    default='portal.academy.services.perform_grading_production')
+BASE_URL = env.str('BASE_URL')
+
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
@@ -265,6 +273,9 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAdminUser',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
     ),
 }
 # ------------------------------------------------------------------------------

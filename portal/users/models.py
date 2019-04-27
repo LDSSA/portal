@@ -29,11 +29,11 @@ class User(AbstractUser):
             self.deploy_private_key = key.private_bytes(
                 crypto_serialization.Encoding.PEM,
                 crypto_serialization.PrivateFormat.PKCS8,
-                crypto_serialization.NoEncryption())
+                crypto_serialization.NoEncryption()).decode('utf8')
+
             self.deploy_public_key = key.public_key().public_bytes(
                 crypto_serialization.Encoding.OpenSSH,
-                crypto_serialization.PublicFormat.OpenSSH
-            )
+                crypto_serialization.PublicFormat.OpenSSH).decode('utf8')
 
         super().save(*args, **kwargs)
 

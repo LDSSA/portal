@@ -8,6 +8,9 @@ class Specialization(models.Model):
     description = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return self.code
+
 
 class Unit(models.Model):
     specialization = models.ForeignKey(Specialization,
@@ -25,13 +28,15 @@ class Unit(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.specialization.code}/{self.code}"
+
 
 def notebook_path(instance, filename):
     return '{instance.student.username}_{instance.unit.code}.ipynb'
 
 
 class Grade(models.Model):
-    # TODO We want to store grade history?
     student = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.CASCADE,
                                 related_name='grades')
@@ -48,8 +53,13 @@ class Grade(models.Model):
         ('out-of-date', 'Out-of-date'),
         ('graded', 'Graded'),
     )
-    status = models.CharField(max_length=1024, choices=STATUSES)
+    status = models.CharField(
+        max_length=1024,
+        choices=STATUSES,
+        default='never-submitted')
     message = models.TextField(blank=True)
-
+    updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = ('student', 'unit')

@@ -15,7 +15,9 @@ RUN apk update \
   # https://docs.djangoproject.com/en/dev/ref/django-admin/#dbshell
   && apk add postgresql-client \
   # bash
-  && apk add bash
+  && apk add bash \
+  # docker
+  && apk add docker
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements

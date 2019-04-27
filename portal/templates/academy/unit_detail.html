@@ -1,14 +1,23 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ object.code }}{% endblock %}
+{% block title %}{{ unit.code }}{% endblock %}
 
 {% block content %}
   <div class="container">
-    <h2>{{ object.code }}: {{ object.name }}</h2>
+    <h2>{{ unit.code }}: {{ unit.name }}</h2>
 
-    <p>{{ object.description }}</p>
+    <p>{{ unit.description }}</p>
 
+    <p>Status: {{ grade.status }}</p>
+    {% if grade.status == "graded" %}
+      <p>Score: {{ grade.score }}</p>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="submit" value="Grade">
+    </form>
 
   </div>
 {% endblock content %}
