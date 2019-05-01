@@ -1,0 +1,20 @@
+pytz  # https://github.com/stub42/pytz
+python-slugify  # https://github.com/un33k/python-slugify
+Pillow  # https://github.com/python-pillow/Pillow
+rcssmin  # https://github.com/ndparker/rcssmin
+argon2-cffi  # https://github.com/hynek/argon2_cffi
+redis  # https://github.com/antirez/redis
+cryptography
+
+# Django
+# ------------------------------------------------------------------------------
+django  # https://www.djangoproject.com/
+django-environ  # https://github.com/joke2k/django-environ
+django-model-utils  # https://github.com/jazzband/django-model-utils
+django-allauth  # https://github.com/pennersr/django-allauth
+django-crispy-forms  # https://github.com/django-crispy-forms/django-crispy-forms
+django-compressor  # https://github.com/django-compressor/django-compressor
+django-redis  # https://github.com/niwinz/django-redis
+
+# Django REST Framework
+djangorestframework  # https://github.com/encode/django-rest-framework
