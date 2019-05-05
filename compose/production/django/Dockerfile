@@ -12,6 +12,7 @@ RUN apk update \
   && apk add libffi-dev py-cffi \
   # bash
   && apk add bash
+  # kubectl
 
 RUN addgroup -S django \
     && adduser -S -G django django
