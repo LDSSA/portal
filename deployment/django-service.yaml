@@ -5,8 +5,9 @@ metadata:
   labels:
     app: django
 spec:
+  type: ClusterIP
   ports:
-    - port: 80
+    - port: 5000
       protocol: TCP
   selector:
     app: django

@@ -11,6 +11,7 @@ spec:
       labels:
         app: django
         environment: production
+        force: force
     spec:
       restartPolicy: Always
       volumes:
@@ -18,7 +19,7 @@ spec:
           configMap:
             name: kubeconfig-configmap
       containers:
-        - image: hcastilho/django:8e87300
+        - image: hcastilho/django:test8
           name: django
           resources: {}
           args:
@@ -66,6 +67,11 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: DJANGO_AWS_STORAGE_BUCKET_NAME
+                  name: django-configmap
+            - name: DJANGO_AWS_S3_REGION_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: DJANGO_AWS_S3_REGION_NAME
                   name: django-configmap
             - name: DJANGO_SECRET_KEY
               valueFrom:
