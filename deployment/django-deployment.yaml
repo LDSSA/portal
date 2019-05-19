@@ -19,7 +19,7 @@ spec:
           configMap:
             name: kubeconfig-configmap
       containers:
-        - image: hcastilho/django:test8
+        - image: hcastilho/django:9558572
           name: django
           resources: {}
           args:
