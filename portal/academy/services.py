@@ -72,7 +72,6 @@ def perform_grading_production(user, unit):
         "--env", f"DEPLOY_KEY={key}",
         "--env", f"CODENAME={unit.code}",
         "--env", f"USERNAME={user.username}",
-        "--" "/bin/echo",
     ])
 
     if process.returncode != 0:
