@@ -13,6 +13,7 @@ RUN apk update \
   # bash
   && apk add bash
   # kubectl
+  && apk add kubernetes
 
 RUN addgroup -S django \
     && adduser -S -G django django
