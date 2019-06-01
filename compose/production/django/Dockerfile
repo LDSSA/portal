@@ -11,16 +11,19 @@ RUN apk update \
   # CFFI dependencies
   && apk add libffi-dev py-cffi \
   # bash
-  && apk add bash
-  # kubectl
-  && apk add kubernetes
+  && apk add bash \
+  && apk add curl
+
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+RUN chmod +x kubectl && mv kubectl /bin/kubectl
 
 RUN addgroup -S django \
     && adduser -S -G django django
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
-RUN pip install --no-cache-dir -r /requirements/production.txt \
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r /requirements/production.txt \
     && rm -rf /requirements
 
 COPY ./compose/production/django/entrypoint /entrypoint

@@ -46,7 +46,9 @@ def perform_grading_local(user, unit):
     )
     if process.returncode != 0:
         logger.critical('--------------------------------------------')
+        logger.critical(process.returncode)
         logger.critical(process.stderr)
+        logger.critical(process.stdout)
         logger.critical('--------------------------------------------')
         # raise RuntimeError("Error running grading")
         return
@@ -58,14 +60,15 @@ def perform_grading_local(user, unit):
 def perform_grading_production(user, unit):
     params = get_ldsa_params()
     key = user.deploy_private_key.replace('\n', '|')
-    id_ = random.choices(string.ascii_lowercase, k=8)
+    id_ = "".join(random.choices(string.ascii_lowercase, k=8))
 
-    process = subprocess.run([
-        "kubectl", "run", f"{unit.code}-{id_}",
+    logger.info("Starting grading of `%s` for `%s`", unit.code, user.username)
+    process = subprocess.Popen([
+        "kubectl", "run", f"{unit.code.lower()}-{id_}",
         "--restart=Never",
-        "--requests='cpu=100m,memory=512Mi'",
-        "--rm", "-i", "--tty",
-        "--image=ldssa/hello-python",
+        #"--requests='cpu=100m,memory=512Mi'",
+        "--rm", "-i",  # "--tty",
+        f"--image=ldssa/{unit.code.lower()}:{unit.image_tag}",
         "--env", f"LDSA_TOKEN={params['token']}",
         "--env", f"LDSA_GRADING_URL={params['grading_url']}",
         "--env", f"LDSA_CHECKSUM_URL={params['checksum_url']}",
@@ -75,10 +78,7 @@ def perform_grading_production(user, unit):
     ])
 
     if process.returncode != 0:
-        logger.critical('--------------------------------------------')
-        logger.critical(process.stderr)
-        logger.critical('--------------------------------------------')
-        # raise RuntimeError("Error running grading")
+        logger.critical("Error grading %s %s", user.username, unit.code)
         return
 
     else:
