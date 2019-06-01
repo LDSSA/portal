@@ -68,7 +68,7 @@ def perform_grading_production(user, unit):
         "--restart=Never",
         #"--requests='cpu=100m,memory=512Mi'",
         "--rm", "-i",  # "--tty",
-        f"--image=ldssa/{unit.code.lower()}:{unit.image_tag}",
+        f"--image=ldssa/{unit.code.lower()}",
         "--env", f"LDSA_TOKEN={params['token']}",
         "--env", f"LDSA_GRADING_URL={params['grading_url']}",
         "--env", f"LDSA_CHECKSUM_URL={params['checksum_url']}",
