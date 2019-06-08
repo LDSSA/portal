@@ -7,6 +7,11 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 
+class UserWhitelist(models.Model):
+    username = models.CharField(_("Username"), max_length=255, unique=True)
+    student = models.BooleanField(default=True)
+
+
 class User(AbstractUser):
 
     # First Name and Last Name do not cover name patterns

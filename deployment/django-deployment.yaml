@@ -19,7 +19,7 @@ spec:
           configMap:
             name: kubeconfig-configmap
       containers:
-        - image: hcastilho/django:899313a
+        - image: ldssa/django:latest
           name: django
           resources: {}
           args:
@@ -28,6 +28,7 @@ spec:
             - name: kubeconfig-volume
               mountPath: /home/django/.kube/
           env:
+            # DJANGO
             - name: BASE_URL
               valueFrom:
                 configMapKeyRef:
@@ -83,26 +84,53 @@ spec:
                 configMapKeyRef:
                   key: DJANGO_SECURE_SSL_REDIRECT
                   name: django-configmap
-            - name: DJANGO_SERVER_EMAIL
-              valueFrom:
-                configMapKeyRef:
-                  key: DJANGO_SERVER_EMAIL
-                  name: django-configmap
             - name: DJANGO_SETTINGS_MODULE
               valueFrom:
                 configMapKeyRef:
                   key: DJANGO_SETTINGS_MODULE
                   name: django-configmap
-            - name: MAILGUN_API_KEY
+            - name: DJANGO_LOGIN_URL
               valueFrom:
                 configMapKeyRef:
-                  key: MAILGUN_API_KEY
+                  key: DJANGO_LOGIN_URL
                   name: django-configmap
-            - name: MAILGUN_DOMAIN
+            # DJANGO EMAIL
+            - name: DJANGO_EMAIL_BACKEND
               valueFrom:
                 configMapKeyRef:
-                  key: MAILGUN_DOMAIN
+                  key: DJANGO_EMAIL_BACKEND
                   name: django-configmap
+            - name: DJANGO_EMAIL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: DJANGO_EMAIL_HOST
+                  name: django-configmap
+            - name: DJANGO_EMAIL_HOST_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: DJANGO_EMAIL_HOST_PASSWORD
+                  name: django-configmap
+            - name: DJANGO_EMAIL_HOST_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: DJANGO_EMAIL_HOST_USER
+                  name: django-configmap
+            - name: DJANGO_EMAIL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: DJANGO_EMAIL_PORT
+                  name: django-configmap
+            - name: DJANGO_EMAIL_USE_TLS
+              valueFrom:
+                configMapKeyRef:
+                  key: DJANGO_EMAIL_USE_TLS
+                  name: django-configmap
+            - name: DJANGO_DEFAULT_FROM_EMAIL
+              valueFrom:
+                configMapKeyRef:
+                  key: DJANGO_DEFAULT_FROM_EMAIL
+                  name: django-configmap
+            # POSTGRES
             - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
@@ -128,6 +156,7 @@ spec:
                 configMapKeyRef:
                   key: POSTGRES_USER
                   name: postgres-configmap
+            # OTHER
             - name: REDIS_URL
               valueFrom:
                 configMapKeyRef:

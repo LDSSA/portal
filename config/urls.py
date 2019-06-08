@@ -4,6 +4,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 from django.views import defaults as default_views
+from allauth.account import views
 
 urlpatterns = [
     # path("",
@@ -18,17 +19,32 @@ urlpatterns = [
          name="home"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
-    # User management
     path(
         "users/",
         include("portal.users.urls", namespace="users"),
     ),
-    path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
     path("academy/", include("academy.urls")),
 ] + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )
+
+# User management
+# TODO sorry, just needed this to work
+if settings.LOGIN_URL == 'account_login':
+    urlpatterns += [
+        path(r"^signup/$", views.signup, name="account_signup"),
+        path(r"^login/$", views.login, name="account_login"),
+    ]
+else:
+    urlpatterns += [
+        path("accounts/",
+             include("allauth.socialaccount.providers.github.urls")),
+    ]
+urlpatterns += [
+    path(r"accounts/email/", views.email, name="account_email"),
+]
+
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit

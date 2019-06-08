@@ -21,7 +21,7 @@ spec:
           persistentVolumeClaim:
             claimName: postgres-backups-persistentvolumeclaim
       containers:
-        - image: hcastilho/postgres
+        - image: ldssa/postgres
           name: postgres
           resources: {}
           volumeMounts:

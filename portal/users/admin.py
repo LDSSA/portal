@@ -3,8 +3,14 @@ from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
 
 from portal.users.forms import UserChangeForm, UserCreationForm
+from portal.users.models import UserWhitelist
 
 User = get_user_model()
+
+
+@admin.register(UserWhitelist)
+class UserAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(User)
