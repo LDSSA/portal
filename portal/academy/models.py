@@ -23,6 +23,7 @@ class Unit(models.Model):
     instructor = models.ForeignKey(settings.AUTH_USER_MODEL,
                                    on_delete=models.CASCADE)
     due_date = models.DateField(auto_now_add=True)
+    open = models.BooleanField(default=False)
 
     checksum = models.TextField(blank=True)
 
@@ -47,10 +48,10 @@ class Grade(models.Model):
     notebook = models.FileField(upload_to=notebook_path, null=True)
 
     STATUSES = (
-        ('never-submitted', 'Never Submitted'),
-        ('grading', 'Grading...'),
-        ('failed', 'Failed'),
-        ('out-of-date', 'Out-of-date'),
+        ('never-submitted', 'Unsubmitted'),
+        ('grading', "Grading"),
+        ('failed', "Grading failed"),
+        ('out-of-date', "Out-of-date"),
         ('graded', 'Graded'),
     )
     status = models.CharField(
@@ -63,3 +64,4 @@ class Grade(models.Model):
 
     class Meta:
         unique_together = ('student', 'unit')
+

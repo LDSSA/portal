@@ -4,15 +4,19 @@ from . import views
 
 app_name = "academy"
 
-
-
 urlpatterns = [
-    path(r'',
-         view=views.UnitListView.as_view(),
-         name='unit-list'),
-    path(r'<str:pk>/',
-         view=views.UnitDetailView.as_view(),
-         name='unit-detail'),
+    # Student Views
+    path(r'student/units/',
+         view=views.StudentUnitListView.as_view(),
+         name='student-unit-list'),
+    path(r'student/units/<str:pk>/',
+         view=views.StudentUnitDetailView.as_view(),
+         name='student-unit-detail'),
+
+    # Instructor Views
+    path(r'instructor/units/',
+         view=views.InstructorUserListView.as_view(),
+         name='instructor-user-list'),
 
     # API
     path(

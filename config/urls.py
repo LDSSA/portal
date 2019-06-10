@@ -1,10 +1,12 @@
 from django.conf import settings
-from django.urls import include, path, reverse_lazy
+from django.urls import include, path, reverse_lazy, re_path
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView, RedirectView
 from django.views import defaults as default_views
 from allauth.account import views
+
+from portal.academy.views import HomeRedirectView
 
 urlpatterns = [
     # path("",
@@ -15,7 +17,7 @@ urlpatterns = [
     #      name="about",
     # ),
     path("",
-         RedirectView.as_view(url=reverse_lazy('academy:unit-list')),
+         HomeRedirectView.as_view(),
          name="home"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
@@ -33,8 +35,21 @@ urlpatterns = [
 # TODO sorry, just needed this to work
 if settings.LOGIN_URL == 'account_login':
     urlpatterns += [
-        path(r"^signup/$", views.signup, name="account_signup"),
-        path(r"^login/$", views.login, name="account_login"),
+        path("signup/", views.signup, name="account_signup"),
+        path("login/", views.login, name="account_login"),
+        # password reset
+        path("password/reset/",
+             views.password_reset,
+             name="account_reset_password"),
+        path("password/reset/done/",
+             views.password_reset_done,
+             name="account_reset_password_done"),
+        re_path(r"^password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
+                views.password_reset_from_key,
+                name="account_reset_password_from_key"),
+        path("password/reset/key/done/",
+             views.password_reset_from_key_done,
+             name="account_reset_password_from_key_done"),
     ]
 else:
     urlpatterns += [

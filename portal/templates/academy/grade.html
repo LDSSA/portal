@@ -1,0 +1,17 @@
+{% if grade.status == "graded" %}
+  {% if grade.score > 15 %}
+    <span class="badge badge-success">{{ grade.score }}</span>
+  {% else %}
+    <span class="badge badge-danger">{{ grade.score }}</span>
+  {% endif %}
+{% else %}
+  <span class="badge
+      {% if grade.status == "never-submitted" %}badge-warning
+      {% elif grade.status == "grading" %}badge-info
+      {% elif grade.status == "failed" %}badge-danger
+      {% elif grade.status == "out-of-date" %}badge-danger
+      {% elif grade.status == "graded" %}badge-success
+      {% endif %}">
+    {{ grade.get_status_display }}
+  </span>
+{% endif %}

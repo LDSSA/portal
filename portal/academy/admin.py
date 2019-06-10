@@ -4,14 +4,29 @@ from portal.academy import models
 
 @admin.register(models.Specialization)
 class SpecializationAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('code', 'name')
 
 
 @admin.register(models.Unit)
 class UnitAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        'get_code',
+        'name',
+        'instructor',
+        'due_date',
+        'open',
+    )
+
+    def get_code(self, obj):
+        return str(obj)
+    get_code.short_description = 'Code'
 
 
 @admin.register(models.Grade)
 class GradeAdmin(admin.ModelAdmin):
-    pass
+    list_display = (
+        'unit',
+        'student',
+        'status',
+        'score',
+    )

@@ -1,11 +1,16 @@
 {% extends "base.html" %}
 {% load static %}
+{% load grade_tags %}
 
-{% block title %}Units{% endblock %}
+{% block title %}Learning Units{% endblock %}
 
 {% block content %}
 <div class="container">
-  <h2>Units</h2>
+  <div class="row mb-5 mt-5">
+    <div class="col">
+      <h1>Learning Units</h1>
+    </div>
+  </div>
 
   <table class="table table-hover">
     <thead>
@@ -21,7 +26,7 @@
      {% for unit, grade in object_list %}
       <tr  id="row-{{ unit.code }}">
         <th>
-          <a href="{% url 'academy:unit-detail' unit.pk %}">
+          <a href="{% url 'academy:student-unit-detail' unit.pk %}">
             {{ unit.specialization.code }}/{{ unit.pk }}
           </a>
         </th>
@@ -29,11 +34,7 @@
         <td>{{ unit.due_date }}</td>
         <td>{{ unit.instructor.name }}</td>
         <td>
-          {% if grade.status == 'graded' %}
-              {{ grade.score }}
-          {% else %}
-              {{ grade.status }}
-          {% endif %}
+          {% show_grade grade %}
         </td>
       </tr>
       {% endfor %}

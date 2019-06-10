@@ -1,20 +1,51 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
 from django.http import Http404
-from django.views.generic import DetailView, ListView, UpdateView
+from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework import generics
 from rest_framework.settings import import_from_string
 
-from portal.academy import models, serializers, services
+from portal.academy import models, serializers
 
 
-class UnitListView(LoginRequiredMixin, ListView):
+class InstructorMixin(AccessMixin):
+    """Verify that the current user is an instructor."""
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
 
+        if request.user.student:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class StudentMixin(AccessMixin):
+    """Verify that the current user is a student."""
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+
+        if not request.user.student:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class HomeRedirectView(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        if self.request.user.student:
+            self.pattern_name = 'academy:student-unit-list'
+
+        else:
+            self.pattern_name = 'academy:instructor-user-list'
+
+        return super().get_redirect_url(*args, **kwargs)
+
+
+class StudentUnitListView(StudentMixin, ListView):
     model = models.Unit
     queryset = models.Unit.objects.order_by('due_date')
-    slug_field = "unit"
-    slug_url_kwarg = "unit"
+    template_name = 'academy/student/unit_list.html'
 
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
@@ -29,8 +60,9 @@ class UnitListView(LoginRequiredMixin, ListView):
         return self.render_to_response(context)
 
 
-class UnitDetailView(LoginRequiredMixin, DetailView):
+class StudentUnitDetailView(StudentMixin, DetailView):
     model = models.Unit
+    template_name = 'academy/student/unit_detail.html'
 
     def get(self, request, *args, **kwargs):
         unit, grade = self.get_object()
@@ -58,10 +90,51 @@ class UnitDetailView(LoginRequiredMixin, DetailView):
         return self.get(request, *args, **kwargs)
 
 
-class UnitUpdateView(LoginRequiredMixin, UpdateView):
+class InstructorUserListView(InstructorMixin, ListView):
+    model = get_user_model()
+    queryset = get_user_model().objects.filter(student=True)
+    template_name = 'academy/instructor/user_list.html'
 
-    model = models.Unit
-    fields = ["code"]
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+
+        specializations = models.Specialization.objects.order_by('code')
+        spc_list = []
+        unit_list = []
+        max_score = 0
+        for spc in specializations:
+            qs = (models.Unit.objects
+                  .filter(specialization=spc)
+                  .order_by('due_date'))
+            spc_list.append(spc)
+            max_score += qs.count() * 20
+            if qs.exists():
+                unit_list += list(qs)
+            else:
+                unit_list += [None]
+
+        object_list = []
+        for user in self.object_list:
+            total_score = 0
+            user_data = {'user': user, 'grades': [], 'total_score': 0}
+            for unit in unit_list:
+                if unit is None:
+                    user_data['grades'].append(None)
+
+                else:
+                    grade, _ = models.Grade.objects.get_or_create(student=user,
+                                                                  unit=unit)
+                    if grade.status == 'graded':
+                        total_score += grade.score
+                    user_data['grades'].append(grade)
+            user_data['total_score'] = total_score
+            object_list.append(user_data)
+
+        context = self.get_context_data(object_list=object_list,
+                                        spc_list=spc_list,
+                                        unit_list=unit_list,
+                                        max_score=max_score)
+        return self.render_to_response(context)
 
 
 class GradingView(generics.RetrieveUpdateAPIView):
