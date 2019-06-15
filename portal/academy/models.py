@@ -1,9 +1,9 @@
 import random
 import string
-from datetime import timezone, datetime
 
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class Specialization(models.Model):
@@ -26,7 +26,7 @@ class Unit(models.Model):
     description = models.TextField(blank=True)
     instructor = models.ForeignKey(settings.AUTH_USER_MODEL,
                                    on_delete=models.CASCADE)
-    due_date = models.DateField(auto_now_add=True)
+    due_date = models.DateField(default=timezone.now)
     open = models.BooleanField(default=False)
 
     checksum = models.TextField(blank=True)
@@ -38,7 +38,7 @@ class Unit(models.Model):
 
 
 def notebook_path(instance, filename):
-    date = str(datetime.now(timezone.utc)).split(' ')[0]
+    date = str(timezone.now()).split(' ')[0]
     randstr = "".join(random.choices(string.ascii_lowercase, k=8))
     return (f'{instance.student.username}_{instance.unit.code}'
             f'_{date}_{randstr}.ipynb')
