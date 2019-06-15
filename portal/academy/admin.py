@@ -18,6 +18,7 @@ class UnitAdmin(admin.ModelAdmin):
     )
     fields = (
         'open',
+        'due_date',
         'specialization',
         'code',
         'name',
