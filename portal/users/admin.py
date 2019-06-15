@@ -9,8 +9,8 @@ User = get_user_model()
 
 
 @admin.register(UserWhitelist)
-class UserAdmin(admin.ModelAdmin):
-    pass
+class UserWhitelistAdmin(admin.ModelAdmin):
+    list_display = ['username', 'student']
 
 
 @admin.register(User)

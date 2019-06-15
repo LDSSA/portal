@@ -13,14 +13,14 @@
       <div class="col-md-auto">
         {% show_grade grade %}
       </div>
-      <div class="col-md-auto">
-        {% if unit.open %}
+      {% if unit.open %}
+        <div class="col-md-auto">
           <form method="post">
             {% csrf_token %}
             <input type="submit" class="btn btn-dark" value="Grade">
           </form>
-        {% endif %}
-      </div>
+        </div>
+      {% endif %}
 
     </div>
     <div class="row">

@@ -16,6 +16,15 @@ class UnitAdmin(admin.ModelAdmin):
         'due_date',
         'open',
     )
+    fields = (
+        'open',
+        'specialization',
+        'code',
+        'name',
+        'description',
+        'instructor'
+        'checksum',
+    )
 
     def get_code(self, obj):
         return str(obj)

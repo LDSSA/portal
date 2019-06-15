@@ -1,3 +1,7 @@
+import random
+import string
+from datetime import timezone, datetime
+
 from django.db import models
 from django.conf import settings
 
@@ -34,7 +38,10 @@ class Unit(models.Model):
 
 
 def notebook_path(instance, filename):
-    return '{instance.student.username}_{instance.unit.code}.ipynb'
+    date = str(datetime.now(timezone.utc)).split(' ')[0]
+    randstr = "".join(random.choices(string.ascii_lowercase, k=8))
+    return (f'{instance.student.username}_{instance.unit.code}'
+            f'_{date}_{randstr}.ipynb')
 
 
 class Grade(models.Model):
@@ -64,4 +71,3 @@ class Grade(models.Model):
 
     class Meta:
         unique_together = ('student', 'unit')
-

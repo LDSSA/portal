@@ -1,9 +1,13 @@
+{% load static %}
+
 {% if grade.status == "graded" %}
-  {% if grade.score > 15 %}
-    <span class="badge badge-success">{{ grade.score }}</span>
-  {% else %}
-    <span class="badge badge-danger">{{ grade.score }}</span>
-  {% endif %}
+  <a href="{% get_media_prefix %}{{ grade.notebook }}">
+    {% if grade.score > 15 %}
+      <span class="badge badge-success">{{ grade.score }}</span>
+    {% else %}
+      <span class="badge badge-danger">{{ grade.score }}</span>
+    {% endif %}
+  </a>
 {% else %}
   <span class="badge
       {% if grade.status == "never-submitted" %}badge-warning
