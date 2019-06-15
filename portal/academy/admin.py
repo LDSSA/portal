@@ -22,7 +22,7 @@ class UnitAdmin(admin.ModelAdmin):
         'code',
         'name',
         'description',
-        'instructor'
+        'instructor',
         'checksum',
     )
 
