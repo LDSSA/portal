@@ -114,7 +114,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'portal.users.apps.UsersAppConfig',
     'portal.academy.apps.AcademyConfig',
-    # 'portal.hackathon.apps.HackathonConfig',
+    'portal.hackathons.apps.HackathonsConfig',
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -402,6 +402,9 @@ ADMINS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
 
+# crispy forms
+# ------------------------------------------------------------------------------
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # django-allauth
 # ------------------------------------------------------------------------------
@@ -514,7 +517,6 @@ LOGGING = {
     'formatters': {
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s '
-                      '%(process)d %(thread)d '
                       '%(name)s.%(funcName)s/%(lineno)d %(message)s'
         },
     },

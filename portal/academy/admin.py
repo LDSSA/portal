@@ -26,6 +26,8 @@ class UnitAdmin(admin.ModelAdmin):
         'instructor',
         'checksum',
     )
+    search_fields = ['username', 'name', 'unit__code']
+    list_filter = ('specialization', 'open', 'instructor')
 
     def get_code(self, obj):
         return str(obj)
@@ -40,3 +42,5 @@ class GradeAdmin(admin.ModelAdmin):
         'status',
         'score',
     )
+    search_fields = ['username', 'name', 'unit__code']
+    list_filter = ('unit', 'student', 'status')

@@ -18,3 +18,9 @@ django-redis  # https://github.com/niwinz/django-redis
 
 # Django REST Framework
 djangorestframework  # https://github.com/encode/django-rest-framework
+
+# Hackathon metrics
+ml_metrics
+numpy
+pandas
+sklearn

@@ -27,6 +27,7 @@ urlpatterns = [
     ),
     # Your stuff: custom urls includes go here
     path("academy/", include("academy.urls")),
+    path("hackathons/", include("hackathons.urls")),
 ] + static(
     settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
 )

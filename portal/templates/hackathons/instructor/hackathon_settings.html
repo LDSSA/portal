@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ hackathon.code }}{% endblock %}
+
+{% block content %}
+<div class="row mb-5 mt-5">
+  <div class="col">
+    <h1>{{ hackathon.code }} Settings</h1>
+  </div>
+  <div class="col-md-auto">
+    <a href="{% url 'hackathons:instructor-hackathon-detail' hackathon.pk%}">
+      Attendance
+    </a>
+  </div>
+  <div class="col-md-auto">
+    <a href="{% url 'hackathons:leaderboard' hackathon.pk%}">
+      Leaderboard
+    </a>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-auto">
+    <div class="mb-4">
+      <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-success">Save</button>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+{% endblock content %}
+

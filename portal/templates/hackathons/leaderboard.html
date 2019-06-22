@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Learderboard{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row mb-5 mt-5">
+    <div class="col">
+      <h1>Leaderboard</h1>
+    </div>
+  </div>
+
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Logo</th>
+        <th scope="col">Name</th>
+        <th scope="col">Score</th>
+      </tr>
+    </thead>
+    <tbody>
+     {% for obj in teams %}
+      <tr>
+        <th>
+          <img src="{{ obj.logo }}" alt="{{ obj.name }}">
+        </th>
+        <td>{{ obj.name }}</td>
+        <td>{{ obj.score }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock content %}
+

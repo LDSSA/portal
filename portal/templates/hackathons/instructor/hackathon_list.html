@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% load grade_tags %}
+
+{% block title %}Hackathons{% endblock %}
+
+{% block content %}
+<div class="row mb-5 mt-5">
+  <div class="col">
+    <h1>Hackathons</h1>
+  </div>
+</div>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">Code</th>
+      <th scope="col">Name</th>
+      <th scope="col">Status</th>
+      <th scope="col">Due Date</th>
+      <th scope="col">Leaderboard</th>
+    </tr>
+  </thead>
+  <tbody>
+   {% for obj in object_list %}
+    <tr  id="row-{{ obj.code }}">
+      <th>
+        <a href="{% url 'hackathons:instructor-hackathon-detail' obj.pk %}">
+          {{ obj.pk }}
+        </a>
+      </th>
+      <td>{{ obj.name }}</td>
+      <td>{{ obj.get_status_display }}</td>
+      <td>{{ obj.due_date }}</td>
+      <td>
+        <a href="{% url 'hackathons:leaderboard' obj.pk%}">
+          Leaderboard
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock content %}
+
