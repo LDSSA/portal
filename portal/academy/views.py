@@ -85,6 +85,14 @@ class StudentUnitDetailView(StudentMixin, DetailView):
         if not unit.checksum:
             raise RuntimeError("Not checksum present for this unit")
 
+        # Clear grade
+        grade.status = 'sent'
+        grade.score = None
+        grade.notebook = None
+        grade.message = ''
+        grade.save()
+
+        # Send to grading
         grading_fcn = import_from_string(settings.GRADING_FCN, 'GRADING_FCN')
         grading_fcn(request.user, unit)
         return self.get(request, *args, **kwargs)

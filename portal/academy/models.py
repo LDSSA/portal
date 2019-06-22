@@ -56,6 +56,7 @@ class Grade(models.Model):
 
     STATUSES = (
         ('never-submitted', 'Unsubmitted'),
+        ('sent', "Sent"),
         ('grading', "Grading"),
         ('failed', "Grading failed"),
         ('out-of-date', "Out-of-date"),
