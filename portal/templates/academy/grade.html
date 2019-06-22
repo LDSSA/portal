@@ -11,11 +11,10 @@
 {% else %}
   <span class="badge
       {% if grade.status == "never-submitted" %}badge-warning
-      {% elif grade.status == "sent" %}badge-info
-      {% elif grade.status == "grading" %}badge-info
       {% elif grade.status == "failed" %}badge-danger
       {% elif grade.status == "out-of-date" %}badge-danger
       {% elif grade.status == "graded" %}badge-success
+      {% else %}badge-info
       {% endif %}">
     {{ grade.get_status_display }}
   </span>
