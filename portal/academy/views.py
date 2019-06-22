@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework import generics
 from rest_framework.settings import import_from_string
@@ -99,7 +99,8 @@ class StudentUnitDetailView(StudentMixin, DetailView):
         # Send to grading
         grading_fcn = import_from_string(settings.GRADING_FCN, 'GRADING_FCN')
         grading_fcn(request.user, unit)
-        return self.get(request, *args, **kwargs)
+
+        return HttpResponseRedirect(request.path_info)
 
 
 class InstructorUserListView(InstructorMixin, ListView):
