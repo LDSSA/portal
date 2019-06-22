@@ -9,6 +9,7 @@ from rest_framework.settings import import_from_string
 from portal.academy import models, serializers
 
 
+# noinspection PyUnresolvedReferences
 class InstructorMixin(AccessMixin):
     """Verify that the current user is an instructor."""
     def dispatch(self, request, *args, **kwargs):
@@ -20,6 +21,7 @@ class InstructorMixin(AccessMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
+# noinspection PyUnresolvedReferences
 class StudentMixin(AccessMixin):
     """Verify that the current user is a student."""
     def dispatch(self, request, *args, **kwargs):
@@ -47,6 +49,7 @@ class StudentUnitListView(StudentMixin, ListView):
     queryset = models.Unit.objects.order_by('due_date')
     template_name = 'academy/student/unit_list.html'
 
+    # noinspection PyAttributeOutsideInit
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         data = []
@@ -69,13 +72,14 @@ class StudentUnitDetailView(StudentMixin, DetailView):
         context = self.get_context_data(unit=unit, grade=grade)
         return self.render_to_response(context)
 
+    # noinspection PyAttributeOutsideInit
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset=queryset)
         unit = self.object
 
         grade, _ = models.Grade.objects.get_or_create(
             student=self.request.user,
-            unit=self.kwargs.get('pk'))
+            unit=unit)
 
         return unit, grade
 
@@ -103,6 +107,7 @@ class InstructorUserListView(InstructorMixin, ListView):
     queryset = get_user_model().objects.filter(student=True)
     template_name = 'academy/instructor/user_list.html'
 
+    # noinspection PyAttributeOutsideInit
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
 
