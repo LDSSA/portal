@@ -64,7 +64,7 @@ def perform_grading_production(user, unit):
 
     logger.info("Starting grading of `%s` for `%s`", unit.code, user.username)
     process = subprocess.Popen([
-        "kubectl", "run", f"{unit.code.lower()}-{user.username.lower}-{id_}",
+        "kubectl", "run", f"{unit.code.lower()}-{user.username.lower()}-{id_}",
         "--restart=Never",
         #"--requests='cpu=100m,memory=512Mi'",
         "--rm", "-i",  # "--tty",
