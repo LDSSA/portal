@@ -42,5 +42,10 @@ class GradeAdmin(admin.ModelAdmin):
         'status',
         'score',
     )
-    search_fields = ['username', 'name', 'unit__code']
-    list_filter = ('unit', 'student', 'status')
+    search_fields = ['unit__code', 'student__username', 'student__name', ]
+    list_filter = (
+        'student__student',
+        'status',
+        'unit',
+        'student',
+    )

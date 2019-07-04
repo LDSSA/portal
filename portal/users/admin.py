@@ -25,5 +25,5 @@ class UserAdmin(auth_admin.UserAdmin):
                                          "deploy_public_key")}),
                 ) + auth_admin.UserAdmin.fieldsets
     list_display = ["username", "student", "name", "is_superuser"]
-    search_fields = ["name"]
+    search_fields = ['username', 'name']
     list_filter = ('student', 'is_superuser', 'is_active', 'groups')

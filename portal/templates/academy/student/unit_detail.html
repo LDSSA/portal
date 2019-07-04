@@ -21,8 +21,17 @@
           </form>
         </div>
       {% endif %}
-
     </div>
+
+    {% if grade.status == "failed" %}
+    <div class="row">
+      <div class="mb-4">
+        <h5>Fail message:</h5>
+        <span>{{ grade.message }}</span>
+      </div>
+    </div>
+    {% endif %}
+
     <div class="row">
       <div class="col-md-auto">
         <div class="mb-4">
