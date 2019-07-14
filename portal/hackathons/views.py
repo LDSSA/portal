@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.views import generic
 from rest_framework import generics
@@ -249,3 +250,16 @@ class InstructorHackathonDetailView(InstructorMixin, generic.DetailView):
 class HackathonSetupView(generics.UpdateAPIView):
     queryset = models.Hackathon.objects.all()
     serializer_class = serializers.HackathonSerializer
+    lookup_url_kwarg = 'pk'
+    lookup_field = 'pk__iexact'
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_url_kwarg]}
+        obj = get_object_or_404(queryset, **filter_kwargs)
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj

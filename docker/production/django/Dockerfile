@@ -8,13 +8,13 @@ RUN apt-get update && apt-get install -y \
       python3-dev \
       libpq-dev \
       postgresql-client \
-      docker
+      docker \
+      curl
 
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 RUN chmod +x kubectl && mv kubectl /bin/kubectl
 
-RUN addgroup -S django \
-    && adduser -S -G django django
+RUN adduser --system django
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements

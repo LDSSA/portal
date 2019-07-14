@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y \
       python3-dev \
       libpq-dev \
       postgresql-client \
-      docker
+      docker \
+      curl
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements

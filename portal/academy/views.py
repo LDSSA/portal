@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
-from django.http import Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework import generics
 from rest_framework.settings import import_from_string
@@ -172,15 +173,16 @@ class GradingView(generics.RetrieveUpdateAPIView):
 class ChecksumView(generics.RetrieveUpdateAPIView):
     queryset = models.Unit.objects.all()
     serializer_class = serializers.ChecksumSerializer
+    lookup_url_kwarg = 'pk'
+    lookup_field = 'pk__iexact'
 
     def get_object(self):
-        try:
-            obj = super().get_object()
+        queryset = self.filter_queryset(self.get_queryset())
 
-        except Http404:
-            lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
-            uppercase = self.kwargs[lookup_url_kwarg].upper()
-            self.kwargs[lookup_url_kwarg] = uppercase
-            obj = super().get_object()
+        filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_url_kwarg]}
+        obj = get_object_or_404(queryset, **filter_kwargs)
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
 
         return obj
