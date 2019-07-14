@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% load static %}
+{% load grade_tags %}
+
+{% block title %}{{ object.code }} Attendance{% endblock %}
+
+{% block content %}
+<div class="row mb-5 mt-5">
+  <div class="col-md-auto">
+    <h1>{{ object.code }}: {{ object.get_status_display }}</h1>
+  </div>
+  <div class="col-md-auto">
+    <a href="{% url 'hackathons:instructor-hackathon-settings' hackathon.pk%}">
+        <img src="{% static "open-iconic/svg/cog.svg" %}" alt="cog">
+    </a>
+  </div>
+</div>
+
+<!-- Actions -->
+<div class="row">
+    <h3>Actions</h3>
+</div>
+<div class="row">
+  {% if object.status == "closed" %}
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="taking_attendance">
+          <button type="submit"
+                  class="btn btn-success">Open student attendance</button>
+        </form>
+      </div>
+    </div>
+  {% elif object.status == "taking_attendance" %}
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="attendance_closed">
+          <button type="submit"
+                  class="btn btn-success">Close student attendance</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="closed">
+          <button type="submit"
+                  class="btn btn-danger">Go back</button>
+        </form>
+      </div>
+    </div>
+  {% elif object.status == "attendance_closed" %}
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="marking_presences">
+          <button type="submit"
+                  class="btn btn-success"
+                  name="marking-presences">Start marking presence</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="taking_attendance">
+          <button type="submit"
+                  class="btn btn-danger">Go back</button>
+        </form>
+      </div>
+    </div>
+  {% elif object.status == "marking_presences" %}
+    <div class="col-md-auto">
+      <div class="mb-4">
+          <button type="submit"
+                  class="btn btn-success" form="theform">Presences Marked</button>
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="attendance_closed">
+          <button type="submit"
+                  class="btn btn-danger">Go back</button>
+        </form>
+      </div>
+    </div>
+  {% elif object.status == "generating_teams" %}
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="ready">
+          <button type="submit"
+                  class="btn btn-success">Ready</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="generating_teams">
+          <button type="submit"
+                  class="btn btn-info">Re-Generate</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="marking_presences">
+          <button type="submit"
+                  class="btn btn-danger">Go back</button>
+        </form>
+      </div>
+    </div>
+  {% elif object.status == "ready" %}
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="submissions_open">
+          <button type="submit"
+                  class="btn btn-success">Open for submissions</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="generating_teams">
+          <button type="submit"
+                  class="btn btn-danger">Go back</button>
+        </form>
+      </div>
+    </div>
+  {% elif object.status == "submissions_open" %}
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="submissions_closed">
+          <button type="submit"
+                  class="btn btn-success">Close submissions</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="ready">
+          <button type="submit"
+                  class="btn btn-danger">Go back</button>
+        </form>
+      </div>
+    </div>
+  {% elif object.status == "submissions_closed" %}
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="complete">
+          <button type="submit"
+                  class="btn btn-success">Finished</button>
+        </form>
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="submissions_open">
+          <button type="submit"
+                  class="btn btn-danger">Go back</button>
+        </form>
+      </div>
+    </div>
+  {% elif object.status == "complete" %}
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="submissions_closed">
+          <button type="submit"
+                  class="btn btn-danger">Go back</button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Student list -->
+<div class="row mb-4">
+  <form id="theform" method="POST">
+    <input type="hidden" name="status" value="generating_teams">
+    {% csrf_token %}
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">Team</th>
+          <th scope="col">Username</th>
+          <th scope="col">Name</th>
+          <th scope="col">Will Attend</th>
+          <th scope="col">Remote</th>
+          <th scope="col">Present</th>
+        </tr>
+      </thead>
+      <tbody>
+       {% for item in object_list %}
+        <tr>
+          <td>{{ item.team.hackathon_team_id }}</td>
+          <td>{{ item.student.username }}</td>
+          <td>{{ item.student.name }}</td>
+          <td>{{ item.attendance.will_attend }}</td>
+          <td>{{ item.attendance.remote }}</td>
+          <td>
+            {% if object.status == "marking_presences" %}
+              <div class="form-check">
+                <input type="checkbox"
+                       class="form-check-input"
+                       name="{{ item.student.username }}"
+                       {% if item.attendance.present %}checked{% endif %}>
+{#                         {% if not item.attendance.will_attend %}disabled{% endif %}>#}
+              </div>
+              {% else %}
+                {{ item.attendance.present }}
+              {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </form>
+</div>
+{% endblock content %}
+

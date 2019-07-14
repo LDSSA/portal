@@ -1,6 +1,9 @@
 import logging
 import random
 from itertools import zip_longest
+from io import StringIO
+
+from django.contrib.contenttypes.models import ContentType
 
 from . import models
 
@@ -30,10 +33,18 @@ def create_teams(hackathon, present_teams, remote_teams):
 
 
 def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
-    present = models.Attendance.objects.filter(present=True, remote=False)
+    logger.info("Generating Teams Size: %s Max: %s Max teams: %s",
+                team_size, max_team_size, max_teams)
+    present = models.Attendance.objects.filter(hackathon=hackathon,
+                                               present=True,
+                                               remote=False)
     present = [p.student for p in present]
-    remote = models.Attendance.objects.filter(present=True, remote=True)
+    remote = models.Attendance.objects.filter(hackathon=hackathon,
+                                              present=True,
+                                              remote=True)
     remote = [p.student for p in remote]
+    logger.debug("Present %s", present)
+    logger.debug("Remote %s", remote)
 
     for i in range(team_size, max_team_size + 1):
         present_teams = get_groups(present, team_size)
@@ -70,3 +81,50 @@ def get_groups(items, size, max_diff=1):
     logger.debug(groups)
 
     return groups
+
+
+def submission(hackathon, user, file):
+    if user.student:
+        if hackathon.status not in ('submissions_open', 'complete'):
+            raise RuntimeError("Hackathon closed")  # TODO
+
+        # Replace students with team
+        if hackathon.status == 'submissions_open':
+            team = models.Team.objects.filter(students=user).first()
+            if team:
+                user = team
+
+        # Check submission limit
+        num = models.Submission.objects.filter(
+            content_type__app_label=user._meta.app_label,
+            content_type__model=user._meta.model_name,
+            object_id=user.id).count()
+        if num >= hackathon.max_submissions:
+            raise RuntimeError("Max submissions")  # TODO
+
+    # Load hackathon functions
+    glob = {}
+    script = hackathon.script_file.read().decode()
+    exec(script, glob)
+
+    # Load true data
+    y_true = StringIO(hackathon.data_file.read().decode())
+    y_true = glob['load'](y_true)
+
+    # Load prediction data
+    y_pred = glob['load'](file)
+
+    is_valid = glob['validate'](y_true, y_pred)
+    if not is_valid:
+        raise RuntimeError('Invalid input')
+
+    # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
+    score = glob['score'](y_pred, y_true)
+    models.Submission.objects.create(
+        hackathon=hackathon,
+        content_type=ContentType.objects.get_for_model(user._meta.model),
+        object_id=user.id,
+        score=score,
+    )
+
+    return score

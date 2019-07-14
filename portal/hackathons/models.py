@@ -1,8 +1,19 @@
+import random
+import string
 import uuid
 
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+
+
+def random_path(instance, filename):
+    date = str(timezone.now()).split(' ')[0]
+    randstr = "".join(random.choices(string.ascii_lowercase, k=12))
+    return (f'{instance.code}_{filename}'
+            f'_{date}_{randstr}')
 
 
 class Hackathon(models.Model):
@@ -32,6 +43,8 @@ class Hackathon(models.Model):
                    'complete')
     can_update_team_data = ('ready',
                             'submissions_open')
+    can_submit = ('submissions_open', 'complete')
+    can_submit_instructor = ('closed', 'submissions_open', 'complete')
 
     status = models.CharField(max_length=255,
                               choices=status_choices,
@@ -42,8 +55,9 @@ class Hackathon(models.Model):
     max_team_size = models.IntegerField(default=6)
     max_teams = models.IntegerField(default=13)
 
-    scoring_fcn = models.TextField(blank=True)
-    y_true = models.TextField(blank=True)
+    script_file = models.FileField(upload_to=random_path,
+                                   null=True, blank=True)
+    data_file = models.FileField(upload_to=random_path, null=True, blank=True)
     descending = models.BooleanField(blank=True)
 
 
@@ -65,11 +79,19 @@ class Team(models.Model):
                                   related_name='teams')
     hackathon_team_id = models.IntegerField(default=0)
     remote = models.BooleanField(default=False)
-    token = models.UUIDField(default=uuid.uuid4, editable=False)
     students = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                       related_name='hackathon_teams')
     name = models.TextField(blank=True)
     logo = models.TextField(blank=True)
 
-    submissions = models.IntegerField(default=0)
+
+class Submission(models.Model):
+    hackathon = models.ForeignKey(Hackathon,
+                                  on_delete=models.CASCADE,
+                                  related_name='submissions')
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
     score = models.FloatField(default=0.)
+    created = models.DateTimeField(auto_now_add=True)

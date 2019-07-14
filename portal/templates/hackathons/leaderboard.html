@@ -20,14 +20,14 @@
       </tr>
     </thead>
     <tbody>
-     {% for obj in teams %}
-      <tr>
-        <th>
-          <img src="{{ obj.logo }}" alt="{{ obj.name }}">
-        </th>
-        <td>{{ obj.name }}</td>
-        <td>{{ obj.score }}</td>
-      </tr>
+     {% for obj, submission in submissions.items %}
+       <tr>
+         <th>
+           <img src="{{ obj.logo }}" alt="{{ obj.name }}">
+         </th>
+         <td>{{ obj.name }}</td>
+         <td>{{ submission.score }}</td>
+       </tr>
       {% endfor %}
     </tbody>
   </table>

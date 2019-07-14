@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
+from portal.hackathons import models
 
-class SubmissionSerializer(serializers.Serializer):
-    token = serializers.UUIDField()
-    data = serializers.JSONField()
+
+class HackathonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Hackathon
+        fields = ['script_file', 'data_file']

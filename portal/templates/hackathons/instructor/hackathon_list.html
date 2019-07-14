@@ -19,6 +19,7 @@
       <th scope="col">Status</th>
       <th scope="col">Due Date</th>
       <th scope="col">Leaderboard</th>
+      <th scope="col">Admin</th>
     </tr>
   </thead>
   <tbody>
@@ -35,6 +36,11 @@
       <td>
         <a href="{% url 'hackathons:leaderboard' obj.pk%}">
           Leaderboard
+        </a>
+      </td>
+      <td>
+        <a href="{% url 'hackathons:instructor-hackathon-admin' obj.pk %}">
+          {{ obj.pk }}
         </a>
       </td>
     </tr>

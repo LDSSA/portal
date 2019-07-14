@@ -1,18 +1,14 @@
-FROM python:3.6-alpine
+FROM python:3.7-slim-buster
 
 ENV PYTHONUNBUFFERED 1
 
-RUN apk update \
-  # psycopg2 dependencies
-  && apk add --virtual build-deps gcc python3-dev musl-dev \
-  && apk add postgresql-dev \
-  # Pillow dependencies
-  && apk add jpeg-dev zlib-dev freetype-dev lcms2-dev openjpeg-dev tiff-dev tk-dev tcl-dev \
-  # CFFI dependencies
-  && apk add libffi-dev py-cffi \
-  # bash
-  && apk add bash \
-  && apk add curl
+RUN apt-get update && apt-get install -y \
+      build-essential \
+      gcc \
+      python3-dev \
+      libpq-dev \
+      postgresql-client \
+      docker
 
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 RUN chmod +x kubectl && mv kubectl /bin/kubectl

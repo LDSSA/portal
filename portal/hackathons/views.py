@@ -1,63 +1,19 @@
 import logging
-import json
 
+from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views import generic
-from rest_framework.decorators import api_view
-from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
+from rest_framework import generics
 
 from portal.academy.views import StudentMixin, InstructorMixin
 from portal.hackathons import models, serializers, forms, services
 
 
 logger = logging.getLogger(__name__)
-
-
-# noinspection PyUnusedLocal
-@api_view(http_method_names=['POST'])
-def submission(request, *args, **kwargs):
-    code = kwargs['code']
-    serializer = serializers.SubmissionSerializer(
-        data=request.data,
-        context={'request': request})
-    serializer.is_valid(raise_exception=True)
-
-    token = serializer.validated_data['token']
-    team = models.Team.objects.get(hackathon__code=code, token=token)
-
-    if team.hackathon.open:
-        if not team.hackathon.complete:
-            if team.submissions >= team.hackathon.max_submissions:
-                raise ValidationError({
-                    'non_field_errors': ['Submission limit reached.']})
-    else:
-        raise ValidationError({
-            'non_field_errors': ['Hackathon not open.']})
-
-    y_pred = serializer.validated_data['data']
-    y_true = json.loads(team.hackathon.y_true)
-
-    exec(team.hackathon.scoring_fcn)
-    # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
-    score = score(y_pred, y_true)
-
-    if score is None:
-        raise RuntimeError("Unexpected error")
-
-    if team.hackathon.descending:
-        if score > team.score:
-            team.score = score
-    else:
-        if score < team.score:
-            team.score = score
-
-    team.submissions += 1
-    team.save()
-
-    return Response({'score': score})
 
 
 # noinspection PyAttributeOutsideInit
@@ -69,11 +25,15 @@ class LeaderboardView(LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
 
+        submissions = {}
         ordering = '-' if self.object.descending else ''
-        teams = (models.Team.objects.filter(hackathon=self.object)
-                 .order_by(ordering + 'score'))
+        for submission in (
+                models.Submission.objects.order_by(ordering + 'score')):
+            if submission.content_object not in submissions:
+                submissions[submission.content_object] = submission
+
         context = self.get_context_data(object=self.object,
-                                        teams=teams)
+                                        submissions=submissions)
 
         return self.render_to_response(context)
 
@@ -114,6 +74,7 @@ class StudentHackathonDetailView(StudentMixin, generic.DetailView):
             team=team,
             attendance_form=forms.StudentAttendanceForm(instance=attendance),
             team_form=forms.TeamForm(instance=team),
+            submit_form=forms.SubmitForm(),
         )
         return self.render_to_response(context)
 
@@ -131,6 +92,19 @@ class StudentHackathonDetailView(StudentMixin, generic.DetailView):
                                        instance=team)
             if team_form.is_valid():
                 team_form.save()
+
+        elif 'submit' in request.POST:
+            try:
+                score = services.submission(hackathon,
+                                            request.user,
+                                            request.FILES['data'])
+            except Exception as exc:
+                messages.add_message(request, messages.ERROR, str(exc))
+
+            else:
+                messages.add_message(request,
+                                     messages.SUCCESS,
+                                     "Score: %s" % score)
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -152,56 +126,59 @@ class InstructorHackathonSettingsView(InstructorMixin, generic.UpdateView):
     form_class = forms.InstructorHackathonForm
 
     def get_success_url(self):
-        return reverse('hackathons:instructor-hackathon-detail',
+        return reverse('hackathons:instructor-hackathon-settings',
                        args=(self.object.pk, ))
 
 
 # noinspection PyAttributeOutsideInit,PyUnusedLocal
-class InstructorHackathonDetailView(InstructorMixin, generic.DetailView):
+class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by('code')
-    template_name = 'hackathons/instructor/hackathon_detail.html'
+    template_name = 'hackathons/instructor/hackathon_admin.html'
 
     def get_object_list(self):
-
-        teams = (models.Team.objects.filter(hackathon=self.object)
-                 .order_by('hackathon_team_id'))
-        teams_exist = teams.exists()
         object_list = []
-        if teams_exist:
-            for team in teams:
-                for student in team.students.all():
-                    object_list.append({
-                        'student': student,
-                        'team': team,
-                        'attendance': student.attendance.filter(
-                            hackathon=self.object)[0],
-                    })
+        attendance = (models.Attendance.objects
+                      .filter(hackathon=self.object)
+                      .order_by(
+                          'student__hackathon_teams__hackathon_team_id',
+                          'present'))
+        for att in attendance:
+            try:
+                team = att.student.hackathon_teams.get(
+                    hackathon=att.hackathon)
+            except ObjectDoesNotExist:
+                team = None
 
-        else:
-            attendance = models.Attendance.objects.filter(
-                hackathon=self.object)
-            for att in attendance:
-                object_list.append({'student': att.student,
-                                    'attendance': att})
-
-        return object_list, teams_exist
+            object_list.append({
+                'student': att.student,
+                'team': team,
+                'attendance': att})
+        return object_list
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        object_list, teams_exist = self.get_object_list()
+        object_list = self.get_object_list()
         context = self.get_context_data(object=self.object,
-                                        object_list=object_list,
-                                        teams_exist=teams_exist)
+                                        object_list=object_list)
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        object_list, teams_exist = self.get_object_list()
+        object_list = self.get_object_list()
 
-        # Instructor marking students as present/not present
-        if 'attendance' in request.POST:
+        new_status = request.POST.get('status')
+        cur_status = self.object.status
+        logger.debug("new_status: %s cur_status: %s",
+                     new_status, cur_status)
+
+        self.object.status = new_status
+        self.object.save()
+
+        if (cur_status == 'marking_presences'
+                and new_status == 'generating_teams'):
             for item in object_list:
+                logger.info(request.POST)
                 logger.info(item['student'].username)
                 logger.info(item['student'].username in request.POST)
                 if item['student'].username in request.POST:
@@ -210,23 +187,65 @@ class InstructorHackathonDetailView(InstructorMixin, generic.DetailView):
                     item['attendance'].present = False
                 item['attendance'].save()
 
+        if new_status == 'generating_teams':
+            if cur_status in ('marking_presences', 'generating_teams'):
+                self.object.teams.all().delete()
+                services.generate_teams(self.object,
+                                        self.object.team_size,
+                                        self.object.max_team_size,
+                                        self.object.max_teams)
+
+        elif new_status == 'taking_attendance':
+            for user in get_user_model().objects.filter(student=True):
+                attendance, _ = models.Attendance.objects.get_or_create(
+                    student=user,
+                    hackathon=self.object)
+
+            models.Submission.objects.filter(hackathon=self.object).delete()
+
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('hackathons:instructor-hackathon-admin',
+                       args=(self.object.pk, ))
+
+
+# noinspection PyUnusedLocal
+class InstructorHackathonDetailView(InstructorMixin, generic.DetailView):
+    model = models.Hackathon
+    queryset = models.Hackathon.objects.order_by('code')
+    template_name = 'hackathons/instructor/hackathon_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(
+            hackathon=self.object,
+            submit_form=forms.SubmitForm(),
+        )
+        return self.render_to_response(context)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        try:
+            score = services.submission(self.object,
+                                        request.user,
+                                        request.FILES['data'])
+        except Exception as exc:
+            messages.add_message(request, messages.ERROR, str(exc))
+
         else:
-            new_status = request.POST.get('status')
-            cur_status = self.object.status
-
-            self.object.status = new_status
-            self.object.save()
-
-            if new_status == 'generating_teams':
-                if cur_status in ('marking_presences', 'generating_teams'):
-                    self.object.teams.all().delete()
-                    services.generate_teams(self.object,
-                                            self.object.team_size,
-                                            self.object.max_team_size,
-                                            self.object.max_teams)
+            messages.add_message(request,
+                                 messages.SUCCESS,
+                                 "Score: %s" % score)
 
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
         return reverse('hackathons:instructor-hackathon-detail',
                        args=(self.object.pk, ))
+
+
+class HackathonSetupView(generics.UpdateAPIView):
+    queryset = models.Hackathon.objects.all()
+    serializer_class = serializers.HackathonSerializer

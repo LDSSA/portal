@@ -23,4 +23,4 @@ djangorestframework  # https://github.com/encode/django-rest-framework
 ml_metrics
 numpy
 pandas
-sklearn
+scikit-learn

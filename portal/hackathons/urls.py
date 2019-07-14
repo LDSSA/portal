@@ -11,11 +11,9 @@ urlpatterns = [
          name='leaderboard'),
 
     # API
-    path(
-        r'api/<str:code>/submit/',
-        views.submission,
-        name='student-submit',
-    ),
+    path(r'api/setup/<str:pk>/',
+         view=views.HackathonSetupView.as_view(),
+         name='hackathon-setup'),
 
     # Student Views
     path(r'student/hackathons/',
@@ -35,5 +33,8 @@ urlpatterns = [
     path(r'instructor/hackathons/<str:pk>/',
          view=views.InstructorHackathonDetailView.as_view(),
          name='instructor-hackathon-detail'),
+    path(r'instructor/hackathons/<str:pk>/admin/',
+         view=views.InstructorHackathonAdminView.as_view(),
+         name='instructor-hackathon-admin'),
 
 ]

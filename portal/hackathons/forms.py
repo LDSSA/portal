@@ -32,6 +32,13 @@ class TeamForm(forms.ModelForm):
         fields = ['name', 'logo']
 
 
+class SubmitForm(forms.Form):
+    data = forms.FileField()
+
+    class Meta:
+        fields = ['data']
+
+
 class InstructorHackathonForm(forms.ModelForm):
     class Meta:
         model = models.Hackathon
@@ -42,8 +49,8 @@ class InstructorHackathonForm(forms.ModelForm):
             'max_team_size',
             'max_teams',
             'descending',
-            'scoring_fcn',
-            'y_true',
+            'script_file',
+            'data_file',
         ]
 
     # def clean_teams_closed(self):

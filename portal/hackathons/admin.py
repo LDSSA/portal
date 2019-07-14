@@ -15,9 +15,9 @@ class HackathonAdmin(admin.ModelAdmin):
         'team_size',
         'max_team_size',
         'max_teams',
-        'y_true',
-        'scoring_fcn',
-        'descending'
+        'descending',
+        'script_file',
+        'data_file',
     )
 
     def save_model(self, request, obj, form, change):
@@ -44,4 +44,16 @@ class AttendanceAdmin(admin.ModelAdmin):
         'remote',
     )
     list_filter = ('hackathon', 'will_attend', 'remote')
+
+
+@admin.register(models.Submission)
+class SubmissionAdmin(admin.ModelAdmin):
+    list_display = ('hackathon', 'content_object', 'score', 'created')
+    fields = (
+        'hackathon',
+        'content_object',
+        'score',
+        'created',
+    )
+    list_filter = ('hackathon', )
 

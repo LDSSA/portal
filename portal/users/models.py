@@ -17,6 +17,7 @@ class User(AbstractUser):
     # First Name and Last Name do not cover name patterns
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
+    logo = models.TextField(blank=True)
     student = models.BooleanField(default=True)
     deploy_private_key = models.TextField(blank=True)
     deploy_public_key = models.TextField(blank=True)

@@ -446,7 +446,6 @@ if COMPRESS_ENABLED:
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -532,5 +531,10 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',
         },
+    },
+    'parso': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+        'propagate': False,
     },
 }
