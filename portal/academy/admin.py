@@ -26,7 +26,7 @@ class UnitAdmin(admin.ModelAdmin):
         'instructor',
         'checksum',
     )
-    search_fields = ['username', 'name', 'unit__code']
+    search_fields = ['instructor__username', 'name', 'unit__code']
     list_filter = ('specialization', 'open', 'instructor')
 
     def get_code(self, obj):
