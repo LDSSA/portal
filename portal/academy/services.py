@@ -77,9 +77,5 @@ def perform_grading_production(user, unit):
         "--env", f"USERNAME={user.username}",
     ])
 
-    if process.returncode != 0:
-        logger.critical("Error grading %s %s", user.username, unit.code)
-        return
-
-    else:
-        logger.info("Graded %s %s", user.username, unit.code)
+    logger.info("Graded %s %s", user.username, unit.code)
+    logger.info(process.returncode)
