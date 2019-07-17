@@ -2,7 +2,7 @@
 
 {% if grade.status == "graded" %}
   <a href="{% get_media_prefix %}{{ grade.notebook }}">
-    {% if grade.score > 16 %}
+    {% if grade.score >= 16 %}
       <span class="badge badge-success">{{ grade.score }}</span>
     {% else %}
       <span class="badge badge-danger">{{ grade.score }}</span>
