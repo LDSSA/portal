@@ -27,9 +27,11 @@ class LeaderboardView(LoginRequiredMixin, generic.DetailView):
         self.object = self.get_object()
 
         submissions = {}
+        # If scores are to be descending (higher is top score)
         ordering = '-' if self.object.descending else ''
-        for submission in (
-                models.Submission.objects.order_by(ordering + 'score')):
+        for submission in (models.Submission.objects
+                           .filter(hackathon=self.object)
+                           .order_by(ordering + 'score', 'created')):
             if submission.content_object not in submissions:
                 submissions[submission.content_object] = submission
 

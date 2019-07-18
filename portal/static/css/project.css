@@ -4,6 +4,10 @@
   height: 100px;
 }
 
+table img {
+  max-height: 200px;
+}
+
 .alert-debug {
   color: black;
   background-color: white;
