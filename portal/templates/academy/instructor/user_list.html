@@ -30,8 +30,7 @@
       <tbody>
       {% for obj in object_list %}
         <tr>
-          <th>{% if obj.user.name %}{{ obj.user.name }}
-          {% else %}{{ obj.user.username }}{% endif %}</th>
+          <th>{{ obj.user.username }}</th>
           <td>{{ obj.total_score }}&#47;{{ max_score }}</td>
           {% for grade in obj.grades %}
           <td>{% show_grade grade %}</td>
