@@ -26,7 +26,7 @@
            <img src="{{ obj.logo }}" alt="{{ obj.name }}">
          </th>
          <td>{{ obj.name }}</td>
-         <td>{{ submission.score }}</td>
+         <td>{{ submission.score|floatformat:3 }}</td>
        </tr>
       {% endfor %}
     </tbody>
