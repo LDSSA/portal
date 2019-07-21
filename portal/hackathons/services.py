@@ -119,7 +119,7 @@ def submission(hackathon, user, file):
         raise RuntimeError('Invalid input')
 
     # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
-    score = glob['score'](y_pred, y_true)
+    score = glob['score'](y_true, y_pred)
     models.Submission.objects.create(
         hackathon=hackathon,
         content_type=ContentType.objects.get_for_model(user._meta.model),
