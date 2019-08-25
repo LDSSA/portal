@@ -90,7 +90,8 @@ def submission(hackathon, user, file):
 
         # Replace students with team
         if hackathon.status == 'submissions_open':
-            team = models.Team.objects.filter(students=user).first()
+            team = models.Team.objects.filter(students=user,
+                                              hackathon=hackathon).first()
             if team:
                 user = team
 
