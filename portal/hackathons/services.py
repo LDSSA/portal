@@ -95,13 +95,14 @@ def submission(hackathon, user, file):
             if team:
                 user = team
 
-        # Check submission limit
-        num = models.Submission.objects.filter(
-            content_type__app_label=user._meta.app_label,
-            content_type__model=user._meta.model_name,
-            object_id=user.id).count()
-        if num >= hackathon.max_submissions:
-            raise RuntimeError("Max submissions")  # TODO
+                # Check submission limit
+                num = models.Submission.objects.filter(
+                    hackathon=hackathon,
+                    content_type__app_label=user._meta.app_label,
+                    content_type__model=user._meta.model_name,
+                    object_id=user.id).count()
+                if num >= hackathon.max_submissions:
+                    raise RuntimeError("Max submissions")  # TODO
 
     # Load hackathon functions
     glob = {}
