@@ -32,7 +32,7 @@
         </th>
         <td>{{ unit.name }}</td>
         <td>{{ unit.due_date }}</td>
-        <td>{{ unit.instructor.name }}</td>
+        <td>{{ unit.instructor.name |default:unit.instructor.username}}</td>
         <td>
           {% show_grade grade %}
         </td>
