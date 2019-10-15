@@ -9,4 +9,4 @@ spec:
     - port: 6379
       protocol: TCP
   selector:
-    app: postgres
+    app: redis
