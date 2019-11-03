@@ -123,7 +123,7 @@ class InstructorUserListView(InstructorMixin, ListView):
         # Validate query params
         validator = serializers.InstructorsViewFiltersSerializer(data=self.request.GET)
         if not validator.is_valid():
-            msg = " ".join([f"Filter '{k}': {v[0].lower()}" for k,v in validator.errors.items()])
+            msg = " ".join([f"Filter '{k}': {v[0].lower()}" for k, v in validator.errors.items()])
             messages.error(request, _(msg))
             return redirect('academy:instructor-user-list')
         query_params = validator.validated_data
@@ -132,6 +132,8 @@ class InstructorUserListView(InstructorMixin, ListView):
         specializations = models.Specialization.objects
 
         grade_status = query_params.get("grade_status")
+        score__gte = query_params.get("score__gte")
+        score__lte = query_params.get("score__lte")
         spc_code = query_params.get("spc_code")
         if spc_code:
             specializations = specializations.filter(code=spc_code)
@@ -168,6 +170,10 @@ class InstructorUserListView(InstructorMixin, ListView):
                     if grade.status == 'graded':
                         total_score += grade.score
                     user_data['grades'].append(grade)
+            if score__gte and total_score < score__gte:
+                continue
+            if score__lte and total_score > score__lte:
+                continue
             user_data['total_score'] = total_score
             object_list.append(user_data)
 
