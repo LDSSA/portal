@@ -10,7 +10,7 @@
     {% endif %}
   </a>
 {% else %}
-{% if not request.user.student %}<a href="{% add_query_param 'grade_status' grade.status %}">{% endif %}
+{% if not user.student %}<a href="{% add_query_param 'grade_status' grade.status %}">{% endif %}
   <span class="badge
       {% if grade.status == "never-submitted" %}badge-warning
       {% elif grade.status == "failed" %}badge-danger
@@ -20,5 +20,5 @@
       {% endif %}">
     {{ grade.get_status_display }}
   </span>
-  {% if not request.user.student %}</a>{% endif %}
+  {% if not user.student %}</a>{% endif %}
 {% endif %}
