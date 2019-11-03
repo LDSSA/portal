@@ -6,6 +6,9 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework import generics
 from rest_framework.settings import import_from_string
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.utils.translation import ugettext_lazy as _
 
 from portal.academy import models, serializers
 
@@ -109,11 +112,31 @@ class InstructorUserListView(InstructorMixin, ListView):
     queryset = get_user_model().objects.filter(student=True)
     template_name = 'academy/instructor/user_list.html'
 
+    def get_queryset(self):
+        user_id = self.request.GET.get("user_id")
+        if user_id:
+            return self.queryset.filter(id=user_id)
+        return self.queryset.all()
+
     # noinspection PyAttributeOutsideInit
     def get(self, request, *args, **kwargs):
-        self.object_list = self.get_queryset()
+        # Validate query params
+        validator = serializers.InstructorsViewFiltersSerializer(data=self.request.GET)
+        if not validator.is_valid():
+            msg = " ".join([f"Filter '{k}': {v[0].lower()}" for k,v in validator.errors.items()])
+            messages.error(request, _(msg))
+            return redirect('academy:instructor-user-list')
+        query_params = validator.validated_data
 
-        specializations = models.Specialization.objects.order_by('code')
+        self.object_list = self.get_queryset()
+        specializations = models.Specialization.objects
+
+        grade_status = query_params.get("grade_status")
+        spc_code = query_params.get("spc_code")
+        if spc_code:
+            specializations = specializations.filter(code=spc_code)
+
+        specializations = specializations.order_by('code')
         spc_list = []
         unit_list = []
         max_score = 0
@@ -137,8 +160,11 @@ class InstructorUserListView(InstructorMixin, ListView):
                     user_data['grades'].append(None)
 
                 else:
-                    grade, _ = models.Grade.objects.get_or_create(student=user,
-                                                                  unit=unit)
+                    grade, __ = models.Grade.objects.get_or_create(student=user,
+                                                                   unit=unit)
+                    if grade_status and grade.status != grade_status:
+                        user_data['grades'].append(None)
+                        continue
                     if grade.status == 'graded':
                         total_score += grade.score
                     user_data['grades'].append(grade)
