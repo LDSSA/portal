@@ -134,6 +134,7 @@ class InstructorUserListView(InstructorMixin, ListView):
         grade_status = query_params.get("grade_status")
         score__gte = query_params.get("score__gte")
         score__lte = query_params.get("score__lte")
+        unit_code = query_params.get("unit_code")
         spc_code = query_params.get("spc_code")
         if spc_code:
             specializations = specializations.filter(code=spc_code)
@@ -143,11 +144,13 @@ class InstructorUserListView(InstructorMixin, ListView):
         unit_list = []
         max_score = 0
         for spc in specializations:
-            qs = (models.Unit.objects
-                  .filter(specialization=spc)
-                  .order_by('due_date'))
-            spc_list.append(spc)
+            qs = models.Unit.objects.filter(specialization=spc)
+            if unit_code:
+                qs = qs.filter(code=unit_code)
+            qs = qs.order_by('due_date')
             max_score += qs.count() * 20
+            spc.unit_count = qs.count()
+            spc_list.append(spc)
             if qs.exists():
                 unit_list += list(qs)
             else:

@@ -19,14 +19,14 @@
           <th scope="col" rowspan="2">Name</th>
           <th scope="col" rowspan="2">Total</th>
           {% for spc in spc_list %}
-          <th scope="col" colspan="{{ spc.units.count }}">
+          <th scope="col" colspan="{{ spc.unit_count }}">
             <a href="{% add_query_param 'spc_code' spc.code %}" class="text-dark" title="Filter by specialization">{{ spc.code }}</a>
           </th>
           {% endfor %}
         </tr>
         <tr>
           {% for unit in unit_list %}
-            <th scope="col">{{ unit.code }}</th>
+          <th scope="col"><a href="{% add_query_param 'unit_code' unit.code %}" class="text-dark" title="Filter by unit">{{ unit.code }}</a></th>
           {% endfor %}
         </tr>
       </thead>
