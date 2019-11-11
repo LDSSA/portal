@@ -32,6 +32,11 @@ RUN sed -i 's/\r//' /start
 RUN chmod +x /start
 RUN chown django /start
 
+COPY ./docker/production/django/start_simulator /start_simulator
+RUN sed -i 's/\r//' /start_simulator
+RUN chmod +x /start_simulator
+RUN chown django /start_simulator
+
 COPY . /app
 
 RUN chown -R django /app

@@ -14,6 +14,12 @@ if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(ROOT_DIR.path('.env')))
 
+# CAPSTONE
+# ------------------------------------------------------------------------------
+SIMULATOR_INTERVAL = 5
+PRODUCER_INTERVAL = 1
+REQUEST_TIMEOUT = 10
+BLOCK_SIZE = 20
 
 # GRADING
 # ------------------------------------------------------------------------------

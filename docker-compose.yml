@@ -9,7 +9,6 @@ services:
     build:
       context: .
       dockerfile: ./docker/local/django/Dockerfile
-    image: portal_local_django
     depends_on:
       - postgres
       - mailhog
@@ -23,11 +22,24 @@ services:
       - "8000:8000"
     command: /start
 
+  simulator:
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+    depends_on:
+      - postgres
+      - mailhog
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    command: /start_simulator
+
   postgres:
     build:
       context: .
       dockerfile: ./docker/production/postgres/Dockerfile
-    image: portal_production_postgres
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
       - local_postgres_data_backups:/backups
