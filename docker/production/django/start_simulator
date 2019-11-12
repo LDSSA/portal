@@ -4,4 +4,4 @@ set -o errexit
 set -o nounset
 
 
-python manage.py runsimulator
+python manage.py run-simulator

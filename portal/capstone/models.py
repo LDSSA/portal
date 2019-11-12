@@ -10,8 +10,19 @@ from portal.users.models import User
 logger = logging.getLogger(__name__)
 
 
+class Capstone(models.Model):
+    name = models.CharField(max_length=1024)
+    simulators = models.ManyToManyField('Simulator')
+
+
+class Score(models.Model):
+    capstone = models.ForeignKey(Capstone, models.CASCADE)
+    student = models.ForeignKey(User, models.CASCADE)
+    score = models.FloatField(default=0)
+
+
 class Simulator(models.Model):
-    name = models.CharField(1024)
+    name = models.CharField(max_length=1024)
     started = models.DateTimeField(null=True)
     ends = models.DateTimeField(null=True)
     interval = models.DurationField(null=True)
@@ -93,7 +104,6 @@ class Simulator(models.Model):
 class Datapoint(models.Model):
     simulator = models.ForeignKey(Simulator, models.CASCADE,
                                   related_name='datapoints')
-    datapoint_id = models.CharField(max_length=24)
     data = models.TextField()
 
 

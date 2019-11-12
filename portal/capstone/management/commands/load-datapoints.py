@@ -1,5 +1,7 @@
-from django.core.management.base import BaseCommand, CommandError
+import json
 
+import pandas as pd
+from django.core.management.base import BaseCommand
 
 from portal.capstone import models
 
@@ -13,14 +15,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         simulator = models.Simulator(name=options['simulator_name'])
-        with open(options['file']) as fd:
-            data = fd.read()
-
+        df = pd.read_csv(options['file'])
         datapoints = [
             models.Datapoint(simulator=simulator,
-                             datapoint_id=entry['id'],
-                             data=entry['data'])
-            for entry in data]
+                             data=json.dumps(data.to_dict()))
+            for _, data in df.iterrows()]
         models.Datapoint.objects.bulk_create(datapoints)
 
-        self.stdout.write(self.style.SUCCESS('Successfully created datapoints'))
+        self.stdout.write(
+            self.style.SUCCESS('Successfully created datapoints'))

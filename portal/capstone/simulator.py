@@ -31,8 +31,8 @@ def run():
 
         while True:
             # Consume queue
-            id_, url, data = submissions.get(block=True)
-            executor.submit(consume, id_, url, data)
+            args = submissions.get(block=True)
+            executor.submit(consume, *args)
 
 
 def run_simulator():
@@ -67,16 +67,18 @@ def run_producer(submissions):
                   .filter(simulator__status='started')
                   .filter(state='due')
                   .filter(due__gte=now)
-                  .select_related('student',
-                                  'datapoint',
-                                  'simulation'))[:settings.BLOCK_SIZE]
+                  .values(
+                        'student__app_name',
+                        'simulator__endpoint',
+                        'id',
+                  ))[:settings.BLOCK_SIZE]
 
             items = []
             for obs in qs:
-                url = obs.simulator.endpoint.format(
-                    obs.student.app_name)
+                url = obs['simulator__endpoint'].format(
+                    obs['student__app_name'])
 
-                items.append([obs.id, url, obs.datapoint.data])
+                items.append([url, obs['id']])
                 obs.status = 'queued'
                 obs.save()
 
@@ -93,14 +95,16 @@ def run_producer(submissions):
         time.sleep(settings.PRODUCER_INTERVAL)
 
 
-def consume(id_, url, data):
+def consume(url, id_):
     close_old_connections()
 
     with transaction.atomic():
-        due_datapoint = (models.Datapoint.objects
+        due_datapoint = (models.DueDatapoint.objects
+                         .select_related('datapoint')
                          .select_for_update().get(id=id_))
 
         try:
+            data = json.loads(due_datapoint.datapoint.data)
             response = requests.post(url, json=data, timeout=settings.TIMEOUT)
         except requests.exceptions.RequestException as exc:
             due_datapoint.state = 'fail'

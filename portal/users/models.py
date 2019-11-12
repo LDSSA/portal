@@ -22,7 +22,7 @@ class User(AbstractUser):
     deploy_private_key = models.TextField(blank=True)
     deploy_public_key = models.TextField(blank=True)
 
-    app_name = models.CharField(max_length=255)
+    app_name = models.CharField(max_length=255, blank=True)
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})

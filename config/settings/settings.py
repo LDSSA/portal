@@ -121,6 +121,7 @@ LOCAL_APPS = [
     'portal.users.apps.UsersAppConfig',
     'portal.academy.apps.AcademyConfig',
     'portal.hackathons.apps.HackathonsConfig',
+    'portal.capstone.apps.CapstoneConfig',
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
