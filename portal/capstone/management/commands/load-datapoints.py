@@ -14,7 +14,8 @@ class Command(BaseCommand):
         parser.add_argument('file')
 
     def handle(self, *args, **options):
-        simulator = models.Simulator(name=options['simulator_name'])
+        simulator = models.Simulator.objects.get(
+            name=options['simulator_name'])
         df = pd.read_csv(options['file'])
         datapoints = [
             models.Datapoint(simulator=simulator,

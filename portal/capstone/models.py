@@ -12,7 +12,15 @@ logger = logging.getLogger(__name__)
 
 class Capstone(models.Model):
     name = models.CharField(max_length=1024)
-    simulators = models.ManyToManyField('Simulator')
+
+    def __str__(self):
+        return self.name
+
+
+class StudentApp(models.Model):
+    capstone = models.ForeignKey(Capstone, models.CASCADE)
+    student = models.ForeignKey(User, models.CASCADE)
+    app_name = models.CharField(max_length=255, blank=True)
 
 
 class Score(models.Model):
@@ -22,6 +30,8 @@ class Score(models.Model):
 
 
 class Simulator(models.Model):
+    capstone = models.ForeignKey(Capstone, models.CASCADE)
+
     name = models.CharField(max_length=1024)
     started = models.DateTimeField(null=True)
     ends = models.DateTimeField(null=True)
@@ -43,6 +53,7 @@ class Simulator(models.Model):
 
     def start(self):
         if self.status == 'start':  # Started manually through the admin
+            logger.info("Starting simulator %s", self)
             now = datetime.now(timezone.utc)
             self.started = now
             self.status = 'started'
@@ -51,9 +62,10 @@ class Simulator(models.Model):
             self.create_due_datapoints(now)
 
     def create_due_datapoints(self, starts, ends=None):
+        logger.info("Creating due datapoints for %s", self)
         self.due_datapoints.all().delete()
         datapoints = self.datapoints.all()
-        students = User.objects.filter(student=True)
+        students = StudentApp.objects.filter(capstone=self.capstone).exclude(app_name='')
         due_datapoints = []
 
         if ends is None:
@@ -72,7 +84,10 @@ class Simulator(models.Model):
         self.save()
 
         for student in students:
+            app = StudentApp.objects.get(capstone=self.capstone,
+                                         student=student)
             due = starts
+            url = self.endpoint.format(app.app_name)
             for datapoint in datapoints:
                 due_datapoints.append(
                     DueDatapoint(
@@ -80,25 +95,35 @@ class Simulator(models.Model):
                         datapoint=datapoint,
                         student=student,
                         due=due,
+                        url=url,
                     )
                 )
                 due += interval
 
+        logger.info("Creating due datapoints for %s", self)
         DueDatapoint.objects.bulk_create(due_datapoints)
+
+    def __str__(self):
+        return self.name
 
     def reset(self):
         if self.status == 'reset':
+            logger.info("Resetting simulator %s", self)
             self.due_datapoints.all().delete()
             self.status = 'stopped'
             self.save()
 
     def pause(self):
-        self.status = 'paused'
-        self.save()
+        if self.status == 'pause':
+            logger.info("Pausing simulator %s", self)
+            self.status = 'paused'
+            self.save()
 
-    def unpause(self):
-        self.status = 'started'
-        self.save()
+    def resume(self):
+        if self.status == 'paused':
+            logger.info("Resuming simulator %s", self)
+            self.status = 'started'
+            self.save()
 
 
 class Datapoint(models.Model):
@@ -110,6 +135,7 @@ class Datapoint(models.Model):
 class DueDatapoint(models.Model):
     simulator = models.ForeignKey(Simulator, models.CASCADE,
                                   related_name='due_datapoints')
+    url = models.TextField()
     datapoint = models.ForeignKey(Datapoint, models.CASCADE)
     student = models.ForeignKey(User, models.CASCADE)
 
