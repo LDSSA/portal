@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from django.contrib import admin
 
 from portal.capstone import models
@@ -39,14 +41,32 @@ class DatapointAdmin(admin.ModelAdmin):
     fields = ('simulator', 'data')
 
 
+class OldFilter(admin.SimpleListFilter):
+    title = 'Old'
+
+    # Parameter for the filter that will be used in the URL query.
+    parameter_name = 'old'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('now', 'now'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'now':
+            return queryset.filter(due__lte=datetime.now(timezone.utc))
+
+
 @admin.register(models.DueDatapoint)
 class DueDatapointAdmin(admin.ModelAdmin):
-    list_display = ('id', 'simulator', 'student', 'datapoint', 'due')
+    list_filter = (OldFilter, 'state', 'simulator', 'student', 'simulator')
+
+    list_display = ('id', 'simulator', 'student', 'datapoint', 'state', 'due')
     fields = (
         'simulator',
         'student',
         'datapoint',
-        'status',
+        'state',
         'due',
         'url',
         'response_content',

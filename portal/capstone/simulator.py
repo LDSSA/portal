@@ -49,8 +49,6 @@ def run_simulator():
                 for simulator in simulators:
                     simulator.reset()
                     simulator.start()
-                    simulator.pause()
-                    simulator.resume()
 
         except Exception:
             logger.exception("Exception in simulator")
@@ -61,7 +59,6 @@ def run_simulator():
 def run_producer(submissions):
     # Prevent thundering herd
     time.sleep(2 * random.random())
-    qsize = 0
 
     while True:
         logger.debug("Producer cycle...")
@@ -77,7 +74,7 @@ def run_producer(submissions):
                       .select_for_update()
                       .filter(simulator__status='started')
                       .filter(state='due')
-                      .filter(due__gte=now))[:settings.BLOCK_SIZE]
+                      .filter(due__lte=now))[:settings.BLOCK_SIZE]
 
                 items = []
                 for due_datapoint in qs:
@@ -92,11 +89,7 @@ def run_producer(submissions):
                 logger.info("Producing %s", item)
                 submissions.put(item)
 
-            # TODO
-            old_qsize = qsize
-            qsize = submissions.qsize()
-            if old_qsize > 0 and qsize > old_qsize:
-                logger.critical("Queue size increased this iteration")
+            logger.debug("Queue size: %s", submissions.qsize())
 
         except Exception:
             logger.exception("Exception in producer")
@@ -104,6 +97,7 @@ def run_producer(submissions):
         time.sleep(settings.PRODUCER_INTERVAL)
 
 
+# TODO mark as due any unconsumed due datapoints
 def consume(id_):
     close_old_connections()
     logger.info("Consuming %s", id_)
@@ -115,11 +109,14 @@ def consume(id_):
                              .select_for_update().get(id=id_))
 
             try:
+                logger.info("Posting %s", id_)
                 data = json.loads(due_datapoint.datapoint.data)
                 response = requests.post(due_datapoint.url,
                                          json=data,
                                          timeout=settings.TIMEOUT)
+
             except requests.exceptions.RequestException as exc:
+                logger.info("Request Exception %s", id_, exc_info=True)
                 due_datapoint.state = 'fail'
                 due_datapoint.request_exception = exc.__class__.__name__
                 due_datapoint.request_traceback = traceback.format_tb(
@@ -131,9 +128,11 @@ def consume(id_):
 
             try:
                 response.raise_for_status()
+
             except requests.exceptions.HTTPError as exc:
+                logger.info("HTTP Exception %s", id_, exc_info=True)
                 due_datapoint.state = 'fail'
-                due_datapoint.request_exception = exc.__class__.__name
+                due_datapoint.request_exception = exc.__class__.__name__
                 due_datapoint.request_traceback = traceback.format_tb(
                     exc.__traceback__)
                 due_datapoint.response_status = response.status_code
@@ -148,8 +147,10 @@ def consume(id_):
                 content = response.text
 
             except json.JSONDecodeError as exc:
+                logger.info("Response Exception %s", id_, exc_info=True)
+
                 due_datapoint.state = 'fail'
-                due_datapoint.request_exception = exc.__class__.__name
+                due_datapoint.request_exception = exc.__class__.__name__
                 due_datapoint.request_traceback = traceback.format_tb(
                     exc.__traceback__)
                 due_datapoint.response_status = response.status_code
@@ -160,6 +161,7 @@ def consume(id_):
                 return
 
             else:
+                logger.info("Success %s", id_)
                 due_datapoint.state = 'success'
                 due_datapoint.response_content = content
                 due_datapoint.response_status = response.status_code

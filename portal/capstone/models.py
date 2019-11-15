@@ -53,7 +53,7 @@ class Simulator(models.Model):
 
     def start(self):
         if self.status == 'start':  # Started manually through the admin
-            logger.info("Starting simulator %s", self)
+            logger.info("Starting simulator: %s", self)
             now = datetime.now(timezone.utc)
             self.started = now
             self.status = 'started'
@@ -61,46 +61,64 @@ class Simulator(models.Model):
 
             self.create_due_datapoints(now)
 
-    def create_due_datapoints(self, starts, ends=None):
+    def create_due_datapoints(self, starts):
         logger.info("Creating due datapoints for %s", self)
         self.due_datapoints.all().delete()
         datapoints = self.datapoints.all()
-        students = StudentApp.objects.filter(capstone=self.capstone).exclude(app_name='')
-        due_datapoints = []
+        student_apps = (StudentApp.objects
+                        .filter(capstone=self.capstone)
+                        .exclude(app_name=''))
 
-        if ends is None:
-            ends = self.ends
-
-        interval = (ends - starts) / datapoints.count()
-        self.interval = interval
+        interval = (self.ends - starts) / datapoints.count()
 
         # Assuming one producer we are queueing BLOCK_SIZE requests per cycle
         # to queue enough requests we need to queue at least
         # (PRODUCER_INTERVAL / interval) * number of students
-        if (settings.BLOCK_SIZE
-                < students.count() * (settings.PRODUCER_INTERVAL / interval)):
-            logger.critical("Current BLOCK_SIZE and PRODUCER_INTERVAL settings"
-                            "are not enough")
+        required_requests_per_cycle = (
+            student_apps.count()
+            * (settings.PRODUCER_INTERVAL / interval.total_seconds()))
+        logger.debug('Block size: %s', settings.BLOCK_SIZE)
+        logger.debug('Required requests: %s', required_requests_per_cycle)
+        if settings.BLOCK_SIZE < required_requests_per_cycle:
+            logger.critical()
+            raise RuntimeError(
+                f'Number of queued requests per cycle is not enough, '
+                f'required {required_requests_per_cycle}',
+                f'consumed {settings.BLOCK_SIZE}',
+            )
+
+        self.interval = interval
         self.save()
 
-        for student in students:
-            app = StudentApp.objects.get(capstone=self.capstone,
-                                         student=student)
-            due = starts
-            url = self.endpoint.format(app.app_name)
-            for datapoint in datapoints:
-                due_datapoints.append(
-                    DueDatapoint(
-                        simulator=self,
-                        datapoint=datapoint,
-                        student=student,
-                        due=due,
-                        url=url,
-                    )
-                )
-                due += interval
+        for student_app in student_apps:
+            self.add_student_app(student_app,
+                                 datapoints,
+                                 starts)
 
-        logger.info("Creating due datapoints for %s", self)
+    def add_student_app(self, student_app, datapoints, starts=None):
+        logger.info("Creating due datapoints for simulator %s student %s",
+                    self, student_app.student)
+        due = starts or datetime.now(timezone.utc)
+        interval = (self.ends - starts) / datapoints.count()
+
+        logger.debug("Starting: %s", due)
+        logger.debug("Ending: %s", self.ends)
+        logger.debug("Count: %s", datapoints.count())
+        logger.debug("Interval: %s", interval)
+
+        url = self.endpoint.format(app_name=student_app.app_name)
+        due_datapoints = []
+        for datapoint in datapoints:
+            due_datapoints.append(
+                DueDatapoint(
+                    simulator=self,
+                    datapoint=datapoint,
+                    student=student_app.student,
+                    due=due,
+                    url=url,
+                )
+            )
+            due += interval
         DueDatapoint.objects.bulk_create(due_datapoints)
 
     def __str__(self):
@@ -111,18 +129,6 @@ class Simulator(models.Model):
             logger.info("Resetting simulator %s", self)
             self.due_datapoints.all().delete()
             self.status = 'stopped'
-            self.save()
-
-    def pause(self):
-        if self.status == 'pause':
-            logger.info("Pausing simulator %s", self)
-            self.status = 'paused'
-            self.save()
-
-    def resume(self):
-        if self.status == 'paused':
-            logger.info("Resuming simulator %s", self)
-            self.status = 'started'
             self.save()
 
 
@@ -147,7 +153,7 @@ class DueDatapoint(models.Model):
         ('fail', 'fail'),
     )
     state = models.CharField(choices=STATE_CHOICES,
-                             default='duw',
+                             default='due',
                              max_length=64)
 
     response_content = models.TextField(blank=True)
