@@ -24,6 +24,10 @@ COPY ./docker/local/django/start /start
 RUN sed -i 's/\r//' /start
 RUN chmod +x /start
 
+COPY ./docker/production/django/start_simulator /start_simulator
+RUN sed -i 's/\r//' /start_simulator
+RUN chmod +x /start_simulator
+
 WORKDIR /app
 
 ENTRYPOINT ["/entrypoint"]

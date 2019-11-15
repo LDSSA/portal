@@ -14,6 +14,13 @@ if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(ROOT_DIR.path('.env')))
 
+# CAPSTONE
+# ------------------------------------------------------------------------------
+TIMEOUT = 5
+SIMULATOR_INTERVAL = 5
+PRODUCER_INTERVAL = 1
+REQUEST_TIMEOUT = 10
+BLOCK_SIZE = 20
 
 # GRADING
 # ------------------------------------------------------------------------------
@@ -115,6 +122,7 @@ LOCAL_APPS = [
     'portal.users.apps.UsersAppConfig',
     'portal.academy.apps.AcademyConfig',
     'portal.hackathons.apps.HackathonsConfig',
+    'portal.capstone.apps.CapstoneConfig',
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
