@@ -8,7 +8,7 @@ from portal.capstone import models
 @admin.register(models.Capstone)
 class CapstoneAdmin(admin.ModelAdmin):
     list_display = ('name', )
-    fields = ('name', )
+    fields = ('name', 'scoring')
 
 
 @admin.register(models.StudentApp)
@@ -38,7 +38,8 @@ class SimulatorAdmin(admin.ModelAdmin):
 @admin.register(models.Datapoint)
 class DatapointAdmin(admin.ModelAdmin):
     list_display = ('id', 'simulator', 'data')
-    fields = ('simulator', 'data')
+    fields = ('simulator', 'data', 'outcome')
+    list_filter = ('simulator', )
 
 
 class OldFilter(admin.SimpleListFilter):

@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from django.db import models
 from django.conf import settings
 
+from portal.hackathons.models import random_path
 from portal.users.models import User
 
 
@@ -13,8 +14,23 @@ logger = logging.getLogger(__name__)
 class Capstone(models.Model):
     name = models.CharField(max_length=1024)
 
+    scoring = models.FileField(upload_to=random_path,
+                               null=True, blank=True)
+
     def __str__(self):
         return self.name
+
+    def score(self):
+        # Load scoring
+        glob = {}
+        script = self.scoring.read().decode()
+        exec(script, glob)
+
+        for app in self.studentapp_set.all():
+            # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
+            score = glob['score'](self, app)
+            app.score = score
+            app.save()
 
 
 class StudentApp(models.Model):
@@ -80,7 +96,6 @@ class Simulator(models.Model):
         logger.debug('Block size: %s', settings.BLOCK_SIZE)
         logger.debug('Required requests: %s', required_requests_per_cycle)
         if settings.BLOCK_SIZE < required_requests_per_cycle:
-            logger.critical()
             raise RuntimeError(
                 f'Number of queued requests per cycle is not enough, '
                 f'required {required_requests_per_cycle}',
@@ -135,7 +150,8 @@ class Simulator(models.Model):
 class Datapoint(models.Model):
     simulator = models.ForeignKey(Simulator, models.CASCADE,
                                   related_name='datapoints')
-    data = models.TextField()
+    data = models.TextField(blank=True)
+    outcome = models.TextField(blank=True)
 
 
 class DueDatapoint(models.Model):
@@ -157,9 +173,8 @@ class DueDatapoint(models.Model):
                              max_length=64)
 
     response_content = models.TextField(blank=True)
-    response_exception = models.TextField(null=True)
-    response_traceback = models.TextField(null=True)
+    response_exception = models.TextField(blank=True)
+    response_traceback = models.TextField(blank=True)
     response_elapsed = models.FloatField(null=True)
     response_status = models.IntegerField(null=True)
     response_timeout = models.BooleanField(default=False)
-
