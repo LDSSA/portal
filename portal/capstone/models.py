@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timezone
+from urllib.parse import urljoin
 
 from django.db import models
 from django.conf import settings
@@ -26,22 +27,17 @@ class Capstone(models.Model):
         script = self.scoring.read().decode()
         exec(script, glob)
 
-        for app in self.studentapp_set.all():
+        for api in self.studentapi_set.all():
             # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
-            score = glob['score'](self, app)
-            app.score = score
-            app.save()
+            score = glob['score'](self, api)
+            api.score = score
+            api.save()
 
 
-class StudentApp(models.Model):
+class StudentApi(models.Model):
     capstone = models.ForeignKey(Capstone, models.CASCADE)
     student = models.ForeignKey(User, models.CASCADE)
-    app_name = models.CharField(max_length=255, blank=True)
-
-
-class Score(models.Model):
-    capstone = models.ForeignKey(Capstone, models.CASCADE)
-    student = models.ForeignKey(User, models.CASCADE)
+    url = models.CharField(max_length=255, blank=True)
     score = models.FloatField(default=0)
 
 
@@ -52,8 +48,8 @@ class Simulator(models.Model):
     started = models.DateTimeField(null=True)
     ends = models.DateTimeField(null=True)
     interval = models.DurationField(null=True)
-    # example 'https://{app_name}.herokuapp.com/predict'
-    endpoint = models.CharField(max_length=255)
+    # example: predict
+    path = models.CharField(max_length=255)
 
     STATUS_CHOICES = (
         ('stopped', 'stopped'),
@@ -81,9 +77,9 @@ class Simulator(models.Model):
         logger.info("Creating due datapoints for %s", self)
         self.due_datapoints.all().delete()
         datapoints = self.datapoints.all()
-        student_apps = (StudentApp.objects
+        student_apis = (StudentApi.objects
                         .filter(capstone=self.capstone)
-                        .exclude(app_name=''))
+                        .exclude(url=''))
 
         interval = (self.ends - starts) / datapoints.count()
 
@@ -91,7 +87,7 @@ class Simulator(models.Model):
         # to queue enough requests we need to queue at least
         # (PRODUCER_INTERVAL / interval) * number of students
         required_requests_per_cycle = (
-            student_apps.count()
+            student_apis.count()
             * (settings.PRODUCER_INTERVAL / interval.total_seconds()))
         logger.debug('Block size: %s', settings.BLOCK_SIZE)
         logger.debug('Required requests: %s', required_requests_per_cycle)
@@ -105,14 +101,14 @@ class Simulator(models.Model):
         self.interval = interval
         self.save()
 
-        for student_app in student_apps:
-            self.add_student_app(student_app,
+        for student_api in student_apis:
+            self.add_student_api(student_api,
                                  datapoints,
                                  starts)
 
-    def add_student_app(self, student_app, datapoints, starts=None):
+    def add_student_api(self, student_api, datapoints, starts=None):
         logger.info("Creating due datapoints for simulator %s student %s",
-                    self, student_app.student)
+                    self, student_api.student)
         due = starts or datetime.now(timezone.utc)
         interval = (self.ends - starts) / datapoints.count()
 
@@ -121,14 +117,14 @@ class Simulator(models.Model):
         logger.debug("Count: %s", datapoints.count())
         logger.debug("Interval: %s", interval)
 
-        url = self.endpoint.format(app_name=student_app.app_name)
+        url = urljoin(student_api.url, self.path)
         due_datapoints = []
         for datapoint in datapoints:
             due_datapoints.append(
                 DueDatapoint(
                     simulator=self,
                     datapoint=datapoint,
-                    student=student_app.student,
+                    student=student_api.student,
                     due=due,
                     url=url,
                 )

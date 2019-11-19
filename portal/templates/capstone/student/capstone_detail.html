@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ hackathon.code }}{% endblock %}
+
+{% block content %}
+  <div class="row mb-5 mt-5">
+    <div class="col">
+      <h1>{{ hackathon.code }}: {{ hackathon.get_status_display }}</h1>
+    </div>
+  </div>
+  {% if hackathon.status in hackathon.teams_exist and not attendance.present %}
+    <div class="row">
+      <div class="col-md-auto">
+        <div class="mb-4">
+          <h3>Taking presence is over</h3>
+          <p>
+            If you are attending the hackathon and are reading this please
+            contact an instructor immediately!
+          </p>
+        </div>
+      </div>
+    </div>
+
+  {% else %}
+
+    {% if hackathon.status == "taking_attendance" %}
+    <!-- Student attendance-->
+    <div class="row">
+      <div class="col-md-auto">
+        <div class="mb-4">
+          <h3>Mark your attendance</h3>
+          <form method="post">
+            {% csrf_token %}
+            {{ attendance_form|crispy }}
+            <button type="submit"
+                    class="btn btn-success"
+                    name="attendance">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% elif hackathon.status in hackathon.teams_ready %}
+      <!-- Team data -->
+      <div class="row">
+        <div class="col-md-auto">
+          <h3>Team ID:</h3>
+        </div>
+        <div class="col-md-auto">
+          {{ team.hackathon_team_id }} {% if team.remote %} (remote){% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-auto">
+          <h3>Students:</h3>
+        </div>
+      </div>
+      {% for student in team.students.all %}
+      <div class="row">
+        <div class="col-md-auto">
+          <b>Username:</b> {{ student.username }}
+        </div>
+        <div class="col-md-auto">
+          <b>Name:</b> {{ student.name }}
+        </div>
+      </div>
+      {% endfor %}
+
+      <!-- Team logo and name -->
+      {% if hackathon.status in hackathon.can_update_team_data %}
+        <div class="row">
+          <div class="col-md-auto">
+            <div class="mb-4">
+              <form method="post">
+                {% csrf_token %}
+                {{ team_form|crispy }}
+                <button type="submit"
+                        class="btn btn-success"
+                        name="team">Save</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+    {% else %}
+      <div class="row">
+        <div class="col-md-auto">
+          <div class="mb-4">
+            <h3>Nothing to do at the moment!</h3>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Submissions -->
+    {% if hackathon.status in hackathon.can_submit %}
+      <div class="row">
+        <div class="col-md-auto">
+          <div class="mb-4">
+            <h3>Submit</h3>
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ submit_form|crispy }}
+              <button type="submit"
+                      class="btn btn-success"
+                      name="submit">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+  {% endif %}
+{% endblock content %}
+

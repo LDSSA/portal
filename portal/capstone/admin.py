@@ -11,10 +11,10 @@ class CapstoneAdmin(admin.ModelAdmin):
     fields = ('name', 'scoring')
 
 
-@admin.register(models.StudentApp)
-class StudentAppAdmin(admin.ModelAdmin):
-    list_display = ('capstone', 'student', 'app_name')
-    fields = ('capstone', 'student', 'app_name')
+@admin.register(models.StudentApi)
+class StudentApiAdmin(admin.ModelAdmin):
+    list_display = ('capstone', 'student', 'url')
+    fields = ('capstone', 'student', 'url')
 
 
 @admin.register(models.Simulator)

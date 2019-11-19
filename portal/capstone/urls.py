@@ -5,6 +5,22 @@ from . import views
 app_name = "capstone"
 
 urlpatterns = [
+    # Student Views
+    path(r'capstones/',
+         view=views.StudentCapstoneListView.as_view(),
+         name='student-capstone-list'),
+    path(r'capstones/<str:pk>/',
+         view=views.StudentCapstoneDetailView.as_view(),
+         name='student-capstone-detail'),
+
+    # Instructor Views
+    path(r'capstones/',
+         view=views.InstructorCapstoneListView.as_view(),
+         name='instructor-capstone-list'),
+    path(r'capstones/<str:pk>/',
+         view=views.InstructorCapstoneDetailView.as_view(),
+         name='instructor-capstone-detail'),
+
     # Capstone Testing Views
     path(r'<slug:app_name>/predict/',
          view=views.CapstonePredictView.as_view(),
