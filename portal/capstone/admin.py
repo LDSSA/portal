@@ -24,7 +24,7 @@ class SimulatorAdmin(admin.ModelAdmin):
         'name',
         'capstone',
         'status',
-        'endpoint',
+        'path',
         'ends',
         'started',
         'interval',

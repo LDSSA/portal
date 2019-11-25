@@ -19,21 +19,15 @@
     </tr>
   </thead>
   <tbody>
-   {% for obj in object_list %}
-    <tr  id="row-{{ obj.code }}">
+   {% for capstone, obj in object_list %}
+    <tr  id="row-{{ obj.name }}">
       <th>
-        <a href="{% url 'hackathons:student-hackathon-detail' obj.pk %}">
-          {{ obj.pk }}
+        <a href="{% url 'capstone:student-capstone-detail' obj.pk %}">
+          {{ capstone.name }}
         </a>
       </th>
-      <td>{{ obj.name }}</td>
-      <td>{{ obj.get_status_display }}</td>
-      <td>{{ obj.due_date }}</td>
-      <td>
-        <a href="{% url 'hackathons:leaderboard' obj.pk%}">
-          Leaderboard
-        </a>
-      </td>
+      <td>{{ obj.url }}</td>
+      <td>{{ obj.score }}</td>
     </tr>
     {% endfor %}
   </tbody>

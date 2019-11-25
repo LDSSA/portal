@@ -1,32 +1,32 @@
 {% extends "base.html" %}
 {% load static %}
-{% load crispy_forms_tags %}
 
-{% block title %}{{ hackathon.code }}{% endblock %}
+{% block title %}{{ object.name }}{% endblock %}
 
 {% block content %}
   <div class="row mb-5 mt-5">
     <div class="col">
-      <h1>{{ hackathon.code }}: {{ hackathon.get_status_display }}</h1>
+      <h1>{{ object.name }}</h1>
     </div>
   </div>
 
-    <!-- Submissions -->
-    {% if hackathon.status in hackathon.can_submit_instructor %}
-      <div class="row">
-        <div class="col-md-auto">
-          <div class="mb-4">
-            <h3>Submit</h3>
-            <form method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              {{ submit_form|crispy }}
-              <button type="submit"
-                      class="btn btn-success"
-                      name="submit">Submit</button>
-            </form>
-          </div>
-        </div>
-      </div>
-    {% endif %}
+  <table class="table table-hover">
+    <thead>
+    <tr>
+      <th scope="col">Student</th>
+      <th scope="col">URL</th>
+      <th scope="col">Score</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for obj in student_apis %}
+      <tr>
+        <th>{{ obj.student.username }}</th>
+        <td>{{ obj.url }}</td>
+        <td>{{ obj.score }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
 {% endblock content %}
 

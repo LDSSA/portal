@@ -117,9 +117,12 @@ def consume(id_):
 
             except requests.exceptions.RequestException as exc:
                 logger.info("Request Exception %s", id_, exc_info=True)
+                logger.debug(exc.__class__.__name__)
+                logger.debug(traceback.format_tb(exc.__traceback__))
+
                 due_datapoint.state = 'fail'
-                due_datapoint.request_exception = exc.__class__.__name__
-                due_datapoint.request_traceback = traceback.format_tb(
+                due_datapoint.response_exception = exc.__class__.__name__
+                due_datapoint.response_traceback = traceback.format_tb(
                     exc.__traceback__)
                 if isinstance(exc, requests.exceptions.Timeout):
                     due_datapoint.response_timeout = True
@@ -132,8 +135,8 @@ def consume(id_):
             except requests.exceptions.HTTPError as exc:
                 logger.info("HTTP Exception %s", id_, exc_info=True)
                 due_datapoint.state = 'fail'
-                due_datapoint.request_exception = exc.__class__.__name__
-                due_datapoint.request_traceback = traceback.format_tb(
+                due_datapoint.response_exception = exc.__class__.__name__
+                due_datapoint.response_traceback = traceback.format_tb(
                     exc.__traceback__)
                 due_datapoint.response_status = response.status_code
                 due_datapoint.response_elapsed = (response.elapsed
@@ -150,8 +153,8 @@ def consume(id_):
                 logger.info("Response Exception %s", id_, exc_info=True)
 
                 due_datapoint.state = 'fail'
-                due_datapoint.request_exception = exc.__class__.__name__
-                due_datapoint.request_traceback = traceback.format_tb(
+                due_datapoint.response_exception = exc.__class__.__name__
+                due_datapoint.response_traceback = traceback.format_tb(
                     exc.__traceback__)
                 due_datapoint.response_status = response.status_code
                 due_datapoint.response_elapsed = (response.elapsed
