@@ -17,8 +17,8 @@ if READ_DOT_ENV_FILE:
 # CAPSTONE
 # ------------------------------------------------------------------------------
 TIMEOUT = 5
-SIMULATOR_INTERVAL = 1
-PRODUCER_INTERVAL = 1
+SIMULATOR_INTERVAL = 5
+PRODUCER_INTERVAL = 5
 REQUEST_TIMEOUT = 10
 BLOCK_SIZE = 20
 
