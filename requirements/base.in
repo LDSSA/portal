@@ -20,7 +20,7 @@ django-redis  # https://github.com/niwinz/django-redis
 djangorestframework  # https://github.com/encode/django-rest-framework
 
 # Hackathon metrics
-ml_metrics
 numpy
+ml_metrics
 pandas
 scikit-learn
