@@ -12,7 +12,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('simulator_name')
         parser.add_argument('--data', required=True)
-        parser.add_argument('--outcomes')
         parser.add_argument('--batch-size', type=int, default=1000)
 
     def handle(self, *args, **options):
@@ -20,19 +19,13 @@ class Command(BaseCommand):
             name=options['simulator_name'])
         data = pd.read_csv(options['data'])
 
-        outcome_iter = None
-        if options['outcomes']:
-            outcomes = pd.read_csv(options['outcomes'])
-            outcome_iter = outcomes.iterrows()
-
         self.stdout.write(
             self.style.SUCCESS('Creating datapoint objects batch 1'))
         datapoints = []
         for idx, obs in data.iterrows():
-            dt = models.Datapoint(simulator=simulator,
-                                  data=json.dumps(obs.to_dict()))
-            if outcome_iter:
-                dt.outcome = json.dumps(next(outcome_iter)[1].to_dict())
+            data = obs.to_dict()
+            data['true_class'] = data.pop('ContrabandIndicator')
+            dt = models.Datapoint(simulator=simulator, data=json.dumps(data))
             datapoints.append(dt)
 
             if (idx + 1) % options['batch_size'] == 0:
