@@ -76,7 +76,7 @@ class Simulator(models.Model):
     def create_due_datapoints(self, starts):
         logger.info("Creating due datapoints for %s", self)
         self.due_datapoints.all().delete()
-        datapoints = self.datapoints.all()
+        datapoints = self.datapoints.order_by('id').all()
         student_apis = (StudentApi.objects
                         .filter(capstone=self.capstone)
                         .exclude(url=''))
