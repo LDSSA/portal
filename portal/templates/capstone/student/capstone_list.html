@@ -22,7 +22,7 @@
    {% for capstone, obj in object_list %}
     <tr  id="row-{{ obj.name }}">
       <th>
-        <a href="{% url 'capstone:student-capstone-detail' obj.pk %}">
+        <a href="{% url 'capstone:student-capstone-detail' capstone.pk %}">
           {{ capstone.name }}
         </a>
       </th>
