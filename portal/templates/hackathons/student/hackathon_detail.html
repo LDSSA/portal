@@ -10,7 +10,7 @@
       <h1>{{ hackathon.code }}: {{ hackathon.get_status_display }}</h1>
     </div>
   </div>
-  {% if hackathon.status in hackathon.teams_exist and not attendance.present %}
+  {% if hackathon.status != "complete" and hackathon.status in hackathon.teams_exist and not attendance.present %}
     <div class="row">
       <div class="col-md-auto">
         <div class="mb-4">
