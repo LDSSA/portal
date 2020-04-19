@@ -9,10 +9,18 @@ RUN apt-get update && apt-get install -y \
       libpq-dev \
       postgresql-client \
       docker \
-      curl
+      curl \
+      unzip
 
+# Install kubectl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 RUN chmod +x kubectl && mv kubectl /bin/kubectl
+
+# Instal aws cli
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && rm -r aws
 
 RUN adduser --system django
 
