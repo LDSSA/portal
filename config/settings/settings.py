@@ -29,6 +29,7 @@ GRADING_FCN = env.str(
     'GRADING_FCN',
     default='portal.academy.services.perform_grading_production')
 BASE_URL = env.str('BASE_URL')
+STUDENT_REPO_NAME = env.str('STUDENT_REPO_NAME')
 
 # GENERAL
 # ------------------------------------------------------------------------------

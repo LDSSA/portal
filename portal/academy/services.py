@@ -42,6 +42,7 @@ def perform_grading_local(user, unit):
          "--env", f"DEPLOY_KEY={key}",
          "--env", f"CODENAME={unit.code}",
          "--env", f"USERNAME={user.username}",
+         "--env", f"REPO_NAME={settings.STUDENT_REPO_NAME}",
          f"{unit.code.lower()}"]
     )
     if process.returncode != 0:
@@ -75,6 +76,7 @@ def perform_grading_production(user, unit):
         "--env", f"DEPLOY_KEY={key}",
         "--env", f"CODENAME={unit.code}",
         "--env", f"USERNAME={user.username}",
+        "--env", f"REPO_NAME={settings.STUDENT_REPO_NAME}",
     ])
 
     logger.info("Graded %s %s", user.username, unit.code)
