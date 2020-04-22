@@ -10,7 +10,9 @@ RUN apt-get update && apt-get install -y \
       postgresql-client \
       docker \
       curl \
-      unzip
+      unzip \
+      less \
+      groff
 
 # Install kubectl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
@@ -21,6 +23,11 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
     && unzip awscliv2.zip \
     && ./aws/install \
     && rm -r aws
+
+# aws-iam-authenticator
+RUN curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator \
+    && chmod +x ./aws-iam-authenticator \
+    && mv aws-iam-authenticator /usr/bin
 
 RUN adduser --system django
 
