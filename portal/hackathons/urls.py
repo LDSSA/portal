@@ -11,6 +11,7 @@ urlpatterns = [
          name='leaderboard'),
 
     # API
+    # https://portal.lisbondatascience.org/hackathons/api/setup/{codename}/
     path(r'api/setup/<str:pk>/',
          view=views.HackathonSetupView.as_view(),
          name='hackathon-setup'),

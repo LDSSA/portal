@@ -19,11 +19,13 @@ urlpatterns = [
          name='instructor-user-list'),
 
     # API
+    # https://portal.lisbondatascience.org/academy/api/grades/{username}/units/{codename}/
     path(
         r'api/grades/<str:username>/units/<str:unit>/',
         views.GradingView.as_view(),
         name='grade',
     ),
+    # https://portal.lisbondatascience.org/academy/api/checksums/{codename}/
     path(
         r'api/checksums/<str:pk>/',
         views.ChecksumView.as_view(),

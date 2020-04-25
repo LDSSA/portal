@@ -24,7 +24,7 @@ BLOCK_SIZE = 20
 
 # GRADING
 # ------------------------------------------------------------------------------
-GRADING_USERNAME = 'grader'
+GRADING_USERNAME = env.str('GRADING_USERNAME')
 GRADING_FCN = env.str(
     'GRADING_FCN',
     default='portal.academy.services.perform_grading_production')
