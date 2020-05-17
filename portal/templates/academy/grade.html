@@ -1,4 +1,5 @@
 {% load static %}
+{% load query_param_tags %}
 
 {% if grade.status == "graded" %}
   <a href="{% get_media_prefix %}{{ grade.notebook }}">
@@ -9,6 +10,7 @@
     {% endif %}
   </a>
 {% else %}
+{% if not user.student %}<a href="{% add_query_param 'grade_status' grade.status %}">{% endif %}
   <span class="badge
       {% if grade.status == "never-submitted" %}badge-warning
       {% elif grade.status == "failed" %}badge-danger
@@ -18,4 +20,5 @@
       {% endif %}">
     {{ grade.get_status_display }}
   </span>
+  {% if not user.student %}</a>{% endif %}
 {% endif %}
