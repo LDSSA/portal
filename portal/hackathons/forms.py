@@ -2,7 +2,6 @@ import logging
 
 from crispy_forms.layout import Field
 from django import forms
-from django.core.exceptions import ValidationError
 
 from . import models
 
@@ -17,7 +16,7 @@ class CustomCheckbox(Field):
 class StudentAttendanceForm(forms.ModelForm):
     class Meta:
         model = models.Attendance
-        fields = ['will_attend', 'remote']
+        fields = ['remote']
 
     def clean(self):
         cleaned_data = super().clean()

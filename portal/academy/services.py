@@ -1,12 +1,15 @@
+import shlex
 import string
 import subprocess
 import logging
 import random
 from urllib.parse import urljoin, unquote
 
+import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework.reverse import reverse
+
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +59,21 @@ def perform_grading_local(user, unit):
 
     else:
         logger.info("Graded %s %s", user.username, unit.code)
+
+
+def simulate_grading_local(user, unit):
+    grader = get_user_model().objects.get(username=settings.GRADING_USERNAME)
+    # response = requests.put(
+    #     f'http://localhost:8000/academy/api/grades/{user.username}/units/{unit.code}/',
+    #     headers={'Authorization': f'Token {grader.auth_token.pk}'},
+    #     json={
+    #         'status': 'graded',
+    #         'score': 18,
+    #         'message': '',
+    #     })
+    # response.raise_for_status()
+    command = f'curl -X PUT http://localhost:8000/academy/api/grades/{user.username}/units/{unit.code}/ -H "Authorization: Token {grader.auth_token.pk}" -H "Content-Type: application/json" --data \'{{"status": "graded", "score": 16, "message": ""}}\''
+    subprocess.Popen(shlex.split(command))
 
 
 def perform_grading_production(user, unit):

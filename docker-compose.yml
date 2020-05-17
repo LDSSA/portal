@@ -22,20 +22,6 @@ services:
       - "8000:8000"
     command: /start
 
-  simulator:
-    build:
-      context: .
-      dockerfile: ./docker/local/django/Dockerfile
-    depends_on:
-      - postgres
-      - mailhog
-    volumes:
-      - .:/app
-    env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
-    command: /start_simulator
-
   postgres:
     build:
       context: .
@@ -52,8 +38,3 @@ services:
     image: mailhog/mailhog:v1.0.0
     ports:
       - "8025:8025"
-
-networks:
-  default:
-    external:
-      name: portal

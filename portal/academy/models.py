@@ -67,8 +67,5 @@ class Grade(models.Model):
         choices=STATUSES,
         default='never-submitted')
     message = models.TextField(blank=True)
-    updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('student', 'unit')

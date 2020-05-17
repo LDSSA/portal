@@ -68,8 +68,7 @@ class Attendance(models.Model):
     student = models.ForeignKey(settings.AUTH_USER_MODEL,
                                 on_delete=models.CASCADE,
                                 related_name='attendance')
-    will_attend = models.BooleanField(default=False)
-    present = models.BooleanField(default=False)
+    present = models.BooleanField(default=True)
     remote = models.BooleanField(default=False)
 
 

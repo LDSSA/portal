@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, AccessMixin
@@ -5,12 +7,16 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework import generics
+from rest_framework.response import Response
 from rest_framework.settings import import_from_string
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 
 from portal.academy import models, serializers
+
+
+logger = logging.getLogger(__name__)
 
 
 # noinspection PyUnresolvedReferences
@@ -48,6 +54,15 @@ class HomeRedirectView(LoginRequiredMixin, RedirectView):
         return super().get_redirect_url(*args, **kwargs)
 
 
+def get_grade(unit, user):
+    grade = (unit.grades.filter(student=user)
+             .order_by('-created')
+             .first())
+    if grade is None:
+        grade = models.Grade(student=user, unit=unit)
+    return grade
+
+
 class StudentUnitListView(StudentMixin, ListView):
     model = models.Unit
     queryset = models.Unit.objects.order_by('due_date')
@@ -58,9 +73,7 @@ class StudentUnitListView(StudentMixin, ListView):
         self.object_list = self.get_queryset()
         data = []
         for unit in self.object_list:
-            grade, _ = models.Grade.objects.get_or_create(
-                student=request.user,
-                unit=unit)
+            grade = get_grade(unit, request.user)
             data.append((unit, grade))
 
         context = self.get_context_data(object_list=data)
@@ -80,15 +93,16 @@ class StudentUnitDetailView(StudentMixin, DetailView):
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset=queryset)
         unit = self.object
-
-        grade, _ = models.Grade.objects.get_or_create(
-            student=self.request.user,
-            unit=unit)
-
+        grade = (unit.grades.filter(student=self.request.user)
+                 .order_by('-created')
+                 .first())
+        if grade is None:
+            grade = models.Grade(student=self.request.user, unit=unit)
         return unit, grade
 
     def post(self, request, *args, **kwargs):
-        unit, grade = self.get_object()
+        unit, _ = self.get_object()
+        grade = models.Grade(student=self.request.user, unit=unit)
 
         if not unit.checksum:
             raise RuntimeError("Not checksum present for this unit")
@@ -165,8 +179,7 @@ class InstructorUserListView(InstructorMixin, ListView):
                     user_data['grades'].append(None)
 
                 else:
-                    grade, __ = models.Grade.objects.get_or_create(student=user,
-                                                                   unit=unit)
+                    grade = get_grade(unit, user)
                     if grade_status and grade.status != grade_status:
                         user_data['grades'].append(None)
                         continue
@@ -195,12 +208,19 @@ class GradingView(generics.RetrieveUpdateAPIView):
         user = get_user_model().objects.get(
             username=self.kwargs.get('username'))
         unit = models.Unit.objects.get(code=self.kwargs.get('unit').upper())
-        grade, _ = models.Grade.objects.get_or_create(
-            student=user,
-            unit=unit)
+        grade = (unit.grades.filter(student=user, status='sent')
+                 .order_by('-created').first())
+        if grade is None:
+            logger.critical('Received unexpected grade for %s %s',
+                            unit.code, user.username)
+            grade = models.Grade.objects.create(
+                student=user,
+                unit=unit)
 
         # May raise a permission denied
         self.check_object_permissions(self.request, grade)
+        logger.critical('Received grade for %s %s',
+                        unit.code, user.username)
 
         return grade
 

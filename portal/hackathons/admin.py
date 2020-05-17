@@ -35,15 +35,14 @@ class TeamAdmin(admin.ModelAdmin):
 
 @admin.register(models.Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
-    list_display = ('hackathon', 'student', 'will_attend', 'present', 'remote')
+    list_display = ('hackathon', 'student', 'present', 'remote')
     fields = (
         'hackathon',
         'student',
-        'will_attend',
         'present',
         'remote',
     )
-    list_filter = ('hackathon', 'will_attend', 'remote')
+    list_filter = ('hackathon', 'remote')
 
 
 @admin.register(models.Submission)
