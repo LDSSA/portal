@@ -6,7 +6,7 @@ from allauth.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 from django.http import HttpRequest
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 
 from portal.users.models import UserWhitelist
 
@@ -35,7 +35,7 @@ class SocialAccountWhitelistAdapter(DefaultSocialAccountAdapter):
         try:
             UserWhitelist.objects.get(username=sociallogin.user)
         except UserWhitelist.DoesNotExist:
-            raise ImmediateHttpResponse(render_to_response('whitelist.html'))
+            raise ImmediateHttpResponse(render(request, 'whitelist.html'))
 
     def populate_user(self, request, sociallogin, data):
         user = super().populate_user(request, sociallogin, data)

@@ -23,8 +23,6 @@ class Hackathon(models.Model):
 
     status_choices = (
         ('closed', 'Closed'),
-        ('taking_attendance', 'Taking Attendance'),
-        ('attendance_closed', 'Attendance Closed'),
         ('marking_presences', 'Marking Presences'),
         ('generating_teams', 'Generating Teams'),
         ('ready', 'Ready'),
@@ -69,7 +67,7 @@ class Attendance(models.Model):
                                 on_delete=models.CASCADE,
                                 related_name='attendance')
     present = models.BooleanField(default=True)
-    remote = models.BooleanField(default=False)
+    # remote = models.BooleanField(default=False)
 
 
 class Team(models.Model):
@@ -77,7 +75,7 @@ class Team(models.Model):
                                   on_delete=models.CASCADE,
                                   related_name='teams')
     hackathon_team_id = models.IntegerField(default=0)
-    remote = models.BooleanField(default=False)
+    # remote = models.BooleanField(default=False)
     students = models.ManyToManyField(settings.AUTH_USER_MODEL,
                                       related_name='hackathon_teams')
     name = models.TextField(blank=True)

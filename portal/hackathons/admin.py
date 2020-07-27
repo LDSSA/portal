@@ -29,20 +29,31 @@ class HackathonAdmin(admin.ModelAdmin):
 
 @admin.register(models.Team)
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ('hackathon_team_id', 'name', 'remote', 'hackathon')
+    list_display = ('hackathon_team_id',
+                    'name',
+                    # 'remote',
+                    'hackathon')
     list_filter = ('hackathon', )
 
 
 @admin.register(models.Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
-    list_display = ('hackathon', 'student', 'present', 'remote')
+    list_display = (
+        'hackathon',
+        'student',
+        'present',
+        # 'remote',
+    )
     fields = (
         'hackathon',
         'student',
         'present',
-        'remote',
+        # 'remote',
     )
-    list_filter = ('hackathon', 'remote')
+    list_filter = (
+        'hackathon',
+        # 'remote',
+    )
 
 
 @admin.register(models.Submission)

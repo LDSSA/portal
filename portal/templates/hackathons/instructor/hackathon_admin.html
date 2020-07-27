@@ -26,52 +26,9 @@
       <div class="mb-4">
         <form method="post">
           {% csrf_token %}
-          <input type="hidden" name="status" value="taking_attendance">
-          <button type="submit"
-                  class="btn btn-success">Open student attendance</button>
-        </form>
-      </div>
-    </div>
-  {% elif object.status == "taking_attendance" %}
-    <div class="col-md-auto">
-      <div class="mb-4">
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="status" value="attendance_closed">
-          <button type="submit"
-                  class="btn btn-success">Close student attendance</button>
-        </form>
-      </div>
-    </div>
-    <div class="col-md-auto">
-      <div class="mb-4">
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="status" value="closed">
-          <button type="submit"
-                  class="btn btn-danger">Go back</button>
-        </form>
-      </div>
-    </div>
-  {% elif object.status == "attendance_closed" %}
-    <div class="col-md-auto">
-      <div class="mb-4">
-        <form method="post">
-          {% csrf_token %}
           <input type="hidden" name="status" value="marking_presences">
           <button type="submit"
-                  class="btn btn-success"
-                  name="marking-presences">Start marking presence</button>
-        </form>
-      </div>
-    </div>
-    <div class="col-md-auto">
-      <div class="mb-4">
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="status" value="taking_attendance">
-          <button type="submit"
-                  class="btn btn-danger">Go back</button>
+                  class="btn btn-success">Mark student presences</button>
         </form>
       </div>
     </div>
@@ -86,7 +43,7 @@
       <div class="mb-4">
         <form method="post">
           {% csrf_token %}
-          <input type="hidden" name="status" value="attendance_closed">
+          <input type="hidden" name="status" value="closed">
           <button type="submit"
                   class="btn btn-danger">Go back</button>
         </form>
@@ -109,7 +66,7 @@
           {% csrf_token %}
           <input type="hidden" name="status" value="generating_teams">
           <button type="submit"
-                  class="btn btn-info">Re-Generate</button>
+                  class="btn btn-info">Generate Teams</button>
         </form>
       </div>
     </div>
@@ -211,7 +168,7 @@
           <th scope="col">Team</th>
           <th scope="col">Username</th>
           <th scope="col">Name</th>
-          <th scope="col">Remote</th>
+{#          <th scope="col">Remote</th>#}
           <th scope="col">Present</th>
         </tr>
       </thead>
@@ -221,7 +178,7 @@
           <td>{{ item.team.hackathon_team_id }}</td>
           <td>{{ item.student.username }}</td>
           <td>{{ item.student.name }}</td>
-          <td>{{ item.attendance.remote }}</td>
+{#          <td>{{ item.attendance.remote }}</td>#}
           <td>
             {% if object.status == "marking_presences" %}
               <div class="form-check">

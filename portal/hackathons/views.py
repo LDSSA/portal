@@ -190,8 +190,8 @@ class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
                     item['attendance'].present = False
                 item['attendance'].save()
 
-        if new_status == 'generating_teams':
-            if cur_status in ('marking_presences', 'generating_teams'):
+        elif new_status == 'generating_teams':
+            if cur_status == 'generating_teams':
                 self.object.teams.all().delete()
                 services.generate_teams(self.object,
                                         self.object.team_size,

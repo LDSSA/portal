@@ -11,7 +11,29 @@ from . import models
 logger = logging.getLogger(__name__)
 
 
-def create_teams(hackathon, present_teams, remote_teams):
+def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
+    logger.info("Generating Teams Size: %s Max: %s Max teams: %s",
+                team_size, max_team_size, max_teams)
+    present = models.Attendance.objects.filter(hackathon=hackathon,
+                                               present=True)
+    present = [p.student for p in present]
+    logger.debug("Present %s", present)
+
+    for i in range(team_size, max_team_size + 1):
+        present_teams = get_groups(present, team_size)
+
+        if len(present_teams) > max_teams:
+            team_size += 1
+            continue
+        else:
+            break
+    else:
+        raise RuntimeError("Cannot fit with these parameters")
+
+    create_teams(hackathon, present_teams)
+
+
+def create_teams(hackathon, present_teams):
     hackathon_team_id = 1
     for students in present_teams:
         team = models.Team.objects.create(
@@ -21,18 +43,8 @@ def create_teams(hackathon, present_teams, remote_teams):
         logger.info("Team %s students %s", hackathon_team_id, students)
         hackathon_team_id += 1
 
-    for students in remote_teams:
-        team = models.Team.objects.create(
-            hackathon=hackathon,
-            hackathon_team_id=hackathon_team_id,
-            remote=True)
-        team.students.set(students)
-        logger.info("(remote) Team %s students %s",
-                    hackathon_team_id, students)
-        hackathon_team_id += 1
 
-
-def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
+def generate_teams_with_remote(hackathon, team_size=3, max_team_size=6, max_teams=13):
     logger.info("Generating Teams Size: %s Max: %s Max teams: %s",
                 team_size, max_team_size, max_teams)
     present = models.Attendance.objects.filter(hackathon=hackathon,
@@ -59,6 +71,27 @@ def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
         raise RuntimeError("Cannot fit with these parameters")
 
     create_teams(hackathon, present_teams, remote_teams)
+
+
+def create_teams_with_remote(hackathon, present_teams, remote_teams):
+    hackathon_team_id = 1
+    for students in present_teams:
+        team = models.Team.objects.create(
+            hackathon=hackathon,
+            hackathon_team_id=hackathon_team_id)
+        team.students.set(students)
+        logger.info("Team %s students %s", hackathon_team_id, students)
+        hackathon_team_id += 1
+
+    for students in remote_teams:
+        team = models.Team.objects.create(
+            hackathon=hackathon,
+            hackathon_team_id=hackathon_team_id,
+            remote=True)
+        team.students.set(students)
+        logger.info("(remote) Team %s students %s",
+                    hackathon_team_id, students)
+        hackathon_team_id += 1
 
 
 def get_groups(items, size, max_diff=1):

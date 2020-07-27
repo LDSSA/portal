@@ -16,7 +16,9 @@ class CustomCheckbox(Field):
 class StudentAttendanceForm(forms.ModelForm):
     class Meta:
         model = models.Attendance
-        fields = ['remote']
+        fields = [
+            # 'remote'
+        ]
 
     def clean(self):
         cleaned_data = super().clean()

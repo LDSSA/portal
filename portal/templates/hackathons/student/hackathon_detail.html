@@ -25,30 +25,31 @@
 
   {% else %}
 
-    {% if hackathon.status == "taking_attendance" %}
-    <!-- Student attendance-->
-    <div class="row">
-      <div class="col-md-auto">
-        <div class="mb-4">
-          <h3>Mark your attendance</h3>
-          <form method="post">
-            {% csrf_token %}
-            {{ attendance_form|crispy }}
-            <button type="submit"
-                    class="btn btn-success"
-                    name="attendance">Save</button>
-          </form>
-        </div>
-      </div>
-    </div>
-    {% elif hackathon.status in hackathon.teams_ready %}
+{#    {% if hackathon.status == "taking_attendance" %}#}
+{#    <!-- Student attendance-->#}
+{#    <div class="row">#}
+{#      <div class="col-md-auto">#}
+{#        <div class="mb-4">#}
+{#          <h3>Mark your attendance</h3>#}
+{#          <form method="post">#}
+{#            {% csrf_token %}#}
+{#            {{ attendance_form|crispy }}#}
+{#            <button type="submit"#}
+{#                    class="btn btn-success"#}
+{#                    name="attendance">Save</button>#}
+{#          </form>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
+    {% if hackathon.status in hackathon.teams_ready %}
       <!-- Team data -->
       <div class="row">
         <div class="col-md-auto">
           <h3>Team ID:</h3>
         </div>
         <div class="col-md-auto">
-          {{ team.hackathon_team_id }} {% if team.remote %} (remote){% endif %}
+{#          {{ team.hackathon_team_id }} {% if team.remote %} (remote){% endif %}#}
+          {{ team.hackathon_team_id }}
         </div>
       </div>
       <div class="row">
