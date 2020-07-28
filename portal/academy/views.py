@@ -220,8 +220,7 @@ class GradingView(generics.RetrieveUpdateAPIView):
 
         # May raise a permission denied
         self.check_object_permissions(self.request, grade)
-        logger.critical('Received grade for %s %s',
-                        unit.code, user.username)
+        logger.info('Received grade for %s %s', unit.code, user.username)
 
         return grade
 
