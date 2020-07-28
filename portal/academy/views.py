@@ -208,7 +208,8 @@ class GradingView(generics.RetrieveUpdateAPIView):
         user = get_user_model().objects.get(
             username=self.kwargs.get('username'))
         unit = models.Unit.objects.get(code=self.kwargs.get('unit').upper())
-        grade = (unit.grades.filter(student=user, status='sent')
+        grade = (unit.grades
+                 .filter(student=user, status__in=('sent', 'grading'))
                  .order_by('-created').first())
         if grade is None:
             logger.critical('Received unexpected grade for %s %s',
