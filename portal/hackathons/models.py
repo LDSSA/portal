@@ -48,7 +48,7 @@ class Hackathon(models.Model):
                               choices=status_choices,
                               default='closed')
 
-    max_submissions = models.IntegerField(default=3)
+    max_submissions = models.IntegerField(default=5)
     team_size = models.IntegerField(default=3)
     max_team_size = models.IntegerField(default=6)
     max_teams = models.IntegerField(default=13)
