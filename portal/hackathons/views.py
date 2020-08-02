@@ -102,6 +102,7 @@ class StudentHackathonDetailView(StudentMixin, generic.DetailView):
                                             request.user,
                                             request.FILES['data'])
             except Exception as exc:
+                logger.exception("Exception in scoring function")
                 messages.add_message(request, messages.ERROR, str(exc))
 
             else:
