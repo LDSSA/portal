@@ -116,6 +116,10 @@ def get_groups(items, size, max_diff=1):
     return groups
 
 
+class ValidationError(Exception):
+    pass
+
+
 def submission(hackathon, user, file):
     if user.student:
         if hackathon.status not in ('submissions_open', 'complete'):
@@ -149,9 +153,13 @@ def submission(hackathon, user, file):
     # Load prediction data
     y_pred = glob['load'](file)
 
-    is_valid = glob['validate'](y_true, y_pred)
+    try:
+        is_valid = glob['validate'](y_true, y_pred)
+    except Exception as exc:
+        raise ValidationError('Error validating data') from exc
+
     if not is_valid:
-        raise RuntimeError('Invalid input')
+        raise ValidationError('Invalid input')
 
     # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
     score = glob['score'](y_true, y_pred)
