@@ -65,7 +65,7 @@ def get_grade(unit, user):
 
 class StudentUnitListView(StudentMixin, ListView):
     model = models.Unit
-    queryset = models.Unit.objects.order_by('due_date')
+    queryset = models.Unit.objects.order_by('-specialization', '-code')
     template_name = 'academy/student/unit_list.html'
 
     # noinspection PyAttributeOutsideInit
