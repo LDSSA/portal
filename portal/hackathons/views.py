@@ -191,13 +191,13 @@ class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
                     item['attendance'].present = False
                 item['attendance'].save()
 
-        elif new_status == 'generating_teams':
-            if cur_status == 'generating_teams':
-                self.object.teams.all().delete()
-                services.generate_teams(self.object,
-                                        self.object.team_size,
-                                        self.object.max_team_size,
-                                        self.object.max_teams)
+        elif (new_status == 'generating_teams'
+              and cur_status == 'generating_teams'):
+            self.object.teams.all().delete()
+            services.generate_teams(self.object,
+                                    self.object.team_size,
+                                    self.object.max_team_size,
+                                    self.object.max_teams)
 
         elif new_status == 'taking_attendance':
             for user in get_user_model().objects.filter(student=True):
@@ -205,6 +205,8 @@ class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
                     student=user,
                     hackathon=self.object)
 
+        # Delete test submissions
+        elif new_status == 'closed' and cur_status == 'closed':
             models.Submission.objects.filter(hackathon=self.object).delete()
 
         return HttpResponseRedirect(self.get_success_url())
