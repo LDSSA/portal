@@ -32,6 +32,18 @@
         </form>
       </div>
     </div>
+    <div class="col-md-auto">
+      <div class="mb-4">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="status" value="closed">
+          <button type="submit"
+                  class="btn btn-success"
+                  onclick="return confirm('This operation is unrecoverable!');"
+          >Delete submissions</button>
+        </form>
+      </div>
+    </div>
   {% elif object.status == "marking_presences" %}
     <div class="col-md-auto">
       <div class="mb-4">
