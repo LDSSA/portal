@@ -142,11 +142,7 @@ class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
 
     def get_object_list(self):
         object_list = []
-        attendance = (models.Attendance.objects
-                      .filter(hackathon=self.object)
-                      .order_by(
-                          'student__hackathon_teams__hackathon_team_id',
-                          'present'))
+        attendance = models.Attendance.objects.filter(hackathon=self.object)
         for att in attendance:
             try:
                 team = att.student.hackathon_teams.get(
@@ -155,9 +151,11 @@ class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
                 team = None
 
             object_list.append({
+                'hackathon_team_id': team.hackathon_team_id,
                 'student': att.student,
                 'team': team,
                 'attendance': att})
+        object_list = sorted(object_list, key=lambda x: x['hackathon_team_id'])
         return object_list
 
     def get(self, request, *args, **kwargs):
