@@ -45,7 +45,9 @@
           {% csrf_token %}
           <input type="hidden" name="status" value="closed">
           <button type="submit"
-                  class="btn btn-danger">Go back</button>
+                  class="btn btn-danger"
+                  onclick="return confirm('Are you sure you want to go back?');"
+          >Go back</button>
         </form>
       </div>
     </div>
@@ -66,7 +68,9 @@
           {% csrf_token %}
           <input type="hidden" name="status" value="generating_teams">
           <button type="submit"
-                  class="btn btn-info">Generate Teams</button>
+                  class="btn btn-info"
+                  onclick="return confirm('Are you sure you want to generate teams? THIS WILL ERASE THE PREVIOUSLY GENERATED TEAMS');"
+          >Generate Teams</button>
         </form>
       </div>
     </div>
@@ -76,7 +80,9 @@
           {% csrf_token %}
           <input type="hidden" name="status" value="marking_presences">
           <button type="submit"
-                  class="btn btn-danger">Go back</button>
+                  class="btn btn-danger"
+                  onclick="return confirm('Are you sure you want to go back to marking presences?');"
+          >Go back</button>
         </form>
       </div>
     </div>
@@ -97,7 +103,9 @@
           {% csrf_token %}
           <input type="hidden" name="status" value="generating_teams">
           <button type="submit"
-                  class="btn btn-danger">Go back</button>
+                  class="btn btn-danger"
+                  onclick="return confirm('Are you sure you want to go back to generating teams?');"
+          >Go back</button>
         </form>
       </div>
     </div>
@@ -118,7 +126,9 @@
           {% csrf_token %}
           <input type="hidden" name="status" value="ready">
           <button type="submit"
-                  class="btn btn-danger">Go back</button>
+                  class="btn btn-danger"
+                  onclick="return confirm('Are you sure you want to go back to before opening submissions?');"
+          >Go back</button>
         </form>
       </div>
     </div>
@@ -139,7 +149,9 @@
           {% csrf_token %}
           <input type="hidden" name="status" value="submissions_open">
           <button type="submit"
-                  class="btn btn-danger">Go back</button>
+                  class="btn btn-danger"
+                  onclick="return confirm('Are you sure you want to go back and re-open the submissions?');"
+          >Go back</button>
         </form>
       </div>
     </div>
@@ -150,7 +162,9 @@
           {% csrf_token %}
           <input type="hidden" name="status" value="submissions_closed">
           <button type="submit"
-                  class="btn btn-danger">Go back</button>
+                  class="btn btn-danger"
+                  onclick="return confirm('Are you sure you want to go back?');"
+          >Go back</button>
         </form>
       </div>
     </div>
