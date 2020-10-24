@@ -157,7 +157,7 @@ class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
                 team = None
 
             object_list.append({
-                'hackathon_team_id': team.hackathon_team_id,
+                'hackathon_team_id': team.hackathon_team_id if team is not None else '',
                 'student': att.student,
                 'team': team,
                 'attendance': att})
