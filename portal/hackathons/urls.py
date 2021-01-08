@@ -9,6 +9,10 @@ urlpatterns = [
     path(r'student/hackathons/<str:pk>/leaderboard/',
          view=views.LeaderboardView.as_view(),
          name='leaderboard'),
+    # FrankenLeaderboard
+    path(r'student/hackathons/frankenleaderboard/',
+         view=views.FrankenLeaderboardView.as_view(),
+         name='frankenleaderboard'),
 
     # API
     # https://portal.lisbondatascience.org/hackathons/api/setup/{codename}/

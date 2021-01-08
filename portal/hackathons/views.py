@@ -41,6 +41,42 @@ class LeaderboardView(LoginRequiredMixin, generic.DetailView):
         return self.render_to_response(context)
 
 
+class FrankenLeaderboardView(LoginRequiredMixin, generic.DetailView):
+    model = models.Hackathon
+    queryset = models.Hackathon.objects.all()
+    template_name = 'hackathons/leaderboard.html'
+
+    def get(self, request, *args, **kwargs):
+        submissions = {}
+        # If scores are to be descending (higher is top score)
+        ordering = '-' if self.object.descending else ''
+
+        # get the teams for this hackathon
+        hckt06 = model.objects.filter(code='HCKT06')
+        hckt06_teams = hckt06.teams.all()
+
+        context = {}
+        for team in hckt06_teams
+            # get the score of the student with the highest score
+            # this will be the team score
+            scores = []
+            for student in team.students:
+                student_api = capstone.models.StudentApi.objects.filter(
+                    student=student
+                )
+                scores.append(student_api.score)
+
+            try:
+                score = max(scores)
+            except ValueError:
+                # scores is empty,
+                # meaning there are no submissions for this team
+                continue
+            context[team] = student
+
+        return self.render_to_response(context)
+
+
 class StudentHackathonListView(StudentMixin, generic.ListView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by('code')
