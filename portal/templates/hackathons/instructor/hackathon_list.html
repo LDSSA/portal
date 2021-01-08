@@ -34,14 +34,15 @@
       <td>{{ obj.get_status_display }}</td>
       <td>{{ obj.due_date }}</td>
       <td>
-        if obj.pk!= 'HCKT06':
+        {% if obj.pk != 'HCKT06' %}
           <a href="{% url 'hackathons:leaderboard' obj.pk%}">
             Leaderboard
           </a>
-        else:
+        {% else %}
           <a href="{% url 'hackathons:frankenleaderboard'%}">
             Leaderboard
           </a>
+        {% endif %}
       </td>
       <td>
         <a href="{% url 'hackathons:instructor-hackathon-admin' obj.pk %}">
