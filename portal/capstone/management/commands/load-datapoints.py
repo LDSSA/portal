@@ -25,7 +25,11 @@ class Command(BaseCommand):
         datapoints = []
         idx = 0
         for idx, datapoint in enumerate(data):
-            dp = models.Datapoint(simulator=simulator, data=json.dumps(data))
+            dp = models.Datapoint(
+                simulator=simulator, 
+                data=json.dumps(data['data']), 
+                outcome=json.dumps(data.get('outcome', '')),
+                )
             datapoints.append(dp)
 
             if (idx + 1) % options['batch_size'] == 0:
