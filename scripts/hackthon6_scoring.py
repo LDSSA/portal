@@ -11,7 +11,6 @@ def score(student_api):
     :param student_api: StudentApi object
     :return: score as a float
     '''
-    prediction_key = "TODO!!!!"
 
     # Check which simulators have datapoints with outcomes outcomes
     simulator_ids = []
@@ -35,7 +34,7 @@ def score(student_api):
 
         else:
             try:
-                prediction = json.loads(ddp.response_content)['prediction_key']
+                prediction = json.loads(ddp.response_content)['prediction']
             except (json.JSONDecodeError, KeyError):
                 predictions.append(1 - ddp.datapoint.outcome)  # TODO what to do??
                 outcomes.append(ddp.datapoint.outcome)
