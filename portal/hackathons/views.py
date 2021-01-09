@@ -55,7 +55,7 @@ class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
         # Get the teams for this hackathon
         hckt06 = models.Hackathon.objects.filter(code='HCKT06')[0]
         hckt06_teams = hckt06.teams.all()
-        capstone = Capstone.objects.get(name='Hackthon 6')
+        capstone = Capstone.objects.get(name='Hackathon 6')
 
         for team in hckt06_teams:
             # Get the score of the student with the highest score

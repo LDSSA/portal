@@ -12,8 +12,12 @@ from django.utils import timezone
 def random_path(instance, filename):
     date = str(timezone.now()).split(' ')[0]
     randstr = "".join(random.choices(string.ascii_lowercase, k=12))
-    return (f'{instance.code}_{filename}'
-            f'_{date}_{randstr}')
+    if hasattr(instance, 'code'):
+        return (f'{instance.code}_{filename}'
+                f'_{date}_{randstr}')
+    else:
+        return (f'{instance.__class__.__name__}{instance.id}_{filename}'
+                f'_{date}_{randstr}')
 
 
 class Hackathon(models.Model):
