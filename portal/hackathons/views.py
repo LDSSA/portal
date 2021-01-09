@@ -12,6 +12,7 @@ from rest_framework import generics
 
 from portal.academy.views import StudentMixin, InstructorMixin
 from portal.hackathons import models, serializers, forms, services
+from portal.capstone.models import StudentApi, Capstone
 
 
 logger = logging.getLogger(__name__)
@@ -41,39 +42,40 @@ class LeaderboardView(LoginRequiredMixin, generic.DetailView):
         return self.render_to_response(context)
 
 
-class FrankenLeaderboardView(LoginRequiredMixin, generic.DetailView):
-    model = models.Hackathon
-    queryset = models.Hackathon.objects.all()
+class MockSubmission:
+    def __init__(self, score):
+        self.score = score
+
+
+class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'hackathons/leaderboard.html'
 
     def get(self, request, *args, **kwargs):
         submissions = {}
-        # If scores are to be descending (higher is top score)
-        ordering = '-' if self.object.descending else ''
-
-        # get the teams for this hackathon
-        hckt06 = model.objects.filter(code='HCKT06')
+        # Get the teams for this hackathon
+        hckt06 = models.Hackathon.objects.filter(code='HCKT06')
         hckt06_teams = hckt06.teams.all()
+        capstone = Capstone.objects.get(name='Hackthon 6')
 
-        context = {}
-        for team in hckt06_teams
-            # get the score of the student with the highest score
+        for team in hckt06_teams:
+            # Get the score of the student with the highest score
             # this will be the team score
             scores = []
-            for student in team.students:
-                student_api = capstone.models.StudentApi.objects.filter(
-                    student=student
-                )
+            for student in team.students.all():
+                student_api = StudentApi.objects.get(capstone=capstone,
+                                                     student=student)
                 scores.append(student_api.score)
 
             try:
                 score = max(scores)
             except ValueError:
-                # scores is empty,
-                # meaning there are no submissions for this team
+                # Team has not registered an app
+                score = 0
+            if score == 0:
                 continue
-            context[team] = student
+            submissions[team] = MockSubmission(0)
 
+        context = self.get_context_data(submissions=submissions)
         return self.render_to_response(context)
 
 
