@@ -53,7 +53,7 @@ class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
     def get(self, request, *args, **kwargs):
         submissions = {}
         # Get the teams for this hackathon
-        hckt06 = models.Hackathon.objects.filter(code='HCKT06')
+        hckt06 = models.Hackathon.objects.filter(code='HCKT06')[0]
         hckt06_teams = hckt06.teams.all()
         capstone = Capstone.objects.get(name='Hackthon 6')
 
@@ -62,9 +62,12 @@ class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
             # this will be the team score
             scores = []
             for student in team.students.all():
-                student_api = StudentApi.objects.get(capstone=capstone,
-                                                     student=student)
-                scores.append(student_api.score)
+                try:
+                    student_api = StudentApi.objects.get(capstone=capstone,
+                                                        student=student)
+                    scores.append(student_api.score)
+                except StudentApi.DoesNotExist:
+                    continue
 
             try:
                 score = max(scores)
