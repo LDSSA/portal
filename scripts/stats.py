@@ -2,6 +2,7 @@
 from portal.academy import models as amodels
 from portal.hackathons import models as hmodels
 
+
 for h in (hmodels.Hackathon.objects
           .order_by('code')
           .exclude(code__in=('HCKT0', 'HCKT00'))):

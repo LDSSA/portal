@@ -12,6 +12,7 @@ from rest_framework import generics
 
 from portal.academy.views import StudentMixin, InstructorMixin
 from portal.hackathons import models, serializers, forms, services
+from portal.capstone.models import StudentApi, Capstone
 
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,43 @@ class LeaderboardView(LoginRequiredMixin, generic.DetailView):
         context = self.get_context_data(object=self.object,
                                         submissions=submissions)
 
+        return self.render_to_response(context)
+
+
+class MockSubmission:
+    def __init__(self, score):
+        self.score = score
+
+
+class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
+    template_name = 'hackathons/leaderboard.html'
+
+    def get(self, request, *args, **kwargs):
+        submissions = {}
+        # Get the teams for this hackathon
+        hckt06 = models.Hackathon.objects.filter(code='HCKT06')
+        hckt06_teams = hckt06.teams.all()
+        capstone = Capstone.objects.get(name='Hackthon 6')
+
+        for team in hckt06_teams:
+            # Get the score of the student with the highest score
+            # this will be the team score
+            scores = []
+            for student in team.students.all():
+                student_api = StudentApi.objects.get(capstone=capstone,
+                                                     student=student)
+                scores.append(student_api.score)
+
+            try:
+                score = max(scores)
+            except ValueError:
+                # Team has not registered an app
+                score = 0
+            if score == 0:
+                continue
+            submissions[team] = MockSubmission(0)
+
+        context = self.get_context_data(submissions=submissions)
         return self.render_to_response(context)
 
 
