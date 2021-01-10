@@ -60,23 +60,15 @@ class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
         for team in hckt06_teams:
             # Get the score of the student with the highest score
             # this will be the team score
-            scores = []
-            for student in team.students.all():
-                try:
-                    student_api = StudentApi.objects.get(capstone=capstone,
-                                                        student=student)
-                    scores.append(student_api.score)
-                except StudentApi.DoesNotExist:
-                    continue
+            scores = StudentApi.objects.filter(
+                capstone=capstone, 
+                student_id__in=team.students.values_list('id', flat=True)
+                ).exclude(score=0.).values_list('score', flat=True)
 
-            try:
-                score = max(scores)
-            except ValueError:
-                # Team has not registered an app
-                score = 0
-            if score == 0:
+            if not scores:
                 continue
-            submissions[team] = MockSubmission(0)
+
+            submissions[team] = MockSubmission(max(scores))
 
         context = self.get_context_data(submissions=submissions)
         return self.render_to_response(context)
