@@ -83,7 +83,7 @@ def score(student_api):
 
                 sensitive_class_race[race]["outcomes"].append(outcome)
                 sensitive_class_race[race]["predictions"].append(prediction)
-                if not isinstance(value, bool):
+                if not isinstance(prediction, bool):
                     predictions.append(not outcome)
                 else:
                     predictions.append(prediction)
