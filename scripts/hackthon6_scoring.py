@@ -57,7 +57,7 @@ def score(student_api):
     sensitive_class_race = {}
     sensitive_class_sex = {}
     for ddp in qs:  # loop through each entry in DueDataPoint
-        outcome = json.loads(ddp.datapoint.outcome)
+        outcome = bool(json.loads(ddp.datapoint.outcome))
         data = json.loads(ddp.datapoint.data)
         if ddp.response_status != 200:  # Missing or bad response
             predictions.append(not outcome)
