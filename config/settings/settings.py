@@ -20,7 +20,7 @@ TIMEOUT = 5
 SIMULATOR_INTERVAL = 5
 PRODUCER_INTERVAL = 1
 REQUEST_TIMEOUT = 10
-BLOCK_SIZE = 50
+BLOCK_SIZE = 500
 
 # GRADING
 # ------------------------------------------------------------------------------
