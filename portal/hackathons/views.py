@@ -70,6 +70,7 @@ class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
 
             submissions[team] = MockSubmission(max(scores))
 
+        submissions = sorted(submissions, key=lambda x: x.score)
         context = self.get_context_data(submissions=submissions)
         return self.render_to_response(context)
 
