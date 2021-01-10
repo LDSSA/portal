@@ -22,7 +22,7 @@ def run():
     submissions = queue.Queue()
 
     # Start consumer pool
-    with PoolExecutor(max_workers=100) as executor:
+    with PoolExecutor(max_workers=50) as executor:
         # Start simulator
         logger.info("Starting simulator..")
         executor.submit(run_simulator)
