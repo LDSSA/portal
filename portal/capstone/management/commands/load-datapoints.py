@@ -27,8 +27,8 @@ class Command(BaseCommand):
         for idx, datapoint in enumerate(data):
             dp = models.Datapoint(
                 simulator=simulator, 
-                data=json.dumps(data['data']), 
-                outcome=json.dumps(data.get('outcome', '')),
+                data=json.dumps(datapoint['data']), 
+                outcome=json.dumps(datapoint.get('outcome', '')),
                 )
             datapoints.append(dp)
 
