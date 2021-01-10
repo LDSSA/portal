@@ -42,7 +42,8 @@ class StudentApi(models.Model):
 
 
 class Simulator(models.Model):
-    capstone = models.ForeignKey(Capstone, models.CASCADE)
+    capstone = models.ForeignKey(Capstone, models.CASCADE, 
+                                 related_name='simulators')
 
     name = models.CharField(max_length=1024)
     started = models.DateTimeField(null=True)
