@@ -83,8 +83,10 @@ def score(student_api):
 
                 sensitive_class_race[race]["outcomes"].append(outcome)
                 sensitive_class_race[race]["predictions"].append(prediction)
-
-                predictions.append(prediction)
+                if not isinstance(value, bool):
+                    predictions.append(not outcome)
+                else:
+                    predictions.append(prediction)
                 outcomes.append(outcome)
 
     f1_score = metrics.f1_score(outcomes, predictions, pos_label=True)
@@ -94,6 +96,6 @@ def score(student_api):
 
     is_fair = race_diff < 0.2 and sex_diff < 0.2
     if not is_fair:
-        f1_score = 0.0
+        f1_score -= 0.1
 
     return f1_score
