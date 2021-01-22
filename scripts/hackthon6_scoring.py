@@ -1,9 +1,11 @@
 import json
+import logging
 
 from sklearn import metrics
 
 from portal.capstone.models import DueDatapoint
 
+logger = logging.getLogger(__name__)
 
 def fairness_score_precision(sensitive_class):
     '''
@@ -23,7 +25,7 @@ def fairness_score_precision(sensitive_class):
         outcomes = sensitive_class[s_class]["outcomes"]
         predictions = sensitive_class[s_class]["predictions"]
         if len(outcomes) > 100:
-            precisions.append(metrics.precision(outcomes, predictions))
+            precisions.append(metrics.precision_score(outcomes, predictions))
 
     precision_diff = 0
     if precisions:
@@ -32,7 +34,7 @@ def fairness_score_precision(sensitive_class):
     return precision_diff
 
 
-def score(student_api):
+def score(capstone, student_api):
     '''
     Calculates the score of the students' API model
     :param student_api: StudentApi object
@@ -41,7 +43,7 @@ def score(student_api):
 
     # Check which simulators have datapoints with outcomes outcomes
     simulator_ids = []
-    for simulator in student_api.capstone.simulators.all():
+    for simulator in capstone.simulators.all():
         if simulator.datapoints.exclude(outcome="").count() > 0:
             simulator_ids.append(simulator.id)
 
@@ -57,7 +59,7 @@ def score(student_api):
     sensitive_class_race = {}
     sensitive_class_sex = {}
     for ddp in qs:  # loop through each entry in DueDataPoint
-        outcome = json.loads(ddp.datapoint.outcome)
+        outcome = bool(json.loads(ddp.datapoint.outcome))
         data = json.loads(ddp.datapoint.data)
         if ddp.response_status != 200:  # Missing or bad response
             predictions.append(not outcome)
@@ -83,17 +85,24 @@ def score(student_api):
 
                 sensitive_class_race[race]["outcomes"].append(outcome)
                 sensitive_class_race[race]["predictions"].append(prediction)
-
-                predictions.append(prediction)
+                if not isinstance(prediction, bool):
+                    predictions.append(not outcome)
+                else:
+                    predictions.append(prediction)
                 outcomes.append(outcome)
 
+    logger.info(student_api.student)
     f1_score = metrics.f1_score(outcomes, predictions, pos_label=True)
+    logger.info("f1_score %s" % f1_score)
 
     race_diff = fairness_score_precision(sensitive_class_race)
     sex_diff = fairness_score_precision(sensitive_class_sex)
 
     is_fair = race_diff < 0.2 and sex_diff < 0.2
+    logger.info("race_diff %s" % race_diff)
+    logger.info("sex_diff %s" % sex_diff)
+    logger.info("is_fair %s" % is_fair)
     if not is_fair:
-        f1_score = 0.0
+        f1_score -= 0.1
 
     return f1_score
