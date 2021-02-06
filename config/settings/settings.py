@@ -16,7 +16,7 @@ if READ_DOT_ENV_FILE:
 
 # CAPSTONE
 # ------------------------------------------------------------------------------
-TIMEOUT = 1
+TIMEOUT = 5
 SIMULATOR_INTERVAL = 5
 PRODUCER_INTERVAL = 1
 REQUEST_TIMEOUT = 10
