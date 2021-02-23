@@ -33,30 +33,24 @@ urlpatterns = [
 )
 
 # User management
-# TODO sorry, just needed this to work
-if settings.LOGIN_URL == 'account_login':
-    urlpatterns += [
-        path("signup/", views.signup, name="account_signup"),
-        path("login/", views.login, name="account_login"),
-        # password reset
-        path("password/reset/",
-             views.password_reset,
-             name="account_reset_password"),
-        path("password/reset/done/",
-             views.password_reset_done,
-             name="account_reset_password_done"),
-        re_path(r"^password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
-                views.password_reset_from_key,
-                name="account_reset_password_from_key"),
-        path("password/reset/key/done/",
-             views.password_reset_from_key_done,
-             name="account_reset_password_from_key_done"),
-    ]
-else:
-    urlpatterns += [
-        path("accounts/",
-             include("allauth.socialaccount.providers.github.urls")),
-    ]
+urlpatterns += [
+    path("signup/", views.signup, name="account_signup"),
+    path("login/", views.login, name="account_login"),
+    # password reset
+    path("password/reset/",
+            views.password_reset,
+            name="account_reset_password"),
+    path("password/reset/done/",
+            views.password_reset_done,
+            name="account_reset_password_done"),
+    re_path(r"^password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
+            views.password_reset_from_key,
+            name="account_reset_password_from_key"),
+    path("password/reset/key/done/",
+            views.password_reset_from_key_done,
+            name="account_reset_password_from_key_done"),
+]
+
 urlpatterns += [
     path(r"accounts/email/", views.email, name="account_email"),
 ]
