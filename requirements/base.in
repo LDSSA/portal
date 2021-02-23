@@ -5,6 +5,7 @@ rcssmin  # https://github.com/ndparker/rcssmin
 argon2-cffi  # https://github.com/hynek/argon2_cffi
 redis  # https://github.com/antirez/redis
 cryptography
+pyyaml
 
 # Django
 # ------------------------------------------------------------------------------

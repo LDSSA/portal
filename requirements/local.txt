@@ -4,102 +4,249 @@
 #
 #    pip-compile --output-file=local.txt base.in local.in
 #
-alabaster==0.7.12         # via sphinx
-argon2-cffi==20.1.0       # via -r base.in
-asgiref==3.2.7            # via django
-attrs==19.3.0             # via pytest
-babel==2.8.0              # via sphinx
-backcall==0.1.0           # via ipython
-certifi==2020.4.5.1       # via requests
-cffi==1.14.0              # via argon2-cffi, cryptography
-chardet==3.0.4            # via requests
-coverage==5.1             # via -r local.in, django-coverage-plugin
-cryptography==2.9.2       # via -r base.in
-decorator==4.4.2          # via ipython, traitlets
-defusedxml==0.6.0         # via python3-openid
-django-allauth==0.41.0    # via -r base.in
-django-appconf==1.0.4     # via django-compressor
-django-compressor==2.4    # via -r base.in
-django-coverage-plugin==1.8.0  # via -r local.in
-django-crispy-forms==1.9.1  # via -r base.in
-django-debug-toolbar==2.2  # via -r local.in
-django-environ==0.4.5     # via -r base.in
-django-extensions==2.2.9  # via -r local.in
-django-model-utils==4.0.0  # via -r base.in
-django-redis==4.11.0      # via -r base.in
-django==3.0.6             # via -r base.in, django-allauth, django-appconf, django-debug-toolbar, django-model-utils, django-redis, djangorestframework
-djangorestframework==3.11.0  # via -r base.in
-docutils==0.16            # via sphinx
-factory-boy==2.12.0       # via -r local.in
-faker==4.1.0              # via factory-boy
-flake8==3.8.1             # via -r local.in
-idna==2.9                 # via requests
-imagesize==1.2.0          # via sphinx
-importlib-metadata==1.6.0  # via flake8, pluggy, pytest
-ipdb==0.13.2              # via -r local.in
-ipython-genutils==0.2.0   # via traitlets
-ipython==7.14.0           # via ipdb
-jedi==0.17.0              # via ipython
-jinja2==2.11.2            # via sphinx
-joblib==0.15.1            # via scikit-learn
-markupsafe==1.1.1         # via jinja2
-mccabe==0.6.1             # via flake8
-ml-metrics==0.1.4         # via -r base.in
-more-itertools==8.3.0     # via pytest
-mypy-extensions==0.4.3    # via mypy
-mypy==0.770               # via -r local.in
-numpy==1.18.4             # via -r base.in, ml-metrics, pandas, scikit-learn, scipy
-oauthlib==3.1.0           # via requests-oauthlib
-packaging==20.3           # via pytest, pytest-sugar, sphinx
-pandas==1.0.3             # via -r base.in, ml-metrics
-parso==0.7.0              # via jedi
-pexpect==4.8.0            # via ipython
-pickleshare==0.7.5        # via ipython
-pillow==7.1.2             # via -r base.in
-pluggy==0.13.1            # via pytest
-prompt-toolkit==3.0.5     # via ipython
-psycopg2-binary==2.8.5    # via -r local.in
-ptyprocess==0.6.0         # via pexpect
-py==1.8.1                 # via pytest
-pycodestyle==2.6.0        # via flake8
-pycparser==2.20           # via cffi
-pyflakes==2.2.0           # via flake8
-pygments==2.6.1           # via ipython, sphinx
-pyparsing==2.4.7          # via packaging
-pytest-django==3.9.0      # via -r local.in
-pytest-sugar==0.9.3       # via -r local.in
-pytest==5.4.2             # via -r local.in, pytest-django, pytest-sugar
-python-dateutil==2.8.1    # via faker, pandas
-python-slugify==4.0.0     # via -r base.in
-python3-openid==3.1.0     # via django-allauth
-pytz==2020.1              # via -r base.in, babel, django, pandas
-rcssmin==1.0.6            # via -r base.in, django-compressor
-redis==3.5.2              # via -r base.in, django-redis
-requests-oauthlib==1.3.0  # via django-allauth
-requests==2.23.0          # via django-allauth, requests-oauthlib, sphinx
-rjsmin==1.1.0             # via django-compressor
-scikit-learn==0.23.0      # via -r base.in
-scipy==1.4.1              # via scikit-learn
-six==1.14.0               # via argon2-cffi, cryptography, django-compressor, django-coverage-plugin, django-extensions, packaging, python-dateutil, traitlets
-snowballstemmer==2.0.0    # via sphinx
-sphinx==3.0.3             # via -r local.in
-sphinxcontrib-applehelp==1.0.2  # via sphinx
-sphinxcontrib-devhelp==1.0.2  # via sphinx
-sphinxcontrib-htmlhelp==1.0.3  # via sphinx
-sphinxcontrib-jsmath==1.0.1  # via sphinx
-sphinxcontrib-qthelp==1.0.3  # via sphinx
-sphinxcontrib-serializinghtml==1.1.4  # via sphinx
-sqlparse==0.3.1           # via django, django-debug-toolbar
-termcolor==1.1.0          # via pytest-sugar
-text-unidecode==1.3       # via faker, python-slugify
-threadpoolctl==2.0.0      # via scikit-learn
-traitlets==4.3.3          # via ipython
-typed-ast==1.4.1          # via mypy
-typing-extensions==3.7.4.2  # via mypy
-urllib3==1.25.9           # via requests
-wcwidth==0.1.9            # via prompt-toolkit, pytest
-werkzeug==1.0.1           # via -r local.in
-zipp==3.1.0               # via importlib-metadata
+alabaster==0.7.12
+    # via sphinx
+argon2-cffi==20.1.0
+    # via -r base.in
+asgiref==3.3.1
+    # via django
+attrs==20.3.0
+    # via pytest
+babel==2.9.0
+    # via sphinx
+backcall==0.2.0
+    # via ipython
+certifi==2020.12.5
+    # via requests
+cffi==1.14.5
+    # via
+    #   argon2-cffi
+    #   cryptography
+chardet==4.0.0
+    # via requests
+coverage==5.4
+    # via
+    #   -r local.in
+    #   django-coverage-plugin
+cryptography==3.4.6
+    # via
+    #   -r base.in
+    #   pyjwt
+decorator==4.4.2
+    # via ipython
+defusedxml==0.6.0
+    # via python3-openid
+django-allauth==0.44.0
+    # via -r base.in
+django-appconf==1.0.4
+    # via django-compressor
+django-compressor==2.4
+    # via -r base.in
+django-coverage-plugin==1.8.0
+    # via -r local.in
+django-crispy-forms==1.11.1
+    # via -r base.in
+django-debug-toolbar==3.2
+    # via -r local.in
+django-environ==0.4.5
+    # via -r base.in
+django-extensions==3.1.1
+    # via -r local.in
+django-model-utils==4.1.1
+    # via -r base.in
+django-redis==4.12.1
+    # via -r base.in
+django==3.1.7
+    # via
+    #   -r base.in
+    #   django-allauth
+    #   django-appconf
+    #   django-debug-toolbar
+    #   django-model-utils
+    #   django-redis
+    #   djangorestframework
+djangorestframework==3.12.2
+    # via -r base.in
+docutils==0.16
+    # via sphinx
+factory-boy==3.2.0
+    # via -r local.in
+faker==6.4.1
+    # via factory-boy
+flake8==3.8.4
+    # via -r local.in
+idna==2.10
+    # via requests
+imagesize==1.2.0
+    # via sphinx
+iniconfig==1.1.1
+    # via pytest
+ipdb==0.13.4
+    # via -r local.in
+ipython-genutils==0.2.0
+    # via traitlets
+ipython==7.20.0
+    # via ipdb
+jedi==0.18.0
+    # via ipython
+jinja2==2.11.3
+    # via sphinx
+joblib==1.0.1
+    # via scikit-learn
+markupsafe==1.1.1
+    # via jinja2
+mccabe==0.6.1
+    # via flake8
+ml-metrics==0.1.4
+    # via -r base.in
+mypy-extensions==0.4.3
+    # via mypy
+mypy==0.812
+    # via -r local.in
+numpy==1.20.1
+    # via
+    #   -r base.in
+    #   ml-metrics
+    #   pandas
+    #   scikit-learn
+    #   scipy
+oauthlib==3.1.0
+    # via requests-oauthlib
+packaging==20.9
+    # via
+    #   pytest
+    #   pytest-sugar
+    #   sphinx
+pandas==1.2.2
+    # via
+    #   -r base.in
+    #   ml-metrics
+parso==0.8.1
+    # via jedi
+pexpect==4.8.0
+    # via ipython
+pickleshare==0.7.5
+    # via ipython
+pillow==8.1.0
+    # via -r base.in
+pluggy==0.13.1
+    # via pytest
+prompt-toolkit==3.0.16
+    # via ipython
+psycopg2-binary==2.8.6
+    # via -r local.in
+ptyprocess==0.7.0
+    # via pexpect
+py==1.10.0
+    # via pytest
+pycodestyle==2.6.0
+    # via flake8
+pycparser==2.20
+    # via cffi
+pyflakes==2.2.0
+    # via flake8
+pygments==2.8.0
+    # via
+    #   ipython
+    #   sphinx
+pyjwt[crypto]==2.0.1
+    # via django-allauth
+pyparsing==2.4.7
+    # via packaging
+pytest-django==4.1.0
+    # via -r local.in
+pytest-sugar==0.9.4
+    # via -r local.in
+pytest==6.2.2
+    # via
+    #   -r local.in
+    #   pytest-django
+    #   pytest-sugar
+python-dateutil==2.8.1
+    # via
+    #   faker
+    #   pandas
+python-slugify==4.0.1
+    # via -r base.in
+python3-openid==3.2.0
+    # via django-allauth
+pytz==2021.1
+    # via
+    #   -r base.in
+    #   babel
+    #   django
+    #   pandas
+pyyaml==5.4.1
+    # via -r base.in
+rcssmin==1.0.6
+    # via
+    #   -r base.in
+    #   django-compressor
+redis==3.5.3
+    # via
+    #   -r base.in
+    #   django-redis
+requests-oauthlib==1.3.0
+    # via django-allauth
+requests==2.25.1
+    # via
+    #   django-allauth
+    #   requests-oauthlib
+    #   sphinx
+rjsmin==1.1.0
+    # via django-compressor
+scikit-learn==0.24.1
+    # via -r base.in
+scipy==1.6.1
+    # via scikit-learn
+six==1.15.0
+    # via
+    #   argon2-cffi
+    #   django-compressor
+    #   django-coverage-plugin
+    #   python-dateutil
+snowballstemmer==2.1.0
+    # via sphinx
+sphinx==3.5.1
+    # via -r local.in
+sphinxcontrib-applehelp==1.0.2
+    # via sphinx
+sphinxcontrib-devhelp==1.0.2
+    # via sphinx
+sphinxcontrib-htmlhelp==1.0.3
+    # via sphinx
+sphinxcontrib-jsmath==1.0.1
+    # via sphinx
+sphinxcontrib-qthelp==1.0.3
+    # via sphinx
+sphinxcontrib-serializinghtml==1.1.4
+    # via sphinx
+sqlparse==0.4.1
+    # via
+    #   django
+    #   django-debug-toolbar
+termcolor==1.1.0
+    # via pytest-sugar
+text-unidecode==1.3
+    # via
+    #   faker
+    #   python-slugify
+threadpoolctl==2.1.0
+    # via scikit-learn
+toml==0.10.2
+    # via pytest
+traitlets==5.0.5
+    # via ipython
+typed-ast==1.4.2
+    # via mypy
+typing-extensions==3.7.4.3
+    # via mypy
+urllib3==1.26.3
+    # via requests
+wcwidth==0.2.5
+    # via prompt-toolkit
+werkzeug==1.0.1
+    # via -r local.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
