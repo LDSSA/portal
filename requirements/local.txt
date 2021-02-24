@@ -32,6 +32,8 @@ cryptography==3.4.6
     # via
     #   -r base.in
     #   pyjwt
+debugpy==1.2.1
+    # via -r local.in
 decorator==4.4.2
     # via ipython
 defusedxml==0.6.0
