@@ -19,8 +19,9 @@ services:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
     ports:
-      - "8000:8000"
-    command: /start
+      - 8000:8000
+      - 5678:5678
+    command: python -m debugpy --listen 0.0.0.0:5678 manage.py runserver 0.0.0.0:8000
 
   postgres:
     build:
