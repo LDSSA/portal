@@ -16,7 +16,9 @@ jobs:
       - run:
           name: Store image tag
           command: |
-            pwd
+            mkdir /workspace
+            mv project /workspace
+            cd /workspace/project
             echo "IMAGE_TAG=$(echo `git log -n1 --format="%h"`)" >> /workspace/env
       - persist_to_workspace:
           root: /workspace
