@@ -2,7 +2,7 @@ version: 2
 
 fast-checkout: &fast-checkout
   attach_workspace:
-    at: /workspace
+    at: /tmp/workspace
 
 jobs:
   persist-checkout:
@@ -16,12 +16,12 @@ jobs:
       - run:
           name: Store image tag
           command: |
-            mkdir /workspace
-            mv project /workspace
-            cd /workspace/project
-            echo "IMAGE_TAG=$(echo `git log -n1 --format="%h"`)" >> /workspace/env
+            mkdir /tmp/workspace
+            mv project /tmp/workspace
+            cd /tmp/workspace/project
+            echo "IMAGE_TAG=$(echo `git log -n1 --format="%h"`)" >> /tmp/workspace/env
       - persist_to_workspace:
-          root: /workspace
+          root: /tmp/workspace
           paths:
             - project
             - env
@@ -35,7 +35,7 @@ jobs:
         environment:
           SNYK_TOKEN: TODO
           MONITOR: "true"
-          PROJECT_FOLDER: /workspace/project
+          PROJECT_FOLDER: /tmp/workspace/project
     steps:
       - *fast-checkout
       - run:
@@ -68,9 +68,9 @@ jobs:
       - run:
           name: Build and push django image
           command: |
-            source /workspace/env
+            source /tmp/workspace/env
             docker build -f docker/local/django/Dockerfile -t django:$IMAGE_TAG .
-            docker save -o /workspace/image/django.tar oxpecker-api:$IMAGE_TAG
+            docker save -o /tmp/workspace/image/django.tar oxpecker-api:$IMAGE_TAG
       - persist_to_workspace:
           root: /root
           paths:
@@ -85,12 +85,12 @@ jobs:
     steps:
       - setup_remote_docker
       - attach_workspace:
-          at: /workspace/image
+          at: /tmp/workspace/image
       - run:
           name: Build and push django image
           command: |
-            source /workspace/env
-            docker load -i /workspace/image/django.tar
+            source /tmp/workspace/env
+            docker load -i /tmp/workspace/image/django.tar
             docker push ldssa/django:$IMAGE_TAG
 
   deploy:
