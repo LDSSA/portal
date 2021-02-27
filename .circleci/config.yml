@@ -16,8 +16,8 @@ jobs:
       - run:
           name: Store image tag
           command: |
-            cd project
-            echo "IMAGE_TAG=$(echo `git log -n1 --format="%h"`)" >> $HOME/env
+            cd $HOME
+            echo "IMAGE_TAG=$(echo `git log -n1 --format="%h"`)" >> env
       - persist_to_workspace:
           root: $HOME
           paths:
