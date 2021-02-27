@@ -1,3 +1,4 @@
+debugpy
 Werkzeug  # https://github.com/pallets/werkzeug
 ipdb  # https://github.com/gotcha/ipdb
 Sphinx  # https://github.com/sphinx-doc/sphinx

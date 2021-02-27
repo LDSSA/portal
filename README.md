@@ -8,7 +8,7 @@ Your friendly neighborhood LDSA Academy portal.
 The first time you need to create the database and a super user.
 ```bash
 docker-compose run --rm django ./manage.py migrate
-docker-compose run --rm django ./manage.py createsuperuser
+docker-compose run --rm django ./manage.py loaddata fixtures/initial.yaml
 ```
 
 To test submissions get the hash for the exercise notebook using ldsagrader add
@@ -26,6 +26,13 @@ http://localhost:8000
 
 And the admin site in:
 http://localhost:8000/admin/
+
+
+### Updating Fixtures
+
+```bash
+docker-compose run --rm django ./manage.py dumpdata --format=yaml --output=fixtures/initial.yaml
+```
 
 
 ## Build & push
