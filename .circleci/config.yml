@@ -1,0 +1,130 @@
+version: 2
+
+fast-checkout: &fast-checkout
+  attach_workspace:
+    at: /root
+
+jobs:
+  persist-checkout:
+    docker:
+      - image: circleci/python:3.9
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - checkout
+      - run:
+          name: Store image tag
+          command: |
+            echo "IMAGE_TAG=$(echo `git log -n1 --format="%h"`)" >> /root/env
+      - persist_to_workspace:
+          root: /root
+          paths:
+            - project
+            - env
+
+  test-snyk:
+    docker:
+      - image: snyk/snyk-cli
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+        environment:
+          SNYK_TOKEN: TODO
+          MONITOR: "true"
+          PROJECT_FOLDER: /root/project
+    steps:
+      - *fast-checkout
+      - run:
+          name: Run snyk
+          command: |
+            snyk test --org=ldsa
+
+  test-prospector:
+    docker:
+      - image: circleci/python:3.9
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - *fast-checkout
+      - run:
+          name: Run prospector
+          command: |
+            pip install prospector[with_everything]
+            prospector
+  build:
+    docker:
+      - image: circleci/python:3.9
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - *fast-checkout
+      - setup_remote_docker
+      - run:
+          name: Build and push django image
+          command: |
+            source /root/env
+            docker build -f docker/local/django/Dockerfile -t django:$IMAGE_TAG .
+            docker save -o /root/image/django.tar oxpecker-api:$IMAGE_TAG
+      - persist_to_workspace:
+          root: /root
+          paths:
+            - image/django.tar
+
+  push:
+    docker:
+      - image: circleci/python:3.9
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - setup_remote_docker
+      - attach_workspace:
+          at: /root/image
+      - run:
+          name: Build and push django image
+          command: |
+            source /root/env
+            docker load -i /root/image/django.tar
+            docker push ldssa/django:$IMAGE_TAG
+
+  deploy:
+    docker:
+      - image: circleci/python:3.9
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - run:
+          name: Deploy
+          command: |
+            sentry-cli releases new --finalize -p backend oxpecker-api:$CI_COMMIT_SHORT_SHA
+            sentry-cli releases set-commits --auto oxpecker-api:$CI_COMMIT_SHORT_SHA
+
+workflows:
+  version: 2
+
+  workflow:
+    jobs:
+      - persist-checkout 
+      - test-snyk:
+          requires:
+            - persist-checkout
+      - test-prospector:
+          requires:
+            - persist-checkout
+      - approval:
+          requires:
+            - test-snyk
+            - test-prospector
+      - build:
+          requires:
+            - approval
+      - push:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - approval
