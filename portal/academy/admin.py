@@ -40,6 +40,7 @@ class GradeAdmin(admin.ModelAdmin):
         'unit',
         'student',
         'status',
+        'created',
         'score',
     )
     search_fields = ['unit__code', 'student__username', 'student__name', ]
@@ -49,3 +50,16 @@ class GradeAdmin(admin.ModelAdmin):
         'unit',
         'student',
     )
+    fields = (
+        'unit',
+        'student',
+        'status',
+        'created',
+        'score',
+        'notebook',
+        'message',
+    )
+    readonly_fields = (
+        'created',
+    )
+
