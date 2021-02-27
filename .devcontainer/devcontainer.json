@@ -28,6 +28,7 @@
 		"ms-azuretools.vscode-docker",
 		"mhutchie.git-graph",
 		"eamodio.gitlens",
+		"redhat.vscode-yaml",
 	],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
