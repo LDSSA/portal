@@ -111,35 +111,35 @@ workflows:
     jobs:
       - persist-checkout:
           context: 
-            - common-env
+            - Common Env
       - test-snyk:
           context: 
-            - common-env
+            - Common Env
           requires:
             - persist-checkout
       - test-prospector:
           context: 
-            - common-env
+            - Common Env
           requires:
             - persist-checkout
       - approval:
           context: 
-            - common-env
+            - Common Env
           requires:
             - test-snyk
             - test-prospector
       - build:
           context: 
-            - common-env
+            - Common Env
           requires:
             - approval
       - push:
           context: 
-            - common-env
+            - Common Env
           requires:
             - build
       - deploy:
           context: 
-            - common-env
+            - Common Env
           requires:
             - approval
