@@ -73,7 +73,7 @@ docutils==0.16
     # via sphinx
 factory-boy==3.2.0
     # via -r local.in
-faker==6.4.1
+faker==6.5.0
     # via factory-boy
 flake8==3.8.4
     # via -r local.in
@@ -87,7 +87,7 @@ ipdb==0.13.4
     # via -r local.in
 ipython-genutils==0.2.0
     # via traitlets
-ipython==7.20.0
+ipython==7.21.0
     # via ipdb
 jedi==0.18.0
     # via ipython
