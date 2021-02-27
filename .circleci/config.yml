@@ -38,7 +38,7 @@ jobs:
       - run:
           name: Run snyk
           command: |
-            snyk test --org=ldsa
+            snyk test --org=$SNYK_ORG_ID
 
   test-prospector:
     docker:
@@ -51,6 +51,7 @@ jobs:
       - run:
           name: Run prospector
           command: |
+            cd /tmp/workspace/project
             pip install prospector[with_everything]
             prospector
   build:
@@ -108,23 +109,37 @@ workflows:
 
   workflow:
     jobs:
-      - persist-checkout 
+      - persist-checkout:
+          context: 
+            - common-env
       - test-snyk:
+          context: 
+            - common-env
           requires:
             - persist-checkout
       - test-prospector:
+          context: 
+            - common-env
           requires:
             - persist-checkout
       - approval:
+          context: 
+            - common-env
           requires:
             - test-snyk
             - test-prospector
       - build:
+          context: 
+            - common-env
           requires:
             - approval
       - push:
+          context: 
+            - common-env
           requires:
             - build
       - deploy:
+          context: 
+            - common-env
           requires:
             - approval
