@@ -16,10 +16,9 @@ jobs:
       - run:
           name: Store image tag
           command: |
-            cd $HOME
-            echo "IMAGE_TAG=$(echo `git log -n1 --format="%h"`)" >> env
+            echo "IMAGE_TAG=$(echo `git log -n1 --format="%h"`)" >> $HOME/env
       - persist_to_workspace:
-          root: $HOME
+          root: /home/circleci
           paths:
             - project
             - env
