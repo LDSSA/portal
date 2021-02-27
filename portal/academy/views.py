@@ -200,6 +200,63 @@ class InstructorUserListView(InstructorMixin, ListView):
         return self.render_to_response(context)
 
 
+class InstructorUnitListView(InstructorMixin, ListView):
+    model = models.Unit
+    queryset = models.Unit.objects.order_by('-specialization', '-code')
+    template_name = 'academy/instructor/unit_list.html'
+
+    # noinspection PyAttributeOutsideInit
+    def get(self, request, *args, **kwargs):
+        self.object_list = self.get_queryset()
+        data = []
+        for unit in self.object_list:
+            grade = get_grade(unit, request.user)
+            data.append((unit, grade))
+
+        context = self.get_context_data(object_list=data)
+        return self.render_to_response(context)
+
+
+class InstructorUnitDetailView(InstructorMixin, DetailView):
+    model = models.Unit
+    template_name = 'academy/instructor/unit_detail.html'
+
+    def get(self, request, *args, **kwargs):
+        unit, grade = self.get_object()
+        context = self.get_context_data(unit=unit, grade=grade)
+        return self.render_to_response(context)
+
+    # noinspection PyAttributeOutsideInit
+    def get_object(self, queryset=None):
+        self.object = super().get_object(queryset=queryset)
+        unit = self.object
+        grade = (unit.grades.filter(student=self.request.user)
+                 .order_by('-created')
+                 .first())
+        if grade is None:
+            grade = models.Grade(student=self.request.user, unit=unit)
+        return unit, grade
+
+    def post(self, request, *args, **kwargs):
+        unit, _ = self.get_object()
+        grade = models.Grade(student=self.request.user, unit=unit)
+
+        if not unit.checksum:
+            raise RuntimeError("Not checksum present for this unit")
+
+        # Clear grade
+        grade.status = 'sent'
+        grade.score = None
+        grade.notebook = None
+        grade.message = ''
+        grade.save()
+
+        # Send to grading
+        grading_fcn = import_from_string(settings.GRADING_FCN, 'GRADING_FCN')
+        grading_fcn(request.user, unit)
+
+        return HttpResponseRedirect(request.path_info)
+
 class GradingView(generics.RetrieveUpdateAPIView):
     queryset = models.Grade.objects.all()
     serializer_class = serializers.GradeSerializer

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+{% load grade_tags %}
+
+{% block title %}Learning Units{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row mb-5 mt-5">
+    <div class="col">
+      <h1>Learning Units</h1>
+    </div>
+  </div>
+
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Code</th>
+        <th scope="col">Name</th>
+        <th scope="col">Due Date</th>
+        <th scope="col">Instructor</th>
+        <th scope="col">Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+     {% for unit, grade in object_list %}
+      <tr  id="row-{{ unit.code }}">
+        <th>
+          <a href="{% url 'academy:instructor-unit-detail' unit.pk %}">
+            {{ unit.specialization.code }}/{{ unit.pk }}
+          </a>
+        </th>
+        <td>{{ unit.name }}</td>
+        <td>{{ unit.due_date }}</td>
+        <td>{{ unit.instructor.name |default:unit.instructor.username}}</td>
+        <td>
+          {% show_grade grade %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+</div>
+{% endblock content %}
+
