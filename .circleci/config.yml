@@ -36,7 +36,11 @@ jobs:
           command: |
             cd /tmp/workspace/project
             ls -l
-            snyk test --org=$SNYK_ORG_NAME
+            python -m venv .production
+            pip source .production/bin/activate
+            pip install -r requirements/production.txt
+            snyk test --org=$SNYK_ORG_NAME --package-manager=pip --file=requirements/production.txt
+            snyk monitor --org=$SNYK_ORG_NAME --package-manager=pip --file=requirements/production.txt
 
   test-prospector:
     docker:
