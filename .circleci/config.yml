@@ -102,7 +102,7 @@ workflows:
           context: 
             - Common Env
           requires:
-            - persis-checkout
+            - persist-checkout
       - test-prospector:
           context: 
             - Common Env
