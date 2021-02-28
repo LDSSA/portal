@@ -25,7 +25,7 @@ jobs:
 
   test-snyk:
     docker:
-      - image: snyk/snyk-cli
+      - image: snyk/snyk-cli:python-3
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -52,7 +52,8 @@ jobs:
           name: Run prospector
           command: |
             cd /tmp/workspace/project
-            pip install prospector[with_everything]
+            pip3 install prospector[with_everything]
+            which prospector
             prospector
   build:
     docker:
