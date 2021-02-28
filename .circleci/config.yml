@@ -23,46 +23,6 @@ jobs:
             - project
             - env
 
-  test-snyk:
-    docker:
-      - image: snyk/snyk-cli:python-3
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
-    steps:
-      - *fast-checkout
-      - run:
-          name: Run snyk
-          command: |
-            cd /tmp/workspace/project
-            python -m venv .production
-            source .production/bin/activate
-
-            REQUIREMENTS=requirements/production.txt
-            pip install -r $REQUIREMENTS
-            snyk test --org=$SNYK_ORG_NAME --project-name=$REQUIREMENTS --package-manager=pip --file=$REQUIREMENTS
-            snyk monitor --org=$SNYK_ORG_NAME --project-name=$REQUIREMENTS --package-manager=pip --file=$REQUIREMENTS
-
-            DOCKERFILE=docker/production/django/Dockerfile
-            snyk container test --org=$SNYK_ORG_NAME --project-name=$DOCKERFILE --file=$DOCKERFILE
-            snyk container monitor --org=$SNYK_ORG_NAME --project-name=$DOCKERFILE --file=$DOCKERFILE
-
-  test-prospector:
-    docker:
-      - image: circleci/python:3.8
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
-    steps:
-      - *fast-checkout
-      - run:
-          name: Run prospector
-          command: |
-            cd /tmp/workspace/project
-            ls -l
-            sudo pip3 install prospector[with_everything]
-            which prospector
-            prospector
   build:
     docker:
       - image: circleci/python:3.9
@@ -76,12 +36,29 @@ jobs:
           name: Build and push django image
           command: |
             source /tmp/workspace/env
-            docker build -f docker/local/django/Dockerfile -t django:$IMAGE_TAG .
+            docker build -f docker/production/django/Dockerfile -t django:$IMAGE_TAG .
             docker save -o /tmp/workspace/image/django.tar oxpecker-api:$IMAGE_TAG
       - persist_to_workspace:
-          root: /root
+          root: /home/circleci
           paths:
             - image/django.tar
+
+  test-prospector:
+    docker:
+      - image: circleci/python:3.8
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - setup_remote_docker
+      - *fast-checkout
+      - run:
+          name: Run prospector
+          command: |
+            source /tmp/workspace/env
+            docker load -i /tmp/workspace/image/django.tar
+            docker push 
+            docker run --rm ldssa/django:$IMAGE_TAG pip install prospector[with_everything];prospector
 
   push:
     docker:
@@ -121,11 +98,6 @@ workflows:
       - persist-checkout:
           context: 
             - Common Env
-      - test-snyk:
-          context: 
-            - Common Env
-          requires:
-            - persist-checkout
       - test-prospector:
           context: 
             - Common Env
@@ -135,7 +107,6 @@ workflows:
           context: 
             - Common Env
           requires:
-            - test-snyk
             - test-prospector
       - push:
           context: 
