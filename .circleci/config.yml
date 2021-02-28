@@ -35,11 +35,12 @@ jobs:
           name: Run snyk
           command: |
             cd /tmp/workspace/project
-            snyk test -d --org=$SNYK_ORG_NAME
+            ls -l
+            snyk test --org=$SNYK_ORG_NAME
 
   test-prospector:
     docker:
-      - image: circleci/python:3.9
+      - image: circleci/python:3.8
         auth:
           username: $DOCKER_USER
           password: $DOCKER_PASS
@@ -49,6 +50,7 @@ jobs:
           name: Run prospector
           command: |
             cd /tmp/workspace/project
+            ls -l
             sudo pip3 install prospector[with_everything]
             which prospector
             prospector
