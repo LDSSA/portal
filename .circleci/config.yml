@@ -37,9 +37,15 @@ jobs:
             cd /tmp/workspace/project
             python -m venv .production
             source .production/bin/activate
-            pip install -r requirements/production.txt
-            snyk test --org=$SNYK_ORG_NAME --package-manager=pip --file=requirements/production.txt
-            snyk monitor --org=$SNYK_ORG_NAME --package-manager=pip --file=requirements/production.txt
+
+            REQUIREMENTS=requirements/production.txt
+            pip install -r $REQUIREMENTS
+            snyk test --org=$SNYK_ORG_NAME --project-name=$REQUIREMENTS --package-manager=pip --file=$REQUIREMENTS
+            snyk monitor --org=$SNYK_ORG_NAME --project-name=$REQUIREMENTS --package-manager=pip --file=$REQUIREMENTS
+
+            DOCKERFILE=docker/production/django/Dockerfile
+            snyk container test --org=$SNYK_ORG_NAME --project-name=$DOCKERFILE --file=$DOCKERFILE
+            snyk container monitor --org=$SNYK_ORG_NAME --project-name=$DOCKERFILE --file=$DOCKERFILE
 
   test-prospector:
     docker:
@@ -125,22 +131,22 @@ workflows:
             - Common Env
           requires:
             - persist-checkout
-      - approval:
+      - build:
           context: 
             - Common Env
           requires:
             - test-snyk
             - test-prospector
-      - build:
-          context: 
-            - Common Env
-          requires:
-            - approval
       - push:
           context: 
             - Common Env
           requires:
             - build
+      - approval:
+          context: 
+            - Common Env
+          requires:
+            - push
       - deploy:
           context: 
             - Common Env
