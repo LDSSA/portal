@@ -61,7 +61,7 @@ jobs:
             set -ex
             source /tmp/workspace/env
             docker load -i /tmp/workspace/image/django.tar
-            docker run --rm --entrypoint='' --name=django ldssa/django:$IMAGE_TAG tail -f /dev/null
+            docker run --rm --entrypoint=/usr/bin/env --name=django ldssa/django:$IMAGE_TAG tail -f /dev/null
             docker exec -u root django pip install prospector[with_everything]
             docker exec -u root django prospector
 
@@ -76,7 +76,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run:
-          name: Build and push django image
+          name: Push django image
           command: |
             source /tmp/workspace/env
             docker load -i /tmp/workspace/image/django.tar
@@ -93,8 +93,9 @@ jobs:
       - run:
           name: Deploy
           command: |
-            sentry-cli releases new --finalize -p backend django:$CI_COMMIT_SHORT_SHA
-            sentry-cli releases set-commits --auto django:$CI_COMMIT_SHORT_SHA
+            # sentry-cli releases new --finalize -p django django:$CI_COMMIT_SHORT_SHA
+            # sentry-cli releases set-commits --auto django:$CI_COMMIT_SHORT_SHA
+            true
 
 workflows:
   version: 2
@@ -120,6 +121,7 @@ workflows:
           requires:
             - build
       - approval:
+          type: approval
           context: 
             - Common Env
           requires:
