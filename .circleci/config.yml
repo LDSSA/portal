@@ -60,7 +60,6 @@ jobs:
           command: |
             source /tmp/workspace/env
             docker load -i /tmp/workspace/image/django.tar
-            docker push 
             docker run --rm ldssa/django:$IMAGE_TAG pip install prospector[with_everything];prospector
 
   push:
@@ -72,7 +71,7 @@ jobs:
     steps:
       - setup_remote_docker
       - attach_workspace:
-          at: /tmp/workspace/image
+          at: /tmp/workspace
       - run:
           name: Build and push django image
           command: |
