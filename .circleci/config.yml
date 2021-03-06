@@ -60,7 +60,9 @@ jobs:
           command: |
             source /tmp/workspace/env
             docker load -i /tmp/workspace/image/django.tar
-            docker run --rm --entrypoint='' ldssa/django:$IMAGE_TAG pip install prospector[with_everything];prospector
+            docker run --rm --entrypoint='' --name=django ldssa/django:$IMAGE_TAG tail -f /dev/null
+            docker exec -u root django pip install prospector[with_everything]
+            docker exec -u root django prospector
 
   push:
     docker:
@@ -117,6 +119,7 @@ workflows:
           requires:
             - build
       - approval:
+          type: approval
           context: 
             - Common Env
           requires:
