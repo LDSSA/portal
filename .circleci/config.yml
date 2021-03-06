@@ -40,7 +40,7 @@ jobs:
             source /tmp/workspace/env
             docker build -f docker/production/django/Dockerfile -t django:$IMAGE_TAG .
             mkdir -p /tmp/workspace/image
-            docker save -o /tmp/workspace/image/django.tar oxpecker-api:$IMAGE_TAG
+            docker save -o /tmp/workspace/image/django.tar django:$IMAGE_TAG
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
@@ -90,8 +90,8 @@ jobs:
       - run:
           name: Deploy
           command: |
-            sentry-cli releases new --finalize -p backend oxpecker-api:$CI_COMMIT_SHORT_SHA
-            sentry-cli releases set-commits --auto oxpecker-api:$CI_COMMIT_SHORT_SHA
+            sentry-cli releases new --finalize -p backend django:$CI_COMMIT_SHORT_SHA
+            sentry-cli releases set-commits --auto django:$CI_COMMIT_SHORT_SHA
 
 workflows:
   version: 2
