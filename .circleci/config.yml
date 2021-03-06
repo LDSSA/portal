@@ -33,14 +33,15 @@ jobs:
       - *fast-checkout
       - setup_remote_docker
       - run:
-          name: Build and push django image
+          name: Build django image
           command: |
             cd /tmp/workspace/project
             source /tmp/workspace/env
             docker build -f docker/production/django/Dockerfile -t django:$IMAGE_TAG .
+            mkdir -p /tmp/workspace/image
             docker save -o /tmp/workspace/image/django.tar oxpecker-api:$IMAGE_TAG
       - persist_to_workspace:
-          root: /home/circleci
+          root: /tmp/workspace
           paths:
             - image/django.tar
 
