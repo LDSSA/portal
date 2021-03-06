@@ -38,9 +38,9 @@ jobs:
             set -ex
             cd /tmp/workspace/project
             source /tmp/workspace/env
-            docker build -f docker/production/django/Dockerfile -t django:$IMAGE_TAG .
+            docker build -f docker/production/django/Dockerfile -t ldssa/django:$IMAGE_TAG .
             mkdir -p /tmp/workspace/image
-            docker save -o /tmp/workspace/image/django.tar django:$IMAGE_TAG
+            docker save -o /tmp/workspace/image/django.tar ldssa/django:$IMAGE_TAG
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
