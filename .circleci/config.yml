@@ -61,7 +61,7 @@ jobs:
             set -ex
             source /tmp/workspace/env
             docker load -i /tmp/workspace/image/django.tar
-            docker run --rm --entrypoint=/usr/bin/env --name=django ldssa/django:$IMAGE_TAG tail -f /dev/null
+            docker run -d --rm --entrypoint='' --name=django ldssa/django:$IMAGE_TAG tail -f /dev/null
             docker exec -u root django pip install prospector[with_everything]
             docker exec -u root django prospector
 
