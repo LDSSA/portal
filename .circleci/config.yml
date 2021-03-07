@@ -62,7 +62,7 @@ jobs:
             source /tmp/workspace/env
             docker load -i /tmp/workspace/image/django.tar
             docker run -d --rm --entrypoint='' --name=django ldssa/django:$IMAGE_TAG tail -f /dev/null
-            docker exec -u root django pip install prospector[with_pyroma,with_vulture,with_mypy,with_bandit]
+            docker exec -u root django pip install prospector[with_everything]
             docker exec -u root django prospector --die-on-tool-error --with-tool pyroma --with-tool vulture --with-tool mypy --with-tool bandit --show-profile
 
   push:
