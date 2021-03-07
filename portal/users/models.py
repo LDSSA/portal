@@ -19,6 +19,8 @@ class User(AbstractUser):
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
     logo = models.TextField(blank=True)
     student = models.BooleanField(default=True)
+    slack_member_id = models.TextField(blank=True)
+    github_username = models.TextField(blank=True)
     deploy_private_key = models.TextField(blank=True)
     deploy_public_key = models.TextField(blank=True)
 
