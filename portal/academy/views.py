@@ -63,10 +63,11 @@ def get_grade(unit, user):
     return grade
 
 
-class StudentUnitListView(StudentMixin, ListView):
+class BaseUnitListView(ListView):
     model = models.Unit
     queryset = models.Unit.objects.order_by('-specialization', '-code')
-    template_name = 'academy/student/unit_list.html'
+    template_name = None
+    detail_view_name = None
 
     # noinspection PyAttributeOutsideInit
     def get(self, request, *args, **kwargs):
@@ -76,13 +77,14 @@ class StudentUnitListView(StudentMixin, ListView):
             grade = get_grade(unit, request.user)
             data.append((unit, grade))
 
-        context = self.get_context_data(object_list=data)
+        context = self.get_context_data(object_list=data, 
+                                        detail_view_name=self.detail_view_name)
         return self.render_to_response(context)
 
 
-class StudentUnitDetailView(StudentMixin, DetailView):
+class BaseUnitDetailView(DetailView):
     model = models.Unit
-    template_name = 'academy/student/unit_detail.html'
+    template_name = None
 
     def get(self, request, *args, **kwargs):
         unit, grade = self.get_object()
@@ -119,6 +121,15 @@ class StudentUnitDetailView(StudentMixin, DetailView):
         grading_fcn(request.user, unit)
 
         return HttpResponseRedirect(request.path_info)
+
+
+class StudentUnitListView(StudentMixin, BaseUnitListView):
+    template_name = 'academy/student/unit_list.html'
+    detail_view_name = 'academy:student-unit-detail'
+
+
+class StudentUnitDetailView(StudentMixin, BaseUnitDetailView):
+    template_name = 'academy/student/unit_detail.html'
 
 
 class InstructorUserListView(InstructorMixin, ListView):
@@ -198,6 +209,15 @@ class InstructorUserListView(InstructorMixin, ListView):
                                         unit_list=unit_list,
                                         max_score=max_score)
         return self.render_to_response(context)
+
+
+class InstructorUnitListView(InstructorMixin, BaseUnitListView):
+    template_name = 'academy/instructor/unit_list.html'
+    detail_view_name = 'academy:instructor-unit-detail'
+
+
+class InstructorUnitDetailView(InstructorMixin, BaseUnitDetailView):
+    template_name = 'academy/instructor/unit_detail.html'
 
 
 class GradingView(generics.RetrieveUpdateAPIView):
