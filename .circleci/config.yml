@@ -46,24 +46,24 @@ jobs:
           paths:
             - image/django.tar
 
-  test-prospector:
-    docker:
-      - image: circleci/python:3.8
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
-    steps:
-      - setup_remote_docker
-      - *fast-checkout
-      - run:
-          name: Run prospector
-          command: |
-            set -ex
-            source /tmp/workspace/env
-            docker load -i /tmp/workspace/image/django.tar
-            docker run -d --rm --entrypoint='' --name=django ldssa/django:$IMAGE_TAG tail -f /dev/null
-            docker exec -u root django pip install prospector[with_everything]
-            docker exec -u root django prospector --die-on-tool-error --with-tool pyroma --with-tool vulture --with-tool mypy --with-tool bandit --show-profile
+  # test-prospector:
+  #   docker:
+  #     - image: circleci/python:3.8
+  #       auth:
+  #         username: $DOCKER_USER
+  #         password: $DOCKER_PASS
+  #   steps:
+  #     - setup_remote_docker
+  #     - *fast-checkout
+  #     - run:
+  #         name: Run prospector
+  #         command: |
+  #           set -ex
+  #           source /tmp/workspace/env
+  #           docker load -i /tmp/workspace/image/django.tar
+  #           docker run -d --rm --entrypoint='' --name=django ldssa/django:$IMAGE_TAG tail -f /dev/null
+  #           docker exec -u root django pip install prospector[with_everything]
+  #           docker exec -u root django prospector --die-on-tool-error --with-tool pyroma --with-tool vulture --with-tool mypy --with-tool bandit --show-profile
 
   push:
     docker:
@@ -122,11 +122,11 @@ workflows:
             - Common Env
           requires:
             - persist-checkout
-      - test-prospector:
-          context: 
-            - Common Env
-          requires:
-            - build
+      # - test-prospector:
+      #     context: 
+      #       - Common Env
+      #     requires:
+      #       - build
       - push:
           context: 
             - Common Env
