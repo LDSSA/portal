@@ -14,13 +14,14 @@ from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 
 from portal.academy import models, serializers
+from portal.users.views import UserRequiredFieldsMixin
 
 
 logger = logging.getLogger(__name__)
 
 
 # noinspection PyUnresolvedReferences
-class InstructorMixin(AccessMixin):
+class InstructorMixin(UserRequiredFieldsMixin, AccessMixin):
     """Verify that the current user is an instructor."""
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -32,7 +33,7 @@ class InstructorMixin(AccessMixin):
 
 
 # noinspection PyUnresolvedReferences
-class StudentMixin(AccessMixin):
+class StudentMixin(UserRequiredFieldsMixin, AccessMixin):
     """Verify that the current user is a student."""
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
