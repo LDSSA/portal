@@ -16,4 +16,9 @@
   </form>
   <h2>Deploy Key</h2>
   <p>{{ user.deploy_public_key }}</p>
+  <p>
+    <a href="{% url 'account_set_password' %}">
+      Change password
+    </a>
+  </p>
 {% endblock %}

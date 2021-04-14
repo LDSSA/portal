@@ -40,6 +40,7 @@ DJANGO_CACHE_TEMPLATES=False
 DJANGO_SECURITY_EXTRAS=False
 # EMAIL
 # ------------------------------------------------------------------------------
+DJANGO_DEFAULT_FROM_EMAIL=notifications@lisbondatascience.org
 # ADMIN
 # ------------------------------------------------------------------------------
 # django-allauth
