@@ -33,11 +33,9 @@ STUDENT_REPO_NAME = env.str('STUDENT_REPO_NAME')
 
 # GENERAL
 # ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#debug
+# https://docs.djangoproject.com/en/dev/ref/settings
 DEBUG = env.bool('DJANGO_DEBUG', False)
-# https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
 SECRET_KEY = env('DJANGO_SECRET_KEY')
-# https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
 
 # Local time zone. Choices are
@@ -295,7 +293,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.template.context_processors.tz',
                 'django.contrib.messages.context_processors.messages',
-                'portal.users.context_processors.login_view',
+                # 'portal.users.context_processors.login_view',
             ],
         },
     },
@@ -419,17 +417,11 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool('DJANGO_ACCOUNT_ALLOW_REGISTRATION',
                                       default=True)
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_REQUIRED = False
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = 'none'
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_ADAPTER = 'portal.users.adapters.AccountAdapter'
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
 SOCIALACCOUNT_ADAPTER = 'portal.users.adapters.SocialAccountAdapter'
 
 
@@ -541,10 +533,10 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',
         },
-    },
-    'parso': {
-        'handlers': ['console'],
-        'level': 'WARNING',
-        'propagate': False,
+        'parso': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
     },
 }
