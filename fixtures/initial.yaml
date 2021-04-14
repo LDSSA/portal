@@ -782,10 +782,10 @@
     app_label: capstone
     model: studentapi
 - model: sessions.session
-  pk: a5h2brgfyje6tphmxmjkl8yiiu8ausjj
+  pk: q69ns847j6q712yvdrizwe6ql7q74fac
   fields:
-    session_data: .eJxVjEEOgjAUBe_StWloKfbXpXvOQN5vP4KaNqGwMt5dSVjodmYyLzVgW6dhq7IMc1IXZdTplzHiQ_Iu0h35VnQseV1m1nuiD1t1X5I8r0f7N5hQp31rKFAzimVODETPoM51jW2JQ_g6OjO8RRu8gzh23kpLI4yBjByh3h_nLDhk:1lEdGb:cchB5iyfmWzvU9uZO2GkNdOljLKKjMAXONratNp0YTw
-    expire_date: 2021-03-09 19:22:41.195630+00:00
+    session_data: .eJxVjM0OwiAQBt-Fc0NKodR69O4zNLvLYlGEpD9ejO8uNY1JD3uZmW_fAojympbhxVPwgd3ATwhRnNMaY_W368yTOItGVGKAdRl_YAiuMHVkCPTgtAl3h3TLknJapoByS-RuZ3nNjuNlbw8PRpjHsrYt9771J287bYgMsobOE6LFDp3SHpWxDXBbrvYOe1DYaaoZqIRgxOcLqH1LAw:1lWmJ7:arBgaMH5XnSe0oYo6FEYX4g_smSpQi2hQUHqvsRLWFo
+    expire_date: 2021-04-28 20:40:17.927974+00:00
 - model: sites.site
   pk: 1
   fields:
@@ -794,7 +794,7 @@
 - model: admin.logentry
   pk: 1
   fields:
-    action_time: 2021-02-23 19:23:28.769588+00:00
+    action_time: 2021-04-14 20:34:00.225748+00:00
     user: 1
     content_type: 17
     object_id: S00
@@ -804,7 +804,7 @@
 - model: admin.logentry
   pk: 2
   fields:
-    action_time: 2021-02-23 19:24:12.423400+00:00
+    action_time: 2021-04-14 20:34:31.850678+00:00
     user: 1
     content_type: 18
     object_id: BLU00
@@ -814,87 +814,225 @@
 - model: admin.logentry
   pk: 3
   fields:
-    action_time: 2021-02-23 19:25:06.886011+00:00
+    action_time: 2021-04-14 20:41:38.436796+00:00
     user: 1
-    content_type: 14
+    content_type: 16
     object_id: '1'
-    object_repr: admin
-    action_flag: 2
-    change_message: '[{"changed": {"fields": ["Student", "Deploy private key"]}}]'
-- model: admin.logentry
-  pk: 4
-  fields:
-    action_time: 2021-02-23 19:25:28.120187+00:00
-    user: 1
-    content_type: 14
-    object_id: '2'
-    object_repr: student1
-    action_flag: 2
-    change_message: '[{"changed": {"fields": ["Name of User", "Deploy private key",
-      "Username"]}}]'
+    object_repr: Grade object (1)
+    action_flag: 1
+    change_message: '[{"added": {}}]'
 - model: account.emailaddress
   pk: 1
   fields:
     user: 2
-    email: hcastilho@defaultifnull.com
-    verified: false
+    email: student1@lisbondatascience.org
+    verified: true
     primary: true
 - model: users.user
   pk: 1
   fields:
-    password: argon2$argon2i$v=19$m=512,t=2,p=2$RzBiSVFWRU9sVnh3$5cWBYoEqiWJk8UWFuPvZQA
-    last_login: 2021-02-23 19:22:40+00:00
+    password: argon2$argon2i$v=19$m=512,t=2,p=2$bFdQMVU0UW9KeFVD$ikPdg0fUaFzh6B6JW7/0Iw
+    last_login: 2021-04-14 20:40:17.402478+00:00
     is_superuser: true
     username: admin
     first_name: ''
     last_name: ''
-    email: ''
+    email: admin@lisbondatascience.org
     is_staff: true
     is_active: true
-    date_joined: 2021-02-23 18:10:17+00:00
-    name: ''
-    logo: ''
+    date_joined: 2021-04-14 20:32:27.106363+00:00
+    name: Admin
+    logo: qwe
     student: false
-    deploy_private_key: "-----BEGIN PRIVATE KEY-----\r\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCgxNspbIYIBM3Q\r\nF53FNGDw8LVhJacLHXt4x5PO5qcecU8Be0xBVlphsN5xbIYunyl8YHdc4OLA24QY\r\n6ptbAq4Yp1cgNiB4ZxhCUTySY1mNovmHtdLERXe12wZdU+l1rPN1Pq6EAxB2nkOH\r\ngWmTKBioLwLxdOoN2UXyV1p7wdyB2zew62C0VQpODR7Rri51QQGDyIL+Hl2mlaIG\r\nybw6fykFXh2qUf2Rm4kR5OWv03BKmZTSx7CTXJYmm6RLzmMT8zFvyk0RSV4PZtVS\r\nCxZavoztVSR5LEqT+xIrlSazh6nw4q8K+07WyiuLm37NqtC5aqvsEyXVQQAcdzmC\r\nSkaOBT9JAgMBAAECggEAGmDSWNSelTg8kLUfRNkYQtAr4nmsE83NkX6liOAdcYhD\r\n30lctKe3gqnjhZa52XJx+x9U1l9rtRsPbIsp3F/vMspaKEXZRAgeWds8ZgR5EB06\r\ndgLmRx/iyWrbe3qmJpGvDICxX6WlEOFc0SHxsZx1lzrHb9iwAn+w01dz2DRxurh7\r\nsrP5CYfq6aLq5Sne4bgcNnsDJAFUWCADp1yco0rE5/T/MM+tqV4OAcxe9zeysQky\r\nIoeNnIVUQtBJaLof+djSWlsqg6tO8fDSR8cd7HOfLoEzRlmfe7e11/oVnddymNoB\r\n6hI57khE1Ivw9oQ9dCMhsyhD+eb5WZFXQQ1OTKKjhQKBgQDMAQQ+8969oZcDfDQZ\r\nmnqCwW7DxzX5QlEkRJX1Q8qWzQefdIeFGId41pYQ6TnLj74TNMaRS0ARA733E7/W\r\nzlUvs0fhPlo6ItLOwpi9HRtK+lNhtSWXrwIkeUXMjnsETyxrC74x1IdoafRJNjxl\r\nJS7l8AH4JGjYu0zkvIz8UsBNowKBgQDJvtBm7IG3aZc1yCmKTknjqg/PeXY6UDaX\r\n0ZNQ4bivY/qd+UCFEOFqlXskZbBJUPEAEHoz672O0obq4SvWhxF9xKm66m+pT4DO\r\n0CtWp/K8Ml9ypBpeG8Wuiw2tbKkG2oaPs9BWcZpSpXSzsB1bZ6b7SEZuqC3/Oj9t\r\nvKfOsmD2IwKBgACVBCkV0w3hdyfYY+Gq0iyrVqCSYfILIWYkF/VyMxLJFPt8fqJ/\r\nlmte2WDE+Zg+GcG+Rc7GUzF5PEKHOOXpAs83CL54yhMeZFGYtozbl2dYXYKK3MeZ\r\nBT2LZwqVYX56p1rK1skXnSdMHhlTYUq8l2yqiabmm7H6ntaMPy69IbVXAoGAe+QY\r\nKvyWdEH9v+NZzztgmNS4vNqERi84N2dWJldXiS3Gm/iTLKQ/Kar+Yk2oQn3YYge8\r\nY+IjGHAktlztBOMRVMDO0qBhTgIqwdaIpsCgif4NK2OnZZ98eEGgdp3B9xl/hQQR\r\nruQ4twQwdKB0hstSegHabt4M0S2+Ae/WxVI5xS0CgYAhZU0WHScQv3+69NPoHXpm\r\nbeYEF0xRb+6bRsYvWRA6fyZ1pJFyRVjGCsmHRnjdI4NMMCt2zP0IeiivJjt1xF69\r\nZvaj/6oXHjM+b8P1lUiGaovXnHcuIcKRQh9i57fvWJRi4iu1fKkMGUY0KYwChTrT\r\nc15D/IMCbBDfzFZcbkNM4g==\r\n-----END
-      PRIVATE KEY-----"
-    deploy_public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCgxNspbIYIBM3QF53FNGDw8LVhJacLHXt4x5PO5qcecU8Be0xBVlphsN5xbIYunyl8YHdc4OLA24QY6ptbAq4Yp1cgNiB4ZxhCUTySY1mNovmHtdLERXe12wZdU+l1rPN1Pq6EAxB2nkOHgWmTKBioLwLxdOoN2UXyV1p7wdyB2zew62C0VQpODR7Rri51QQGDyIL+Hl2mlaIGybw6fykFXh2qUf2Rm4kR5OWv03BKmZTSx7CTXJYmm6RLzmMT8zFvyk0RSV4PZtVSCxZavoztVSR5LEqT+xIrlSazh6nw4q8K+07WyiuLm37NqtC5aqvsEyXVQQAcdzmCSkaOBT9J
+    slack_member_id: qwe
+    github_username: qwe
+    deploy_private_key: '-----BEGIN PRIVATE KEY-----
+
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDXoTnU0Nd8vdUG
+
+      O+7Uk82beoZ5nU+ln52cmHFDGAv2+xYGrLLBZ0m7WAjxgbUPR7n5TahoI1opn7Ob
+
+      cGrrEYzlA0zBrXbuiUaaPYQLnkYngiZCdP80eJjFK7n4tOx10SqseP8Kp3A47xT1
+
+      mrExPWRwXiEeVSaCaP1TgcjoDWXRazEx0161YxU2cPMoYaAp3ZlUHZY15ncdGECE
+
+      AzKi+tXax8WO/Cifgdl0Hkhe5cHrW7y77snTuCQGyrzPOkLSrnhMA/R5C3RgOaHp
+
+      rF681vaLjt//yr+MrS6fHwyF9pvYVsDvmsTBQSHL6QRh03L3RAO4bb9SweHQeQ1a
+
+      HAHiBSRHAgMBAAECggEBAMrRWD8HTJiFSbh6aPNELrGedpwvTjofvzUK4gXUuXRO
+
+      yXHvwJdPmrd/X7IhaXd85L1MwSlqjyT1lQ+QltCSCm9iQjEuAt7s+h6b2/a9oYkJ
+
+      zwjVWTI2eKOEtIDtVDihTD079dBEm7bBknpNTXteHnne39HTD8y8CgMg4SL7bxig
+
+      usAtEpa3hjVbTS0AzJtZAgz8B9DCpNTXArAoguCwpxpXeWDnUOvHOIsRpPx+JTJd
+
+      rcoeSIEfPCLD5X6ftjpndBrklwznS+9PEJ9okxze5vTUApdrmH3OgTFXCsPdxBbz
+
+      ANNAxmFfeTyPNyrVvmL9e4feW5gYoPuq+v60hFKXXMkCgYEA+RjYkjNNirwspytn
+
+      rm8Rm0qQwY034eacxGdY4gXnV44Aj4X+amBasX0vbmzs+ntRugeQ4mLfRqCtIeeP
+
+      xXQ1MfkkGwI4PtU4BO2jNgKvzrXz+71lb7qH0lrJoEF0wQd9VidmnxDi0cIzpXs7
+
+      nEr89rAqJz2Qr8KhG3HbPQTH1MMCgYEA3Zr0hDTMIB8FMuyEsQ4k1rrOSC2YVlTA
+
+      +26pA87khj+pKEmMy9WxRf9aul+6vD9b2h1QymbYAQ1K1XBEl/sKhId9RXBNsEBv
+
+      nvFXU+uLOtbiYPISpuXuOuYOg91yD7AqS/IDV+St9I6EjdD9Z/5xsPGDwVHUEc4j
+
+      M63Bs4NEai0CgYA+ykyNTfFV72kyGnbgOY8unfUvVPGpOAB8YbC+CM7v+xOZGiWv
+
+      mupBo1S5eSujWEKZqh6Tcmjl3MrHqR9MnqZqGmtHg5+59vVQCLcDflniuWrvIibX
+
+      qyVhmREKHHXZ0pF9jiEIJ7GFPnbWV+IG28A4Tt/RVGuMYntJ98FT+EiHEQKBgDES
+
+      DvL3ffve4pfUJ83NA/tIgkUZU5JKUjFa37IoLhJMJnj1UGgSeZ62XLDIYeEtZnl1
+
+      5F3tSAdzmg6JPacpv7p5BhRKOem9WvonFt9OWRY+XwJ4mAi9AXOpXa11a7xtlfAb
+
+      NwJPcPWmWVPN408T2LkFwdcc94i5zLG02B+YAZ5BAoGAH5AYKks3VJbRtLSU9f7v
+
+      NsBQduCYLnFvUWIw9Na5atLbyr54m0x5Oc331L3UvUj2fQjG0KUYxuO94bu9Yrr6
+
+      ItBmBTyK6tYh/1Wdg/xRHI4VYrNiANggQeB6V9tv4KTJ6C8m0Zc4F3SUrOQKVbeg
+
+      5MlsGbIXA5tEo0vGhxfsfUE=
+
+      -----END PRIVATE KEY-----
+
+      '
+    deploy_public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDXoTnU0Nd8vdUGO+7Uk82beoZ5nU+ln52cmHFDGAv2+xYGrLLBZ0m7WAjxgbUPR7n5TahoI1opn7ObcGrrEYzlA0zBrXbuiUaaPYQLnkYngiZCdP80eJjFK7n4tOx10SqseP8Kp3A47xT1mrExPWRwXiEeVSaCaP1TgcjoDWXRazEx0161YxU2cPMoYaAp3ZlUHZY15ncdGECEAzKi+tXax8WO/Cifgdl0Hkhe5cHrW7y77snTuCQGyrzPOkLSrnhMA/R5C3RgOaHprF681vaLjt//yr+MrS6fHwyF9pvYVsDvmsTBQSHL6QRh03L3RAO4bb9SweHQeQ1aHAHiBSRH
     groups: []
     user_permissions: []
 - model: users.user
   pk: 2
   fields:
-    password: argon2$argon2i$v=19$m=512,t=2,p=2$WVhuNjFsRmtpVW9a$veGgAYpHHAd4yzaBZ/R4EA
-    last_login: 2021-02-23 19:19:28+00:00
+    password: argon2$argon2i$v=19$m=512,t=2,p=2$aTZkYzllQnhCTEFq$Spll1PN3TgB3Yr8qy9Ex9w
+    last_login: null
     is_superuser: false
     username: student1
     first_name: ''
     last_name: ''
-    email: hcastilho@defaultifnull.com
+    email: student1@lisbondatascience.org
     is_staff: false
     is_active: true
-    date_joined: 2021-02-23 19:19:28+00:00
-    name: Student 1
+    date_joined: 2021-04-14 20:39:24.099076+00:00
+    name: ''
     logo: ''
     student: true
-    deploy_private_key: "-----BEGIN PRIVATE KEY-----\r\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDhHcvR0aUinCC3\r\nAGoZHKAhW7lxn/Xo4wNrYu4M6r2qBlywhb5RqtNOVDN0IP8+vxYH/CI+j01Mn+mL\r\nQ6XCMVbH3jLSJyOryhYUQM6GYTp9BXZGT/mJo/Jv0tf+VequiaoFmdWyTE6KFMs4\r\nw60iqUPmf8VmlOfOzLd1Q++H5Tqb/y+u5TZICRt3FlurnI52Fl3rs86XMCgVpblO\r\norBR5fLM8dtyj369G35FuM69PT5f7y5AIsxGHHM1YnS/UK2ZWTSCGIl+wI9CSFDO\r\nUIjwVVgJXMmBogWFGdkpyat3WOqb5TnLF8WgzNVZrSLJmJzK2Kw65D8KXVr/3147\r\nNbtGZvQTAgMBAAECggEBAKbCj83qY030IjfuUqovjl+ntwP43w2ZvVq7emSPL9jX\r\nxanuKUIOLWIE9ei82Nf+ba+UkzmMplJw02yavBvSuNpuO296Fu6XUSvHpjXdqJoc\r\nhbUoYU4Y6Or1YZPCyYpp6E0l3CusYzHenXx7V7IpeWcyl2SaQe3rsKtpm/MrV/Nd\r\n/qQFg9LR4CpKTnGsC9th7QgbUuyhiMMe6vp5QG5YhHgFOoDx4sKdvzb1aPeEbIWD\r\neifK2D1B+856Ock+pizQReIiw9F9+DZdoGQsdNxSOgoEVxiUbj+zXBqeI9N4KOGs\r\nkAFU/GKggpOtnxXPQ6TCWt8UiYgIh96+Sgx0DLSsFoECgYEA8X6mg2tc/CCm49S9\r\noSKmMEFuNI/McIh883+T+t4gnBwCUKt6kVgRxCzCGoYtQYWmzsLGYaqUIrOsT7va\r\nEPGJNqLHAEuhzMGbgjWL4caEnHR7wrhNzypHWtliDKa31BmwKdF9kZmxyDPSXE37\r\nj3WEW4a3X7o5Uix2sJSm+wA2XVECgYEA7qNNx9jorzV50hgo/vZY9Az7qAjXrSY6\r\nu4IhvXLLrDKKU6wqZqyPYXEgjUtjaI/eR4LnLxrgn48dmh89aXzluU8Vmg0fgpcr\r\nymPM5QtyamUnuQjXTv16tRS44IJ7RGVzVvvKbssn7rtAfXFECLFd2dxm36BdqOac\r\n4M5+7PHAkiMCgYAi0Xjej9c7PtXxGVYx6lX9tSFXkLgQLY2eafGDBQ28lEk9Kkwk\r\nsob1OuLNgjT6MnPncau6nyZ2jmM0p8f8E2cOKo/4me79H5j1QBUn+0BZcm35mCsX\r\nyGe7UIZTfqIYgY+lp9+r43X/gIE+77tqZq4rqBO+SJJFJ8YBFZ2xqMkt0QKBgEsk\r\nKK2w4zOoRv+ck+wUbdYK8ILspdzjmMLKKw2YRAGouF24bHGADHXGRVW4U0jtZDRo\r\nR5tRf0E+szeAdrnslflPqaGkWDOqniNQYYgNnq1ZxLRC0GkS77xtFfm7nEzhFPxi\r\ntE9GsQA+/gOB0sZZ8w9SkyH/QP6Z/vPakaTSSqy5AoGBAMsx929voWDCEhtd2GSt\r\nZcj/kwPU+Fvckc3M4XXltdlcLdV2MVfU5mATZ/L4Klas407ymdB+vJVsrAp+qdS1\r\nzo6hHngSQCd2Pkkk+bR0c5vK9hTdtm3xTjiO/21VRf9NS0LB3bAig/nRje86WKJL\r\nr7mjQ89NiHOwjRG+7tsf9hg2\r\n-----END
-      PRIVATE KEY-----"
-    deploy_public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhHcvR0aUinCC3AGoZHKAhW7lxn/Xo4wNrYu4M6r2qBlywhb5RqtNOVDN0IP8+vxYH/CI+j01Mn+mLQ6XCMVbH3jLSJyOryhYUQM6GYTp9BXZGT/mJo/Jv0tf+VequiaoFmdWyTE6KFMs4w60iqUPmf8VmlOfOzLd1Q++H5Tqb/y+u5TZICRt3FlurnI52Fl3rs86XMCgVpblOorBR5fLM8dtyj369G35FuM69PT5f7y5AIsxGHHM1YnS/UK2ZWTSCGIl+wI9CSFDOUIjwVVgJXMmBogWFGdkpyat3WOqb5TnLF8WgzNVZrSLJmJzK2Kw65D8KXVr/3147NbtGZvQT
+    slack_member_id: ''
+    github_username: ''
+    deploy_private_key: '-----BEGIN PRIVATE KEY-----
+
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQC1vkiMR7VmAAEb
+
+      OienOI8+cUFPTqNg8wMos+xJ6ax0rC3esq2USeCweaFBDt36yGMWHZhsi+F9P7Ll
+
+      Qhdg6KhuOS1kYzfB07dA0gT3inxXOk2bNQUZxI0aghtps3cFIWRdmk3jJxy6Wyqw
+
+      FNL3CFEqODLEK1iAcQgm4+XSVcLaErErknECyPRUL2fK9RPQmfBXix8UUGC9rFsL
+
+      R/uEtxSeoLt2rnIelA5R/YgfXx5Dqlx0fXm83tNHgLkulaPyiSvByaea5xwyyBJs
+
+      tTLBWibNjl1pGOvfn+Tb77bbVbhjfJFWtzsKC58Tg8cjl06fGtQvb48BTo09DE2j
+
+      YLsSVShZAgMBAAECggEAbMHLxDZ9NOa3wsVQSV8tSR6ZCI50cmW59DeHJMvy6XbH
+
+      lEa0XNLA5JpEhxwQdixIL0nSltI2Q69ErLCaMOHJOPx6T2KYUSMSvHVxh3iV49T9
+
+      7+0QelUGY2CMavp8NNPArcrS5SXYqSQ5LVmozS9q8qripkWSFnqNeEhUlUPA8KHQ
+
+      QImx1BulVbKyuo/3M45bpXe1cjidnTKOq5jP/wg3eiUqf8KSEtkXoI3Q+V/d7Smz
+
+      q18FGVg2tdKN6Zjy8eXeTCiyZT9IEN5z0nvUnSNcJVr9eNf9CAfe/SkBee4ekxG+
+
+      u9tKwp3904jzVemUvXttdXXvy0ad9RmO/MBPKY+bIQKBgQDlfd6jTVUFwE6bzPjP
+
+      MAzWWlSUV3dVHEKGrm2Fjchiqenb2/TcP7dvuG5CJIc82hYrwZelBDobRFm96mVA
+
+      FpfjMt29GlZMk8MUDooZjWPodxWHw507kg0GZavbhscvrIrdx7+0DAvUKAK+u2/9
+
+      /rCZAnwIzksNKWMSTYjXFG+DtQKBgQDKvHsxlSUER5v3hel0//mHyORTwzfn4vMU
+
+      fS519zEunjFx3oAuw574Oe8JW02J74cn2noLPM5WqMM9xMpcI1K9TEf6VqxtZIQA
+
+      4aMEQY10L5ljjs9LkZk/EF5440QhBbDy4QF8A2mGKUANIJDWC0wKlAa4Y4Lb7BSs
+
+      /fx4zyeAlQKBgGbqUYOOVIiluxrnitTvSXJ/Q9radqt2ZucbJgZ0lN6aMEPmmiKD
+
+      eHHjlZ6X3wYND1BEGwtnn99GgbBHg2yANVEwKHx7aSQiR6Og+ZGH9Lv1W3Rs5wAl
+
+      +S1bPvzNrlnU2NmokHHfzRYxczmxuQGAzBVyJcmVKdcXLlSw7KL3iSLZAoGAYIdF
+
+      kOIWcec2l7Am7BJE2SYJsOguYjZozsSbroc3355qpHDwT1PNCRtseOQEEzz8+TjJ
+
+      Czi0dgZ8j5h3UU9wQblkPAmwp5VIVLMaTxh3JW7Udda1VKHKeYBtutlawu5Wxg3k
+
+      CwwE3mAdoyJyU7elSRQZ7wlScSwC3CtCXrMjd9ECgYEAzvMmvMz/0cmKfvodOSkA
+
+      tdsLueVXBDo9z3Bjd8kakXYwp/dJd8OonAQ8Od+LwhC5876Uk7XK4VMMn6iZi2QP
+
+      5PHje/i8JK8e9xN/jDWovW+hB+njGvUjW4zCm8g+ju4pgzjeO6SFtjH862DKuLVd
+
+      a77Ulb7YRCnerobJkm9/vyg=
+
+      -----END PRIVATE KEY-----
+
+      '
+    deploy_public_key: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC1vkiMR7VmAAEbOienOI8+cUFPTqNg8wMos+xJ6ax0rC3esq2USeCweaFBDt36yGMWHZhsi+F9P7LlQhdg6KhuOS1kYzfB07dA0gT3inxXOk2bNQUZxI0aghtps3cFIWRdmk3jJxy6WyqwFNL3CFEqODLEK1iAcQgm4+XSVcLaErErknECyPRUL2fK9RPQmfBXix8UUGC9rFsLR/uEtxSeoLt2rnIelA5R/YgfXx5Dqlx0fXm83tNHgLkulaPyiSvByaea5xwyyBJstTLBWibNjl1pGOvfn+Tb77bbVbhjfJFWtzsKC58Tg8cjl06fGtQvb48BTo09DE2jYLsSVShZ
     groups: []
     user_permissions: []
 - model: academy.specialization
   pk: S00
   fields:
-    name: Specialization 0
-    description: Sample specialization
-    created: 2021-02-23 19:23:28.748754+00:00
+    name: Test Specialization
+    description: "S00 Test\r\n\r\n\r\nDolor architecto impedit iste molestias facilis.
+      Sunt asperiores earum occaecati consectetur. Enim accusamus quia esse culpa
+      et dolorem dolore perferendis. Sunt mollitia vitae amet eveniet est aut et.\r\n\r\nUt
+      eaque adipisci animi esse temporibus rerum. Ea pariatur expedita et est ex.
+      Fuga in unde et reiciendis vero sed. Aut aliquid consequatur aut expedita. Ipsa
+      repellendus commodi illo aliquam. Voluptatem sed omnis mollitia et molestias
+      quas ea.\r\n\r\nQuia dolorum autem fugit. Cupiditate est aut sed quia sit dolore
+      aut maiores. Praesentium laboriosam et corrupti est. Vitae sint inventore laborum.
+      Nihil atque repellendus porro eius ut enim. Est sequi voluptas eos id molestias
+      necessitatibus.\r\n\r\nNesciunt deserunt labore aspernatur. Tenetur sequi et
+      iusto non eos. Neque eum non odio sunt asperiores aspernatur. Occaecati quos
+      tempore sit reiciendis.\r\n\r\nNihil rem reiciendis deleniti voluptas dolores
+      perspiciatis fugiat sequi. Hic vel repellat consequatur perferendis fuga aut.
+      Culpa tempore ullam rerum quae."
+    created: 2021-04-14 20:34:00.188510+00:00
 - model: academy.unit
   pk: BLU00
   fields:
     specialization: S00
-    name: Sample
-    description: ''
+    name: Test BLU
+    description: "Dolor architecto impedit iste molestias facilis. Sunt asperiores
+      earum occaecati consectetur. Enim accusamus quia esse culpa et dolorem dolore
+      perferendis. Sunt mollitia vitae amet eveniet est aut et.\r\n\r\nUt eaque adipisci
+      animi esse temporibus rerum. Ea pariatur expedita et est ex. Fuga in unde et
+      reiciendis vero sed. Aut aliquid consequatur aut expedita. Ipsa repellendus
+      commodi illo aliquam. Voluptatem sed omnis mollitia et molestias quas ea.\r\n\r\nQuia
+      dolorum autem fugit. Cupiditate est aut sed quia sit dolore aut maiores. Praesentium
+      laboriosam et corrupti est. Vitae sint inventore laborum. Nihil atque repellendus
+      porro eius ut enim. Est sequi voluptas eos id molestias necessitatibus.\r\n\r\nNesciunt
+      deserunt labore aspernatur. Tenetur sequi et iusto non eos. Neque eum non odio
+      sunt asperiores aspernatur. Occaecati quos tempore sit reiciendis.\r\n\r\nNihil
+      rem reiciendis deleniti voluptas dolores perspiciatis fugiat sequi. Hic vel
+      repellat consequatur perferendis fuga aut. Culpa tempore ullam rerum quae."
     instructor: 1
-    due_date: 2021-04-30
+    due_date: 2021-04-14
     open: false
     checksum: ''
-    created: 2021-02-23 19:24:12.402084+00:00
+    created: 2021-04-14 20:34:31.829286+00:00
+- model: academy.grade
+  pk: 1
+  fields:
+    student: 2
+    unit: BLU00
+    score: 15.0
+    notebook: student1_BLU00_2021-04-14_nguivipk.ipynb
+    status: graded
+    message: ''
+    created: 2021-04-14 20:41:38.396419+00:00

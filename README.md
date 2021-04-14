@@ -27,6 +27,19 @@ http://localhost:8000
 And the admin site in:
 http://localhost:8000/admin/
 
+Emails are sent to:
+http://localhost:8025
+
+Admin creds
+* username: admin
+* password: 123
+
+Entering the container:
+```bash
+docker-compose exec django bash
+source docker/production/django/entrypoint
+```
+
 
 ### Updating Fixtures
 
@@ -34,6 +47,12 @@ http://localhost:8000/admin/
 docker-compose run --rm django ./manage.py dumpdata --format=yaml --output=fixtures/initial.yaml
 ```
 
+### Starting over
+```bash
+docker-compose rm
+docker volume rm portal_local_postgres_data
+docker volume rm portal_local_postgres_data_backups
+```
 
 ## Build & push
 
