@@ -203,6 +203,7 @@ class InstructorUserListView(InstructorMixin, ListView):
             if score__lte and total_score > score__lte:
                 continue
             user_data['total_score'] = total_score
+            user_data['submission_date'] = grade.created
             object_list.append(user_data)
 
         context = self.get_context_data(object_list=object_list,
