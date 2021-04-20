@@ -17,6 +17,7 @@
       <thead>
         <tr>
           <th scope="col" rowspan="2">Name</th>
+          <th scope="col" rowspan="2">Slack</th>
           <th scope="col" rowspan="2">Submission Date</th>
           <th scope="col" rowspan="2">Total</th>
           {% for spc in spc_list %}
@@ -35,6 +36,7 @@
       {% for obj in object_list %}
         <tr>
           <th><a href="{% add_query_param 'user_id' obj.user.id %}" class="text-dark" title="Filter by student">{{ obj.user.username }}</a></th>
+          <td><a href="{% add_query_param 'slack_member_id' obj.user.id %}" class="text-dark">{{ obj.user.slack_member_id }}</a></td>
           <td><a href="{% add_query_param 'submission_date' obj.submission_date %}" class="text-dark"> {{ obj.submission_date }} </a></td>
           <td><a href="{% add_query_param 'score__gte' obj.total_score %}" class="text-dark">{{ obj.total_score }}&#47;{{ max_score }}</a></td>
           {% for grade in obj.grades %}
