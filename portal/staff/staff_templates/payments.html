@@ -1,0 +1,47 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">
+        Selection Payments
+    </h2>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Currency</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Update At</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for s in selections %}
+                <tr>
+                    <td><a href="/staff/candidates/{{ s.user.id }}">{{ s.user.email }}</a></td>
+                    <td>{{ s.payment_value }}</td>
+                    <td>€ (eur)</td>
+                    <td><a href="/staff/payments/{{ s.user.id }}">
+                        {% if s.status == selection_status.ACCEPTED %}
+                        <span class="badge badge-success">{{ s.status }}</span>
+                        {% elif s.status == selection_status.REJECTED %}
+                        <span class="badge badge-danger">{{ s.status }}</span>
+                        {% elif s.status == selection_status.SELECTED %}
+                        <span class="badge badge-warning">{{ s.status }}</span>
+                        {% else %}
+                        <span class="badge badge-info">{{ s.status }}</span>
+                        {% endif %}
+                    </a></td>
+                    <td>{{ s.updated_at }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

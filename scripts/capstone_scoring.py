@@ -5,11 +5,11 @@ from portal.capstone.models import DueDatapoint
 
 
 def score(student_api):
-    '''
+    """
     Calculates the score of the students' API model
     :param student_api: StudentApi object
     :return: score as a float
-    '''
+    """
 
     # Check which simulators have datapoints with outcomes outcomes
     simulator_ids = []
@@ -35,7 +35,7 @@ def score(student_api):
 
         else:
             try:
-                prediction = json.loads(ddp.response_content)['prediction']
+                prediction = json.loads(ddp.response_content)["prediction"]
             except (json.JSONDecodeError, KeyError):
                 predictions.append(not outcome)
                 outcomes.append(outcome)

@@ -16,10 +16,10 @@ class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
         fields = (
-            'name',
-            'logo',
-            'github_username',
-            'slack_member_id',
+            "name",
+            "logo",
+            "github_username",
+            "slack_member_id",
         )
 
 

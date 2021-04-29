@@ -6,21 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hackathons', '0010_auto_20200517_1542'),
+        ("hackathons", "0010_auto_20200517_1542"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='attendance',
-            name='remote',
+            model_name="attendance",
+            name="remote",
         ),
         migrations.RemoveField(
-            model_name='team',
-            name='remote',
+            model_name="team",
+            name="remote",
         ),
         migrations.AlterField(
-            model_name='hackathon',
-            name='status',
-            field=models.CharField(choices=[('closed', 'Closed'), ('marking_presences', 'Marking Presences'), ('generating_teams', 'Generating Teams'), ('ready', 'Ready'), ('submissions_open', 'Submissions Open'), ('submissions_closed', 'Submissions Closed'), ('complete', 'Complete')], default='closed', max_length=255),
+            model_name="hackathon",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("closed", "Closed"),
+                    ("marking_presences", "Marking Presences"),
+                    ("generating_teams", "Generating Teams"),
+                    ("ready", "Ready"),
+                    ("submissions_open", "Submissions Open"),
+                    ("submissions_closed", "Submissions Closed"),
+                    ("complete", "Complete"),
+                ],
+                default="closed",
+                max_length=255,
+            ),
         ),
     ]

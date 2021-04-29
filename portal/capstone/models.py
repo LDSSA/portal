@@ -15,8 +15,7 @@ logger = logging.getLogger(__name__)
 class Capstone(models.Model):
     name = models.CharField(max_length=1024)
 
-    scoring = models.FileField(upload_to=random_path,
-                               null=True, blank=True)
+    scoring = models.FileField(upload_to=random_path, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -29,7 +28,7 @@ class Capstone(models.Model):
 
         for api in self.studentapi_set.all():
             # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
-            score = glob['score'](self, api)
+            score = glob["score"](self, api)
             api.score = score
             api.save()
 
@@ -42,8 +41,9 @@ class StudentApi(models.Model):
 
 
 class Simulator(models.Model):
-    capstone = models.ForeignKey(Capstone, models.CASCADE, 
-                                 related_name='simulators')
+    capstone = models.ForeignKey(
+        Capstone, models.CASCADE, related_name="simulators"
+    )
 
     name = models.CharField(max_length=1024)
     started = models.DateTimeField(null=True)
@@ -53,23 +53,23 @@ class Simulator(models.Model):
     path = models.CharField(max_length=255)
 
     STATUS_CHOICES = (
-        ('stopped', 'stopped'),
-        ('start', 'start'),
-        ('started', 'started'),
-        ('paused', 'paused'),
-        ('reset', 'reset'),
-        ('ended', 'ended'),
+        ("stopped", "stopped"),
+        ("start", "start"),
+        ("started", "started"),
+        ("paused", "paused"),
+        ("reset", "reset"),
+        ("ended", "ended"),
     )
-    status = models.CharField(choices=STATUS_CHOICES,
-                              default='queued',
-                              max_length=64)
+    status = models.CharField(
+        choices=STATUS_CHOICES, default="queued", max_length=64
+    )
 
     def start(self):
-        if self.status == 'start':  # Started manually through the admin
+        if self.status == "start":  # Started manually through the admin
             logger.info("Starting simulator: %s", self)
             now = datetime.now(timezone.utc)
             self.started = now
-            self.status = 'started'
+            self.status = "started"
             self.save()
 
             self.create_due_datapoints(now)
@@ -77,39 +77,40 @@ class Simulator(models.Model):
     def create_due_datapoints(self, starts):
         logger.info("Creating due datapoints for %s", self)
         self.due_datapoints.all().delete()
-        datapoints = self.datapoints.order_by('id').all()
-        student_apis = (StudentApi.objects
-                        .filter(capstone=self.capstone)
-                        .exclude(url=''))
+        datapoints = self.datapoints.order_by("id").all()
+        student_apis = StudentApi.objects.filter(
+            capstone=self.capstone
+        ).exclude(url="")
 
         interval = (self.ends - starts) / datapoints.count()
 
         # Assuming one producer we are queueing BLOCK_SIZE requests per cycle
         # to queue enough requests we need to queue at least
         # (PRODUCER_INTERVAL / interval) * number of students
-        required_requests_per_cycle = (
-            student_apis.count()
-            * (settings.PRODUCER_INTERVAL / interval.total_seconds()))
-        logger.debug('Block size: %s', settings.BLOCK_SIZE)
-        logger.debug('Required requests: %s', required_requests_per_cycle)
+        required_requests_per_cycle = student_apis.count() * (
+            settings.PRODUCER_INTERVAL / interval.total_seconds()
+        )
+        logger.debug("Block size: %s", settings.BLOCK_SIZE)
+        logger.debug("Required requests: %s", required_requests_per_cycle)
         if settings.BLOCK_SIZE < required_requests_per_cycle:
             raise RuntimeError(
-                f'Number of queued requests per cycle is not enough, '
-                f'required {required_requests_per_cycle}',
-                f'consumed {settings.BLOCK_SIZE}',
+                f"Number of queued requests per cycle is not enough, "
+                f"required {required_requests_per_cycle}",
+                f"consumed {settings.BLOCK_SIZE}",
             )
 
         self.interval = interval
         self.save()
 
         for student_api in student_apis:
-            self.add_student_api(student_api,
-                                 datapoints,
-                                 starts)
+            self.add_student_api(student_api, datapoints, starts)
 
     def add_student_api(self, student_api, datapoints, starts=None):
-        logger.info("Creating due datapoints for simulator %s student %s",
-                    self, student_api.student)
+        logger.info(
+            "Creating due datapoints for simulator %s student %s",
+            self,
+            student_api.student,
+        )
         due = starts or datetime.now(timezone.utc)
         interval = (self.ends - starts) / datapoints.count()
 
@@ -137,37 +138,39 @@ class Simulator(models.Model):
         return self.name
 
     def reset(self):
-        if self.status == 'reset':
+        if self.status == "reset":
             logger.info("Resetting simulator %s", self)
             self.due_datapoints.all().delete()
-            self.status = 'stopped'
+            self.status = "stopped"
             self.save()
 
 
 class Datapoint(models.Model):
-    simulator = models.ForeignKey(Simulator, models.CASCADE,
-                                  related_name='datapoints')
+    simulator = models.ForeignKey(
+        Simulator, models.CASCADE, related_name="datapoints"
+    )
     data = models.TextField(blank=True)
     outcome = models.TextField(blank=True)
 
 
 class DueDatapoint(models.Model):
-    simulator = models.ForeignKey(Simulator, models.CASCADE,
-                                  related_name='due_datapoints')
+    simulator = models.ForeignKey(
+        Simulator, models.CASCADE, related_name="due_datapoints"
+    )
     url = models.TextField()
     datapoint = models.ForeignKey(Datapoint, models.CASCADE)
     student = models.ForeignKey(User, models.CASCADE)
 
     due = models.DateTimeField(null=True)
     STATE_CHOICES = (
-        ('due', 'due'),
-        ('queued', 'queued'),
-        ('success', 'success'),
-        ('fail', 'fail'),
+        ("due", "due"),
+        ("queued", "queued"),
+        ("success", "success"),
+        ("fail", "fail"),
     )
-    state = models.CharField(choices=STATE_CHOICES,
-                             default='due',
-                             max_length=64)
+    state = models.CharField(
+        choices=STATE_CHOICES, default="due", max_length=64
+    )
 
     response_content = models.TextField(blank=True)
     response_exception = models.TextField(blank=True)

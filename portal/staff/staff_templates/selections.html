@@ -1,0 +1,203 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<link href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css" rel="stylesheet">
+<script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+<script src="https://unpkg.com/bootstrap-table@1.16.0/dist/extensions/multiple-sort/bootstrap-table-multiple-sort.js"></script>
+
+<div class="container pb-5">
+
+    <h2 class="py-5">
+        Candidate Selections
+    </h2>
+
+    <div class="jumbotron py-4">
+        <h3>Summary (No Scholarships)</h3>
+        <table class="table bg-white mb-5">
+            <thead>
+                <tr>
+                <th scope="col"></th>
+                <th scope="col">Drawn</th>
+                <th scope="col">Selected & Accepted</th>
+                <th scope="col">Total (#)</th>
+                <th scope="col">Total (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <th scope="row">Candidates</th>
+                <td>{{ summary.no_scholarship.drawn_candidates }}</td>
+                <td>{{ summary.no_scholarship.selected_accepted_candidates }}</td>
+                <td>{{ summary.no_scholarship.total_candidates }}</td>
+                <td>{{ summary.no_scholarship.pct_candidates }}</td>
+                </tr>
+                <tr>
+                <th scope="row">Female</th>
+                <td>{{ summary.no_scholarship.drawn_female }}</td>
+                <td>{{ summary.no_scholarship.selected_accepted_female }}</td>
+                <td>{{ summary.no_scholarship.total_female }}</td>
+                <td>{{ summary.no_scholarship.pct_female }}</td>
+                </tr>
+                <tr>
+                <th scope="row">Company</th>
+                <td>{{ summary.no_scholarship.drawn_company }}</td>
+                <td>{{ summary.no_scholarship.selected_accepted_company }}</td>
+                <td>{{ summary.no_scholarship.total_company }}</td>
+                <td>{{ summary.no_scholarship.pct_company }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Summary (Scholarships)</h3>
+        <table class="table bg-white mb-5">
+            <thead>
+                <tr>
+                <th scope="col"></th>
+                <th scope="col">Drawn</th>
+                <th scope="col">Selected & Accepted</th>
+                <th scope="col">Total (#)</th>
+                <th scope="col">Total (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <th scope="row">Candidates</th>
+                <td>{{ summary.scholarship.drawn_candidates }}</td>
+                <td>{{ summary.scholarship.selected_accepted_candidates }}</td>
+                <td>{{ summary.scholarship.total_candidates }}</td>
+                <td>{{ summary.scholarship.pct_candidates }}</td>
+                </tr>
+                <tr>
+                <th scope="row">Female</th>
+                <td>{{ summary.scholarship.drawn_female }}</td>
+                <td>{{ summary.scholarship.selected_accepted_female }}</td>
+                <td>{{ summary.scholarship.total_female }}</td>
+                <td>{{ summary.scholarship.pct_female }}</td>
+                </tr>
+                <tr>
+                <th scope="row">Company</th>
+                <td>{{ summary.scholarship.drawn_company }}</td>
+                <td>{{ summary.scholarship.selected_accepted_company }}</td>
+                <td>{{ summary.scholarship.total_company }}</td>
+                <td>{{ summary.scholarship.pct_company }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p></p>
+
+        <h3>Left out candidates (No Scholarships)</h3>
+        <table class="table bg-white">
+            <thead>
+                <tr>
+                <th scope="col">Candidates</th>
+                <th scope="col">Female</th>
+                <th scope="col">Non company</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <td>{{ summary.no_scholarship.left_out_candidates }}</td>
+                <td>{{ summary.no_scholarship.left_out_females }}</td>
+                <td>{{ summary.no_scholarship.left_out_non_company }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Left out candidates (Scholarships)</h3>
+        <table class="table bg-white">
+            <thead>
+                <tr>
+                <th scope="col">Candidates</th>
+                <th scope="col">Female</th>
+                <th scope="col">Non company</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <td>{{ summary.scholarship.left_out_candidates }}</td>
+                <td>{{ summary.scholarship.left_out_females }}</td>
+                <td>{{ summary.scholarship.left_out_non_company }}</td>
+                </tr>
+            </tbody>
+        </table>
+    
+        <div class="row pt-4">
+            <div class="col-2">
+                <form action="/staff/selections/draw" enctype="multipart/form-data" method="POST" class="mb-0">
+                    {% csrf_token %}
+                    <button class="btn btn-primary" type="submit">Draw Candidates</button>
+                </form>
+            </div>
+            <div class="col-2">
+                <form action="/staff/selections/select" enctype="multipart/form-data" method="POST" class="mb-0">
+                    {% csrf_token %}
+                    <button class="btn btn-primary" type="submit">Select Candidates</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="pt-4">
+        Draw & Select
+    </h3>
+
+    <table class="table table-striped" id="table" data-show-multi-sort="true">
+        <thead>
+            <tr>
+            <th scope="col" data-sortable="true">Rank</th>
+            <th scope="col" data-sortable="true">User</th>
+            <th scope="col" data-sortable="true">Name</th>
+            <th scope="col" data-sortable="true">Gender</th>
+            <th scope="col" data-sortable="true">Ticket Type</th>
+            <th scope="col" data-sortable="true">Company</th>
+            <th scope="col" data-sortable="true">Statuts</th>
+            <th scope="col">Drop Draw</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in first_table_candidates %}
+            <tr>
+                <td>{{ c.draw_rank }}</a></td>
+                <td>{{ c.user.email }}</a></td>
+                <td>{{ c.user.profile.full_name }}</td>
+                <td>{{ c.user.profile.gender }}</td>
+                <td>{{ c.user.profile.ticket_type }}</td>
+                <td>{{ c.user.profile.company }}</td>
+                <td>{{ c.status }}</td>
+                <td></td>
+            </tr>
+            {% endfor %}
+
+            {% for c in second_table_candidates %}
+            <tr>
+                <td>{{ c.draw_rank }}</a></td>
+                <td>{{ c.user.email }}</a></td>
+                <td>{{ c.user.profile.full_name }}</td>
+                <td>{{ c.user.profile.gender }}</td>
+                <td>{{ c.user.profile.ticket_type }}</td>
+                <td>{{ c.user.profile.company }}</td>
+                <td>{{ c.status }}</td>
+                <td>
+                    <form action="/staff/selections/reject-draw/{{ c.id }}" enctype="multipart/form-data" method="POST" class="mb-0">
+                        {% csrf_token %}
+                        <button class="btn btn-danger" type="submit">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+    $(function() {
+        $('#table').bootstrapTable()
+    })
+    </script>
+
+</div>
+
+{% endblock %}

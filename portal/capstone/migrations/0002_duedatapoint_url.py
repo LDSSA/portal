@@ -6,14 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('capstone', '0001_initial'),
+        ("capstone", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='duedatapoint',
-            name='url',
-            field=models.TextField(default=''),
+            model_name="duedatapoint",
+            name="url",
+            field=models.TextField(default=""),
             preserve_default=False,
         ),
     ]

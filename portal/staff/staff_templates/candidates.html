@@ -1,0 +1,41 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">
+        Candidates
+    </h2>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Email</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Profession</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Ticket Type</th>
+                    <th scope="col">Company</th>
+                    <th scope="col">Selection Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for u in users %}
+                <tr>
+                    <td><a href="/staff/candidates/{{ u.id }}">{{ u.email }}</a></td>
+                    <td>{{ u.profile.full_name }}</td>
+                    <td>{{ u.profile.profession }}</td>
+                    <td>{{ u.profile.gender }}</td>
+                    <td>{{ u.profile.ticket_type }}</td>
+                    <td>{{ u.profile.company }}</td>
+                    <td>{{ u.selection.status }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

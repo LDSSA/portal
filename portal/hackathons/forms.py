@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class CustomCheckbox(Field):
-    template = 'crispy/custom_checkbox.html'
+    template = "crispy/custom_checkbox.html"
 
 
 class StudentAttendanceForm(forms.ModelForm):
@@ -22,7 +22,7 @@ class StudentAttendanceForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if self.instance.hackathon.status != 'taking_attendance':
+        if self.instance.hackathon.status != "taking_attendance":
             raise forms.ValidationError("Marking attendance is closed")
         return cleaned_data
 
@@ -30,28 +30,28 @@ class StudentAttendanceForm(forms.ModelForm):
 class TeamForm(forms.ModelForm):
     class Meta:
         model = models.Team
-        fields = ['name', 'logo']
+        fields = ["name", "logo"]
 
 
 class SubmitForm(forms.Form):
     data = forms.FileField()
 
     class Meta:
-        fields = ['data']
+        fields = ["data"]
 
 
 class InstructorHackathonForm(forms.ModelForm):
     class Meta:
         model = models.Hackathon
         fields = [
-            'status',
-            'max_submissions',
-            'team_size',
-            'max_team_size',
-            'max_teams',
-            'descending',
-            'script_file',
-            'data_file',
+            "status",
+            "max_submissions",
+            "team_size",
+            "max_team_size",
+            "max_teams",
+            "descending",
+            "script_file",
+            "data_file",
         ]
 
     # def clean_teams_closed(self):

@@ -15,19 +15,16 @@ logger = logging.getLogger(__name__)
 
 
 class AccountAdapter(DefaultAccountAdapter):
-
     def is_open_for_signup(self, request: HttpRequest):
         return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
-
     def is_open_for_signup(self, request: HttpRequest, sociallogin: Any):
         return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
 
 
 class SocialAccountWhitelistAdapter(DefaultSocialAccountAdapter):
-
     def is_open_for_signup(self, request: HttpRequest, sociallogin: Any):
         return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
 
@@ -35,12 +32,14 @@ class SocialAccountWhitelistAdapter(DefaultSocialAccountAdapter):
         try:
             UserWhitelist.objects.get(username=sociallogin.user)
         except UserWhitelist.DoesNotExist:
-            raise ImmediateHttpResponse(render(request, 'whitelist.html'))
+            raise ImmediateHttpResponse(render(request, "whitelist.html"))
 
     def populate_user(self, request, sociallogin, data):
         user = super().populate_user(request, sociallogin, data)
         try:
-            student = UserWhitelist.objects.get(username=sociallogin.user).student
+            student = UserWhitelist.objects.get(
+                username=sociallogin.user
+            ).student
             user.student = student
         except UserWhitelist.DoesNotExist:
             pass

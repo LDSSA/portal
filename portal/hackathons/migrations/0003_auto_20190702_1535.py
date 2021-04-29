@@ -8,43 +8,55 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hackathons', '0002_auto_20190701_2054'),
+        ("hackathons", "0002_auto_20190701_2054"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='hackathon',
-            name='max_team_size',
+            model_name="hackathon",
+            name="max_team_size",
             field=models.IntegerField(default=6),
         ),
         migrations.AddField(
-            model_name='hackathon',
-            name='max_teams',
+            model_name="hackathon",
+            name="max_teams",
             field=models.IntegerField(default=13),
         ),
         migrations.AddField(
-            model_name='hackathon',
-            name='team_size',
+            model_name="hackathon",
+            name="team_size",
             field=models.IntegerField(default=3),
         ),
         migrations.AddField(
-            model_name='hackathon',
-            name='teams_closed',
+            model_name="hackathon",
+            name="teams_closed",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='attendance',
-            name='hackathon',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attendance', to='hackathons.Hackathon'),
+            model_name="attendance",
+            name="hackathon",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="attendance",
+                to="hackathons.Hackathon",
+            ),
         ),
         migrations.AlterField(
-            model_name='attendance',
-            name='student',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='attendance', to=settings.AUTH_USER_MODEL),
+            model_name="attendance",
+            name="student",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="attendance",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='team',
-            name='hackathon',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='teams', to='hackathons.Hackathon'),
+            model_name="team",
+            name="hackathon",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="teams",
+                to="hackathons.Hackathon",
+            ),
         ),
     ]

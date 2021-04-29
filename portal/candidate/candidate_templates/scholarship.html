@@ -1,0 +1,101 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">Scholarships</h2>
+    
+    {% if decision_made %}
+      {% if applying_for_scholarship %}
+        <div class="alert alert-success text-justify" role="alert">
+          You are applying for a scholarship!
+        </div>
+      {% else %}
+        <div class="alert alert-secondary text-justify" role="alert">
+            You are not applying for a scholarship
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <div>
+    <p>
+      In this batch of the Lisbon Data Science Starters Academy, we’ll have 50 seats for people who live with no / low income and therefore
+      can’t afford paying the normal fees (which are 100€ for student tickets, 250€ for regular tickets and 1500€ for company tickets).
+      The scholarship seats have a 20€ fee.
+    </p>
+
+    <p>
+      The process that we’ll use to decide whether to grant a scholarship is the following:
+      <ul>
+        <li>
+          The candidate will start by reading these terms and conditions carefully, and confirm that they accept them.
+        </li>
+        <li>
+          Between the 1st and 14th June, the candidate will work on the admission tests. This is the same as for candidates who are not applying for a scholarship
+        </li>
+        <li>
+          If the candidate doesn't pass the admission tests, the admission process is over for them and they won’t be accepted in the LDSSA.
+        </li>
+        <li>
+          If the candidate passed the admission tests, and there are less than 50 scholarship candidates who passed the test, the candidate will automatically move on to the next phase.
+          If there are more than 50 scholarship candidates who passed the test, the candidate will go through a random selection process to decide whether they will move on to the next phase.
+          This random selection follows the same <a href="https://github.com/LDSSA/wiki/wiki/Application-process#entrance-type-restrictions">entrance type restrictions</a> as the non scholarship one.
+        </li>
+        <li>
+          If the candidate passed the selection phase, the next phase is a video call with a staff member of the Academy.
+          The goal of the video call is for us to learn why the candidate needs a scholarship.
+          In case the candidate has documentation that proves their no / low income situation, this will be helpful for us to make the decision.
+          This video call will be led by an interviewer who will collect the data that the candidate is comfortable sharing with us, by writing a report in a document shared with the candidate.
+          At the end of the video call, the candidate will be asked to read the interviewer’s report and to sign it (by writing their full name at the bottom of the shared document).
+          The actual decision will be made by the Academy’s executive team, based only on the content of the report.
+        </li>
+        <li>
+          In case the scholarship is granted, the candidate will have 48h to pay the 20€ fee and submit their payment proof.
+          The payment proof will be validated by a staff member of the Academy, and in case it’s valid, the candidate is accepted in batch4 of the LDSSA.
+        </li>
+        <li>
+          If some candidates don’t pass the interview phase or don’t pay the fee, the next candidates in line will be called for the interview.
+          So, even if a candidate is not called for a first round of interviews, they might still be called for a second or third one.
+        </li>
+      </ul>
+    </p>
+    
+    <p>
+      In the case where less than 50 scholarships are granted, the remaining seats will be filled in by non scholarship candidates.
+    </p>
+
+    <p><b>
+      In case the candidate decides to apply for a scholarship at the beginning of the admissions process, they won’t be able to change this at any time during the process!
+      If the scholarship is denied, they won’t be able to pay the normal fee and get in through the normal admissions funnel.
+    </b></p>
+    <br>
+  </div>
+
+  {% if not decision_made %}
+    <div class="jumbotron p-3">
+        <p>
+          Do you want to apply for a scholarship?
+        </p>
+        <div class="row">
+          <div class="col-md-1">
+          <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="decision" value="yes">
+              <button type="submit" class="btn btn-primary">Yes</button>
+          </form>
+        </div>
+        <div class="col-md-1">
+          <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="decision" value="no">
+              <button type="submit" class="btn btn-primary">No</button>
+          </form>
+        </div>
+      </div>
+        
+    </div>
+  {% endif %}
+    
+</div>
+
+{% endblock %}

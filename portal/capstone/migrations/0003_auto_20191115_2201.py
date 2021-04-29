@@ -6,13 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('capstone', '0002_duedatapoint_url'),
+        ("capstone", "0002_duedatapoint_url"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='duedatapoint',
-            name='state',
-            field=models.CharField(choices=[('due', 'due'), ('queued', 'queued'), ('success', 'success'), ('fail', 'fail')], default='due', max_length=64),
+            model_name="duedatapoint",
+            name="state",
+            field=models.CharField(
+                choices=[
+                    ("due", "due"),
+                    ("queued", "queued"),
+                    ("success", "success"),
+                    ("fail", "fail"),
+                ],
+                default="due",
+                max_length=64,
+            ),
         ),
     ]

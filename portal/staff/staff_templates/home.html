@@ -1,0 +1,92 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">Staff Home</h2>
+
+    <hr>
+    {% for f in datetime_flags %}
+    <div class="row">
+        <div class="col-md-4 order-md-4 mb-4 text-center">
+            <div class="alert alert-primary" role="alert">
+                {{f.label}}
+            </div>
+        </div>
+        <div class="col-md-8 order-md-8 mb-8 text-center">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value={{f.key}}>
+                <input name="date_s" value="{{ f.value }}" {% if not user.is_admin %} disabled {% endif %}>
+                <button type="submit" class="btn btn-info" data-placement="bottom" title="datetime format: {{datetime_fmt}}" {% if not user.is_admin %} disabled {% endif %}>
+                     Update Date
+                </button>
+            </form>
+        </div>
+    </div>
+    <hr>
+    {% endfor %}
+
+    {% for f in int_flags %}
+    <div class="row">
+        <div class="col-md-4 order-md-4 mb-4 text-center">
+            <div class="alert alert-secondary" role="alert">
+                {{f.label}}
+            </div>
+        </div>
+        <div class="col-md-8 order-md-8 mb-8 text-center">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value={{f.key}}>
+                <input type="number" name="int_s" value="{{ f.value }}" {% if not user.is_admin %} disabled {% endif %}>
+                <button type="submit" class="btn btn-info" {% if not user.is_admin %} disabled {% endif %}>
+                     Update Value
+                </button>
+            </form>
+        </div>
+    </div>
+    <hr>
+    {% endfor %}
+
+    {% for f in bool_flags %}
+    <div class="row">
+        {% if f.value %}
+        <div class="col-md-4 order-md-4 mb-4 text-center">
+            <div class="alert alert-success" role="alert">
+                {{f.label}} are <strong>Open</strong>
+            </div>
+        </div>
+        <div class="col-md-8 order-md-8 mb-8 text-center">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value={{f.key}}>
+                <input type="hidden" name="action" value="close">
+                <button type="submit" class="btn btn-info" {% if not user.is_admin %} disabled {% endif %}>
+                     Close {{f.label}}
+                </button>
+            </form>
+        </div>
+        {% else %}
+        <div class="col-md-4 order-md-4 mb-4 text-center">
+            <div class="alert alert-danger" role="alert">
+               {{f.label}} are <strong>Closed</strong>
+            </div>
+        </div>
+        <div class="col-md-8 order-md-8 mb-8 text-center">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value={{f.key}}>
+                <input type="hidden" name="action" value="open">
+                <button type="submit" class="btn btn-info" {% if not user.is_admin %} disabled {% endif %}>
+                    Open {{f.label}}
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+    <hr>
+
+    {% endfor %}
+</div>
+
+{% endblock %}

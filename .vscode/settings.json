@@ -1,6 +1,6 @@
 {
     "python.linting.pylintEnabled": false,
-    "python.pythonPath": "/usr/local/bin/python",
+    "python.pythonPath": "/home/hcastilho/.venv/portal/bin/python",
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true
 }

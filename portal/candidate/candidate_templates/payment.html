@@ -1,0 +1,161 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">
+        Payment
+
+        {% if s.status == selection_status.ACCEPTED %}
+        <span class="badge badge-success">{{ s.status }}</span>
+        {% elif s.status == selection_status.REJECTED %}
+        <span class="badge badge-danger">{{ s.status }}</span>
+        {% elif s.status == selection_status.SELECTED %}
+        <span class="badge badge-warning">{{ s.status }}</span>
+        {% elif s.status == selection_status.TO_BE_ACCEPTED %}
+        <span class="badge badge-info">{{ s.status }}</span>
+        {% else %}
+        <span class="badge badge-dark">{{ s.status }}</span>
+        {% endif %}
+    </h2>
+
+    {% if s.status == selection_status.ACCEPTED %}
+    <div class="jumbotron py-3">
+        <p>
+            If you need an invoice for your payment, please write us an email to
+            <b>admissions@lisbondatascience.org</b> with the following details:
+        </p>
+
+        <ul>
+            <li>Name</li>
+            <li>VAT number (NIF)</li>
+            <li>Address</li>
+            <li>Postcode</li>
+        </ul>
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-4 order-md-2 mb-4">
+        <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted">Payment details</span>
+        </h4>
+        <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="my-0">IBAN</h6>
+            </div>
+            <span class="text-muted">PT50 0036 0000 99105926026 14</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="my-0">BIC/SWIFT</h6>
+            </div>
+            <span class="text-muted">MPIOPTPL</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="my-0">Account name</h6>
+            </div>
+            <span class="text-muted">PERCENTAGE HOUR<br>ASSOCIAÇÃO</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="my-0">Amount</h6>
+            </div>
+            <span class="text-muted">{{ s.payment_value|floatformat }} €</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <h6 class="my-0">Due date</h6>
+            </div>
+            <span class="text-muted">{{ s.payment_due_date|date:"Y-m-d" }}</span>
+            </li>
+        </ul>
+        </div>
+
+        <div class="col-md-8 order-md-1">
+        <h4 class="mb-3">Documents</h4>
+
+        <div class="card mb-4">
+            <h5 class="card-header">Payment proof</h5>
+
+            {% if payment_proofs %}
+            <div class="card-body">
+                <h5 class="card-title">Uploaded</h5>
+                {% for doc in payment_proofs %}
+                <p><a href="/candidate/payment/download-document/{{ doc.id }}" class="card-link">{{ doc.filename }}</a></p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if can_update %}
+            <div class="card-body">
+                <h5 class="card-title">Upload new</h5>
+                <form action="/candidate/payment/upload-payment-proof" enctype="multipart/form-data" method="POST" class="mb-0">
+                    {% csrf_token %}
+                    <div class="custom-file mb-3">
+                        <input type="file" class="custom-file-input" id="paymentInputFile" name="file" required {% if not can_update %} disabled {% endif %}>
+                        <label class="custom-file-label" for="paymentInputFile">Choose file</label>
+                    </div>
+                    <script>
+                        $('#paymentInputFile').on('change',function(e){
+                            var fileName = e.target.files[0].name;
+                            $(this).next('.custom-file-label').html(fileName);
+                        })
+                    </script>
+                    <button class="btn btn-secondary" type="submit" {% if not can_update %} disabled {% endif %}>Upload file</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if s.ticket_type == "Student" %}
+        <div class="card mb-4">
+            <h5 class="card-header">Student ID</h5>
+
+            {% if student_ids %}
+            <div class="card-body">
+                <h5 class="card-title">Uploaded</h5>
+                {% for doc in student_ids %}
+                <p><a href="/candidate/payment/download-document/{{ doc.id }}" class="card-link">{{ doc.filename }}</a></p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if can_update %}
+            <div class="card-body">
+                <h5 class="card-title">Upload new</h5>
+                <form action="/candidate/payment/upload-student-id" enctype="multipart/form-data" method="POST" class="mb-0">
+                    {% csrf_token %}
+                    <div class="custom-file mb-3">
+                        <input type="file" class="custom-file-input" id="studentIdInputFile" name="file" required {% if not can_update %} disabled {% endif %}>
+                        <label class="custom-file-label" for="studentIdInputFile">Choose file</label>
+                    </div>
+                    <script>
+                        $('#studentIdInputFile').on('change',function(e){
+                            var fileName = e.target.files[0].name;
+                            $(this).next('.custom-file-label').html(fileName);
+                        })
+                    </script>
+                    <button class="btn btn-secondary" type="submit" {% if not can_update %} disabled {% endif %}>Upload file</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        {% if can_update %}
+        <form method="post" class="mb-4">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary" {% if not can_update %} disabled {% endif %}>Submit payment proof</button>
+        </form>
+        {% endif %}
+
+        </div>
+
+    </div>
+</div>
+
+
+{% endblock %}

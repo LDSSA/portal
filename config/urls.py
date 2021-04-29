@@ -8,7 +8,8 @@ from allauth.account import views
 from portal.academy.views import HomeRedirectView
 
 urlpatterns = [
-    path('accounts/', include('allauth.urls')),
+    # General
+    path("accounts/", include("allauth.urls")),
     # path("",
     #      TemplateView.as_view(template_name="pages/home.html"),
     #      name="home"),
@@ -16,22 +17,21 @@ urlpatterns = [
     #      TemplateView.as_view(template_name="pages/about.html"),
     #      name="about",
     # ),
-    path("",
-         HomeRedirectView.as_view(),
-         name="home"),
+    path("", HomeRedirectView.as_view(), name="home"),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     path(
         "users/",
         include("portal.users.urls", namespace="users"),
     ),
-    # Your stuff: custom urls includes go here
+    # Admissions
+    # TODO
+    # path("admissions/", include("admissions.urls")),
+    # Academy
     path("academy/", include("academy.urls")),
     path("hackathons/", include("hackathons.urls")),
     path("capstone/", include("capstone.urls")),
-] + static(
-    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 if settings.DEBUG:
@@ -58,4 +58,6 @@ if settings.DEBUG:
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
 
-        urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns = [
+            path("__debug__/", include(debug_toolbar.urls))
+        ] + urlpatterns

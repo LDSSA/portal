@@ -1,0 +1,70 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">Profile</h2>
+
+    <div class="row">
+        <div class="col-md-8 order-md-8 mb-6">
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="form-group">                    
+                    <label for="id_full_name">Full name</label>
+                    <input type="text" class="form-control" name="full_name" maxlength="100" id="id_full_name" placeholder="John Doe" value="{{profile.full_name}}" required>
+                </div>
+                <div class="form-group">
+                    <label for="id_profession">Profession</label>
+                    <input type="text" class="form-control" name="profession" maxlength="50" id="id_profession" placeholder="Marine Biologist" value="{{profile.profession}}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_gender">Gender</label>
+                    <select class="form-control" name="gender" id="id_gender" required>
+                        <option value="" {% if not profile.gender %}selected{% endif %}>---------</option>
+                        <option value="{{profile_genders.female}}" {% if profile.gender == profile_genders.female %}selected{% endif %}>{{profile_genders.female}}</option>
+                        <option value="{{profile_genders.male}}" {% if profile.gender == profile_genders.male %}selected{% endif %}>{{profile_genders.male}}</option>
+                        <option value="{{profile_genders.other}}" {% if profile.gender == profile_genders.other %}selected{% endif %}>{{profile_genders.other}}</option>
+                    </select>
+                </div>
+
+                {% if not applying_for_scholarship %}
+                <div class="form-group">
+                    <label for="id_ticket_type">Ticket type</label>
+                    <p class="text-muted"><i>
+                        If you chose a student ticket, you'll need to show us a valid student card at payment time.<br>
+                        To issue an invoice to a company, you must select the company ticket.<br>
+                        Find all the information about our fees <a href="https://github.com/LDSSA/wiki/wiki/Application-process#fees">here</a>.
+                    </i></p>
+                    <select class="form-control" name="ticket_type" id="id_ticket_type"required>
+                        <option value="" {% if not profile.ticket_type %}selected{% endif %}>---------</option>
+                        <option value="{{profile_ticket_types.student}}" {% if profile.ticket_type == profile_ticket_types.student %}selected{% endif %}>{{profile_ticket_types.student}}</option>
+                        <option value="{{profile_ticket_types.regular}}" {% if profile.ticket_type == profile_ticket_types.regular %}selected{% endif %}>{{profile_ticket_types.regular}}</option>
+                        <option value="{{profile_ticket_types.company}}" {% if profile.ticket_type == profile_ticket_types.company %}selected{% endif %}>{{profile_ticket_types.company}}</option>
+                    </select>
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label for="id_company">Company</label>
+                    {% if not applying_for_scholarship %}
+                    <p class="text-muted"><i>
+                        Optional if you've not selected a company ticket.
+                    </i></p>
+                    {% else %}
+                    <p class="text-muted"><i>
+                        Optional
+                    </i></p>
+                    {% endif %}
+                    <input type="text" class="form-control" name="company" maxlength="50" id="id_company" placeholder="LDSA" value="{{profile.company}}">
+                </div>
+
+                <button type="submit" class="btn btn-primary">{% if profile_exists %}Update profile{% else %}Create Profile{% endif %}</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

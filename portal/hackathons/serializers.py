@@ -6,4 +6,4 @@ from portal.hackathons import models
 class HackathonSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Hackathon
-        fields = ['script_file', 'data_file']
+        fields = ["script_file", "data_file"]

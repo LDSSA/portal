@@ -7,13 +7,17 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('capstone', '0005_auto_20191119_2228'),
+        ("capstone", "0005_auto_20191119_2228"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='simulator',
-            name='capstone',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='simulators', to='capstone.capstone'),
+            model_name="simulator",
+            name="capstone",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="simulators",
+                to="capstone.capstone",
+            ),
         ),
     ]

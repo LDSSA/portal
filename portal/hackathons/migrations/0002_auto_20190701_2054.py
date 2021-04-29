@@ -7,18 +7,18 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hackathons', '0001_initial'),
+        ("hackathons", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='hackathon',
-            name='attendance_open',
+            model_name="hackathon",
+            name="attendance_open",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='hackathon',
-            name='due_date',
+            model_name="hackathon",
+            name="due_date",
             field=models.DateField(default=django.utils.timezone.now),
         ),
     ]

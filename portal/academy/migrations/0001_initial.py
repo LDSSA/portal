@@ -16,42 +16,102 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Grade',
+            name="Grade",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('score', models.FloatField(null=True)),
-                ('notebook', models.FileField(null=True, upload_to=portal.academy.models.notebook_path)),
-                ('status', models.CharField(choices=[('never-submitted', 'Never Submitted'), ('grading', 'Grading...'), ('failed', 'Failed'), ('out-of-date', 'Out-of-date'), ('graded', 'Graded')], max_length=1024)),
-                ('message', models.TextField(blank=True)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='grades', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("score", models.FloatField(null=True)),
+                (
+                    "notebook",
+                    models.FileField(
+                        null=True,
+                        upload_to=portal.academy.models.notebook_path,
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("never-submitted", "Never Submitted"),
+                            ("grading", "Grading..."),
+                            ("failed", "Failed"),
+                            ("out-of-date", "Out-of-date"),
+                            ("graded", "Graded"),
+                        ],
+                        max_length=1024,
+                    ),
+                ),
+                ("message", models.TextField(blank=True)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                (
+                    "student",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="grades",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Specialization',
+            name="Specialization",
             fields=[
-                ('code', models.CharField(max_length=255, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('created', models.DateTimeField(auto_now_add=True)),
+                (
+                    "code",
+                    models.CharField(
+                        max_length=255, primary_key=True, serialize=False
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True)),
+                ("created", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Unit',
+            name="Unit",
             fields=[
-                ('code', models.CharField(max_length=255, primary_key=True, serialize=False)),
-                ('name', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('due_date', models.DateField(auto_now_add=True)),
-                ('checksum', models.TextField(blank=True)),
-                ('created', models.DateTimeField(auto_now_add=True)),
-                ('instructor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('specialization', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='units', to='academy.Specialization')),
+                (
+                    "code",
+                    models.CharField(
+                        max_length=255, primary_key=True, serialize=False
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True)),
+                ("due_date", models.DateField(auto_now_add=True)),
+                ("checksum", models.TextField(blank=True)),
+                ("created", models.DateTimeField(auto_now_add=True)),
+                (
+                    "instructor",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "specialization",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="units",
+                        to="academy.Specialization",
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='grade',
-            name='unit',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='grades', to='academy.Unit'),
+            model_name="grade",
+            name="unit",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="grades",
+                to="academy.Unit",
+            ),
         ),
     ]

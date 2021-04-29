@@ -1,0 +1,64 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">
+        Candidate <a href="/staff/candidates/{{ s.user.id }}">{{ s.user.email }}</a> Interview
+
+        <span class="badge badge-info">{{ s.status }}</span>
+    </h2>
+
+    <div class="row justify-content-md-center">
+        <div class="col text-center">
+            <form method="post">
+                {% csrf_token %}
+                    <label for="noteMsg">Informative Note (no side effects)</label>
+                    <textarea class="form-control" id="noteMsg" name="msg" rows="3" required></textarea>
+                    <input type="hidden" id="hiddenNote" name="action" value="note">
+                <button type="submit" class="btn btn-secondary">Add Note</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row justify-content-md-center">
+        <div class="col text-center">
+            <form method="post">
+                {% csrf_token %}
+                <label for="rejectMsg">Explain why the candidate did not pass the interview</label>
+                <textarea class="form-control" id="rejectMsg" name="msg" rows="3" required></textarea>
+                <input type="hidden" id="hiddenReject" name="action" value="reject">
+                <button type="submit" class="btn btn-danger">Fail Interview</button>
+            </form>
+        </div>
+
+        <div class="col text-center">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" id="hiddenAccept" name="action" value="accept">
+                <button type="submit" class="btn btn-success">Pass Interview</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">message</th>
+                <th scope="col">created_at</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+            <tr>
+                <td> <pre>{{ log.message }}</pre> </td>
+                <td> {{ log.created_at }} </td>
+            </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

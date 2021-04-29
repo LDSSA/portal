@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0004_userwhitelist'),
+        ("users", "0004_userwhitelist"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='userwhitelist',
-            name='username',
-            field=models.CharField(max_length=255, unique=True, verbose_name='Username'),
+            model_name="userwhitelist",
+            name="username",
+            field=models.CharField(
+                max_length=255, unique=True, verbose_name="Username"
+            ),
         ),
     ]

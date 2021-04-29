@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('academy', '0006_auto_20190622_0955'),
+        ("academy", "0006_auto_20190622_0955"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='grade',
+            name="grade",
             unique_together=set(),
         ),
         migrations.RemoveField(
-            model_name='grade',
-            name='updated',
+            model_name="grade",
+            name="updated",
         ),
     ]

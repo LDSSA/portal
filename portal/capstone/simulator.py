@@ -70,21 +70,22 @@ def run_producer(submissions):
                 # Lock due datapoints
                 # prevent multiple producers from repeating datapoints
                 now = datetime.now(timezone.utc)
-                qs = (models.DueDatapoint.objects
-                      .select_for_update()
-                      .filter(simulator__status='started')
-                      .filter(state='due')
-                      .filter(due__lte=now))[:settings.BLOCK_SIZE]
+                qs = (
+                    models.DueDatapoint.objects.select_for_update()
+                    .filter(simulator__status="started")
+                    .filter(state="due")
+                    .filter(due__lte=now)
+                )[: settings.BLOCK_SIZE]
 
                 items = []
                 for due_datapoint in qs:
                     items.append(due_datapoint.id)
-                    due_datapoint.status = 'queued'
+                    due_datapoint.status = "queued"
                     due_datapoint.save()
 
             # Queue due datapoints outside lock
             if items:
-                logger.info('Queuing due datapoints')
+                logger.info("Queuing due datapoints")
             for item in items:
                 logger.info("Producing %s", item)
                 submissions.put(item)
@@ -104,26 +105,29 @@ def consume(id_):
 
     try:
         with transaction.atomic():
-            due_datapoint = (models.DueDatapoint.objects
-                             .select_related('datapoint')
-                             .select_for_update().get(id=id_))
+            due_datapoint = (
+                models.DueDatapoint.objects.select_related("datapoint")
+                .select_for_update()
+                .get(id=id_)
+            )
 
             try:
                 logger.info("Posting %s", id_)
                 data = json.loads(due_datapoint.datapoint.data)
-                response = requests.post(due_datapoint.url,
-                                         json=data,
-                                         timeout=settings.TIMEOUT)
+                response = requests.post(
+                    due_datapoint.url, json=data, timeout=settings.TIMEOUT
+                )
 
             except requests.exceptions.RequestException as exc:
                 logger.info("Request Exception %s", id_, exc_info=True)
                 logger.debug(exc.__class__.__name__)
                 logger.debug(traceback.format_tb(exc.__traceback__))
 
-                due_datapoint.state = 'fail'
+                due_datapoint.state = "fail"
                 due_datapoint.response_exception = exc.__class__.__name__
                 due_datapoint.response_traceback = traceback.format_tb(
-                    exc.__traceback__)
+                    exc.__traceback__
+                )
                 if isinstance(exc, requests.exceptions.Timeout):
                     due_datapoint.response_timeout = True
                 due_datapoint.save()
@@ -134,13 +138,15 @@ def consume(id_):
 
             except requests.exceptions.HTTPError as exc:
                 logger.info("HTTP Exception %s", id_, exc_info=True)
-                due_datapoint.state = 'fail'
+                due_datapoint.state = "fail"
                 due_datapoint.response_exception = exc.__class__.__name__
                 due_datapoint.response_traceback = traceback.format_tb(
-                    exc.__traceback__)
+                    exc.__traceback__
+                )
                 due_datapoint.response_status = response.status_code
-                due_datapoint.response_elapsed = (response.elapsed
-                                                  .total_seconds())
+                due_datapoint.response_elapsed = (
+                    response.elapsed.total_seconds()
+                )
                 due_datapoint.response_content = response.text
                 due_datapoint.save()
                 return
@@ -152,24 +158,27 @@ def consume(id_):
             except json.JSONDecodeError as exc:
                 logger.info("Response Exception %s", id_, exc_info=True)
 
-                due_datapoint.state = 'fail'
+                due_datapoint.state = "fail"
                 due_datapoint.response_exception = exc.__class__.__name__
                 due_datapoint.response_traceback = traceback.format_tb(
-                    exc.__traceback__)
+                    exc.__traceback__
+                )
                 due_datapoint.response_status = response.status_code
-                due_datapoint.response_elapsed = (response.elapsed
-                                                  .total_seconds())
+                due_datapoint.response_elapsed = (
+                    response.elapsed.total_seconds()
+                )
                 due_datapoint.response_content = response.text
                 due_datapoint.save()
                 return
 
             else:
                 logger.info("Success %s", id_)
-                due_datapoint.state = 'success'
+                due_datapoint.state = "success"
                 due_datapoint.response_content = content
                 due_datapoint.response_status = response.status_code
-                due_datapoint.response_elapsed = (response.elapsed
-                                                  .total_seconds())
+                due_datapoint.response_elapsed = (
+                    response.elapsed.total_seconds()
+                )
                 due_datapoint.save()
 
     except Exception:
