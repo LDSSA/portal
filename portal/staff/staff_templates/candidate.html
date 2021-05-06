@@ -1,0 +1,103 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">
+        Candidate Data
+    </h2>
+    <form>
+        <div class="form-group">
+            <label for="user_created_at">User Since</label>
+            <input type="text" class="form-control" id="user_created_at" value="{{user.created_at}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="user_email">Email</label>
+            <input type="text" class="form-control" id="user_email" value="{{user.email}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="user_confirmed">Email Confirmed</label>
+            <input type="text" class="form-control" id="user_confirmed" value="{{user.email_confirmed}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="user_coc">CoC Accepted</label>
+            <input type="text" class="form-control" id="user_coc" value="{{user.code_of_conduct_accepted}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="profile_full_name">Name</label>
+            <input type="text" class="form-control" id="profile_full_name" value="{{user.profile.full_name}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="profile_profession">Profession</label>
+            <input type="text" class="form-control" id="profile_profession" value="{{user.profile.profession}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="profile_gender">Gender</label>
+            <input type="text" class="form-control" id="profile_gender" value="{{user.profile.gender}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="profile_ticket_type">Ticket Type</label>
+            <input type="text" class="form-control" id="profile_ticket_type" value="{{user.profile.ticket_type}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="profile_company">Company</label>
+            <input type="text" class="form-control" id="profile_company" value="{{user.profile.company}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="total_submissions">Total Submissions</label>
+            <input type="text" class="form-control" id="total_submissions" value="{{total_submissions}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="applications_best_score_slu01">Best SLU01 Score</label>
+            <input type="text" class="form-control" id="applications_best_score_slu01" value="{{application_best_scores.slu01}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="applications_best_score_coding_test">Best Coding-Test Score</label>
+            <input type="text" class="form-control" id="applications_best_score_coding_test" value="{{application_best_scores.coding_test}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="applications_best_score_slu02">Best SLU02 Score</label>
+            <input type="text" class="form-control" id="applications_best_score_slu02" value="{{application_best_scores.slu02}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="applications_best_score_slu03">Best SLU03 Score</label>
+            <input type="text" class="form-control" id="applications_best_score_slu03" value="{{application_best_scores.slu03}}" disabled>
+        </div>
+
+
+        <div class="form-group">
+            <label for="selection_status">Selection Status</label>
+            <input type="text" class="form-control" id="selection_status" value="{{user.selection.status}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="selection_payment_value">Payment Value</label>
+            <input type="text" class="form-control" id="selection_payment_value" value="{{user.selection.payment_value}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="selection_ticket_type">Payment Ticket Type</label>
+            <input type="text" class="form-control" id="selection_ticket_type" value="{{user.selection.ticket_type}}" disabled>
+        </div>
+
+        <div class="form-group">
+            <label for="selection_payment_due_date">Payment Due Date</label>
+            <input type="text" class="form-control" id="selection_payment_due_date" value="{{user.selection.payment_ticket_type}}" disabled>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">
+        Candidate Applications
+    </h2>
+
+    <div class="jumbotron py-4">
+        <h3 class="pb-2">Summary</h3>
+        <table class="table bg-white">
+            <thead>
+                <tr>
+                <th scope="col"></th>
+                <th scope="col"><span class="badge badge-info">{{status_enum.not_started.value}}</span></th>
+                <th scope="col"><span class="badge badge-warning">{{status_enum.ongoing.value}}</span></th>
+                <th scope="col"><span class="badge badge-success">{{status_enum.passed.value}}</span></th>
+                <th scope="col"><span class="badge badge-danger">{{status_enum.failed.value}}</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                <th scope="row">Coding Test</th>
+                <td> {{ summary.coding_test.not_started }} </td>
+                <td> {{ summary.coding_test.ongoing }} </td>
+                <td> {{ summary.coding_test.passed }} </td>
+                <td> {{ summary.coding_test.failed }} </td>
+                </tr>
+                <tr>
+                <th scope="row">SLU01</th>
+                <td> {{ summary.slu01.not_started }} </td>
+                <td> {{ summary.slu01.ongoing }} </td>
+                <td> {{ summary.slu01.passed }} </td>
+                <td> {{ summary.slu01.failed }} </td>
+                </tr>
+                <tr>
+                <th scope="row">SLU02</th>
+                <td> {{ summary.slu02.not_started }} </td>
+                <td> {{ summary.slu02.ongoing }} </td>
+                <td> {{ summary.slu02.passed }} </td>
+                <td> {{ summary.slu02.failed }} </td>
+                </tr>
+                <tr>
+                <th scope="row">SLU03</th>
+                <td> {{ summary.slu03.not_started }} </td>
+                <td> {{ summary.slu03.ongoing }} </td>
+                <td> {{ summary.slu03.passed }} </td>
+                <td> {{ summary.slu03.failed }} </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div class="dropdown">
+                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Filter Application Status By
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <a class="dropdown-item" href="?application_status={{status_enum.not_started.name}}"><span class="badge badge-info">{{status_enum.not_started.value}} ({{status_enum.not_started.count}})</span></a>
+                    <a class="dropdown-item" href="?application_status={{status_enum.ongoing.name}}"><span class="badge badge-warning">{{status_enum.ongoing.value}} ({{status_enum.ongoing.count}})</span></a>
+                    <a class="dropdown-item" href="?application_status={{status_enum.passed.name}}"><span class="badge badge-success">{{status_enum.passed.value}} ({{status_enum.passed.count}})</span></a>
+                    <a class="dropdown-item" href="?application_status={{status_enum.failed.name}}"><span class="badge badge-danger">{{status_enum.failed.value}} ({{status_enum.failed.count}})</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">Application Status</th>
+                    <th scope="col">Coding Test Score</th>
+                    <th scope="col">SLU 01 Score</th>
+                    <th scope="col">SLU 02 Score</th>
+                    <th scope="col">SLU 03 Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for a in applications %}
+                <tr>
+                    <td><a href="/staff/candidates/{{ a.ref.user.id }}">{{ a.ref.user.email }}</a></td>
+                    {% for status in a.status_list %}
+                    <td>
+                        {% if status.name == "not_started" %}
+                            <span class="badge badge-info">{{status.value}}</span>
+                        {% endif %}
+                        {% if status.name == "ongoing" %}
+                            <span class="badge badge-warning">{{status.value}}</span>
+                        {% endif %}
+                        {% if status.name == "passed" %}
+                            <span class="badge badge-success">{{status.value}}</span>
+                        {% endif %}
+                        {% if status.name == "failed" %}
+                            <span class="badge badge-danger">{{status.value}}</span>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">
+        Candidate Submissions
+    </h2>
+    <br>
+    <div class="row">
+        <div class="col-md-6">
+            <form class="form-inline">
+                <div class="form-group mx-sm-3 mb-2">
+                    <label for="user_email" class="sr-only">User Email</label>
+                    <input class="form-control" id="user_email" name="user_email" placeholder="candidate@adm.org">
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Filter</button>
+            </form>
+        </div>
+        <div class="col-md-6 ">
+                <a class="btn btn-secondary" href="/staff/submissions">Clear Filter</a>
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Score</th>
+                    <th scope="col">Submission</th>
+                    <th scope="col">Feedback</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for s in submissions %}
+                <tr>
+                    <td>{{ s.id }}</td>
+                    <td><a href="/staff/candidates/{{ s.application__user__id }}">{{ s.application__user__email }}</a></td>
+                    <td>{{ s.submission_type }}</td>
+                    <td>{{ s.score }}</td>
+                    <td><a href="/staff/submissions/download/{{s.id}}">submission</a></td>
+                    <td><a href="/staff/submissions/download-feedback/{{s.id}}">feedback</a></td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

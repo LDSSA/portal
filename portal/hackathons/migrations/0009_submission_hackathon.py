@@ -7,14 +7,19 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hackathons', '0008_auto_20190714_0928'),
+        ("hackathons", "0008_auto_20190714_0928"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='submission',
-            name='hackathon',
-            field=models.ForeignKey(default='', on_delete=django.db.models.deletion.CASCADE, related_name='submissions', to='hackathons.Hackathon'),
+            model_name="submission",
+            name="hackathon",
+            field=models.ForeignKey(
+                default="",
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="submissions",
+                to="hackathons.Hackathon",
+            ),
             preserve_default=False,
         ),
     ]

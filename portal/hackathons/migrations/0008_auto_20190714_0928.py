@@ -7,18 +7,26 @@ import portal.hackathons.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('hackathons', '0007_auto_20190714_0846'),
+        ("hackathons", "0007_auto_20190714_0846"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='hackathon',
-            name='data_file',
-            field=models.FileField(blank=True, null=True, upload_to=portal.hackathons.models.random_path),
+            model_name="hackathon",
+            name="data_file",
+            field=models.FileField(
+                blank=True,
+                null=True,
+                upload_to=portal.hackathons.models.random_path,
+            ),
         ),
         migrations.AlterField(
-            model_name='hackathon',
-            name='script_file',
-            field=models.FileField(blank=True, null=True, upload_to=portal.hackathons.models.random_path),
+            model_name="hackathon",
+            name="script_file",
+            field=models.FileField(
+                blank=True,
+                null=True,
+                upload_to=portal.hackathons.models.random_path,
+            ),
         ),
     ]

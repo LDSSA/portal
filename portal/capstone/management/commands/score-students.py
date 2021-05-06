@@ -18,19 +18,18 @@ from portal.users.models import User
 
 
 class Command(BaseCommand):
-    help = 'Load file to datapoints'
+    help = "Load file to datapoints"
 
     def add_arguments(self, parser):
-        parser.add_argument('simulator_name')
-        parser.add_argument('file')
+        parser.add_argument("simulator_name")
+        parser.add_argument("file")
 
     def handle(self, *args, **options):
-        simulator = models.Simulator(name=options['simulator_name'])
-        self.stdout.write('username, score')
+        simulator = models.Simulator(name=options["simulator_name"])
+        self.stdout.write("username, score")
         for student in User.objects.filter(student=True):
             score = self.score_student(simulator, student)
-            self.stdout.write(
-                f'{student.username}, {score}')
+            self.stdout.write(f"{student.username}, {score}")
 
     def score_student(self, simulator, student):
         pass

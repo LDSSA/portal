@@ -5,7 +5,7 @@ from portal.capstone.simulator import run
 
 
 class Command(BaseCommand):
-    help = 'Run simulators'
+    help = "Run simulators"
 
     def handle(self, *args, **options):
         run()

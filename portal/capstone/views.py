@@ -6,7 +6,7 @@ from django.views.generic import ListView, DetailView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from portal.academy.views import StudentMixin, InstructorMixin
+from portal.users.views import StudentMixin, InstructorMixin
 from portal.capstone import models, forms
 
 
@@ -16,15 +16,15 @@ logger = logging.getLogger(__name__)
 class StudentCapstoneListView(StudentMixin, ListView):
     model = models.Capstone
     queryset = models.Capstone.objects.all()
-    template_name = 'capstone/student/capstone_list.html'
+    template_name = "capstone/student/capstone_list.html"
 
     def get(self, request, *args, **kwargs):
         self.object_list = self.get_queryset()
         data = []
         for capstone in self.object_list:
             api, _ = models.StudentApi.objects.get_or_create(
-                capstone=capstone,
-                student=request.user)
+                capstone=capstone, student=request.user
+            )
             data.append((capstone, api))
 
         context = self.get_context_data(object_list=data)
@@ -33,15 +33,15 @@ class StudentCapstoneListView(StudentMixin, ListView):
 
 class StudentCapstoneDetailView(StudentMixin, DetailView):
     model = models.Capstone
-    template_name = 'capstone/student/capstone_detail.html'
+    template_name = "capstone/student/capstone_detail.html"
 
     # noinspection PyAttributeOutsideInit
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset=queryset)
 
         api, _ = models.StudentApi.objects.get_or_create(
-            capstone=self.object,
-            student=self.request.user)
+            capstone=self.object, student=self.request.user
+        )
 
         return self.object, api
 
@@ -64,20 +64,21 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('capstone:student-capstone-detail',
-                       args=(self.object.pk, ))
+        return reverse(
+            "capstone:student-capstone-detail", args=(self.object.pk,)
+        )
 
 
 class InstructorCapstoneListView(InstructorMixin, ListView):
     model = models.Capstone
     queryset = models.Capstone.objects.all()
-    template_name = 'capstone/instructor/capstone_list.html'
+    template_name = "capstone/instructor/capstone_list.html"
 
 
 class InstructorCapstoneDetailView(InstructorMixin, DetailView):
     model = models.Capstone
     queryset = models.Capstone.objects.all()
-    template_name = 'capstone/instructor/capstone_detail.html'
+    template_name = "capstone/instructor/capstone_detail.html"
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -92,11 +93,11 @@ class CapstonePredictView(APIView):
     permission_classes = []
 
     def post(self, request, *args, **kwargs):
-        return Response({'proba': .6})
+        return Response({"proba": 0.6})
 
 
 class CapstoneUpdateView(APIView):
     permission_classes = []
 
     def post(self, request, *args, **kwargs):
-        return Response({'msg': 'ok'})
+        return Response({"msg": "ok"})

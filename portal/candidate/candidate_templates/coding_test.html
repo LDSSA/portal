@@ -1,0 +1,135 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+
+<div class="container">
+    <h2 class="py-5">Coding Test</h2>
+    
+    <div class="row">
+        <div class="col-md-12 text-center">
+            {% if status == "passed" %}
+            <div class="alert alert-success" role="alert">
+                You have passed with {{ best_score }}/{{ submission_type.max_score }}!
+            </div>
+            {% endif %}
+            {% if status == "ongoing"%}
+            <div class="alert alert-warning" role="alert" id="countdown"> </div>
+            {% endif %}
+            {% if status == "failed" %}
+            <div class="alert alert-danger" role="alert">
+                You have failed!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 py-4">
+            <p>
+                <h4>Welcome to the Coding Test!</h4>
+            </p>
+            <p>
+                After downloading this assignment, the first thing you need to do is to setup your local environment, so that you can run the <code>Exercise Notebook</code> with the test.
+                This setup is exactly the same as for SLU01, so if you've already done SLU01, you can just use the same virtual environment.
+                If you haven't, check how to setup your local environment <a href="/candidate/slu/slu01#setup-env">here</a>.
+            </p>
+            
+            <p>
+                In order to have your test graded, you should submit your <code>Exercise Notebook</code> in the uploading tool below.
+            </p>
+
+            <br>
+
+            <p>
+                <h5>Submitting your work for grading</h5>
+            </p>
+
+            <p>
+                After you've setup your environment and worked on the <code>Exercise Notebook</code>, you'll need to submit it for grading and get a score of at least 16 (out of 20).
+            </p>
+
+            <p>
+                <strong>You should upload only the <code>Exercise Notebook</code> with your solutions</strong>, you don't need to create a zip file or anything else!
+            </p>
+
+            <p>
+                After you submit, you'll see the grade of your submission, and whether you passed or not.
+                You can click in "Open" in the Feedback column to see how much did you score in each question.
+            </p>
+
+            <p>
+                You can (and should!) make as many submissions as you like during the test!
+            </p>
+            
+            <br>
+
+            <p>
+                <h5>Good luck!</h5>
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card-deck">
+                <div class="card">
+                    <div class="card-body d-flex flex-column">
+                        <p class="card-text">Use the button below to download this assignment</p>
+                        <a href="/candidate/assignment-download?assignment_id=coding_test" class="btn btn-primary {% if not download_enabled %} disabled {% endif %} mt-auto align-self-start" role="button" aria-pressed="true" target="_blank">Download</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body d-flex flex-column">
+                    <form action="/candidate/submissions/upload/{{ submission_type.uname }}" enctype="multipart/form-data" method="POST" class="m-0 mt-auto">
+                        {% csrf_token %}
+                        <div class="custom-file mb-3">
+                            <input type="file" class="custom-file-input" id="submissionFile" name="file" required>
+                            <label class="custom-file-label" for="submissionFile">Choose file</label>
+                        </div>
+                        <script>
+                            $('#submissionFile').on('change',function(e){
+                                var fileName = e.target.files[0].name;
+                                $(this).next('.custom-file-label').html(fileName);
+                            })
+                        </script>
+                        <button class="btn btn-primary" type="submit" {% if not upload_enabled %} disabled {% endif %}>Submit Solution</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "./submissions_table.html" %}
+
+</div>
+
+<script>
+    var testDurationHours = {{ coding_test_duration_hours }}; // TODO: Update this!!!
+    var testStartedAt = {{ coding_test_started_at_ms }};
+    var yourDateToGo = new Date(testStartedAt + testDurationHours * 60 * 60 * 1000);
+    var timing = setInterval(
+        function () {
+            var currentDate = new Date().getTime();
+            var timeLeft = yourDateToGo - currentDate;
+
+            var hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+            var minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            if (minutes < 10) minutes= "0" + minutes;
+
+            var seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            if (seconds < 10) seconds= "0" +seconds;
+
+            var txtAll = `You have <b>${hours}h ${minutes}m ${seconds}s</b> to submit solutions!`;
+            document.getElementById("countdown").innerHTML = txtAll;
+
+            if (timeLeft <= 0) {
+                clearInterval(timing);
+                document.getElementById("countdown").innerHTML = "Time's up!";
+            }
+        }, 1000);
+</script>
+
+{% endblock %}

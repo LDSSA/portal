@@ -8,22 +8,32 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('academy', '0001_initial'),
+        ("academy", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='grade',
-            name='updated',
+            model_name="grade",
+            name="updated",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AlterField(
-            model_name='grade',
-            name='status',
-            field=models.CharField(choices=[('never-submitted', 'Never Submitted'), ('grading', 'Grading...'), ('failed', 'Failed'), ('out-of-date', 'Out-of-date'), ('graded', 'Graded')], default='never-submitted', max_length=1024),
+            model_name="grade",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("never-submitted", "Never Submitted"),
+                    ("grading", "Grading..."),
+                    ("failed", "Failed"),
+                    ("out-of-date", "Out-of-date"),
+                    ("graded", "Graded"),
+                ],
+                default="never-submitted",
+                max_length=1024,
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='grade',
-            unique_together={('student', 'unit')},
+            name="grade",
+            unique_together={("student", "unit")},
         ),
     ]

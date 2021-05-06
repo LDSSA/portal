@@ -7,33 +7,37 @@ import portal.hackathons.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('capstone', '0003_auto_20191115_2201'),
+        ("capstone", "0003_auto_20191115_2201"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='capstone',
-            name='scoring',
-            field=models.FileField(blank=True, null=True, upload_to=portal.hackathons.models.random_path),
+            model_name="capstone",
+            name="scoring",
+            field=models.FileField(
+                blank=True,
+                null=True,
+                upload_to=portal.hackathons.models.random_path,
+            ),
         ),
         migrations.AddField(
-            model_name='datapoint',
-            name='outcome',
+            model_name="datapoint",
+            name="outcome",
             field=models.TextField(blank=True),
         ),
         migrations.AlterField(
-            model_name='datapoint',
-            name='data',
+            model_name="datapoint",
+            name="data",
             field=models.TextField(blank=True),
         ),
         migrations.AlterField(
-            model_name='duedatapoint',
-            name='response_exception',
+            model_name="duedatapoint",
+            name="response_exception",
             field=models.TextField(blank=True),
         ),
         migrations.AlterField(
-            model_name='duedatapoint',
-            name='response_traceback',
+            model_name="duedatapoint",
+            name="response_traceback",
             field=models.TextField(blank=True),
         ),
     ]

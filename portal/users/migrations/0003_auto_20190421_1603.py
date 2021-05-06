@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0002_user_student'),
+        ("users", "0002_user_student"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='deploy_private_key',
+            model_name="user",
+            name="deploy_private_key",
             field=models.TextField(blank=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='deploy_public_key',
+            model_name="user",
+            name="deploy_public_key",
             field=models.TextField(blank=True),
         ),
     ]

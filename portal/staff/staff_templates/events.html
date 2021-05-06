@@ -1,0 +1,36 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">Bulk Emails</h2>
+
+    <hr>
+    {% for email in emails %}
+    <div class="row">
+        <div class="col-md-4 order-md-4 mb-4 text-center">
+            <div class="alert alert-{% if email.sent_to == email.applicable_to %}success{% else %}warning{% endif %}" role="alert">
+                {{email.label}}
+            </div>
+        </div>
+        <div class="col-md-4 order-md-4 mb-4 text-center">
+           <div class="alert alert-info" role="alert">
+                {{ email.sent_to }} / {{ email.applicable_to }} emails sent
+            </div>
+        </div>
+        <div class="col-md-4 order-md-4 mb-4 text-center">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="key" value={{email.key}}>
+                <button type="submit" class="btn btn-info" {% if not user.is_admin %} disabled {% endif %}>
+                     Trigger Event
+                </button>
+            </form>
+        </div>
+    </div>
+    <hr>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

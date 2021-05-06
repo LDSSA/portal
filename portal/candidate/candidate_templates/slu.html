@@ -1,0 +1,188 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">{{ submission_type.uname|upper }}</h2>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            {% if status == "passed" %}
+            <div class="alert alert-success" role="alert">
+                You have passed with {{ best_score }}/{{ submission_type.max_score }}!
+            </div>
+            {% endif %}
+            {% if status == "ongoing"%}
+            <div class="alert alert-warning" role="alert">
+                You have until <strong>{{ submissions_closes_at }}</strong> to submit solutions!
+            </div>
+            {% endif %}
+            {% if status == "failed" %}
+            <div class="alert alert-danger" role="alert">
+                You have failed!
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 py-4">
+            <p>
+                <h4>Welcome to this SLU!</h4>
+            </p>
+            <p>
+                After downloading this assignment, the first thing you need to do is to setup your local environment, so that you can run the all the notebooks in this SLU.
+            </p>
+            <p>
+                With your setup in place, you should go through the notebooks in this order:
+                <ul>
+                    <li>
+                        <code>Learning Notebook</code>: here we'll teach you all the basics of <a href="https://pandas.pydata.org/docs/">Pandas</a>.
+                    </li>
+                    <li>
+                        <code>Examples Notebook</code>: here you'll find a summary of the methods that you've learned in the <code>Learning Notebook</code>.
+                    </li>
+                    <li>
+                        <code>Exercise Notebook</code>: here you'll find the exercises that you should complete and submit.
+                    </li>
+                </ul>
+            </p>
+
+            <p>
+                Once you're done with the three notebooks, you should submit your <code>Exercise Notebook</code> for grading, in the uploading tool below.
+            </p>
+            
+            <br>
+
+            <p>
+                <h5 id="setup-env">How Setup your local environment</h5>
+            </p>
+
+            <p>
+                In order for you to go through the notebooks, you need to:
+                <ul>
+                    <li>
+                        Have Python 3 installed in your machine.
+                    </li>
+                    <li>
+                        Create a python virtual environment.
+                    </li>
+                    <li>
+                        Install the requirements listed in the <code>requirements.txt</code>, in your virtual env (note: it is paramount that the packages that you install have the exact same version as in the <code>requirements.txt</code> file, because those are the versions that we're using to grade your notebooks).
+                    </li>
+                    <li>
+                        Be able open a Jypyter Notebook and run code there.
+                    </li>
+                </ul>
+            </p>
+
+            <p>
+                If you know what you're doing, the above instructions should be enough!
+                Otherwise, we have a guide that explains how to set up a Python environment and install requirements <a href="https://github.com/LDSSA/ds-prep-course#initial-setup">here</a>.
+                The parts that are sufficient and necessary for you to setup your local environment are:
+                <ul>
+                    <li>
+                        Setup
+                        <ul>
+                            <li>
+                                <a href="https://github.com/LDSSA/ds-prep-course#Windows-Setup">Windows Setup</a>
+                            </li>
+                            <li>
+                                <a href="https://github.com/LDSSA/ds-prep-course#macos-setup">MacOS Setup</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="https://github.com/LDSSA/ds-prep-course#creating-python-virtual-environment-and-installing-the-necessary-packages">Creating Python Virtual Environment and installing the necessary packages</a>
+                    </li>
+                    <li>
+                        <a href="https://github.com/LDSSA/ds-prep-course#working-on-the-learning-unit">Working on the Learning Unit</a> - this part is about launching a Jupyter Notebook
+                    </li>
+                    <li>
+                        <a href="The Exercise Notebook">https://github.com/LDSSA/ds-prep-course#the-exercise-notebook</a> - this part is about running code in a a Jupyter Notebook
+                    </li>
+                </ul>
+            </p>
+
+            <p>
+                Alternatively, you can achieve the same by using Anaconda:
+                <ul>
+                    <li>
+                        <a href="https://docs.anaconda.com/anaconda/install/">Installing Anaconda</a>
+                    </li>
+                    <li>
+                        <a href="https://docs.anaconda.com/anaconda/user-guide/getting-started/#run-python-in-a-jupyter-notebook">Launching a Jupyter Notebook</a>
+                    </li>
+                    <li>
+                        <a href="https://docs.anaconda.com/anaconda/user-guide/tasks/install-packages/">Installing a Python package on Anaconda</a>
+                    </li>
+                </ul>
+            </p>
+
+            <br>
+
+            <p>
+                <h5>Submitting your work for grading</h5>
+            </p>
+
+            <p>
+                After you've setup your environment and worked on the <code>Exercise Notebook</code>, you'll need to submit it for grading and get a score of at least 16 (out of 20).
+            </p>
+
+            <p>
+                <strong>You should upload only the <code>Exercise Notebook</code> with your solutions</strong>, you don't need to create a zip file or anything else!
+            </p>
+
+            <p>
+                After you submit, you'll see the grade of your submission, and whether you passed or not.
+                You can click in "Open" in the Feedback column to see how much did you score in each question.
+            </p>
+
+            <p>
+                You can make as many submissions as you like until the due date. So take your time to work on this assignment :)
+            </p>
+            
+            <br>
+
+            <p>
+                <h5>Good luck!</h5>
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card-deck">
+                <div class="card">
+                    <div class="card-body d-flex flex-column">
+                        <p class="card-text">Use the button below to download this assignment</p>
+                        <a href="/candidate/assignment-download?assignment_id={{ submission_type.uname }}" class="btn btn-primary {% if not download_enabled %} disabled {% endif %} mt-auto align-self-start" role="button" aria-pressed="true" target="_blank">Download</a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-body d-flex flex-column">
+                    <form action="/candidate/submissions/upload/{{ submission_type.uname }}" enctype="multipart/form-data" method="POST" class="m-0 mt-auto">
+                        {% csrf_token %}
+                        <div class="custom-file mb-3">
+                            <input type="file" class="custom-file-input" id="submissionFile" name="file" required>
+                            <label class="custom-file-label" for="submissionFile">Choose file</label>
+                        </div>
+                        <script>
+                            $('#submissionFile').on('change',function(e){
+                                var fileName = e.target.files[0].name;
+                                $(this).next('.custom-file-label').html(fileName);
+                            })
+                        </script>
+                        <button class="btn btn-primary" type="submit" {% if not upload_enabled %} disabled {% endif %}>Submit Solution</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include "./submissions_table.html" %}
+
+</div>
+
+{% endblock %}

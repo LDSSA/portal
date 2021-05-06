@@ -7,8 +7,9 @@ from portal.capstone.models import DueDatapoint
 
 logger = logging.getLogger(__name__)
 
+
 def fairness_score_precision(sensitive_class):
-    '''
+    """
     Computes a fairness score corresponding to the highest difference
      between precision among sensitive classes
 
@@ -19,7 +20,7 @@ def fairness_score_precision(sensitive_class):
        ...
       }
     :return: maximum difference between precisions in sensitive clasess
-    '''
+    """
     precisions = []
     for s_class in sensitive_class.keys():
         outcomes = sensitive_class[s_class]["outcomes"]
@@ -35,11 +36,11 @@ def fairness_score_precision(sensitive_class):
 
 
 def score(capstone, student_api):
-    '''
+    """
     Calculates the score of the students' API model
     :param student_api: StudentApi object
     :return: score as a float
-    '''
+    """
 
     # Check which simulators have datapoints with outcomes outcomes
     simulator_ids = []
@@ -67,21 +68,27 @@ def score(capstone, student_api):
 
         else:
             try:
-                prediction = json.loads(ddp.response_content)['prediction']
+                prediction = json.loads(ddp.response_content)["prediction"]
             except (json.JSONDecodeError, KeyError):
                 predictions.append(not outcome)
                 outcomes.append(outcome)
             else:
                 sex = data["sex"].lower()
                 if sex not in sensitive_class_sex:
-                    sensitive_class_sex[sex] = {"outcomes": [], "predictions": []}
+                    sensitive_class_sex[sex] = {
+                        "outcomes": [],
+                        "predictions": [],
+                    }
 
                 sensitive_class_sex[sex]["outcomes"].append(outcome)
                 sensitive_class_sex[sex]["predictions"].append(prediction)
 
                 race = data["race"].lower()
                 if race not in sensitive_class_race:
-                    sensitive_class_race[race] = {"outcomes": [], "predictions": []}
+                    sensitive_class_race[race] = {
+                        "outcomes": [],
+                        "predictions": [],
+                    }
 
                 sensitive_class_race[race]["outcomes"].append(outcome)
                 sensitive_class_race[race]["predictions"].append(prediction)

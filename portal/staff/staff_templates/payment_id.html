@@ -1,0 +1,164 @@
+{% extends './base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2 class="py-5">
+        Candidate Payment
+
+        {% if s.status == selection_status.ACCEPTED %}
+        <span class="badge badge-success">{{ s.status }}</span>
+        {% elif s.status == selection_status.REJECTED %}
+        <span class="badge badge-danger">{{ s.status }}</span>
+        {% elif s.status == selection_status.SELECTED %}
+        <span class="badge badge-warning">{{ s.status }}</span>
+        {% else %}
+        <span class="badge badge-info">{{ s.status }}</span>
+        {% endif %}
+    </h2>
+
+    <div class="card mb-5">
+        <div class="card-body">
+            <h4 class="pb-4 pt-2">Candidate</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Ticket type</th>
+                    <th scope="col">Payment value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ s.user.profile.full_name }}</td>
+                        <td><a href="/staff/candidates/{{ s.user.id }}">{{ s.user.email }}</a></td>
+                        <td>{{ s.user.profile.ticket_type }}</td>
+                        <td>{{ s.payment_value }}€</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="card mb-5">
+        <div class="card-body">
+            <h4 class="pb-4 pt-2">Submitted documents</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                    <th scope="col">Document type</th>
+                    <th scope="col">Link to download</th>
+                    <th scope="col">Uploaded at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in docs %}
+                    <tr>
+                        <td>{{ d.doc_type }}</td>
+                        <td> <a href="{{ d.url }}">link</a></td>
+                        <td>{{ d.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card mb-5">
+        <div class="card-body">
+            <h4 class="pb-4 pt-2">Actions</h4>
+
+            {% if can_update %}
+            <h5 class="pb-4 pt-2">Decide on payment proof</h5>
+
+            <div class="row ">
+                <div class="col">
+                    <form method="post">
+                        {% csrf_token %}
+                        <label for="rejectMsg">Explain the candidate why the the payment proof was refused</label>
+                        <textarea class="form-control mb-3" id="rejectMsg" name="msg" rows="3" required></textarea>
+                        <input type="hidden" id="hiddenReject" name="action" value="reject">
+                        <button type="submit" class="btn btn-danger">Refuse payment proof</button>
+                    </form>
+                </div>
+                <div class="col">
+                    <form method="post">
+                        {% csrf_token %}
+                        <label for="needAddMsg">Explain the candidate what additional proof is necessary</label>
+                        <textarea class="form-control mb-3" id="needAddMsg" name="msg" rows="3" required></textarea>
+                        <input type="hidden" id="hiddenNeedAdd" name="action" value="ask_additional">
+                        <button type="submit" class="btn btn-warning">Request additional proof</button>
+                    </form>
+                </div>
+                <div class="col">
+                    <form method="post">
+                        {% csrf_token %}
+                        <label for="acceptMsg">Welcome the candidate<br>(optional)</label>
+                        <textarea class="form-control mb-3" id="acceptMsg" name="msg" rows="3"></textarea>
+                        <input type="hidden" id="hiddenAccept" name="action" value="accept">
+                        <button type="submit" class="btn btn-success">Accept existing proof</button>
+                    </form>
+                </div>
+            </div>
+
+            <br>
+            <hr>
+            <br>
+
+            <h5 class="pb-4 pt-2">Reset payment</h5>
+            <p>
+                If the candidate wants to change their ticket type, they should do it on their Profile.
+                Then, we must reset their payment, in order to generate new payment details with the right amount.
+                <br>
+                Note: candidates are not allowed to switch to or from the Scholarship ticket type.
+            </p>
+
+            <form action="/staff/payments/{{candidate_id}}/reset" enctype="multipart/form-data" method="POST" class="m-0 mt-auto">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-info">Reset Payment</button>
+            </form>
+            
+            <br>
+            <hr>
+            <br>
+            {% endif %}
+
+            <h5 class="pb-4 pt-2">Add note</h5>
+            <form method="post">
+                {% csrf_token %}
+                    <label for="noteMsg">Add a note about this payment. This has no side effects (no payment status changes and no communications are sent to the candidate).</label>
+                    <textarea class="form-control mb-3" id="noteMsg" name="msg" rows="3" required></textarea>
+                    <input type="hidden" id="hiddenNote" name="action" value="note">
+                <button type="submit" class="btn btn-secondary">Add Note</button>
+            </form>
+
+        </div>
+    </div>
+
+    <div class="card mb-5">
+        <div class="card-body">
+            <h4 class="pb-4 pt-2">Notes</h4>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                    <th scope="col">Note</th>
+                    <th scope="col">Created at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td><pre style="white-space:pre-line">{{ log.message }}</pre></td>
+                        <td> {{ log.created_at }} </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+{% endblock %}

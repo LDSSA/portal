@@ -12,10 +12,15 @@ logger = logging.getLogger(__name__)
 
 
 def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
-    logger.info("Generating Teams Size: %s Max: %s Max teams: %s",
-                team_size, max_team_size, max_teams)
-    present = models.Attendance.objects.filter(hackathon=hackathon,
-                                               present=True)
+    logger.info(
+        "Generating Teams Size: %s Max: %s Max teams: %s",
+        team_size,
+        max_team_size,
+        max_teams,
+    )
+    present = models.Attendance.objects.filter(
+        hackathon=hackathon, present=True
+    )
     present = [p.student for p in present]
     logger.debug("Present %s", present)
 
@@ -37,23 +42,29 @@ def create_teams(hackathon, present_teams):
     hackathon_team_id = 1
     for students in present_teams:
         team = models.Team.objects.create(
-            hackathon=hackathon,
-            hackathon_team_id=hackathon_team_id)
+            hackathon=hackathon, hackathon_team_id=hackathon_team_id
+        )
         team.students.set(students)
         logger.info("Team %s students %s", hackathon_team_id, students)
         hackathon_team_id += 1
 
 
-def generate_teams_with_remote(hackathon, team_size=3, max_team_size=6, max_teams=13):
-    logger.info("Generating Teams Size: %s Max: %s Max teams: %s",
-                team_size, max_team_size, max_teams)
-    present = models.Attendance.objects.filter(hackathon=hackathon,
-                                               present=True,
-                                               remote=False)
+def generate_teams_with_remote(
+    hackathon, team_size=3, max_team_size=6, max_teams=13
+):
+    logger.info(
+        "Generating Teams Size: %s Max: %s Max teams: %s",
+        team_size,
+        max_team_size,
+        max_teams,
+    )
+    present = models.Attendance.objects.filter(
+        hackathon=hackathon, present=True, remote=False
+    )
     present = [p.student for p in present]
-    remote = models.Attendance.objects.filter(hackathon=hackathon,
-                                              present=True,
-                                              remote=True)
+    remote = models.Attendance.objects.filter(
+        hackathon=hackathon, present=True, remote=True
+    )
     remote = [p.student for p in remote]
     logger.debug("Present %s", present)
     logger.debug("Remote %s", remote)
@@ -77,8 +88,8 @@ def create_teams_with_remote(hackathon, present_teams, remote_teams):
     hackathon_team_id = 1
     for students in present_teams:
         team = models.Team.objects.create(
-            hackathon=hackathon,
-            hackathon_team_id=hackathon_team_id)
+            hackathon=hackathon, hackathon_team_id=hackathon_team_id
+        )
         team.students.set(students)
         logger.info("Team %s students %s", hackathon_team_id, students)
         hackathon_team_id += 1
@@ -87,10 +98,12 @@ def create_teams_with_remote(hackathon, present_teams, remote_teams):
         team = models.Team.objects.create(
             hackathon=hackathon,
             hackathon_team_id=hackathon_team_id,
-            remote=True)
+            remote=True,
+        )
         team.students.set(students)
-        logger.info("(remote) Team %s students %s",
-                    hackathon_team_id, students)
+        logger.info(
+            "(remote) Team %s students %s", hackathon_team_id, students
+        )
         hackathon_team_id += 1
 
 
@@ -98,14 +111,16 @@ def get_groups(items, size, max_diff=1):
     if not len(items):
         return []
 
-    logger.debug('Creating groups...')
+    logger.debug("Creating groups...")
     random.shuffle(items)
     iterators = [iter(items)] * size
-    groups = list([item for item in group if item is not None]
-                  for group in zip_longest(*iterators))
+    groups = list(
+        [item for item in group if item is not None]
+        for group in zip_longest(*iterators)
+    )
     logger.debug(groups)
 
-    logger.debug('Reshaping groups...')
+    logger.debug("Reshaping groups...")
     idx = 0
     while (size - len(groups[-1])) > max_diff:
         item = groups[-2 - idx].pop()
@@ -122,13 +137,14 @@ class ValidationError(Exception):
 
 def submission(hackathon, user, file):
     if user.student:
-        if hackathon.status not in ('submissions_open', 'complete'):
+        if hackathon.status not in ("submissions_open", "complete"):
             raise RuntimeError("Hackathon closed")  # TODO
 
         # Replace students with team
-        if hackathon.status == 'submissions_open':
-            team = models.Team.objects.filter(students=user,
-                                              hackathon=hackathon).first()
+        if hackathon.status == "submissions_open":
+            team = models.Team.objects.filter(
+                students=user, hackathon=hackathon
+            ).first()
             if team:
                 user = team
 
@@ -137,7 +153,8 @@ def submission(hackathon, user, file):
                     hackathon=hackathon,
                     content_type__app_label=user._meta.app_label,
                     content_type__model=user._meta.model_name,
-                    object_id=user.id).count()
+                    object_id=user.id,
+                ).count()
                 if num >= hackathon.max_submissions:
                     raise RuntimeError("Max submissions")  # TODO
 
@@ -148,21 +165,21 @@ def submission(hackathon, user, file):
 
     # Load true data
     y_true = StringIO(hackathon.data_file.read().decode())
-    y_true = glob['load'](y_true)
+    y_true = glob["load"](y_true)
 
     # Load prediction data
-    y_pred = glob['load'](file)
+    y_pred = glob["load"](file)
 
     try:
-        is_valid = glob['validate'](y_true, y_pred)
+        is_valid = glob["validate"](y_true, y_pred)
     except Exception as exc:
-        raise ValidationError('Error validating data') from exc
+        raise ValidationError("Error validating data") from exc
 
     if not is_valid:
-        raise ValidationError('Invalid input')
+        raise ValidationError("Invalid input")
 
     # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
-    score = glob['score'](y_true, y_pred)
+    score = glob["score"](y_true, y_pred)
     models.Submission.objects.create(
         hackathon=hackathon,
         content_type=ContentType.objects.get_for_model(user._meta.model),

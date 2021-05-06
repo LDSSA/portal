@@ -1,6 +1,10 @@
-from cryptography.hazmat.primitives import serialization as crypto_serialization
+from cryptography.hazmat.primitives import (
+    serialization as crypto_serialization,
+)
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import default_backend as crypto_default_backend
+from cryptography.hazmat.backends import (
+    default_backend as crypto_default_backend,
+)
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
@@ -17,12 +21,24 @@ class User(AbstractUser):
     # First Name and Last Name do not cover name patterns
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
+
+    # Academy
     logo = models.TextField(blank=True)
     student = models.BooleanField(default=True)
     slack_member_id = models.TextField(blank=True)
     github_username = models.TextField(blank=True)
     deploy_private_key = models.TextField(blank=True)
     deploy_public_key = models.TextField(blank=True)
+
+    # Admissions
+    code_of_conduct_accepted = models.BooleanField(default=False, null=False)
+    applying_for_scholarship = models.BooleanField(default=None, null=True)
+    profession = models.CharField(null=False, max_length=50)
+    gender = models.CharField(null=False, max_length=25)  # TODO choices
+    ticket_type = models.CharField(null=False, max_length=25)  # TODO choices
+    company = models.CharField(null=False, default="", max_length=100)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
@@ -32,16 +48,21 @@ class User(AbstractUser):
             key = rsa.generate_private_key(
                 backend=crypto_default_backend(),
                 public_exponent=65537,
-                key_size=2048
+                key_size=2048,
             )
             self.deploy_private_key = key.private_bytes(
                 crypto_serialization.Encoding.PEM,
                 crypto_serialization.PrivateFormat.PKCS8,
-                crypto_serialization.NoEncryption()).decode('utf8')
+                crypto_serialization.NoEncryption(),
+            ).decode("utf8")
 
-            self.deploy_public_key = key.public_key().public_bytes(
-                crypto_serialization.Encoding.OpenSSH,
-                crypto_serialization.PublicFormat.OpenSSH).decode('utf8')
+            self.deploy_public_key = (
+                key.public_key()
+                .public_bytes(
+                    crypto_serialization.Encoding.OpenSSH,
+                    crypto_serialization.PublicFormat.OpenSSH,
+                )
+                .decode("utf8")
+            )
 
         super().save(*args, **kwargs)
-

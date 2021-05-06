@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
@@ -11,17 +11,102 @@ User = get_user_model()
 
 class UserRequiredFieldsMixin:
     required_fields = (
-        'name',
-        'slack_member_id',
-        'github_username',
+        "name",
+        "slack_member_id",
+        "github_username",
     )
+
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            if any(getattr(request.user, field) == ''
-                   for field in self.required_fields):
-                return redirect('users:profile')
+            if any(
+                getattr(request.user, field) == ""
+                for field in self.required_fields
+            ):
+                return redirect("users:profile")
 
         return super().dispatch(request, *args, **kwargs)
+
+
+class StaffMixin(
+    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
+):
+    """Verify that the current user is an instructor."""
+
+    def test_func(self):
+        if not self.user.is_staff:
+            return False
+        return True
+
+
+# TODO TODO
+class CandidateMixin(
+    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
+):
+    """Verify that the current user is an instructor."""
+
+    def test_func(self):
+        if not self.user.is_staff:
+            return False
+        return True
+
+
+# TODO TODO
+class CandidateAcceptedCoCMixin(
+    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
+):
+    """Verify that the current user is an instructor."""
+
+    def test_func(self):
+        if not self.user.is_staff:
+            return False
+        return True
+
+
+# TODO TODO
+class CandidateScholarshipDecidedMixin(
+    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
+):
+    """Verify that the current user is an instructor."""
+
+    def test_func(self):
+        if not self.user.is_staff:
+            return False
+        return True
+
+
+# TODO TODO
+class CandidateProfileMixin(
+    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
+):
+    """Verify that the current user is an instructor."""
+
+    def test_func(self):
+        if not self.user.is_staff:
+            return False
+        return True
+
+
+class InstructorMixin(
+    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
+):
+    """Verify that the current user is an instructor."""
+
+    def test_func(self):
+        if self.user.student:
+            return False
+        return True
+
+
+class StudentMixin(
+    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
+):
+    """Verify that the current user is a student."""
+
+    def test_func(self):
+        if not self.user.student:
+            return False
+        return True
+
 
 class UserDetailView(LoginRequiredMixin, DetailView):
 
@@ -47,7 +132,6 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
 
     model = User
     form_class = forms.UserChangeForm
-
 
     def get_success_url(self):
         return reverse("users:profile")
