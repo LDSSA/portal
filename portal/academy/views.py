@@ -195,6 +195,7 @@ class InstructorUserListView(InstructorMixin, ListView):
             spc_list=spc_list,
             unit_list=unit_list,
             max_score=max_score,
+            workspace_url =settings.SLACK_WORKSPACE
         )
         return self.render_to_response(context)
 
