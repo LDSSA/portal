@@ -10,6 +10,7 @@ from portal.academy.views import HomeRedirectView
 urlpatterns = [
     # General
     path("accounts/", include("allauth.urls")),
+    # path("accounts/instructor/signup", include("")),  # TODO TODO TODO
     # path("",
     #      TemplateView.as_view(template_name="pages/home.html"),
     #      name="home"),
