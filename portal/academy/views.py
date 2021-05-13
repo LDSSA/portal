@@ -1,16 +1,16 @@
 import logging
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework import generics
 from rest_framework.settings import import_from_string
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.utils.translation import ugettext_lazy as _
 
 from portal.academy import models, serializers
 from portal.users.views import StudentMixin, InstructorMixin
@@ -22,11 +22,18 @@ logger = logging.getLogger(__name__)
 # noinspection PyUnresolvedReferences
 class HomeRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        if self.request.user.student:
-            self.pattern_name = "academy:student-unit-list"
+        if settings.ADMISSIONS_OPEN:
+            if self.request.user.is_staff:
+                self.pattern_name = "candidate:home"
 
+            else:
+                self.pattern_name = "staff:home"
         else:
-            self.pattern_name = "academy:instructor-user-list"
+            if self.request.user.student:
+                self.pattern_name = "academy:student-unit-list"
+
+            else:
+                self.pattern_name = "academy:instructor-user-list"
 
         return super().get_redirect_url(*args, **kwargs)
 

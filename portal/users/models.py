@@ -34,8 +34,19 @@ class User(AbstractUser):
     code_of_conduct_accepted = models.BooleanField(default=False, null=False)
     applying_for_scholarship = models.BooleanField(default=None, null=True)
     profession = models.CharField(null=False, max_length=50)
-    gender = models.CharField(null=False, max_length=25)  # TODO choices
-    ticket_type = models.CharField(null=False, max_length=25)  # TODO choices
+    GENDERS = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other/Prefer not to say'),
+    ]
+    gender = models.CharField(null=False, max_length=25, choices=GENDERS)
+    TICKET_TYPE = [
+        ("student", "Student"),
+        ("regular", "Regular"),
+        ("company", "Company"),
+        ("scholarship", "Scholarship"),
+    ]
+    ticket_type = models.CharField(null=False, max_length=25, choices=TICKET_TYPE)
     company = models.CharField(null=False, default="", max_length=100)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)

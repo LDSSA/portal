@@ -33,7 +33,7 @@ class StaffMixin(
     """Verify that the current user is an instructor."""
 
     def test_func(self):
-        if not self.user.is_staff:
+        if not self.request.user.is_staff:
             return False
         return True
 
@@ -45,7 +45,7 @@ class CandidateMixin(
     """Verify that the current user is an instructor."""
 
     def test_func(self):
-        if not self.user.is_staff:
+        if not self.request.user.is_staff:
             return False
         return True
 
@@ -57,7 +57,7 @@ class CandidateAcceptedCoCMixin(
     """Verify that the current user is an instructor."""
 
     def test_func(self):
-        if not self.user.is_staff:
+        if not self.request.user.is_staff:
             return False
         return True
 
@@ -69,7 +69,7 @@ class CandidateScholarshipDecidedMixin(
     """Verify that the current user is an instructor."""
 
     def test_func(self):
-        if not self.user.is_staff:
+        if not self.request.user.is_staff:
             return False
         return True
 
@@ -81,7 +81,7 @@ class CandidateProfileMixin(
     """Verify that the current user is an instructor."""
 
     def test_func(self):
-        if not self.user.is_staff:
+        if not self.request.user.is_staff:
             return False
         return True
 
@@ -92,7 +92,7 @@ class InstructorMixin(
     """Verify that the current user is an instructor."""
 
     def test_func(self):
-        if self.user.student:
+        if self.request.user.student:
             return False
         return True
 
@@ -103,7 +103,7 @@ class StudentMixin(
     """Verify that the current user is a student."""
 
     def test_func(self):
-        if not self.user.student:
+        if not self.request.user.student:
             return False
         return True
 
