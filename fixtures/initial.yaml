@@ -840,6 +840,8 @@
     email: admin@lisbondatascience.org
     is_staff: true
     is_active: true
+    created_at: 2021-04-14 20:32:27.106363+00:00
+    updated_at: 2021-04-14 20:32:27.106363+00:00
     date_joined: 2021-04-14 20:32:27.106363+00:00
     name: Admin
     logo: qwe
@@ -919,10 +921,12 @@
     is_staff: false
     is_active: true
     date_joined: 2021-04-14 20:39:24.099076+00:00
+    created_at: 2021-04-14 20:32:27.106363+00:00
+    updated_at: 2021-04-14 20:32:27.106363+00:00
     name: ''
     logo: ''
     student: true
-    slack_member_id: ''
+    slack_member_id: 'U01SZUU0R2M'
     github_username: ''
     deploy_private_key: '-----BEGIN PRIVATE KEY-----
 
