@@ -33,6 +33,12 @@ GRADING_FCN = env.str(
 BASE_URL = env.str("BASE_URL")
 STUDENT_REPO_NAME = env.str("STUDENT_REPO_NAME")
 
+# ADMISSIONS
+# ------------------------------------------------------------------------------
+ADMISSIONS_ENABLED = env.bool("ADMISSIONS_ENABLED", default=True)
+ADMISSIONS_OPEN = env.bool("ADMISSIONS_OPEN", default=True)  # TODO TODO feature flag, is this the best way?
+# See ACCOUNT_ALLOW_REGISTRATION
+
 # GENERAL
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings
@@ -126,11 +132,11 @@ LOCAL_APPS = [
     "portal.academy.apps.AcademyConfig",
     "portal.hackathons.apps.HackathonsConfig",
     "portal.capstone.apps.CapstoneConfig",
-    # TODO
-    #"portal.admissions.apps.AdmissionsConfig",
-    #"portal.candidate.apps.CandidateConfig",
-    #"portal.applications.apps.ApplicationsConfig",
-    #"portal.staff.apps.StaffConfig",
+    "portal.admissions.apps.AdmissionsConfig",
+    "portal.candidate.apps.CandidateConfig",
+    "portal.staff.apps.StaffConfig",
+    "portal.applications.apps.ApplicationsConfig",
+    "portal.selection.apps.SelectionConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -422,15 +428,18 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # django-allauth
 # ------------------------------------------------------------------------------
+# TODO TODO feature flag
 ACCOUNT_ALLOW_REGISTRATION = env.bool(
     "DJANGO_ACCOUNT_ALLOW_REGISTRATION", default=True
 )
-ACCOUNT_AUTHENTICATION_METHOD = "username"
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_ADAPTER = "portal.users.adapters.AccountAdapter"
-SOCIALACCOUNT_ADAPTER = "portal.users.adapters.SocialAccountAdapter"
+# SOCIALACCOUNT_ADAPTER = "portal.users.adapters.SocialAccountAdapter"
+ACCOUNT_SIGNUP_FORM_CLASS = 'portal.users.forms.PortalSignupForm'
 
 
 # django-compressor

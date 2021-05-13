@@ -6,6 +6,9 @@ GRADING_FCN=portal.academy.services.simulate_grading_local
 BASE_URL=http://django:8000/
 GRADING_USERNAME=portal-api
 STUDENT_REPO_NAME=batch4-workspace
+# ADMISSIONS
+# ------------------------------------------------------------------------------
+ADMISSIONS_ENABLED=False
 # GENERAL
 # ------------------------------------------------------------------------------
 DJANGO_DEBUG=true
