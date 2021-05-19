@@ -22,18 +22,24 @@ logger = logging.getLogger(__name__)
 # noinspection PyUnresolvedReferences
 class HomeRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        if settings.ADMISSIONS_OPEN:
-            if self.request.user.is_staff:
-                self.pattern_name = "candidate:home"
+        # TODO
+        # if settings.ADMISSIONS_OPEN:
+        #     if self.request.user.is_staff:
+        #         self.pattern_name = "candidate:home"
 
-            else:
-                self.pattern_name = "staff:home"
+        #     else:
+        #         self.pattern_name = "staff:home"
+        # else:
+        #     if self.request.user.student:
+        #         self.pattern_name = "academy:student-unit-list"
+
+        #     else:
+        #         self.pattern_name = "academy:instructor-user-list"
+        if self.request.user.student:
+            self.pattern_name = "academy:student-unit-list"
+
         else:
-            if self.request.user.student:
-                self.pattern_name = "academy:student-unit-list"
-
-            else:
-                self.pattern_name = "academy:instructor-user-list"
+            self.pattern_name = "academy:instructor-user-list"
 
         return super().get_redirect_url(*args, **kwargs)
 

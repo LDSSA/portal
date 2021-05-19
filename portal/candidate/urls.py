@@ -5,6 +5,9 @@ from portal.candidate import payments_views
 from portal.candidate import profile_views
 from portal.candidate import views
 
+
+app_name = "candidate"
+
 urlpatterns = [
     path("", views.HomeView.as_view(), "home"),
     path("contact", views.ContactView.as_view(), "contact"),

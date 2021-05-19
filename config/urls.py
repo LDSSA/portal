@@ -26,7 +26,6 @@ urlpatterns = [
         include("portal.users.urls", namespace="users"),
     ),
     # Admissions
-    # TODO
     # path("admissions/", include("admissions.urls")),
     # Academy
     path("academy/", include("academy.urls")),
