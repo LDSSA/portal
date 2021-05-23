@@ -51,15 +51,13 @@ class PortalSignupForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # del self.fields["username"].widget.attrs["autofocus"]
-        if settings.ENABLE_ADMISSIONS:
-            self.fields["gender"] = forms.ChoiceField(choices=User.GENDERS)
-            self.fields["profession"] = forms.CharField(max_length=50)
-            self.fields["company"] = forms.CharField(max_length=100)
+        self.fields["gender"] = forms.ChoiceField(choices=User.GENDERS)
+        self.fields["profession"] = forms.CharField(max_length=50)
+        self.fields["company"] = forms.CharField(max_length=100)
 
     def signup(self, request, user):
         user.name = self.cleaned_data['name']
-        if settings.ENABLE_ADMISSIONS:
-            user.gender = self.cleaned_data['gender']
-            user.profession = self.cleaned_data['profession']
-            user.company = self.cleaned_data['company']
+        user.gender = self.cleaned_data['gender']
+        user.profession = self.cleaned_data['profession']
+        user.company = self.cleaned_data['company']
         user.save()

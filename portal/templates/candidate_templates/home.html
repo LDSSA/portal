@@ -57,41 +57,6 @@
 
     <h4 class="py-2" id="next">Your next steps</h4>
     <div id="accordion" class="mb-5">
-        <!-- validate email -->
-        <div class="card">
-          <div class="card-header" id="headingOne">
-            <h5 class="mb-0">
-              <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-controls="collapseOne" {% if not accordion_enabled_status.confirmed_email %} disabled {% endif %}>
-                {% if state.confirmed_email %}
-                    <i class="fas fa-check-circle"></i>
-                {% else %}
-                    <i class="far fa-circle"></i>
-                {% endif %}
-                Validate email address
-              </button>
-            </h5>
-          </div>
-
-          <div id="collapseOne" class="collapse {% if action_point == 'confirmed_email' %} show {% endif %}" aria-labelledby="headingOne" data-parent="#accordion">
-            <div class="card-body">
-                <p>
-                    We've sent an email requesting you to validate your email address.<br>
-                    You'll need to validate your email address before going further in this application process.
-                </p>
-                {% if not state.confirmed_email %}
-                <p>
-                    If you can't find the email in your inbox, please <strong>check your spam folder</strong> and promotions tab.<br>
-                    If it's still not there, please add the email address <b>admissions@lisbondatascience.org</b> to your trusted contacts.
-                    Also, be a little patient because the email may take some time to arrive to your inbox!
-                </p>
-                <p>
-                    Still not there? <a href="/account/send-confirmation-email">Resend it</a>.
-                </p>
-                {% endif %}
-            </div>
-          </div>
-        </div>
-
         <!-- code of conduct -->
         <div class="card">
           <div class="card-header" id="headingTwo">
@@ -111,7 +76,7 @@
               <p>In order to proceed with your application to the Lisbon Data Science Starters Academy, you need to <b>read and agree with our Code of Conduct</b>.</p>
               <p>Not complying with the Code of Conduct during the Academy will lead to imediate exclusion from the course, without a refund.
               So we want you to be completely familiar with the Code of Conduct, before putting any more time into this application process.</p>
-              <p>Read the Code of Conduct <a href="/candidate/code-of-conduct">here</a>.</p>
+              <p>Read the Code of Conduct <a href="{% url 'admissions:candidate:codeofconduct' %}">here</a>.</p>
             </div>
           </div>
         </div>
@@ -134,7 +99,7 @@
             <div class="card-body">
                 {% if not state.decided_scholarship %}
                 <p>
-                    Read our Scholarships Terms & Conditions carefully and decide whether you want to apply for one <a href="/candidate/scholarship">here</a>.
+                    Read our Scholarships Terms & Conditions carefully and decide whether you want to apply for one <a href="{% url 'admissions:candidate:scholarship' %}">here</a>.
                 </p>
                 <p>
                     If you don't want to apply for a scholarship, you'll have to explicitly tell us that.
@@ -148,30 +113,6 @@
                     {% endif %}
                 {% endif %}
 
-            </div>
-          </div>
-        </div>
-
-        <!-- complete profile -->
-        <div class="card">
-          <div class="card-header" id="headingThree">
-            <h5 class="mb-0">
-              <button class="btn btn-link" data-toggle="collapse" data-target="#collapseThree" aria-controls="collapseThree" {% if not accordion_enabled_status.created_profile %} disabled {% endif %}>
-                {% if state.created_profile %}
-                    <i class="fas fa-check-circle"></i>
-                {% else %}
-                    <i class="far fa-circle"></i>
-                {% endif %}
-                Complete your profile
-              </button>
-            </h5>
-          </div>
-          <div id="collapseThree" class="collapse {% if action_point == 'created_profile' %} show {% endif %}" aria-labelledby="headingThree" data-parent="#accordion">
-            <div class="card-body">
-                For this application, we need some information about you, like your name, etc.<p>
-                We promise this is the last bureaucracy step before you can show us your coding skills :)
-                <p>
-                To share this information with us, please fill in your <a href="/candidate/profile">profile</a>.
             </div>
           </div>
         </div>

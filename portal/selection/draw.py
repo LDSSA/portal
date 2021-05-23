@@ -1,8 +1,6 @@
 from logging import getLogger
 from typing import Iterable, List, NamedTuple, Optional
 
-from profiles.models import ProfileGenders, ProfileTicketTypes
-
 from .domain import SelectionDomain
 from .models import Selection
 from .queries import SelectionQueries
@@ -34,14 +32,14 @@ class DrawCounters:
         self.company = 0
 
     def update(self, selection: Selection) -> None:
-        profile = selection.user.profile
+        user = selection.user
 
         self.total += 1
 
-        if profile.gender == ProfileGenders.female:
+        if user.gender == 'female':
             self.female += 1
 
-        if profile.ticket_type == ProfileTicketTypes.company:
+        if user.ticket_type == 'company':
             self.company += 1
 
 

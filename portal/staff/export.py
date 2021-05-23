@@ -19,7 +19,6 @@ def get_all_candidates() -> ExportData:
         "create_at": "created_at",
         "updated_at": "updated_at",
         "email": "email",
-        "email_confirmed": "email_confirmed",
         "coc_accepted": "code_of_conduct_accepted",
         "applying_for_scholarship": "applying_for_scholarship",
         # profile

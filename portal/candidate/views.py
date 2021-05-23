@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict
 
 from django.conf import settings
@@ -12,6 +12,7 @@ from django.shortcuts import redirect
 from django.template import loader
 from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView, View
+from constance import config
 
 from portal.applications.domain import Domain
 from portal.applications.domain import Status
@@ -24,18 +25,16 @@ from portal.applications.models import (
 from portal.candidate.domain import Domain
 from portal.candidate.helpers import applications_are_open, build_context
 from portal.candidate.helpers import build_context
-from portal.interface import interface
-from portal.interface import interface
+
 from portal.selection.domain import SelectionDomain
 from portal.selection.models import Selection, SelectionDocument
 from portal.selection.payment import add_document, can_be_updated
 from portal.selection.queries import SelectionDocumentQueries
 from portal.selection.status import SelectionStatus
-from portal.selection.status import SelectionStatus
-from portal.users.views import CandidateMixin, CandidateAcceptedCoCMixin
+from portal.users.views import AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin
 
 
-class HomeView(CandidateMixin, TemplateView):
+class HomeView(AdmissionsCandidateViewMixin, TemplateView):
     template_name = "candidate_templates/home.html"
 
     def get_context_data(self, **kwargs):
@@ -44,46 +43,29 @@ class HomeView(CandidateMixin, TemplateView):
         # the action_point is the first open section in the steps accordion
         # accordion_enabled_status say whether each accordion section should be enabled
         accordion_enabled_status = {
-            "confirmed_email": False,
             "accepted_coc": False,
             "decided_scholarship": False,
-            "created_profile": False,
             "admission_test": False,
             "selection_results": False,
             "payment": False,
         }
 
-        if not state.confirmed_email:
-            action_point = "confirmed_email"
-            accordion_enabled_status["confirmed_email"] = True
-
-        elif not state.accepted_coc:
+        if not state.accepted_coc:
             action_point = "accepted_coc"
-            accordion_enabled_status["confirmed_email"] = True
             accordion_enabled_status["accepted_coc"] = True
 
         elif not state.decided_scholarship:
             action_point = "decided_scholarship"
-            accordion_enabled_status["confirmed_email"] = True
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
-
-        elif not state.created_profile:
-            action_point = "created_profile"
-            accordion_enabled_status["confirmed_email"] = True
-            accordion_enabled_status["accepted_coc"] = True
-            accordion_enabled_status["decided_scholarship"] = True
-            accordion_enabled_status["created_profile"] = True
 
         elif (
             state.application_status != Status.passed
             or state.selection_status is None
         ):
             action_point = "admission_test"
-            accordion_enabled_status["confirmed_email"] = True
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
-            accordion_enabled_status["created_profile"] = True
             accordion_enabled_status["admission_test"] = True
 
         elif (
@@ -92,26 +74,20 @@ class HomeView(CandidateMixin, TemplateView):
             not in SelectionStatus.SELECTION_POSITIVE_STATUS
         ):
             action_point = "selection_results"
-            accordion_enabled_status["confirmed_email"] = True
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
-            accordion_enabled_status["created_profile"] = True
             accordion_enabled_status["admission_test"] = True
             accordion_enabled_status["selection_results"] = True
 
         else:
             action_point = "payment"
-            accordion_enabled_status["confirmed_email"] = True
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
-            accordion_enabled_status["created_profile"] = True
             accordion_enabled_status["admission_test"] = True
             accordion_enabled_status["selection_results"] = True
             accordion_enabled_status["payment"] = True
 
-        first_name = None
-        if state.created_profile:
-            first_name = self.request.user.profile.full_name.split(" ")[0]
+        first_name = self.request.user.name.split(" ")[0]
 
         ctx = build_context(
             self.request.user,
@@ -121,18 +97,18 @@ class HomeView(CandidateMixin, TemplateView):
                 "selection_status_values": SelectionStatus,
                 "action_point": action_point,
                 "first_name": first_name,
-                "is_applications_open": datetime.now()
-                >= interface.feature_flag_client.get_applications_opening_date(),
-                "applications_open_datetime": interface.feature_flag_client.get_applications_opening_date().strftime(
+                "is_applications_open": datetime.now(timezone.utc)
+                >= config.ADMISSIONS_APPLICATIONS_OPENING_DATE,
+                "applications_open_datetime": config.ADMISSIONS_APPLICATIONS_OPENING_DATE.strftime(
                     "%Y-%m-%d %H:%M"
                 ),
-                "applications_close_datetime": interface.feature_flag_client.get_applications_closing_date().strftime(
+                "applications_close_datetime": config.ADMISSIONS_APPLICATIONS_CLOSING_DATE.strftime(
                     "%Y-%m-%d %H:%M"
                 ),
-                "applications_close_date": interface.feature_flag_client.get_applications_closing_date().strftime(
+                "applications_close_date": config.ADMISSIONS_APPLICATIONS_CLOSING_DATE.strftime(
                     "%Y-%m-%d"
                 ),
-                "coding_test_duration": interface.feature_flag_client.get_coding_test_duration()
+                "coding_test_duration": config.ADMISSIONS_CODING_TEST_DURATION
                 / 60,
                 "accordion_enabled_status": accordion_enabled_status,
             },
@@ -140,7 +116,7 @@ class HomeView(CandidateMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class ContactView(CandidateMixin, TemplateView):
+class ContactView(AdmissionsCandidateViewMixin, TemplateView):
     template_name = "candidate_templates/contactus.html"
 
     def get_context_data(self, **kwargs):
@@ -156,7 +132,7 @@ class ContactView(CandidateMixin, TemplateView):
         except Profile.DoesNotExist:
             user_name = "-"
 
-        interface.email_client.send_contact_us_email(
+        settings.email_client.send_contact_us_email(
             from_email=user.email,
             user_name=user_name,
             user_url=user_url,
@@ -172,7 +148,7 @@ class ContactView(CandidateMixin, TemplateView):
         return HttpResponse(template.render(ctx, request))
 
 
-class CodeOfConductView(CandidateMixin, TemplateView):
+class CodeOfConductView(AdmissionsCandidateViewMixin, TemplateView):
     template_name = "candidate_templates/code_of_conduct.html"
 
     def get_context_data(self, **kwargs):
@@ -186,10 +162,10 @@ class CodeOfConductView(CandidateMixin, TemplateView):
         user = request.user
         user.code_of_conduct_accepted = True
         user.save()
-        return redirect("candidate:home")
+        return redirect("admissions:candidate:home")
 
 
-class ScholarshipView(CandidateAcceptedCoCMixin, TemplateView):
+class ScholarshipView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView):
     template_name = "candidate_templates/scholarship.html"
 
     def get_context_data(self, **kwargs):
@@ -207,7 +183,7 @@ class ScholarshipView(CandidateAcceptedCoCMixin, TemplateView):
         user = request.user
         user.applying_for_scholarship = request.POST["decision"] == "yes"
         user.save()
-        return redirect("candidate:home")
+        return redirect("admissions:candidate:home")
 
 
 @require_http_methods(["GET", "POST"])
@@ -221,7 +197,7 @@ def candidate_before_coding_test_view(request: HttpRequest) -> HttpResponse:
         )
         ctx = {
             **build_context(request.user),
-            "coding_test_duration_hours": interface.feature_flag_client.get_coding_test_duration()
+            "coding_test_duration_hours": config.ADMISSIONS_CODING_TEST_DURATION
             / 60,
             "coding_test_subtype": SubmissionTypes.coding_test,
         }
@@ -229,7 +205,7 @@ def candidate_before_coding_test_view(request: HttpRequest) -> HttpResponse:
 
     application = Application.objects.get(user=request.user)
     if application.coding_test_started_at is None:
-        application.coding_test_started_at = datetime.now()
+        application.coding_test_started_at = datetime.now(timezone.utc)
         application.save()
 
     return HttpResponseRedirect("/candidate/coding-test")
@@ -247,7 +223,7 @@ def candidate_coding_test_view(request: HttpRequest) -> HttpResponse:
     submission_type_ = SubmissionTypes.coding_test
     sub_view_ctx = {
         **submission_view_ctx(application, submission_type_),
-        "coding_test_duration_hours": interface.feature_flag_client.get_coding_test_duration()
+        "coding_test_duration_hours": config.ADMISSIONS_CODING_TEST_DURATION
         / 60,
     }
     ctx = build_context(request.user, sub_view_ctx)
@@ -298,7 +274,7 @@ def candidate_submission_upload_view(
     submission_type_ = getattr(SubmissionTypes, submission_type)
 
     file = request.FILES["file"]
-    now_str = datetime.now().strftime("%m_%d_%Y__%H_%M_%S")
+    now_str = datetime.now(timezone.utc).strftime("%m_%d_%Y__%H_%M_%S")
     upload_key = (
         f"{submission_type_.uname}/{request.user.uuid}/{file.name}@{now_str}"
     )

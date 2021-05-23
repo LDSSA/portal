@@ -1,13 +1,15 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from logging import getLogger
 
-from applications.domain import Domain as ApplicationDomain
-from applications.domain import DomainException as ApplicationDomainException
-from applications.domain import DomainQueries as ApplicationDomainQueries
-from interface import interface
-from selection.domain import SelectionDomain
-from selection.queries import SelectionQueries
-from selection.status import SelectionStatus
+from constance import config
+
+from portal.applications.domain import Domain as ApplicationDomain
+from portal.applications.domain import DomainException as ApplicationDomainException
+from portal.applications.domain import DomainQueries as ApplicationDomainQueries
+# from interface import interface
+from portal.selection.domain import SelectionDomain
+from portal.selection.queries import SelectionQueries
+from portal.selection.status import SelectionStatus
 
 logger = getLogger(__name__)
 
@@ -27,10 +29,7 @@ class Events:
 
     @staticmethod
     def trigger_applications_are_over() -> None:
-        if (
-            datetime.now()
-            < interface.feature_flag_client.get_applications_closing_date()
-        ):
+        if datetime.now(timezone.utc) < config.APPLICATIONS_CLOSING_DATE:
             logger.error(
                 "trying to trigger `applications over` event but applications are still open"
             )
@@ -63,10 +62,7 @@ class Events:
 
     @staticmethod
     def trigger_admissions_are_over() -> None:
-        if (
-            datetime.now()
-            < interface.feature_flag_client.get_applications_closing_date()
-        ):
+        if datetime.now(timezone.utc) < config.APPLICATIONS_CLOSING_DATE:
             logger.error(
                 "trying to trigger `admissions over` event but applications are still open"
             )

@@ -3,6 +3,10 @@ Base settings to build other settings files upon.
 """
 
 import environ
+from datetime import datetime, timedelta, timezone
+
+from django.utils.module_loading import import_string
+
 
 ROOT_DIR = (
     environ.Path(__file__) - 3
@@ -36,7 +40,6 @@ STUDENT_REPO_NAME = env.str("STUDENT_REPO_NAME")
 # ADMISSIONS
 # ------------------------------------------------------------------------------
 ADMISSIONS_ENABLED = env.bool("ADMISSIONS_ENABLED", default=True)
-ADMISSIONS_OPEN = env.bool("ADMISSIONS_OPEN", default=True)  # TODO TODO feature flag, is this the best way?
 # See ACCOUNT_ALLOW_REGISTRATION
 
 # GENERAL
@@ -62,8 +65,14 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
 
+# DATETIME_FORMAT
+# DATE_FORMAT
+# TIME_FORMAT
+# SHORT_DATETIME_FORMAT
+
 # DATABASES
 # ------------------------------------------------------------------------------
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     "default": env.db("DATABASE_URL"),
@@ -120,6 +129,8 @@ DJANGO_APPS = [
     "django.contrib.admin",
 ]
 THIRD_PARTY_APPS = [
+    "constance",
+    "constance.backends.database",
     "crispy_forms",
     "allauth",
     "allauth.account",
@@ -133,9 +144,9 @@ LOCAL_APPS = [
     "portal.hackathons.apps.HackathonsConfig",
     "portal.capstone.apps.CapstoneConfig",
     "portal.admissions.apps.AdmissionsConfig",
+    "portal.applications.apps.ApplicationsConfig",
     "portal.candidate.apps.CandidateConfig",
     "portal.staff.apps.StaffConfig",
-    "portal.applications.apps.ApplicationsConfig",
     "portal.selection.apps.SelectionConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
@@ -380,7 +391,7 @@ EMAIL_BACKEND = env(
 )
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="")
+DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org")
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
@@ -389,6 +400,7 @@ EMAIL_SUBJECT_PREFIX = env(
 )
 
 if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
+    EMAIL_ELASTICMAIL_CLIENT = 'portal.email_client.local.LocalEmailClient'
     if DEBUG:
         # https://docs.djangoproject.com/en/dev/ref/settings/#email-host
         EMAIL_HOST = env("EMAIL_HOST", default="mailhog")
@@ -402,13 +414,11 @@ if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
         EMAIL_PORT = env("DJANGO_EMAIL_PORT")
         EMAIL_USE_TLS = env.bool("DJANGO_EMAIL_PORT")
 
-elif EMAIL_BACKEND == "anymail.backends.mailgun.EmailBackend":
-    INSTALLED_APPS += ["anymail"]  # noqa F405
-    # https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
-    ANYMAIL = {
-        "MAILGUN_API_KEY": env("MAILGUN_API_KEY"),
-        "MAILGUN_SENDER_DOMAIN": env("MAILGUN_DOMAIN"),
-    }
+elif EMAIL_BACKEND == "anymail.backends.amazon_ses.EmailBackend":
+    EMAIL_ELASTICMAIL_CLIENT = 'portal.email_client.elastic.ElasticEmailClient'
+
+
+EMAIL_ELASTICMAIL_CLIENT = import_string(EMAIL_ELASTICMAIL_CLIENT)
 
 
 # ADMIN
@@ -426,12 +436,22 @@ MANAGERS = ADMINS
 # ------------------------------------------------------------------------------
 CRISPY_TEMPLATE_PACK = "bootstrap4"
 
+
+# django-constance
+# ------------------------------------------------------------------------------
+CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+# CONSTANCE_DATABASE_CACHE_BACKEND ='default'
+CONSTANCE_CONFIG = {
+    'ACCOUNT_ALLOW_REGISTRATION': (True, ''),
+    'ADMISSIONS_CODING_TEST_DURATION': (timedelta(minutes=20), ''), 
+    'ADMISSIONS_APPLICATIONS_OPENING_DATE': (datetime.now(timezone.utc), ''),
+    'ADMISSIONS_APPLICATIONS_CLOSING_DATE': (datetime.now(timezone.utc), '',),
+    'ADMISSIONS_ACCEPTING_PAYMENT_PROFS': (True, ''),
+}
+
+
 # django-allauth
 # ------------------------------------------------------------------------------
-# TODO TODO feature flag
-ACCOUNT_ALLOW_REGISTRATION = env.bool(
-    "DJANGO_ACCOUNT_ALLOW_REGISTRATION", default=True
-)
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_REQUIRED = True

@@ -1,14 +1,14 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from logging import getLogger
 from typing import Any, Dict, Optional
 
+from constance import config
 from django.db import models
+from django.conf import settings
 
-from interface import interface
-from profiles.models import Profile
 
-from .models import Application, Submission, SubmissionType, SubmissionTypes
+from portal.applications.models import Application, Submission, SubmissionType, SubmissionTypes
 
 logger = getLogger(__name__)
 
@@ -84,7 +84,7 @@ class Domain:
         if Domain.has_positive_score(application, sub_type):
             return SubmissionStatus.passed
 
-        dt_now = datetime.now()
+        dt_now = datetime.now(timezone.utc)
         start_date = Domain.get_start_date(application, sub_type)
         end_date = Domain.get_end_date(application, sub_type)
 
@@ -105,9 +105,7 @@ class Domain:
                 application, f"{sub_type.uname}_started_at", None
             )
         else:
-            start_date = (
-                interface.feature_flag_client.get_applications_opening_date()
-            )
+            start_date = config.ADMISSIONS_APPLICATIONS_OPENING_DATE
 
         return start_date
 
@@ -123,16 +121,12 @@ class Domain:
         if sub_type == SubmissionTypes.coding_test:
             if start_date is not None:
                 close_date = start_date + timedelta(
-                    minutes=interface.feature_flag_client.get_coding_test_duration()
+                    minutes=config.ADMINSSIONS_CODING_TEST_DURATION
                 )
             else:
-                close_date = (
-                    interface.feature_flag_client.get_applications_closing_date()
-                )
+                close_date = config.ADMISSIONS_APPLICATIONS_CLOSING_DATE
         else:
-            close_date = (
-                interface.feature_flag_client.get_applications_closing_date()
-            )
+            close_date = config.ADMISSIONS_APPLICATIONS_CLOSING_DATE
 
         if apply_buffer:
             # buffer is applied to account for possible latency (lambda grader func may take a while)
@@ -159,7 +153,7 @@ class Domain:
     def can_add_submission(
         application: Application, sub_type: SubmissionType
     ) -> bool:
-        dt_now = datetime.now()
+        dt_now = datetime.now(timezone.utc)
 
         start_dt = Domain.get_start_date(application, sub_type)
 
@@ -203,21 +197,18 @@ class Domain:
         if application.application_over_email_sent is not None:
             raise DomainException("email was already sent")
 
-        try:
-            to_name = application.user.profile.name
-        except Profile.DoesNotExist:
-            to_name = "candidate"
+        to_name = application.user.name
 
         status = Domain.get_application_status(application)
         if status == ApplicationStatus.passed:
-            interface.email_client.send_application_is_over_passed(
+            settings.email_client.send_application_is_over_passed(
                 to_email=application.user.email, to_name=to_name
             )
             application.application_over_email_sent = "passed"
             application.save()
 
         else:
-            interface.email_client.send_application_is_over_failed(
+            settings.email_client.send_application_is_over_failed(
                 to_email=application.user.email, to_name=to_name
             )
             application.application_over_email_sent = "failed"

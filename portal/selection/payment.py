@@ -1,9 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from logging import getLogger
 from typing import Optional
 
-from profiles.models import ProfileTicketTypes
-from users.models import User
 
 from .domain import SelectionDomain
 from .logs import SelectionEvent, log_selection_event
@@ -14,10 +12,10 @@ logger = getLogger(__name__)
 
 
 PRICE_TABLE = {
-    ProfileTicketTypes.student: 100,
-    ProfileTicketTypes.regular: 250,
-    ProfileTicketTypes.company: 1500,
-    ProfileTicketTypes.scholarship: 20,
+    "student": 100,
+    "regular": 250,
+    "company": 1500,
+    "scholarship": 20,
 }
 
 
@@ -25,9 +23,7 @@ class PaymentException(Exception):
     pass
 
 
-def load_payment_data(
-    selection: Selection, staff: Optional[User] = None
-) -> None:
+def load_payment_data(selection, staff=None):
     old_ticket_type = selection.ticket_type
     old_value = selection.payment_value
 
@@ -37,7 +33,7 @@ def load_payment_data(
 
     selection.ticket_type = ticket_type
     selection.payment_value = value
-    selection.payment_due_date = datetime.now() + timedelta(hours=48)
+    selection.payment_due_date = datetime.now(timezone.utc) + timedelta(hours=48)
     selection.save()
 
     log_selection_event(
@@ -69,9 +65,7 @@ def add_document(selection: Selection, document: SelectionDocument) -> None:
     )
 
 
-def add_note(
-    selection: Selection, note: str, user: Optional[User] = None
-) -> None:
+def add_note(selection, note, user=None):
     log_selection_event(
         selection, SelectionEvent.note_added, data={"note": note}, user=user
     )

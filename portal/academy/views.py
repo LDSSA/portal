@@ -1,5 +1,6 @@
 import logging
 
+from constance import config
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -13,7 +14,7 @@ from rest_framework import generics
 from rest_framework.settings import import_from_string
 
 from portal.academy import models, serializers
-from portal.users.views import StudentMixin, InstructorMixin
+from portal.users.views import StudentViewsMixin, InstructorViewsMixin, admissions_open
 
 
 logger = logging.getLogger(__name__)
@@ -22,24 +23,18 @@ logger = logging.getLogger(__name__)
 # noinspection PyUnresolvedReferences
 class HomeRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        # TODO
-        # if settings.ADMISSIONS_OPEN:
-        #     if self.request.user.is_staff:
-        #         self.pattern_name = "candidate:home"
-
-        #     else:
-        #         self.pattern_name = "staff:home"
-        # else:
-        #     if self.request.user.student:
-        #         self.pattern_name = "academy:student-unit-list"
-
-        #     else:
-        #         self.pattern_name = "academy:instructor-user-list"
-        if self.request.user.student:
-            self.pattern_name = "academy:student-unit-list"
-
+        if settings.ADMISSIONS_ENABLED and admissions_open():
+            if self.request.user.is_staff:
+                self.pattern_name = "admissions:staff:home"
+            else:
+                self.pattern_name = "admissions:candidate:home"
         else:
-            self.pattern_name = "academy:instructor-user-list"
+            if self.request.user.is_student:
+                self.pattern_name = "academy:student-unit-list"
+            elif self.request.user.is_instructor:
+                self.pattern_name = "academy:instructor-user-list"
+            else:
+                self.handle_no_permission()
 
         return super().get_redirect_url(*args, **kwargs)
 
@@ -114,18 +109,18 @@ class BaseUnitDetailView(DetailView):
         return HttpResponseRedirect(request.path_info)
 
 
-class StudentUnitListView(StudentMixin, BaseUnitListView):
+class StudentUnitListView(StudentViewsMixin, BaseUnitListView):
     template_name = "academy/student/unit_list.html"
     detail_view_name = "academy:student-unit-detail"
 
 
-class StudentUnitDetailView(StudentMixin, BaseUnitDetailView):
+class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):
     template_name = "academy/student/unit_detail.html"
 
 
-class InstructorUserListView(InstructorMixin, ListView):
+class InstructorUserListView(InstructorViewsMixin, ListView):
     model = get_user_model()
-    queryset = get_user_model().objects.filter(student=True)
+    queryset = get_user_model().objects.filter(is_student=True)
     template_name = "academy/instructor/user_list.html"
 
     def get_queryset(self):
@@ -212,12 +207,12 @@ class InstructorUserListView(InstructorMixin, ListView):
         return self.render_to_response(context)
 
 
-class InstructorUnitListView(InstructorMixin, BaseUnitListView):
+class InstructorUnitListView(InstructorViewsMixin, BaseUnitListView):
     template_name = "academy/instructor/unit_list.html"
     detail_view_name = "academy:instructor-unit-detail"
 
 
-class InstructorUnitDetailView(InstructorMixin, BaseUnitDetailView):
+class InstructorUnitDetailView(InstructorViewsMixin, BaseUnitDetailView):
     template_name = "academy/instructor/unit_detail.html"
 
 

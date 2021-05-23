@@ -1,36 +1,32 @@
-import csv
 from datetime import datetime
 from logging import getLogger
+from typing import Any, Dict
 
+from constance import config
 from django.http import (
     HttpResponseServerError,
     Http404,
-    HttpResponse,
 )
 from django.shortcuts import redirect
 from django.views.generic import TemplateView, View
 
-from portal.users.views import StaffMixin
+from portal.users.views import AdmissionsStaffViewMixin
 from portal.users.models import User
 from portal.staff.domain import Events, EventsException
-from portal.profiles.models import ProfileGenders, ProfileTicketTypes
+from portal.applications.models import Submission, SubmissionTypes, Application
+from portal.applications.domain import Domain as ApplicationDomain, Status
 from portal.selection.draw import default_draw_params, draw, reject_draw
 from portal.selection.models import Selection
 from portal.selection.queries import SelectionQueries
 from portal.selection.select import select
 from portal.selection.status import SelectionStatus
-from portal.interface import interface
 from portal.selection.domain import SelectionDomain
 from portal.selection.logs import get_selection_logs
-from portal.selection.models import Selection
 from portal.selection.payment import (
     add_note,
     load_payment_data,
     can_be_updated,
 )
-from portal.selection.queries import SelectionQueries
-from portal.selection.status import SelectionStatus
-from portal.staff.export import get_all_candidates, ExportData
 
 logger = getLogger(__name__)
 
@@ -38,7 +34,7 @@ logger = getLogger(__name__)
 DATETIME_FMT = "%d/%m/%Y %H:%M:%S"
 
 
-class HomeView(StaffMixin, TemplateView):
+class HomeView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/home.html"
 
     def get_context_data(self, **kwargs):
@@ -48,14 +44,14 @@ class HomeView(StaffMixin, TemplateView):
             "datetime_flags": [
                 {
                     "key": "applications_opening_date",
-                    "value": interface.feature_flag_client.get_applications_opening_date().strftime(
+                    "value": config.ADMISSIONS_APPLICATIONS_OPENING_DATE.strftime(
                         DATETIME_FMT
                     ),
                     "label": "Challenge Submissions Opening Date",
                 },
                 {
                     "key": "applications_closing_date",
-                    "value": interface.feature_flag_client.get_applications_closing_date().strftime(
+                    "value": config.ADMISSIONS_APPLICATIONS_CLOSING_DATE.strftime(
                         DATETIME_FMT
                     ),
                     "label": "Challenge Submissions Closing Date",
@@ -64,19 +60,19 @@ class HomeView(StaffMixin, TemplateView):
             "int_flags": [
                 {
                     "key": "coding_test_duration",
-                    "value": interface.feature_flag_client.get_coding_test_duration(),
+                    "value": config.ADMISSIONS_CODING_TEST_DURATION,
                     "label": "Coding Test Duration in minutes",
                 }
             ],
             "bool_flags": [
                 {
                     "key": "signups_are_open",
-                    "value": interface.feature_flag_client.signups_are_open(),
+                    "value": config.ACCOUNT_ALLOW_REGISTRATION,
                     "label": "Signups",
                 },
                 {
                     "key": "accepting_payment_profs",
-                    "value": interface.feature_flag_client.accepting_payment_profs(),
+                    "value": config.ADMISSIONS_ACCEPTING_PAYMENT_PROFS,
                     "label": "Payment Proof Uploads",
                 },
             ],
@@ -131,7 +127,7 @@ class HomeView(StaffMixin, TemplateView):
         return redirect("staff:home")
 
 
-class EventsView(StaffMixin, TemplateView):
+class EventsView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/events.html"
 
     def get_context_data(self, **kwargs):
@@ -181,7 +177,7 @@ class EventsView(StaffMixin, TemplateView):
         return redirect("staff:events")
 
 
-class CandidateListView(StaffMixin, TemplateView):
+class CandidateListView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/candidates.html"
 
     def get_context_data(self, **kwargs):
@@ -193,7 +189,7 @@ class CandidateListView(StaffMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class CandidateDetailView(StaffMixin, TemplateView):
+class CandidateDetailView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/candidate.html"
 
     def get_context_data(self, **kwargs):
@@ -237,7 +233,7 @@ class CandidateDetailView(StaffMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class ApplicationView(StaffMixin, TemplateView):
+class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/applications.html"
 
     def get_context_data(self, **kwargs):
@@ -296,7 +292,7 @@ class ApplicationView(StaffMixin, TemplateView):
             },
         }
         for a in query:
-            application_det_status = Domain.get_application_detailed_status(a)
+            application_det_status = ApplicationDomain.get_application_detailed_status(a)
             for sub_type, sub_status in application_det_status.items():
                 count_by_type[sub_type][sub_status.name] += 1
 
@@ -313,7 +309,7 @@ class ApplicationView(StaffMixin, TemplateView):
                     "status_list": [
                         application_det_status["application"],
                         *[
-                            Domain.get_sub_type_status(a, sub_type)
+                            ApplicationDomain.get_sub_type_status(a, sub_type)
                             for sub_type in SubmissionTypes.all
                         ],
                     ],
@@ -336,7 +332,7 @@ class ApplicationView(StaffMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class SubmissionView(StaffMixin, TemplateView):
+class SubmissionView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/submissions.html"
 
     def get_context_data(self, **kwargs):
@@ -360,7 +356,7 @@ class SubmissionView(StaffMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class SubmissionDownloadView(StaffMixin, View):
+class SubmissionDownloadView(AdmissionsStaffViewMixin, View):
     def get(self, request, *args, **kwargs):
         try:
             submission: Submission = Submission.objects.get(id=submission_id)
@@ -376,7 +372,7 @@ class SubmissionDownloadView(StaffMixin, View):
         return redirect(url)
 
 
-class SubmissionFeedbackDownloadView(StaffMixin, View):
+class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):
     def get(self, request, *args, **kwargs):
         try:
             submission: Submission = Submission.objects.get(id=submission_id)
@@ -389,7 +385,7 @@ class SubmissionFeedbackDownloadView(StaffMixin, View):
         return redirect(url)
 
 
-class SelectionListView(StaffMixin, TemplateView):
+class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/selections.html"
 
     def get_context_data(self, **kwargs):
@@ -419,7 +415,7 @@ class SelectionListView(StaffMixin, TemplateView):
 
         drawn_candidates_no_scholarships = drawn_no_scholarships.count()
         drawn_female_no_scholarships = drawn_no_scholarships.filter(
-            user__profile__gender=ProfileGenders.female
+            user__profile__gender='female'
         ).count()
         drawn_company_no_scholarships = drawn_no_scholarships.filter(
             user__profile__ticket_type=ProfileTicketTypes.company
@@ -565,27 +561,27 @@ class SelectionListView(StaffMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class SelectionDrawView(StaffMixin, View):
+class SelectionDrawView(AdmissionsStaffViewMixin, View):
     def post(self, request, *args, **kwargs):
         draw(default_draw_params, scholarships=False)
         draw(default_draw_params, scholarships=True)
         return redirect("staff:selections")
 
 
-class SelectionRejectView(StaffMixin, View):
+class SelectionRejectView(AdmissionsStaffViewMixin, View):
     def post(self, request, *args, **kwargs):
         selection = Selection.objects.get(id=candidate_id)
         reject_draw(selection)
         return redirect("staff:selections")
 
 
-class SelectionSelectView(StaffMixin, View):
+class SelectionSelectView(AdmissionsStaffViewMixin, View):
     def post(self, request, *args, **kwargs):
         select()
         return redirect("staff:selections")
 
 
-class InterviewListView(StaffMixin, TemplateView):
+class InterviewListView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "./staff_templates/interviews.html"
 
     def get_context_data(self, **kwargs):
@@ -613,7 +609,7 @@ def _get_user_selection(user_id):
     return candidate, selection
 
 
-class InterviewDetailView(StaffMixin, TemplateView):
+class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "./staff_templates/interviews.html"
 
     def get_context_data(self, **kwargs):
@@ -664,7 +660,7 @@ class InterviewDetailView(StaffMixin, TemplateView):
         return redirect(request.path_info)  # TODO check get_success_url
 
 
-class PaymentListView(StaffMixin, TemplateView):
+class PaymentListView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/payments.html"
 
     def get_context_data(self, **kwargs):
@@ -682,7 +678,7 @@ class PaymentListView(StaffMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class PaymentDetailView(StaffMixin, TemplateView):
+class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/payment_id.html"
 
     def get_context_data(self, **kwargs):
@@ -745,7 +741,7 @@ class PaymentDetailView(StaffMixin, TemplateView):
         return redirect(request.path_info)  # TODO check get_success_url
 
 
-class PaymentResetView(StaffMixin, View):
+class PaymentResetView(AdmissionsStaffViewMixin, View):
     def post(self, request, user_id):
         _, selection = _get_user_selection(user_id)
         try:
@@ -759,26 +755,26 @@ class PaymentResetView(StaffMixin, View):
         return redirect("staff:payments", args=(user_id,))
 
 
-class PaymentDetailView(StaffMixin, TemplateView):
-    template_name = "staff_templates/exports.html"
+# class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
+#     template_name = "staff_templates/exports.html"
 
 
-class PaymentDetailView(StaffMixin, View):
-    template_name = "staff_templates/exports.html"
+# class PaymentDetailView(AdmissionsStaffViewMixin, View):
+#     template_name = "staff_templates/exports.html"
 
-    def get(self, **kwargs):
-        export_data = get_all_candidates()
-        filename = (
-            f"candidates@{datetime.now().strftime('%Y-%m-%d_%H:%M')}.csv"
-        )
+#     def get(self, **kwargs):
+#         export_data = get_all_candidates()
+#         filename = (
+#             f"candidates@{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H:%M')}.csv"
+#         )
 
-        response = HttpResponse(status=200, content_type="text/csv")
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="{filename}.csv"'
+#         response = HttpResponse(status=200, content_type="text/csv")
+#         response[
+#             "Content-Disposition"
+#         ] = f'attachment; filename="{filename}.csv"'
 
-        w = csv.DictWriter(response, export_data.headers, lineterminator="\n")
-        w.writeheader()
-        w.writerows(export_data.rows)
+#         w = csv.DictWriter(response, export_data.headers, lineterminator="\n")
+#         w.writeheader()
+#         w.writerows(export_data.rows)
 
-        return response
+#         return response

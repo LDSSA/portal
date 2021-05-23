@@ -2,31 +2,26 @@ from typing import List, Optional
 
 from django.db.models import Max
 
-from custom_typing.queryset import QuerySet
-from profiles.models import ProfileTicketTypes
 
 from .models import Selection, SelectionDocument
 from .status import SelectionStatus, SelectionStatusType
 
-SelectionQuerySet = QuerySet[Selection]
-SelectionDocumentQuerySet = QuerySet[SelectionDocument]
-
 
 class SelectionQueries:
     @staticmethod
-    def get_all() -> SelectionQuerySet:
+    def get_all():
         return Selection.objects.all()
 
     @staticmethod
     def filter_by_status_in(
         status_list: List[SelectionStatusType],
-    ) -> SelectionQuerySet:
+    ):
         return Selection.objects.filter(status__in=status_list)
 
     @staticmethod
     def draw_filter(
         forbidden_genders: List[str], forbidden_ticket_types: List[str]
-    ) -> SelectionQuerySet:
+    ):
         return (
             Selection.objects.filter(status=SelectionStatus.PASSED_TEST)
             .exclude(user__profile__gender__in=forbidden_genders)
@@ -34,21 +29,21 @@ class SelectionQueries:
         )
 
     @staticmethod
-    def random(q: SelectionQuerySet) -> Optional[Selection]:
+    def random(q):
         return q.order_by("?").first()
 
     @staticmethod
-    def max_rank(q: SelectionQuerySet) -> int:
+    def max_rank(q):
         return q.aggregate(Max("draw_rank"))["draw_rank__max"] or 0
 
     @staticmethod
-    def scholarships(q: SelectionQuerySet) -> SelectionQuerySet:
+    def scholarships(q):
         return q.filter(
             user__profile__ticket_type=ProfileTicketTypes.scholarship
         )
 
     @staticmethod
-    def no_scholarships(q: SelectionQuerySet) -> SelectionQuerySet:
+    def no_scholarships(q):
         return q.exclude(
             user__profile__ticket_type=ProfileTicketTypes.scholarship
         )
@@ -57,8 +52,8 @@ class SelectionQueries:
 class SelectionDocumentQueries:
     @staticmethod
     def get_payment_proof_documents(
-        selection: Selection,
-    ) -> SelectionDocumentQuerySet:
+        selection,
+    ):
         return (
             SelectionDocument.objects.filter(selection=selection)
             .filter(doc_type="payment_proof")
@@ -67,8 +62,8 @@ class SelectionDocumentQueries:
 
     @staticmethod
     def get_student_id_documents(
-        selection: Selection,
-    ) -> SelectionDocumentQuerySet:
+        selection,
+    ):
         return (
             SelectionDocument.objects.filter(selection=selection)
             .filter(doc_type="student_id")
