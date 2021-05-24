@@ -19,6 +19,7 @@
 
     <!-- Latest compiled and minified Bootstrap 4.1.1 CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous"></head>
 
 
     <!-- Your stuff: Third-party CSS libraries go here -->
@@ -35,41 +36,116 @@
   <body>
 
     <div class="mb-1">
-      <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark">
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static "images/logo.png" %}" alt="LDSA Portal"></a>
+        <a class="navbar-brand" href="{% url 'home' %}"><img src="{% static "images/ldssa_white.png" %}" alt="LDSA Portal"></a>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
           {% if request.user.is_authenticated %}
-            {% if request.user.student %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'academy:student-unit-list' %}">Learning Units</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'hackathons:student-hackathon-list' %}">Hackathons</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'capstone:student-capstone-list' %}">Capstones</a>
-              </li>
+            {% if not ADMISSIONS_ENDED %}
+              {% if request.user.is_staff %}
+                {# ADMISSIONS STAFF #}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:staff:events' %}">Events</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:staff:candidate-list' %}">Candidates</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:staff:application-list' %}">Applications</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:staff:submission-list' %}">Submissions</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:staff:selection-list' %}">Selections</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:staff:interview-list' %}">Interviews</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:staff:payment-list' %}">Payments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:staff:export' %}">Exports</a>
+                </li>
+                {% comment %} 
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Django-Admin</a>
+                </li> 
+                {% endcomment %}
+                {# END ADMISSIONS STAFF #}
+              {% else %}
+                {# ADMISSIONS CANDIDATES #}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:candidate:codeofconduct' %}">Code of Conduct</a>
+                </li>
+                {% if user_accepted_coc %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:candidate:scholarship' %}">Scholarships</a>
+                </li>
+                {% if user_has_profile and applications_are_open %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Submissions
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu01' %}">SLU01</a>
+                      <a class="dropdown-item" href="{% url 'admissions:candidate:coding-test' %}">Coding Test</a>
+                      <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu02' %}">SLU02</a>
+                      <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu02' %}">SLU03</a>
+                    </div>
+                  </li>
+                {% if user_has_payment %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admissions:candidate:payment' %}">Payment</a>
+                    </li>
+                {% endif %}
+                {% endif %}
+                {% endif %}
+                {# END ADMISSIONS CANDIDATES #}
+              {% endif %}
             {% else %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'academy:instructor-user-list' %}">Students</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'academy:instructor-unit-list' %}">Learning Units</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'hackathons:instructor-hackathon-list' %}">Hackathons</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'capstone:instructor-capstone-list' %}">Capstones</a>
-              </li>
+              {% if request.user.is_student %}
+              {# STUDENT #}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'academy:student-unit-list' %}">Learning Units</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'hackathons:student-hackathon-list' %}">Hackathons</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'capstone:student-capstone-list' %}">Capstones</a>
+                </li>
+              {# END STUDENT #}
+              {% endif %}
+              {% if request.user.is_instructor %}
+              {# INSTRUCTOR #}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'academy:instructor-user-list' %}">Students</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'academy:instructor-unit-list' %}">Learning Units</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'hackathons:instructor-hackathon-list' %}">Hackathons</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'capstone:instructor-capstone-list' %}">Capstones</a>
+                </li>
+              {# END INSTRUCTOR #}
+              {% endif %}
             {% endif %}
             </ul>
             <ul class="navbar-nav">
+              {% if not ADMISSIONS_ENDED %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'admissions:candidate:contact' %}">{% trans "Contact Us" %}</a>
+              </li>
+              {% endif %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'users:profile' %}">{% trans "Profile" %}</a>
               </li>

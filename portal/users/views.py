@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
 from . import forms
+from portal.admissions import domain
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -33,31 +34,28 @@ class UserRequiredFieldsMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-def admissions_open():
-    return config.ADMISSIONS_APPLICATIONS_OPENING_DATE <= timezone.now() <= config.ADMISSIONS_APPLICATIONS_CLOSING_DATE
-
-
 class AdmissionsOngoingMixin:
     """Verify that the current user is authenticated."""
     def dispatch(self, request, *args, **kwargs):
-        if settings.ADMISSIONS_ENABLED and not admissions_open():
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
+        if domain.admissions_open():
+            return super().dispatch(request, *args, **kwargs)
+        return self.handle_no_permission()
 
 
 class AdmissionsEndedMixin:
     """Verify that the current user is authenticated."""
     def dispatch(self, request, *args, **kwargs):
-        if settings.ADMISSIONS_ENABLED and admissions_open():
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
+        if domain.admissions_ended():
+            return super().dispatch(request, *args, **kwargs)
+        return self.handle_no_permission()
 
 
 class InstructorMixin:
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_instructor:
+        if request.user.is_instructor or request.user.is_superuser or request.user.is_staff:
+            return super().dispatch(request, *args, **kwargs)
+        else:
             return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
 
 
 class InstructorViewsMixin(LoginRequiredMixin, UserRequiredFieldsMixin, AdmissionsEndedMixin, InstructorMixin):

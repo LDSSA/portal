@@ -39,7 +39,7 @@ def get_all_candidates() -> ExportData:
     }
 
     rows = (
-        User.objects.exclude(is_admin=True)
+        User.objects
         .exclude(is_staff=True)
         .order_by("id")
         .values("id")

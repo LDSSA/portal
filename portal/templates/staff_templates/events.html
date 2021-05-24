@@ -1,4 +1,4 @@
-{% extends './base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 
@@ -22,7 +22,7 @@
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="key" value={{email.key}}>
-                <button type="submit" class="btn btn-info" {% if not user.is_admin %} disabled {% endif %}>
+                <button type="submit" class="btn btn-info" {% if not user.is_superuser %} disabled {% endif %}>
                      Trigger Event
                 </button>
             </form>

@@ -1,4 +1,4 @@
-{% extends './base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 
@@ -17,8 +17,8 @@
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="key" value={{f.key}}>
-                <input name="date_s" value="{{ f.value }}" {% if not user.is_admin %} disabled {% endif %}>
-                <button type="submit" class="btn btn-info" data-placement="bottom" title="datetime format: {{datetime_fmt}}" {% if not user.is_admin %} disabled {% endif %}>
+                <input name="date_s" value="{{ f.value }}" {% if not user.is_superuser %} disabled {% endif %}>
+                <button type="submit" class="btn btn-info" data-placement="bottom" title="datetime format: {{datetime_fmt}}" {% if not user.is_superuser %} disabled {% endif %}>
                      Update Date
                 </button>
             </form>
@@ -38,8 +38,8 @@
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" name="key" value={{f.key}}>
-                <input type="number" name="int_s" value="{{ f.value }}" {% if not user.is_admin %} disabled {% endif %}>
-                <button type="submit" class="btn btn-info" {% if not user.is_admin %} disabled {% endif %}>
+                <input type="number" name="int_s" value="{{ f.value }}" {% if not user.is_superuser %} disabled {% endif %}>
+                <button type="submit" class="btn btn-info" {% if not user.is_superuser %} disabled {% endif %}>
                      Update Value
                 </button>
             </form>
@@ -61,7 +61,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="key" value={{f.key}}>
                 <input type="hidden" name="action" value="close">
-                <button type="submit" class="btn btn-info" {% if not user.is_admin %} disabled {% endif %}>
+                <button type="submit" class="btn btn-info" {% if not user.is_superuser %} disabled {% endif %}>
                      Close {{f.label}}
                 </button>
             </form>
@@ -77,7 +77,7 @@
                 {% csrf_token %}
                 <input type="hidden" name="key" value={{f.key}}>
                 <input type="hidden" name="action" value="open">
-                <button type="submit" class="btn btn-info" {% if not user.is_admin %} disabled {% endif %}>
+                <button type="submit" class="btn btn-info" {% if not user.is_superuser %} disabled {% endif %}>
                     Open {{f.label}}
                 </button>
             </form>

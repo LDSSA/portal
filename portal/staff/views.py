@@ -183,7 +183,6 @@ class CandidateListView(AdmissionsStaffViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         ctx = {
             "users": User.objects.filter(is_staff=False)
-            .filter(is_admin=False)
             .order_by("email")
         }
         return super().get_context_data(**ctx)
@@ -196,7 +195,6 @@ class CandidateDetailView(AdmissionsStaffViewMixin, TemplateView):
         try:
             user = (
                 User.objects.filter(is_staff=False)
-                .filter(is_admin=False)
                 .get(id=user_id)
             )
         except User.DoesNotExist:
@@ -755,26 +753,26 @@ class PaymentResetView(AdmissionsStaffViewMixin, View):
         return redirect("staff:payments", args=(user_id,))
 
 
-# class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
-#     template_name = "staff_templates/exports.html"
+class ExportView(AdmissionsStaffViewMixin, TemplateView):
+    template_name = "staff_templates/exports.html"
 
 
-# class PaymentDetailView(AdmissionsStaffViewMixin, View):
-#     template_name = "staff_templates/exports.html"
+class ExportCandidatesView(AdmissionsStaffViewMixin, View):
+    template_name = "staff_templates/exports.html"
 
-#     def get(self, **kwargs):
-#         export_data = get_all_candidates()
-#         filename = (
-#             f"candidates@{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H:%M')}.csv"
-#         )
+    def get(self, **kwargs):
+        export_data = get_all_candidates()
+        filename = (
+            f"candidates@{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H:%M')}.csv"
+        )
 
-#         response = HttpResponse(status=200, content_type="text/csv")
-#         response[
-#             "Content-Disposition"
-#         ] = f'attachment; filename="{filename}.csv"'
+        response = HttpResponse(status=200, content_type="text/csv")
+        response[
+            "Content-Disposition"
+        ] = f'attachment; filename="{filename}.csv"'
 
-#         w = csv.DictWriter(response, export_data.headers, lineterminator="\n")
-#         w.writeheader()
-#         w.writerows(export_data.rows)
+        w = csv.DictWriter(response, export_data.headers, lineterminator="\n")
+        w.writeheader()
+        w.writerows(export_data.rows)
 
-#         return response
+        return response

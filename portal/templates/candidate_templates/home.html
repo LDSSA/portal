@@ -1,4 +1,4 @@
-{% extends './base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 
@@ -174,7 +174,7 @@
                             {% else %}
                                 <i class="far fa-circle"></i>
                             {% endif %}
-                            <a href="/candidate/slu/slu01">SLU01</a>
+                            <a href="{% url 'admissions:candidate:slu' 'slu01' %}">SLU01</a>
                         </li>
                         <li class="list-group-item">
                             {% if state.coding_test_status.name == "passed" %}
@@ -184,7 +184,7 @@
                             {% else %}
                                 <i class="far fa-circle"></i>
                             {% endif %}
-                            <a href="/candidate/coding-test">Coding Test</a>
+                            <a href="{% url 'admissions:candidate:coding-test' %}">Coding Test</a>
                         </li>
                         <li class="list-group-item">
                             {% if state.slu02_status.name == "passed" %}
@@ -194,7 +194,7 @@
                             {% else %}
                                 <i class="far fa-circle"></i>
                             {% endif %}
-                            <a href="/candidate/slu/slu02">SLU02</a>
+                            <a href="{% url 'admissions:candidate:slu' 'slu02' %}">SLU02</a>
                         </li>
                         <li class="list-group-item">
                             {% if state.slu03_status.name == "passed" %}
@@ -204,7 +204,7 @@
                             {% else %}
                                 <i class="far fa-circle"></i>
                             {% endif %}
-                            <a href="/candidate/slu/slu03">SLU03</a>
+                            <a href="{% url 'admissions:candidate:slu' 'slu03' %}">SLU03</a>
                         </li>
                     </ul>
 
@@ -289,10 +289,10 @@
                 <div class="card-body">
                     {% if state.selection_status == selection_status_values.SELECTED %}
                         We're waiting for your payment in order to finally accept your application.
-                        See all the details in the <a href="/candidate/payment">payments page</a>.
+                        See all the details in the <a href="{% url 'admissions:candidate:payment' %}">payments page</a>.
                     {% elif state.selection_status == selection_status_values.TO_BE_ACCEPTED %}
                         We're analysing your payment proof. We'll get back to you ASAP!
-                        You can follow your payment process in the <a href="/candidate/payment">payments page</a>.
+                        You can follow your payment process in the <a href="{% url 'admissions:/candidate:payment' %}">payments page</a>.
                     {% elif state.selection_status == selection_status_values.ACCEPTED %}
                         Your payment has been accepted! Welcome to batch4 of the Lisbon Data Science Starters Academy!
                     {% elif state.selection_status == selection_status_values.REJECTED %}

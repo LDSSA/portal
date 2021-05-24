@@ -13,8 +13,9 @@ from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework import generics
 from rest_framework.settings import import_from_string
 
+from portal.admissions import domain
 from portal.academy import models, serializers
-from portal.users.views import StudentViewsMixin, InstructorViewsMixin, admissions_open
+from portal.users.views import StudentViewsMixin, InstructorViewsMixin
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 # noinspection PyUnresolvedReferences
 class HomeRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        if settings.ADMISSIONS_ENABLED and admissions_open():
+        if not domain.admissions_ended():
             if self.request.user.is_staff:
                 self.pattern_name = "admissions:staff:home"
             else:
@@ -31,7 +32,7 @@ class HomeRedirectView(LoginRequiredMixin, RedirectView):
         else:
             if self.request.user.is_student:
                 self.pattern_name = "academy:student-unit-list"
-            elif self.request.user.is_instructor:
+            elif self.request.user.is_instructor or self.request.user.is_superuser or self.request.user.is_staff:
                 self.pattern_name = "academy:instructor-user-list"
             else:
                 self.handle_no_permission()

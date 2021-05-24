@@ -20,45 +20,45 @@ urlpatterns = [
     path(
         "coding-test",
         views.candidate_coding_test_view,
-        name="candidate-coding-test",
+        name="coding-test",
     ),
     path(
-        "slu/<slug:submission_type>", views.candidate_slu_view, name="candidate-slu"
+        "slu/<slug:submission_type>", views.candidate_slu_view, name="slu"
     ),
     path(
         "assignment-download",
         views.candidate_assignment_download_view,
-        name="candidate-assignment-download",
+        name="assignment-download",
     ),
     path(
         "submissions/upload/<slug:submission_type>",
         views.candidate_submission_upload_view,
-        name="candidate-submissions-upload",
+        name="submissions-upload",
     ),
     path(
         "submission/<slug:submission_type>/<int:submission_id>",
         views.candidate_submission_download_view,
-        name="candidate-coding-submission-download",
+        name="coding-submission-download",
     ),
     path(
         "submission/feedback/<slug:submission_type>/<int:submission_id>",
         views.candidate_submission_feedback_download_view,
-        name="candidate-coding-feedback-download",
+        name="coding-feedback-download",
     ),
-    path("payment", views.candidate_payment_view, name="candidate-payment"),
+    path("payment", views.candidate_payment_view, name="payment"),
     path(
         "payment/download-document/<int:document_id>",
         views.candidate_document_download_view,
-        name="candidate-payment-document-download",
+        name="payment-document-download",
     ),
     path(
         "payment/upload-payment-proof",
         views.candidate_payment_proof_upload_view,
-        name="candidate-payment-proof-upload",
+        name="payment-proof-upload",
     ),
     path(
         "payment/upload-student-id",
         views.candidate_student_id_upload_view,
-        name="candidate-student-id-upload",
+        name="student-id-upload",
     ),
 ]

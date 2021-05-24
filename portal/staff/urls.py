@@ -39,7 +39,7 @@ urlpatterns = [
         views.SelectionSelectView.as_view(),
         name="selection-select",
     ),
-    path("interviews", views.InterviewListView.as_view(), name="interviews-list"),
+    path("interviews", views.InterviewListView.as_view(), name="interview-list"),
     path(
         "interviews/<int:user_id>",
         views.InterviewDetailView.as_view(),
@@ -56,6 +56,6 @@ urlpatterns = [
         views.PaymentResetView.as_view(),
         name="payment-reset",
     ),
-    # path("exports", views.ExportView, name="export"),
-    # path("export-candidates", views.ExportCandidatesView, name="export-candidates"),
+    path("exports", views.ExportView, name="export"),
+    path("export-candidates", views.ExportCandidatesView, name="export-candidates"),
 ]
