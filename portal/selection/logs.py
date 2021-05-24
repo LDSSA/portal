@@ -2,7 +2,7 @@ from enum import Enum
 from logging import getLogger
 from typing import Any, Dict, List, Optional
 
-from users.models import User
+from portal.users.models import User
 
 from .models import Selection, SelectionLogs
 

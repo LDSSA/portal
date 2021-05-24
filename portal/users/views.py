@@ -1,3 +1,8 @@
+import logging
+
+from django.utils import timezone
+from constance import config
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
@@ -7,6 +12,7 @@ from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 from . import forms
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class UserRequiredFieldsMixin:
@@ -27,83 +33,88 @@ class UserRequiredFieldsMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class StaffMixin(
-    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
+def admissions_open():
+    return config.ADMISSIONS_APPLICATIONS_OPENING_DATE <= timezone.now() <= config.ADMISSIONS_APPLICATIONS_CLOSING_DATE
+
+
+class AdmissionsOngoingMixin:
+    """Verify that the current user is authenticated."""
+    def dispatch(self, request, *args, **kwargs):
+        if settings.ADMISSIONS_ENABLED and not admissions_open():
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class AdmissionsEndedMixin:
+    """Verify that the current user is authenticated."""
+    def dispatch(self, request, *args, **kwargs):
+        if settings.ADMISSIONS_ENABLED and admissions_open():
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class InstructorMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_instructor:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class InstructorViewsMixin(LoginRequiredMixin, UserRequiredFieldsMixin, AdmissionsEndedMixin, InstructorMixin):
+    pass
+
+
+class StudentMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_student:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class StudentViewsMixin(LoginRequiredMixin, UserRequiredFieldsMixin, AdmissionsOngoingMixin, StudentMixin):
+    pass
+
+
+class AdmissionsStaffMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class AdmissionsStaffViewMixin(LoginRequiredMixin, UserRequiredFieldsMixin, AdmissionsOngoingMixin, AdmissionsStaffMixin):
+    pass
+
+
+class AdmissionsCandidateMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
+
+
+class AdmissionsCandidateViewMixin(
+    LoginRequiredMixin, UserRequiredFieldsMixin, AdmissionsOngoingMixin,
 ):
-    """Verify that the current user is an instructor."""
-
-    def test_func(self):
-        if not self.request.user.is_staff:
-            return False
-        return True
+    pass
 
 
-# TODO TODO
-class CandidateMixin(
-    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
-):
-    """Verify that the current user is an instructor."""
+class CandidateAcceptedCoCMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.code_of_conduct_accepted:
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)
 
-    def test_func(self):
-        if not self.request.user.is_staff:
-            return False
-        return True
-
-
-# TODO TODO
-class CandidateAcceptedCoCMixin(
-    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
-):
-    """Verify that the current user is an instructor."""
-
-    def test_func(self):
-        if not self.request.user.is_staff:
-            return False
-        return True
 
 
 # TODO TODO
 class CandidateScholarshipDecidedMixin(
-    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
+    AdmissionsCandidateMixin, UserPassesTestMixin
 ):
     """Verify that the current user is an instructor."""
 
     def test_func(self):
         if not self.request.user.is_staff:
-            return False
-        return True
-
-
-# TODO TODO
-class CandidateProfileMixin(
-    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
-):
-    """Verify that the current user is an instructor."""
-
-    def test_func(self):
-        if not self.request.user.is_staff:
-            return False
-        return True
-
-
-class InstructorMixin(
-    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
-):
-    """Verify that the current user is an instructor."""
-
-    def test_func(self):
-        if self.request.user.student:
-            return False
-        return True
-
-
-class StudentMixin(
-    LoginRequiredMixin, UserPassesTestMixin, UserRequiredFieldsMixin
-):
-    """Verify that the current user is a student."""
-
-    def test_func(self):
-        if not self.request.user.student:
             return False
         return True
 

@@ -1,7 +1,3 @@
-from typing import Optional
-
-from users.models import User
-
 from .logs import SelectionEvent, log_selection_event
 from .models import Selection
 from .status import SelectionStatusType
@@ -9,21 +5,17 @@ from .status import SelectionStatusType
 
 class SelectionDomain:
     @staticmethod
-    def create(user: User) -> Selection:
+    def create(user):
         return Selection.objects.create(user=user)
 
     @staticmethod
-    def get_status(selection: Selection) -> SelectionStatusType:
+    def get_status(selection):
         return SelectionStatusType(selection.status)
 
     @staticmethod
-    def update_status(
-        selection: Selection,
-        status: SelectionStatusType,
-        *,
-        draw_rank: Optional[int] = None,
-        user: Optional[User] = None
-    ) -> None:
+    def update_status(selection, status, *, draw_rank=None,
+        user=None,
+    ):
         old_status = SelectionDomain.get_status(selection)
         selection.status = status
 
@@ -44,13 +36,7 @@ class SelectionDomain:
         )
 
     @staticmethod
-    def manual_update_status(
-        selection: Selection,
-        status: SelectionStatusType,
-        user: User,
-        *,
-        msg: str = ""
-    ) -> None:
+    def manual_update_status(selection, status, user, *, msg=""):
         old_status = SelectionDomain.get_status(selection)
         selection.status = status
 

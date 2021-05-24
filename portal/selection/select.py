@@ -1,8 +1,5 @@
 from logging import getLogger
 
-from interface import interface
-from profiles.models import ProfileTicketTypes
-
 from .domain import SelectionDomain
 from .models import Selection
 from .payment import load_payment_data
@@ -12,7 +9,7 @@ from .status import SelectionStatus
 logger = getLogger(__name__)
 
 
-def requires_interview(selection: Selection) -> bool:
+def requires_interview(selection):
     return selection.user.profile.ticket_type == ProfileTicketTypes.scholarship
 
 
@@ -26,7 +23,7 @@ def select() -> None:
             to_selected(selection)
 
 
-def to_selected(selection: Selection) -> None:
+def to_selected(selection):
     SelectionDomain.update_status(selection, SelectionStatus.SELECTED)
     load_payment_data(selection)
 
@@ -39,7 +36,7 @@ def to_selected(selection: Selection) -> None:
     )
 
 
-def to_interview(selection: Selection) -> None:
+def to_interview(selection):
     SelectionDomain.update_status(selection, SelectionStatus.INTERVIEW)
     interface.email_client.send_selected_interview_details(
         to_email=selection.user.email, to_name=selection.user.profile.name

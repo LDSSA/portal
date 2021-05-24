@@ -20,9 +20,9 @@ class UserAdmin(auth_admin.UserAdmin):
     add_form = UserCreationForm
     fieldsets = (
         ("User", {"fields": ("name",)}),
-        ("Student", {"fields": ("student",)}),
+        ("Student", {"fields": ("is_student",)}),
         ("Keys", {"fields": ("deploy_private_key", "deploy_public_key")}),
     ) + auth_admin.UserAdmin.fieldsets
-    list_display = ["username", "student", "name", "is_superuser"]
+    list_display = ["username", "is_student", "name", "is_superuser"]
     search_fields = ["username", "name"]
-    list_filter = ("student", "is_superuser", "is_active", "groups")
+    list_filter = ("is_student", "is_superuser", "is_active", "groups")

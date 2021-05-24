@@ -50,7 +50,7 @@ class GradeAdmin(admin.ModelAdmin):
         "student__name",
     ]
     list_filter = (
-        "student__student",
+        "student__is_student",
         "status",
         "unit",
         "student",
