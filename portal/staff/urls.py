@@ -56,6 +56,6 @@ urlpatterns = [
         views.PaymentResetView.as_view(),
         name="payment-reset",
     ),
-    path("exports", views.ExportView, name="export"),
-    path("export-candidates", views.ExportCandidatesView, name="export-candidates"),
+    path("exports", views.ExportView.as_view(), name="export"),
+    path("export-candidates", views.ExportCandidatesView.as_view(), name="export-candidates"),
 ]

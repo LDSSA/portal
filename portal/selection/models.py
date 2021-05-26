@@ -1,6 +1,7 @@
 import os
 
 from django.db import models
+from django.conf import settings
 
 from .status import SelectionStatus
 
@@ -23,13 +24,15 @@ class Selection(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    objects = models.Manager()
-
 
 doc_type_choices = [
     ("payment_proof", "Payment Proof"),
     ("student_id", "Student ID"),
 ]
+
+
+def get_path(instance, filename):
+    return f"payments/{instance.doc}/{instance.selection.user.username}/{filename}"
 
 
 class SelectionDocument(models.Model):
@@ -38,21 +41,13 @@ class SelectionDocument(models.Model):
         on_delete=models.CASCADE,
         related_name="documents",
     )
-
-    file_location = models.TextField(null=False)
-
+    doc = models.FileField(upload_to=get_path, null=True, blank=True)
     doc_type = models.CharField(
         blank=False, null=False, max_length=20, choices=doc_type_choices
     )
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    objects = models.Manager()
-
-    @property
-    def filename(self) -> str:
-        return os.path.basename(self.file_location)
 
 
 class SelectionLogs(models.Model):
@@ -67,5 +62,3 @@ class SelectionLogs(models.Model):
     message = models.TextField(null=False, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
-
-    objects = models.Manager()

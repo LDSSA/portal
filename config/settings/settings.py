@@ -416,6 +416,7 @@ if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
         EMAIL_USE_TLS = env.bool("DJANGO_EMAIL_PORT")
 
 elif EMAIL_BACKEND == "anymail.backends.amazon_ses.EmailBackend":
+    # TODO integrate with anymail
     EMAIL_ELASTICMAIL_CLIENT = 'portal.email_client.elastic.ElasticEmailClient'
 
 

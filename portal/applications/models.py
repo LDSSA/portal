@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from logging import getLogger
 from typing import NamedTuple
 
@@ -23,6 +24,19 @@ class SubmissionTypes:
     all = [coding_test, slu01, slu02, slu03]
 
 
+# TODO
+class Challenge(models.Model):
+    code = models.CharField(max_length=50, primary_key=True)
+    file = models.FileField()
+    max_score = models.FloatField(default=20)
+    pass_score = models.FloatField(default=16)
+
+
+def get_path(instance, filename):
+    now_str = datetime.now(timezone.utc).strftime("%m_%d_%Y__%H_%M_%S")
+    return f"{instance.submission_type}/{instance.application.user.username}/{filename}@{now_str}"
+
+
 class Submission(models.Model):
     application = models.ForeignKey(
         to="applications.Application",
@@ -32,10 +46,10 @@ class Submission(models.Model):
 
     submission_type = models.CharField(null=False, max_length=20)
 
-    file_location = models.TextField(null=False)
+    file = models.FileField(upload_to=get_path, null=True, blank=True)
+    feedback = models.FileField(upload_to=get_path, null=True, blank=True)
 
     score = models.IntegerField(default=0, null=False)
-    feedback_location = models.TextField(null=False)
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -69,5 +83,3 @@ class Application(models.Model):
     application_over_email_sent = models.CharField(
         null=True, default=None, max_length=10, choices=[("passed", "failed")]
     )
-
-    objects = models.Manager()

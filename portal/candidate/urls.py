@@ -14,51 +14,51 @@ urlpatterns = [
     path("scholarship", views.ScholarshipView.as_view(), name="scholarship"),
     path(
         "before-coding-test",
-        views.candidate_before_coding_test_view,
-        name="before-candidate-coding-test",
+        views.CandidateBeforeCodingTestView.as_view(),
+        name="before-coding-test",
     ),
     path(
         "coding-test",
-        views.candidate_coding_test_view,
+        views.CodingTestView.as_view(),
         name="coding-test",
     ),
     path(
-        "slu/<slug:submission_type>", views.candidate_slu_view, name="slu"
-    ),
-    path(
         "assignment-download",
-        views.candidate_assignment_download_view,
+        views.AssignmentDownloadView.as_view(),
         name="assignment-download",
     ),
     path(
+        "slu/<slug:submission_type>", views.SluView, name="slu"
+    ),
+    path(
         "submissions/upload/<slug:submission_type>",
-        views.candidate_submission_upload_view,
+        views.SubmissionView.as_view(),
         name="submissions-upload",
     ),
     path(
         "submission/<slug:submission_type>/<int:submission_id>",
-        views.candidate_submission_download_view,
-        name="coding-submission-download",
+        views.SubmissionDownloadView.as_view(),
+        name="submission-download",
     ),
     path(
         "submission/feedback/<slug:submission_type>/<int:submission_id>",
-        views.candidate_submission_feedback_download_view,
-        name="coding-feedback-download",
+        views.SubmissionFeedbackDownloadView.as_view(),
+        name="submissions-feedback-download",
     ),
-    path("payment", views.candidate_payment_view, name="payment"),
+    path("payment", views.CandidatePaymentView, name="payment"),
     path(
-        "payment/download-document/<int:document_id>",
-        views.candidate_document_download_view,
+        "payment/download-document/<int:pk>",
+        views.SelectionDocumentView.as_view(),
         name="payment-document-download",
     ),
     path(
         "payment/upload-payment-proof",
-        views.candidate_payment_proof_upload_view,
+        views.SelectionDocumentView.as_view(document_type='payment_proof'),
         name="payment-proof-upload",
     ),
     path(
         "payment/upload-student-id",
-        views.candidate_student_id_upload_view,
+        views.SelectionDocumentView.as_view(document_type='student_id'),
         name="student-id-upload",
     ),
 ]

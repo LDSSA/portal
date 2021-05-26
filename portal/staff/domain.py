@@ -2,14 +2,15 @@ from datetime import datetime, timezone
 from logging import getLogger
 
 from constance import config
+from django.conf import settings
 
 from portal.applications.domain import Domain as ApplicationDomain
 from portal.applications.domain import DomainException as ApplicationDomainException
 from portal.applications.domain import DomainQueries as ApplicationDomainQueries
-# from interface import interface
 from portal.selection.domain import SelectionDomain
 from portal.selection.queries import SelectionQueries
 from portal.selection.status import SelectionStatus
+
 
 logger = getLogger(__name__)
 
@@ -93,7 +94,8 @@ class Events:
                 SelectionDomain.update_status(
                     selection, SelectionStatus.NOT_SELECTED
                 )
-                interface.email_client.send_admissions_are_over_not_selected(
+                client = settings.EMAIL_ELASTICMAIL_CLIENT()
+                client.send_admissions_are_over_not_selected(
                     to_email=selection.user.email,
                     to_name=selection.user.profile.name,
                 )

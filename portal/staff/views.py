@@ -1,14 +1,17 @@
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from logging import getLogger
 from typing import Any, Dict
 
 from constance import config
+from django.conf import settings
 from django.http import (
     HttpResponseServerError,
     Http404,
 )
+from django.http.response import FileResponse
 from django.shortcuts import redirect
 from django.views.generic import TemplateView, View
+from django.urls import reverse
 
 from portal.users.views import AdmissionsStaffViewMixin
 from portal.users.models import User
@@ -80,7 +83,7 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
         return super().get_context_data(**ctx)
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_admin:
+        if not request.user.is_superuser:
             return HttpResponseServerError(
                 b"error updating admin variables. Only admins can update these variables"
             )
@@ -89,38 +92,40 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
 
         if key == "applications_opening_date":
             date_s = request.POST["date_s"]
-            if not interface.feature_flag_client.set_applications_opening_date(
-                datetime.strptime(date_s, DATETIME_FMT)
-            ):
+            opening_date = datetime.strptime(date_s, DATETIME_FMT)
+            if opening_date > config.ADMISSIONS_APPLICATIONS_CLOSING_DATE:
                 return HttpResponseServerError(
                     b"error setting opening date. opening date must be before closing date"
                 )
+            else:
+                config.ADMISSIONS_APPLICATIONS_OPENING_DATE = opening_date
 
         elif key == "applications_closing_date":
             date_s = request.POST["date_s"]
-            if not interface.feature_flag_client.set_applications_closing_date(
-                datetime.strptime(date_s, DATETIME_FMT)
-            ):
+            closing_date = datetime.strptime(date_s, DATETIME_FMT)
+            if closing_date < config.ADMISSIONS_APPLICATIONS_OPENING_DATE:
                 return HttpResponseServerError(
                     b"error setting closing date. closing date must be after opening date"
                 )
+            else:
+                config.ADMISSIONS_APPLICATIONS_CLOSING_DATE = closing_date
 
         elif key == "coding_test_duration":
-            interface.feature_flag_client.set_coding_test_duration(
-                int(request.POST["int_s"])
+            config.ADMISSIONS_CODING_TEST_DURATION = timedelta(
+                seconds=int(request.POST["int_s"])
             )
 
         elif key == "signups_are_open":
             if request.POST["action"] == "open":
-                interface.feature_flag_client.open_signups()
+                config.ACCOUNT_ALLOW_REGISTRATION = True
             else:
-                interface.feature_flag_client.close_signups()
+                config.ACCOUNT_ALLOW_REGISTRATION = False
 
         elif key == "accepting_payment_profs":
             if request.POST["action"] == "open":
-                interface.feature_flag_client.open_payment_profs()
+                config.ADMISSIONS_ACCEPTING_PAYMENT_PROFS = True
             else:
-                interface.feature_flag_client.close_payment_profs()
+                config.ADMISSIONS_ACCEPTING_PAYMENT_PROFS = False
         else:
             logger.warning(f"unknown feature flag key `{key}`.. doing nothing")
 
@@ -151,7 +156,7 @@ class EventsView(AdmissionsStaffViewMixin, TemplateView):
         return super().get_context_data(**ctx)
 
     def post(self, request, *args, **kwargs):
-        if not request.user.is_admin:
+        if not request.user.is_superuser:
             return HttpResponseServerError(
                 b"error triggering event. Only admins can trigger events"
             )
@@ -361,13 +366,8 @@ class SubmissionDownloadView(AdmissionsStaffViewMixin, View):
         except Submission.DoesNotExist:
             raise Http404
 
-        url = interface.storage_client.get_attachment_url(
-            submission.file_location,
-            content_type="application/vnd.jupyter",
-            filename=f"{submission.id}.ipynb",
-        )
-
-        return redirect(url)
+        # TODO
+        return FileResponse(submission.file)
 
 
 class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):
@@ -376,11 +376,9 @@ class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):
             submission: Submission = Submission.objects.get(id=submission_id)
         except Submission.DoesNotExist:
             raise Http404
-        url = interface.storage_client.get_url(
-            submission.feedback_location, content_type="text/html"
-        )
 
-        return redirect(url)
+        # TODO
+        return FileResponse(submission.feedback)
 
 
 class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
@@ -636,7 +634,8 @@ class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
             SelectionDomain.manual_update_status(
                 selection, SelectionStatus.REJECTED, staff_user, msg=msg
             )
-            interface.email_client.send_interview_failed_email(
+            client = settings.EMAIL_ELASTICMAIL_CLIENT()
+            client.send_interview_failed_email(
                 to_email=selection.user.email,
                 to_name=selection.user.profile.name,
                 message=msg,
@@ -648,7 +647,8 @@ class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
             load_payment_data(selection)
 
             payment_due_date = selection.payment_due_date.strftime("%Y-%m-%d")
-            interface.email_client.send_interview_passed_email(
+            client = settings.EMAIL_ELASTICMAIL_CLIENT()
+            client.send_interview_passed_email(
                 to_email=selection.user.email,
                 to_name=selection.user.profile.name,
                 payment_value=selection.payment_value,
@@ -688,9 +688,7 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
             "candidate_id": candidate_id,  # TODO
             "docs": [
                 {
-                    "url": interface.storage_client.get_url(
-                        doc.file_location, content_type="image"
-                    ),
+                    "url": reverse('admissions:candidate:doc', args=(123, )),  # TODO
                     "doc_type": doc.doc_type,
                     "created_at": doc.created_at.strftime("%Y-%m-%d %H:%M:%S"),
                 }
@@ -712,7 +710,8 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
             SelectionDomain.manual_update_status(
                 selection, SelectionStatus.REJECTED, staff_user, msg=msg
             )
-            interface.email_client.send_payment_refused_proof_email(
+            client = settings.EMAIL_ELASTICMAIL_CLIENT()
+            client.send_payment_refused_proof_email(
                 to_email=selection.user.email,
                 to_name=selection.user.profile.name,
                 message=msg,
@@ -721,7 +720,8 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
             SelectionDomain.manual_update_status(
                 selection, SelectionStatus.SELECTED, staff_user, msg=msg
             )
-            interface.email_client.send_payment_need_additional_proof_email(
+            client = settings.EMAIL_ELASTICMAIL_CLIENT()
+            client.send_payment_need_additional_proof_email(
                 to_email=selection.user.email,
                 to_name=selection.user.profile.name,
                 message=msg,
@@ -730,7 +730,8 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
             SelectionDomain.manual_update_status(
                 selection, SelectionStatus.ACCEPTED, staff_user, msg=msg
             )
-            interface.email_client.send_payment_accepted_proof_email(
+            client = settings.EMAIL_ELASTICMAIL_CLIENT()
+            client.send_payment_accepted_proof_email(
                 to_email=selection.user.email,
                 to_name=selection.user.profile.name,
                 message=msg,

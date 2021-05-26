@@ -8,16 +8,20 @@ from django.http import (
     HttpResponse,
     HttpResponseRedirect,
 )
+from django.http.response import FileResponse
 from django.shortcuts import redirect
 from django.template import loader
+from django.views import generic
 from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView, View
 from constance import config
+from rest_framework.settings import import_from_string
 
 from portal.applications.domain import Domain
 from portal.applications.domain import Status
 from portal.applications.models import (
     Application,
+    Challenge,
     Submission,
     SubmissionType,
     SubmissionTypes,
@@ -186,118 +190,23 @@ class ScholarshipView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, T
         return redirect("admissions:candidate:home")
 
 
-@require_http_methods(["GET", "POST"])
-def candidate_before_coding_test_view(request: HttpRequest) -> HttpResponse:
-    if not applications_are_open():
-        return HttpResponseRedirect("/candidate/home")
+class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
+    template_name = "candidate_templates/before_coding_test.html"
 
-    if request.method == "GET":
-        template = loader.get_template(
-            "./candidate_templates/before_coding_test.html"
-        )
-        ctx = {
-            **build_context(request.user),
+    def get_context_data(self, **kwargs):
+        ctx = build_context(self.request.user, {
             "coding_test_duration_hours": config.ADMISSIONS_CODING_TEST_DURATION
             / 60,
-            "coding_test_subtype": SubmissionTypes.coding_test,
-        }
-        return HttpResponse(template.render(ctx, request))
+            "coding_test_subtype": SubmissionTypes.coding_test,})
+        return super().get_context_data(**ctx)
 
-    application = Application.objects.get(user=request.user)
-    if application.coding_test_started_at is None:
-        application.coding_test_started_at = datetime.now(timezone.utc)
-        application.save()
+    def post(self, request, *args, **kwargs):
+        application = Application.objects.get(user=request.user)
+        if application.coding_test_started_at is None:
+            application.coding_test_started_at = datetime.now(timezone.utc)
+            application.save()
 
-    return HttpResponseRedirect("/candidate/coding-test")
-
-
-@require_http_methods(["GET"])
-def candidate_coding_test_view(request: HttpRequest) -> HttpResponse:
-    if not applications_are_open():
-        return HttpResponseRedirect("/candidate/home")
-
-    application, _ = Application.objects.get_or_create(user=request.user)
-    if application.coding_test_started_at is None:
-        return HttpResponseRedirect("/candidate/before-coding-test")
-
-    submission_type_ = SubmissionTypes.coding_test
-    sub_view_ctx = {
-        **submission_view_ctx(application, submission_type_),
-        "coding_test_duration_hours": config.ADMISSIONS_CODING_TEST_DURATION
-        / 60,
-    }
-    ctx = build_context(request.user, sub_view_ctx)
-    template = loader.get_template("./candidate_templates/coding_test.html")
-    return HttpResponse(template.render(ctx, request))
-
-
-@require_http_methods(["GET"])
-def candidate_assignment_download_view(request: HttpRequest) -> HttpResponse:
-    try:
-        assignment_id = request.GET["assignment_id"]
-    except Exception:
-        raise Http404
-
-    application = Application.objects.get(user=request.user)
-    if (
-        assignment_id == SubmissionTypes.coding_test.uname
-        and application.coding_test_started_at is None
-    ):
-        raise Http404
-
-    key = Domain.get_candidate_release_zip(assignment_id)
-    url = interface.storage_client.get_attachment_url(
-        key, content_type="application/zip"
-    )
-    return HttpResponseRedirect(url)
-
-
-@require_http_methods(["GET"])
-def candidate_slu_view(
-    request: HttpRequest, submission_type: str
-) -> HttpResponse:
-    if not applications_are_open():
-        return HttpResponseRedirect("/candidate/home")
-    application, _ = Application.objects.get_or_create(user=request.user)
-    submission_type_ = getattr(SubmissionTypes, submission_type)
-    ctx = build_context(
-        request.user, submission_view_ctx(application, submission_type_)
-    )
-    template = loader.get_template("./candidate_templates/slu.html")
-    return HttpResponse(template.render(ctx, request))
-
-
-@require_http_methods(["POST"])
-def candidate_submission_upload_view(
-    request: HttpRequest, submission_type: str
-) -> HttpResponse:
-    submission_type_ = getattr(SubmissionTypes, submission_type)
-
-    file = request.FILES["file"]
-    now_str = datetime.now(timezone.utc).strftime("%m_%d_%Y__%H_%M_%S")
-    upload_key = (
-        f"{submission_type_.uname}/{request.user.uuid}/{file.name}@{now_str}"
-    )
-    interface.storage_client.save(upload_key, file)
-
-    submission_result = interface.grader_client.grade(
-        assignment_id=submission_type_.uname,
-        user_uuid=request.user.uuid,
-        submission_s3_bucket=settings.STORAGE_BUCKET,
-        submission_s3_key=upload_key,
-    )
-
-    application = Application.objects.get(user=request.user)
-    sub = Submission(
-        file_location=upload_key,
-        score=submission_result.score,
-        feedback_location=submission_result.feedback_s3_key,
-    )
-    Domain.add_submission(application, submission_type_, sub)
-
-    if submission_type == SubmissionTypes.coding_test.uname:
         return HttpResponseRedirect("/candidate/coding-test")
-    return HttpResponseRedirect(f"/candidate/slu/{submission_type}")
 
 
 def submission_view_ctx(
@@ -329,127 +238,162 @@ def submission_view_ctx(
     }
 
 
-@require_http_methods(["GET"])
-def candidate_submission_download_view(
-    request: HttpRequest, submission_type: str, submission_id: int
-) -> HttpResponse:
-    try:
-        submission: Submission = Submission.objects.get(
-            id=submission_id,
-            submission_type=submission_type,
-            application=request.user.application,
+class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
+
+    def get(self, request, *args, **kwargs):
+        if not applications_are_open():
+            return HttpResponseRedirect("/candidate/home")
+
+        application, _ = Application.objects.get_or_create(user=request.user)
+        if application.coding_test_started_at is None:
+            return HttpResponseRedirect("/candidate/before-coding-test")
+
+        submission_type_ = SubmissionTypes.coding_test
+        sub_view_ctx = {
+            **submission_view_ctx(application, submission_type_),
+            "coding_test_duration_hours": config.ADMISSIONS_CODING_TEST_DURATION
+            / 60,
+        }
+        ctx = build_context(request.user, sub_view_ctx)
+        template = loader.get_template("./candidate_templates/coding_test.html")
+        return HttpResponse(template.render(ctx, request))
+
+
+class AssignmentDownloadView(AdmissionsCandidateViewMixin, TemplateView):
+    def get(self, request, *args, **kwargs):
+        try:
+            assignment_id = request.GET["assignment_id"]
+        except Exception:
+            raise Http404
+
+        application = Application.objects.get(user=request.user)
+        if (
+            assignment_id == SubmissionTypes.coding_test.uname
+            and application.coding_test_started_at is None
+        ):
+            raise Http404
+
+        obj = Challenge.objects.get(code=assignment_id)
+        return FileResponse(obj.file)
+
+
+class SluView(AdmissionsCandidateViewMixin, TemplateView):
+    def get(self, request, *args, **kwargs):
+        if not applications_are_open():
+            return HttpResponseRedirect("/candidate/home")
+        application, _ = Application.objects.get_or_create(user=request.user)
+        submission_type_ = getattr(SubmissionTypes, submission_type)
+        ctx = build_context(
+            request.user, submission_view_ctx(application, submission_type_)
         )
-    except Submission.DoesNotExist:
-        raise Http404
-    url = interface.storage_client.get_attachment_url(
-        submission.file_location, content_type="application/vnd.jupyter"
-    )
-
-    return HttpResponseRedirect(url)
+        template = loader.get_template("./candidate_templates/slu.html")
+        return HttpResponse(template.render(ctx, request))
 
 
-@require_http_methods(["GET"])
-def candidate_submission_feedback_download_view(
-    request: HttpRequest, submission_type: str, submission_id: int
-) -> HttpResponse:
-    try:
-        submission: Submission = Submission.objects.get(
-            id=submission_id,
-            submission_type=submission_type,
-            application=request.user.application,
+class SubmissionView(generic.View):
+
+    # TODO
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        return FileResponse(obj.doc)
+
+    # TODO
+    def post(self, request, *args, **kwargs):
+        # Send to grading
+        submission_type = kwargs.get('submission_type')
+        submission_type_ = getattr(SubmissionTypes, submission_type)
+
+        # TODO grading!
+        grading_fcn = import_from_string(settings.GRADING_FCN, "GRADING_FCN")
+        grading_fcn(request.user, None)
+
+        # TODO file from form
+        application = Application.objects.get(user=request.user)
+        sub = Submission(
+            file=request.FILE['file'],
+            # TODO score
+            # score=submission_result.score,
+            # TODO feedback
+            # feedback_location=submission_result.feedback_s3_key,
         )
-    except Submission.DoesNotExist:
-        raise Http404
-    url = interface.storage_client.get_url(
-        submission.feedback_location, content_type="text/html"
-    )
+        Domain.add_submission(application, submission_type_, sub)
 
-    return HttpResponseRedirect(url)
+        if submission_type == SubmissionTypes.coding_test.uname:
+            return HttpResponseRedirect("/candidate/coding-test")
+        return HttpResponseRedirect(f"/candidate/slu/{submission_type}")
 
 
-def _get_candidate_payment_view(request: HttpRequest) -> HttpResponse:
-    try:
-        selection = request.user.selection
-    except Selection.DoesNotExist:
-        raise Http404
-
-    payment_proofs = SelectionDocumentQueries.get_payment_proof_documents(
-        selection
-    )
-    student_ids = SelectionDocumentQueries.get_student_id_documents(selection)
-
-    template = loader.get_template("./candidate_templates/payment.html")
-
-    context = {
-        "s": selection,
-        "selection_status": SelectionStatus,
-        "can_update": can_be_updated(selection),
-        "profile": request.user.profile,
-        "payment_proofs": payment_proofs,
-        "student_ids": student_ids,
-    }
-    context = build_context(request.user, context)
-
-    return HttpResponse(template.render(context, request))
+class SubmissionDownloadView(generic.DetailView):
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        return FileResponse(obj.doc)
 
 
-def _post_candidate_payment_view(request: HttpRequest) -> HttpResponse:
-    try:
-        selection = request.user.selection
-    except Selection.DoesNotExist:
-        raise Http404
-    SelectionDomain.manual_update_status(
-        selection, SelectionStatus.TO_BE_ACCEPTED, request.user
-    )
-    return HttpResponseRedirect("/candidate/payment")
+class SubmissionFeedbackDownloadView(generic.DetailView):
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        return FileResponse(obj.doc)
 
 
-@require_http_methods(["GET", "POST"])
-def candidate_payment_view(request: HttpRequest) -> HttpResponse:
-    if request.method == "GET":
-        return _get_candidate_payment_view(request)
-    return _post_candidate_payment_view(request)
+class CandidatePaymentView(generic.DetailView):
 
+    def get(self, request, *args, **kwargs):
+        try:
+            selection = request.user.selection
+        except Selection.DoesNotExist:
+            raise Http404
 
-@require_http_methods(["GET"])
-def candidate_document_download_view(
-    request: HttpRequest, document_id: int
-) -> HttpResponse:
-    try:
-        selection = request.user.selection
-        document = SelectionDocument.objects.get(
-            selection=selection, id=document_id
+        payment_proofs = SelectionDocumentQueries.get_payment_proof_documents(
+            selection
         )
-    except (Selection.DoesNotExist, SelectionDocument.DoesNotExist):
-        raise Http404
-    url = interface.storage_client.get_attachment_url(document.file_location)
+        student_ids = SelectionDocumentQueries.get_student_id_documents(selection)
 
-    return HttpResponseRedirect(url)
+        template = loader.get_template("./candidate_templates/payment.html")
+
+        context = {
+            "s": selection,
+            "selection_status": SelectionStatus,
+            "can_update": can_be_updated(selection),
+            "profile": request.user.profile,
+            "payment_proofs": payment_proofs,
+            "student_ids": student_ids,
+        }
+        context = build_context(request.user, context)
+
+        return HttpResponse(template.render(context, request))
+
+    def post(self, request, *args, **kwargs):
+        try:
+            selection = request.user.selection
+        except Selection.DoesNotExist:
+            raise Http404
+        SelectionDomain.manual_update_status(
+            selection, SelectionStatus.TO_BE_ACCEPTED, request.user
+        )
+        return HttpResponseRedirect("/candidate/payment")
 
 
-@require_http_methods(["POST"])
-def candidate_payment_proof_upload_view(request: HttpRequest) -> HttpResponse:
-    return _candidate_document_upload(request, document_type="payment_proof")
+# TODO permissions
+class SelectionDocumentView(generic.DetailView):
+    model = SelectionDocument
+    queryset = SelectionDocument.objects.order_by("pk")
+    document_type = None
 
+    def get(self, request, *args, **kwargs):
+        obj = self.get_object()
+        return FileResponse(obj.doc)
 
-@require_http_methods(["POST"])
-def candidate_student_id_upload_view(request: HttpRequest) -> HttpResponse:
-    return _candidate_document_upload(request, document_type="student_id")
+    # TODO
+    def post(self, request, *args, **kwargs):
+        document = SelectionDocument(
+            file_location=upload_key_unique, 
+            doc_type=self.document_type
 
+        )
+        selection = request.user.selection
+        pass
 
-def _candidate_document_upload(
-    request: HttpRequest, document_type: str
-) -> HttpResponse:
-    f = request.FILES["file"]
-    upload_key = f"payments/{document_type}/{request.user.uuid}/{f.name}"
-    upload_key_unique = interface.storage_client.key_append_uuid(upload_key)
-
-    interface.storage_client.save(upload_key_unique, f)
-
-    document = SelectionDocument(
-        file_location=upload_key_unique, doc_type=document_type
-    )
-    selection = request.user.selection
-    add_document(selection, document)
-
-    return HttpResponseRedirect("/candidate/payment")
+    # TODO Redirect after post
+    # def get_success_url(self):
+    #     return reverse("hackathons:instructor-hackathon-detail", args=(self.object.pk,)
+    #     )
