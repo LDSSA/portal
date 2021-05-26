@@ -58,4 +58,4 @@ USE_DOCKER=yes
 # Other
 # ------------------------------------------------------------------------------
 GUNICORN_ENABLED=False
-
+SLACK_WORKSPACE=https://ldsacademy.slack.com/team/
