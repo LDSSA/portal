@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block content %}
+{% timezone "Europe/Lisbon" %}
 
 
 <div class="container">
@@ -10,7 +12,7 @@
         <div class="col-md-12 text-center">
             {% if status == "passed" %}
             <div class="alert alert-success" role="alert">
-                You have passed with {{ best_score }}/{{ submission_type.max_score }}!
+                You have passed with {{ best_score }}/{{ challenge.max_score }}!
             </div>
             {% endif %}
             {% if status == "ongoing"%}
@@ -32,7 +34,7 @@
             <p>
                 After downloading this assignment, the first thing you need to do is to setup your local environment, so that you can run the <code>Exercise Notebook</code> with the test.
                 This setup is exactly the same as for SLU01, so if you've already done SLU01, you can just use the same virtual environment.
-                If you haven't, check how to setup your local environment <a href="/candidate/slu/slu01#setup-env">here</a>.
+                If you haven't, check how to setup your local environment <a href="{% url 'admissions:candidate:slu' 'slu01' %}#setup-env">here</a>.
             </p>
             
             <p>
@@ -76,12 +78,12 @@
                 <div class="card">
                     <div class="card-body d-flex flex-column">
                         <p class="card-text">Use the button below to download this assignment</p>
-                        <a href="/candidate/assignment-download?assignment_id=coding_test" class="btn btn-primary {% if not download_enabled %} disabled {% endif %} mt-auto align-self-start" role="button" aria-pressed="true" target="_blank">Download</a>
+                        <a href="{% url 'admissions:candidate:assignment-download' 'coding_test' %}" class="btn btn-primary {% if not download_enabled %} disabled {% endif %} mt-auto align-self-start" role="button" aria-pressed="true" target="_blank">Download</a>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body d-flex flex-column">
-                    <form action="/candidate/submissions/upload/{{ submission_type.uname }}" enctype="multipart/form-data" method="POST" class="m-0 mt-auto">
+                    <form action="{% url 'admissions:candidate:submission-upload' 'coding_test' %}" enctype="multipart/form-data" method="POST" class="m-0 mt-auto">
                         {% csrf_token %}
                         <div class="custom-file mb-3">
                             <input type="file" class="custom-file-input" id="submissionFile" name="file" required>
@@ -106,7 +108,7 @@
 </div>
 
 <script>
-    var testDurationHours = {{ coding_test_duration_hours }}; // TODO: Update this!!!
+    var testDurationHours = {{ coding_test_duration_hours.hours }}; // TODO: Update this!!!
     var testStartedAt = {{ coding_test_started_at_ms }};
     var yourDateToGo = new Date(testStartedAt + testDurationHours * 60 * 60 * 1000);
     var timing = setInterval(
@@ -132,4 +134,5 @@
         }, 1000);
 </script>
 
+{% endtimezone %}
 {% endblock %}

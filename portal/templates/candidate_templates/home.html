@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block content %}
+{% timezone "Europe/Lisbon" %}
 
 <div class="container">
 
@@ -135,19 +137,19 @@
             </div>
             <div id="collapseFour" class="collapse {% if action_point == 'admission_test' %} show {% endif %}" aria-labelledby="collapseFour" data-parent="#accordion">
               <div class="card-body">
-                {% if not is_applications_open %}
-                    <p>The admission tests will open on the <b>{{ applications_open_datetime }}</b>.</p>
+                {% if PORTAL_STATUS == "admissions" %}
+                    <p>The admission tests will open on the <b>{{ ADMISSIONS_APPLICATIONS_START }}</b>.</p>
                     <p>Come back then to start working on the tests!</p>
                 {% else %}
                     {% if state.application_status.name == "passed" %}
                         Congratulations! You've passed the admission test.
-                        From the {{ applications_close_date }}, we'll let you know if you've been (randomly) selected to participate in this batch of the LDSSA.
+                        From the {{ ADMISSIONS_SELECTION_START|date }}, we'll let you know if you've been (randomly) selected to participate in this batch of the LDSSA.
 
                     {% elif state.application_status.name == "ongoing" %}
-                        <p>You have until <b>{{ applications_close_datetime }}</b> to pass all the assignments.</p>
+                        <p>You have until <b>{{ ADMISSIONS_SELECTION_START }}</b> to pass all the assignments.</p>
 
-                        <p>For the SLUs, you can start them at any time, submit them for grading as many times as you want, and the due date will always be the {{ applications_close_datetime }}.
-                        For the coding test, you can also submit it for grading as many times as you want, but once you start it, <b>you only have {{ coding_test_duration|floatformat }} hours to finish it</b>.</p>
+                        <p>For the SLUs, you can start them at any time, submit them for grading as many times as you want, and the due date will always be the {{ ADMISSIONS_SELECTION_START }}.
+                        For the coding test, you can also submit it for grading as many times as you want, but once you start it, <b>you only have {{ ADMISSIONS_CODING_TEST_DURATION }} to finish it</b>.</p>
 
                         <p>Make sure that you only start the coding test when you have enough free and uninterrupted time to spend.
                         Also, we <strong>strongly suggest that you complete SLU01 before doing the coding test</strong>.
@@ -315,4 +317,5 @@
 
 </div>
 
+{% endtimezone %}
 {% endblock %}

@@ -31,16 +31,18 @@ BLOCK_SIZE = 500
 # GRADING
 # ------------------------------------------------------------------------------
 GRADING_USERNAME = env.str("GRADING_USERNAME")
-GRADING_FCN = env.str(
-    "GRADING_FCN", default="portal.academy.services.perform_grading_production"
+GRADING_CLASS = env.str(
+    "GRADING_CLASS", default="portal.grading.services.AcademyKubernetesGrading"
+)
+GRADING_ADMISSIONS_CLASS = env.str(
+    "GRADING_ADMISSIONS_CLASS",
+    default="portal.grading.services.AdmissionsKubernetesGrading",
 )
 BASE_URL = env.str("BASE_URL")
 STUDENT_REPO_NAME = env.str("STUDENT_REPO_NAME")
 
 # ADMISSIONS
 # ------------------------------------------------------------------------------
-ADMISSIONS_ENABLED = env.bool("ADMISSIONS_ENABLED", default=True)
-# See ACCOUNT_ALLOW_REGISTRATION
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -61,24 +63,24 @@ SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
 USE_I18N = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-l10n
-USE_L10N = True
+USE_L10N = False
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
 USE_TZ = True
 
-# DATETIME_FORMAT
-# DATE_FORMAT
-# TIME_FORMAT
-# SHORT_DATETIME_FORMAT
+DATETIME_FORMAT = "Y-m-d H:i:s e"
+DATE_FORMAT = "Y-m-d"
+TIME_FORMAT = "H:i:s e"
+SHORT_DATETIME_FORMAT = "Y-m-d H:i:s e"
 
 # DATABASES
 # ------------------------------------------------------------------------------
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     "default": env.db("DATABASE_URL"),
 }
-DATABASES["default"]["ATOMIC_REQUESTS"] = True
-DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
+# DATABASES["default"]["ATOMIC_REQUESTS"] = True
+# DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
 
 # CACHES
 # ------------------------------------------------------------------------------
@@ -148,6 +150,8 @@ LOCAL_APPS = [
     "portal.candidate.apps.CandidateConfig",
     "portal.staff.apps.StaffConfig",
     "portal.selection.apps.SelectionConfig",
+    "portal.grading.apps.GradingConfig",
+    "portal.scheduler.apps.SchedulerConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -317,7 +321,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                'portal.admissions.context_processors.admissions_context_processor',
+                "portal.admissions.context_processors.admissions_context_processor",
                 # 'portal.users.context_processors.login_view',
             ],
         },
@@ -392,7 +396,9 @@ EMAIL_BACKEND = env(
 )
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org")
+DEFAULT_FROM_EMAIL = env(
+    "DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org"
+)
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
@@ -401,7 +407,6 @@ EMAIL_SUBJECT_PREFIX = env(
 )
 
 if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
-    EMAIL_ELASTICMAIL_CLIENT = 'portal.email_client.local.LocalEmailClient'
     if DEBUG:
         # https://docs.djangoproject.com/en/dev/ref/settings/#email-host
         EMAIL_HOST = env("EMAIL_HOST", default="mailhog")
@@ -415,12 +420,13 @@ if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
         EMAIL_PORT = env("DJANGO_EMAIL_PORT")
         EMAIL_USE_TLS = env.bool("DJANGO_EMAIL_PORT")
 
-elif EMAIL_BACKEND == "anymail.backends.amazon_ses.EmailBackend":
-    # TODO integrate with anymail
-    EMAIL_ELASTICMAIL_CLIENT = 'portal.email_client.elastic.ElasticEmailClient'
-
-
-EMAIL_ELASTICMAIL_CLIENT = import_string(EMAIL_ELASTICMAIL_CLIENT)
+elif (
+    EMAIL_BACKEND
+    == "portal.anymail_elasticmail.elasticmail.ElasticmailBackend"
+):
+    ANYMAIL = {
+        "ELASTICMAIL_API_KEY": env("ELASTICMAIL_API_KEY"),
+    }
 
 
 # ADMIN
@@ -441,14 +447,32 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # django-constance
 # ------------------------------------------------------------------------------
-CONSTANCE_BACKEND = 'constance.backends.database.DatabaseBackend'
+CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 # CONSTANCE_DATABASE_CACHE_BACKEND ='default'
+#
+# * Admissions                    -> admissions
+#   - Sign up
+#   - Applications                -> admissions:applications
+#     - CoC
+#     - Scholarship
+#     - Challenge/Submissions
+#   - Selection                   -> admissions:selection
+# * Academy                       -> academy
+#
 CONSTANCE_CONFIG = {
-    'ACCOUNT_ALLOW_REGISTRATION': (True, ''),
-    'ADMISSIONS_CODING_TEST_DURATION': (timedelta(minutes=20), ''), 
-    'ADMISSIONS_APPLICATIONS_OPENING_DATE': (datetime.now(timezone.utc), ''),
-    'ADMISSIONS_APPLICATIONS_CLOSING_DATE': (datetime.now(timezone.utc), '',),
-    'ADMISSIONS_ACCEPTING_PAYMENT_PROFS': (True, ''),
+    # Portal config
+    "ACCOUNT_ALLOW_REGISTRATION": (True, "Allow Sign Ups"),  # Allow sign ups
+    "PORTAL_STATUS": (
+        "academy",
+        "One of: admissions, admissions:applications, admissions:selection, academy",
+    ),
+    # Academy config
+    "ACADEMY_START": (datetime.now(timezone.utc), ""),
+    # Admissions config
+    "ADMISSIONS_CODING_TEST_DURATION": (timedelta(hours=3), ""),
+    "ADMISSIONS_APPLICATIONS_START": (datetime.now(timezone.utc), ""),
+    "ADMISSIONS_SELECTION_START": (datetime.now(timezone.utc), ""),
+    "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
 }
 
 
@@ -461,7 +485,7 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_ADAPTER = "portal.users.adapters.AccountAdapter"
 # SOCIALACCOUNT_ADAPTER = "portal.users.adapters.SocialAccountAdapter"
-ACCOUNT_SIGNUP_FORM_CLASS = 'portal.users.forms.PortalSignupForm'
+ACCOUNT_SIGNUP_FORM_CLASS = "portal.users.forms.PortalSignupForm"
 
 
 # django-compressor
@@ -580,4 +604,4 @@ LOGGING = {
 
 # SLACK
 # ------------------------------------------------------------------------------
-SLACK_WORKSPACE=env.str("SLACK_WORKSPACE")
+SLACK_WORKSPACE = env.str("SLACK_WORKSPACE")

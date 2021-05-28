@@ -19,8 +19,8 @@
                 <tbody>
                 {% for s in selections %}
                 <tr>
-                    <td><a href="/staff/candidates/{{ s.user.id }}">{{ s.user.email }}</a></td>
-                    <td><a href="/staff/interviews/{{ s.user.id }}">
+                    <td><a href="{% url 'admissions:staff:candidate-detail' s.user.id %}">{{ s.user.email }}</a></td>
+                    <td><a href="{% url 'admissions:staff:interview-detail' s.user.id %}">
                         <span class="badge badge-info">{{ s.status }}</span>
                     </a></td>
                     <td>{{ s.updated_at }}</td>

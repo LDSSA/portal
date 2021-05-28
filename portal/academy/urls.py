@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 
 from . import views
 
@@ -31,18 +31,5 @@ urlpatterns = [
         r"instructor/units/<str:pk>/",
         view=views.InstructorUnitDetailView.as_view(),
         name="instructor-unit-detail",
-    ),
-    # API
-    # https://portal.lisbondatascience.org/academy/api/grades/{username}/units/{codename}/
-    path(
-        r"api/grades/<str:username>/units/<str:unit>/",
-        views.GradingView.as_view(),
-        name="grade",
-    ),
-    # https://portal.lisbondatascience.org/academy/api/checksums/{codename}/
-    path(
-        r"api/checksums/<str:pk>/",
-        views.ChecksumView.as_view(),
-        name="checksum",
     ),
 ]

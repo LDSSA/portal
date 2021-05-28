@@ -1,13 +1,15 @@
 from django.conf import settings
-
-from portal.admissions import domain
+from constance import config
 
 
 def admissions_context_processor(request):
     my_dict = {
-        'ADMISSIONS_ENABLED': settings.ADMISSIONS_ENABLED,
-        'ADMISSIONS_OPEN': domain.admissions_open(),
-        'ADMISSIONS_ENDED': domain.admissions_ended(),
+        "PORTAL_STATUS": config.PORTAL_STATUS,
+        "ACADEMY_START": config.ACADEMY_START,
+        "ADMISSIONS_CODING_TEST_DURATION": config.ADMISSIONS_CODING_TEST_DURATION,
+        "ADMISSIONS_APPLICATIONS_START": config.ADMISSIONS_APPLICATIONS_START,
+        "ADMISSIONS_SELECTION_START": config.ADMISSIONS_SELECTION_START,
+        "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": config.ADMISSIONS_ACCEPTING_PAYMENT_PROFS,
     }
 
     return my_dict

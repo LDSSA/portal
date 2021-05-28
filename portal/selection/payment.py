@@ -27,13 +27,14 @@ def load_payment_data(selection, staff=None):
     old_ticket_type = selection.ticket_type
     old_value = selection.payment_value
 
-    profile = selection.user.profile
-    ticket_type = profile.ticket_type
+    ticket_type = selection.user.ticket_type
     value = PRICE_TABLE[ticket_type]
 
     selection.ticket_type = ticket_type
     selection.payment_value = value
-    selection.payment_due_date = datetime.now(timezone.utc) + timedelta(hours=48)
+    selection.payment_due_date = datetime.now(timezone.utc) + timedelta(
+        hours=48
+    )
     selection.save()
 
     log_selection_event(
@@ -49,17 +50,22 @@ def load_payment_data(selection, staff=None):
     )
 
 
-def add_document(selection: Selection, document: SelectionDocument) -> None:
+def add_document(
+    selection: Selection, document: SelectionDocument, document_type
+) -> None:
     logger.info(f"selection={selection.id}: new document uploaded")
-    document.selection = selection
-    document.save()
+    document = SelectionDocument.objects.create(
+        selection=selection,
+        doc=document,
+        doc_type=document_type,
+    )
 
     log_selection_event(
         selection,
         SelectionEvent.document_added,
         data={
             "doc-type": document.doc_type,
-            "doc-location": document.file_location,
+            "doc-location": document.doc.url,
         },
         user=selection.user,
     )

@@ -64,7 +64,7 @@ class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
             scores = (
                 StudentApi.objects.filter(
                     capstone=capstone,
-                    student_id__in=team.students.values_list("id", flat=True),
+                    user_id__in=team.users.values_list("id", flat=True),
                 )
                 .exclude(score=0.0)
                 .values_list("score", flat=True)
@@ -105,12 +105,12 @@ class StudentHackathonDetailView(StudentMixin, generic.DetailView):
         hackathon = self.object
 
         attendance, _ = models.Attendance.objects.get_or_create(
-            student=self.request.user, hackathon=hackathon
+            user=self.request.user, hackathon=hackathon
         )
 
         team = models.Team.objects.filter(
             hackathon=hackathon,
-            students=self.request.user,
+            user=self.request.user,
         ).first()
 
         return hackathon, attendance, team
@@ -201,7 +201,7 @@ class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
         attendance = models.Attendance.objects.filter(hackathon=self.object)
         for att in attendance:
             try:
-                team = att.student.hackathon_teams.get(hackathon=att.hackathon)
+                team = att.user.hackathon_teams.get(hackathon=att.hackathon)
             except ObjectDoesNotExist:
                 team = None
 
@@ -264,9 +264,9 @@ class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
             )
 
         elif new_status == "taking_attendance":
-            for user in get_user_model().objects.filter(student=True):
+            for user in get_user_model().objects.filter(is_student=True):
                 attendance, _ = models.Attendance.objects.get_or_create(
-                    student=user, hackathon=self.object
+                    user=user, hackathon=self.object
                 )
 
         # Delete test submissions

@@ -13,8 +13,8 @@ class CapstoneAdmin(admin.ModelAdmin):
 
 @admin.register(models.StudentApi)
 class StudentApiAdmin(admin.ModelAdmin):
-    list_display = ("capstone", "student", "url")
-    fields = ("capstone", "student", "url")
+    list_display = ("capstone", "user", "url")
+    fields = ("capstone", "user", "url")
 
 
 @admin.register(models.Simulator)
@@ -58,12 +58,12 @@ class OldFilter(admin.SimpleListFilter):
 
 @admin.register(models.DueDatapoint)
 class DueDatapointAdmin(admin.ModelAdmin):
-    list_filter = (OldFilter, "state", "simulator", "student", "simulator")
+    list_filter = (OldFilter, "state", "simulator", "user", "simulator")
 
-    list_display = ("id", "simulator", "student", "datapoint", "state", "due")
+    list_display = ("id", "simulator", "user", "datapoint", "state", "due")
     fields = (
         "simulator",
-        "student",
+        "user",
         "datapoint",
         "state",
         "due",
@@ -77,7 +77,7 @@ class DueDatapointAdmin(admin.ModelAdmin):
     )
     readonly_fields = (
         "simulator",
-        "student",
+        "user",
         "datapoint",
         "due",
         "url",

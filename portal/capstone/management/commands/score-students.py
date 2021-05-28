@@ -27,7 +27,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         simulator = models.Simulator(name=options["simulator_name"])
         self.stdout.write("username, score")
-        for student in User.objects.filter(student=True):
+        for student in User.objects.filter(is_student=True):
             score = self.score_student(simulator, student)
             self.stdout.write(f"{student.username}, {score}")
 

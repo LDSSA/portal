@@ -1,12 +1,16 @@
-from datetime import datetime, timezone
 from logging import getLogger
 
 from constance import config
 from django.conf import settings
 
 from portal.applications.domain import Domain as ApplicationDomain
-from portal.applications.domain import DomainException as ApplicationDomainException
-from portal.applications.domain import DomainQueries as ApplicationDomainQueries
+from portal.applications.domain import (
+    DomainException as ApplicationDomainException,
+)
+from portal.applications.domain import (
+    DomainQueries as ApplicationDomainQueries,
+)
+from portal.admissions import emails
 from portal.selection.domain import SelectionDomain
 from portal.selection.queries import SelectionQueries
 from portal.selection.status import SelectionStatus
@@ -30,7 +34,7 @@ class Events:
 
     @staticmethod
     def trigger_applications_are_over() -> None:
-        if datetime.now(timezone.utc) < config.APPLICATIONS_CLOSING_DATE:
+        if config.PORTAL_STATUS == "admissions:applications":
             logger.error(
                 "trying to trigger `applications over` event but applications are still open"
             )
@@ -63,7 +67,7 @@ class Events:
 
     @staticmethod
     def trigger_admissions_are_over() -> None:
-        if datetime.now(timezone.utc) < config.APPLICATIONS_CLOSING_DATE:
+        if config.PORTAL_STATUS == "admissions:applications":
             logger.error(
                 "trying to trigger `admissions over` event but applications are still open"
             )
@@ -94,10 +98,9 @@ class Events:
                 SelectionDomain.update_status(
                     selection, SelectionStatus.NOT_SELECTED
                 )
-                client = settings.EMAIL_ELASTICMAIL_CLIENT()
-                client.send_admissions_are_over_not_selected(
+                emails.send_admissions_are_over_not_selected(
                     to_email=selection.user.email,
-                    to_name=selection.user.profile.name,
+                    to_name=selection.user.name,
                 )
 
             sent_count += 1

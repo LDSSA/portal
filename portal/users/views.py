@@ -1,8 +1,6 @@
 import logging
 
-from django.utils import timezone
 from constance import config
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
@@ -10,7 +8,6 @@ from django.urls import reverse
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
 
 from . import forms
-from portal.admissions import domain
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -35,30 +32,29 @@ class UserRequiredFieldsMixin:
 
 
 class AdmissionsOngoingMixin:
-    """Verify that the current user is authenticated."""
     def dispatch(self, request, *args, **kwargs):
-        if domain.admissions_open():
-            return super().dispatch(request, *args, **kwargs)
-        return self.handle_no_permission()
-
-
-class AdmissionsEndedMixin:
-    """Verify that the current user is authenticated."""
-    def dispatch(self, request, *args, **kwargs):
-        if domain.admissions_ended():
+        if config.PORTAL_STATUS.startswith("admissions"):
             return super().dispatch(request, *args, **kwargs)
         return self.handle_no_permission()
 
 
 class InstructorMixin:
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_instructor or request.user.is_superuser or request.user.is_staff:
+        if (
+            request.user.is_instructor
+            or request.user.is_superuser
+            or request.user.is_staff
+        ):
             return super().dispatch(request, *args, **kwargs)
         else:
             return self.handle_no_permission()
 
 
-class InstructorViewsMixin(LoginRequiredMixin, UserRequiredFieldsMixin, AdmissionsEndedMixin, InstructorMixin):
+class InstructorViewsMixin(
+    LoginRequiredMixin,
+    UserRequiredFieldsMixin,
+    InstructorMixin,
+):
     pass
 
 
@@ -69,7 +65,11 @@ class StudentMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class StudentViewsMixin(LoginRequiredMixin, UserRequiredFieldsMixin, AdmissionsOngoingMixin, StudentMixin):
+class StudentViewsMixin(
+    LoginRequiredMixin,
+    UserRequiredFieldsMixin,
+    StudentMixin,
+):
     pass
 
 
@@ -80,7 +80,12 @@ class AdmissionsStaffMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class AdmissionsStaffViewMixin(LoginRequiredMixin, UserRequiredFieldsMixin, AdmissionsOngoingMixin, AdmissionsStaffMixin):
+class AdmissionsStaffViewMixin(
+    LoginRequiredMixin,
+    UserRequiredFieldsMixin,
+    AdmissionsOngoingMixin,
+    AdmissionsStaffMixin,
+):
     pass
 
 
@@ -92,7 +97,8 @@ class AdmissionsCandidateMixin:
 
 
 class AdmissionsCandidateViewMixin(
-    LoginRequiredMixin, UserRequiredFieldsMixin, AdmissionsOngoingMixin,
+    LoginRequiredMixin,
+    AdmissionsOngoingMixin,
 ):
     pass
 
@@ -102,7 +108,6 @@ class CandidateAcceptedCoCMixin:
         if not request.user.code_of_conduct_accepted:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
-
 
 
 # TODO TODO

@@ -18,7 +18,7 @@
             </form>
         </div>
         <div class="col-md-6 ">
-                <a class="btn btn-secondary" href="/staff/submissions">Clear Filter</a>
+                <a class="btn btn-secondary" href="{% url 'admissions:staff:submission-list' %}">Clear Filter</a>
         </div>
     </div>
     <br>
@@ -39,11 +39,11 @@
                 {% for s in submissions %}
                 <tr>
                     <td>{{ s.id }}</td>
-                    <td><a href="/staff/candidates/{{ s.application__user__id }}">{{ s.application__user__email }}</a></td>
-                    <td>{{ s.submission_type }}</td>
+                    <td><a href="{% url 'admissions:staff:candidate-detail' s.application__user__id %}">{{ s.application__user__email }}</a></td>
+                    <td>{{ s.unit__pk }}</td>
                     <td>{{ s.score }}</td>
-                    <td><a href="/staff/submissions/download/{{s.id}}">submission</a></td>
-                    <td><a href="/staff/submissions/download-feedback/{{s.id}}">feedback</a></td>
+                    <td><a href="{% url 'admissions:staff:submission-download' s.id %}">submission</a></td>
+                    <td><a href="{% url 'admissions:staff:submission-feedback-download' s.id %}">feedback</a></td>
                 </tr>
                 {% endfor %}
                 </tbody>

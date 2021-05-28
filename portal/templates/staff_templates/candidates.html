@@ -23,13 +23,13 @@
                 <tbody>
                 {% for u in users %}
                 <tr>
-                    <td><a href="/staff/candidates/{{ u.id }}">{{ u.email }}</a></td>
-                    <td>{{ u.profile.full_name }}</td>
-                    <td>{{ u.profile.profession }}</td>
-                    <td>{{ u.profile.gender }}</td>
-                    <td>{{ u.profile.ticket_type }}</td>
-                    <td>{{ u.profile.company }}</td>
-                    <td>{{ u.selection.status }}</td>
+                    <td><a href="{% url 'admissions:staff:candidate-detail' u.pk %}">{{ u.email }}</a></td>
+                    <td>{{ u.name }}</td>
+                    <td>{{ u.profession }}</td>
+                    <td>{{ u.gender }}</td>
+                    <td>{{ u.ticket_type }}</td>
+                    <td>{{ u.company }}</td>
+                    <td>{{ u.status }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

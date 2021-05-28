@@ -39,25 +39,25 @@ class UnitAdmin(admin.ModelAdmin):
 class GradeAdmin(admin.ModelAdmin):
     list_display = (
         "unit",
-        "student",
+        "user",
         "status",
         "created",
         "score",
     )
     search_fields = [
         "unit__code",
-        "student__username",
-        "student__name",
+        "user__username",
+        "user__name",
     ]
     list_filter = (
-        "student__is_student",
+        "user__is_student",
         "status",
         "unit",
-        "student",
+        "user",
     )
     fields = (
         "unit",
-        "student",
+        "user",
         "status",
         "created",
         "score",

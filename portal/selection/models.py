@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from django.db import models
 from django.conf import settings
@@ -32,7 +33,9 @@ doc_type_choices = [
 
 
 def get_path(instance, filename):
-    return f"payments/{instance.doc}/{instance.selection.user.username}/{filename}"
+    key_basename, key_ext = os.path.splitext(filename)
+    filename = f"{key_basename}_{uuid.uuid4().hex}{key_ext}"
+    return f"payments/{instance.doc_type}/{instance.selection.user.username}/{filename}"
 
 
 class SelectionDocument(models.Model):

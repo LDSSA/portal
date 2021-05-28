@@ -6,14 +6,11 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView, RedirectView
-from rest_framework import generics
-from rest_framework.settings import import_from_string
+from rest_framework.settings import import_string
 
-from portal.admissions import domain
 from portal.academy import models, serializers
 from portal.users.views import StudentViewsMixin, InstructorViewsMixin
 
@@ -24,26 +21,30 @@ logger = logging.getLogger(__name__)
 # noinspection PyUnresolvedReferences
 class HomeRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        if not domain.admissions_ended():
+        if config.PORTAL_STATUS == "academy":
+            if self.request.user.is_student:
+                self.pattern_name = "academy:student-unit-list"
+            elif (
+                self.request.user.is_instructor
+                or self.request.user.is_superuser
+                or self.request.user.is_staff
+            ):
+                self.pattern_name = "academy:instructor-user-list"
+            else:
+                self.handle_no_permission()
+        else:
             if self.request.user.is_staff:
                 self.pattern_name = "admissions:staff:home"
             else:
                 self.pattern_name = "admissions:candidate:home"
-        else:
-            if self.request.user.is_student:
-                self.pattern_name = "academy:student-unit-list"
-            elif self.request.user.is_instructor or self.request.user.is_superuser or self.request.user.is_staff:
-                self.pattern_name = "academy:instructor-user-list"
-            else:
-                self.handle_no_permission()
 
         return super().get_redirect_url(*args, **kwargs)
 
 
 def get_grade(unit, user):
-    grade = unit.grades.filter(student=user).order_by("-created").first()
+    grade = unit.grades.filter(user=user).order_by("-created").first()
     if grade is None:
-        grade = models.Grade(student=user, unit=unit)
+        grade = models.Grade(user=user, unit=unit)
     return grade
 
 
@@ -81,17 +82,17 @@ class BaseUnitDetailView(DetailView):
         self.object = super().get_object(queryset=queryset)
         unit = self.object
         grade = (
-            unit.grades.filter(student=self.request.user)
+            unit.grades.filter(user=self.request.user)
             .order_by("-created")
             .first()
         )
         if grade is None:
-            grade = models.Grade(student=self.request.user, unit=unit)
+            grade = models.Grade(user=self.request.user, unit=unit)
         return unit, grade
 
     def post(self, request, *args, **kwargs):
         unit, _ = self.get_object()
-        grade = models.Grade(student=self.request.user, unit=unit)
+        grade = models.Grade(user=self.request.user, unit=unit)
 
         if not unit.checksum:
             raise RuntimeError("Not checksum present for this unit")
@@ -104,8 +105,8 @@ class BaseUnitDetailView(DetailView):
         grade.save()
 
         # Send to grading
-        grading_fcn = import_from_string(settings.GRADING_FCN, "GRADING_FCN")
-        grading_fcn(request.user, unit)
+        Grading = import_string(settings.GRADING_CLASS)
+        Grading(grade=grade).run_grading()
 
         return HttpResponseRedirect(request.path_info)
 
@@ -204,7 +205,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
             spc_list=spc_list,
             unit_list=unit_list,
             max_score=max_score,
-            workspace_url =settings.SLACK_WORKSPACE
+            workspace_url=settings.SLACK_WORKSPACE,
         )
         return self.render_to_response(context)
 
@@ -216,48 +217,3 @@ class InstructorUnitListView(InstructorViewsMixin, BaseUnitListView):
 
 class InstructorUnitDetailView(InstructorViewsMixin, BaseUnitDetailView):
     template_name = "academy/instructor/unit_detail.html"
-
-
-class GradingView(generics.RetrieveUpdateAPIView):
-    queryset = models.Grade.objects.all()
-    serializer_class = serializers.GradeSerializer
-
-    def get_object(self):
-        user = get_user_model().objects.get(
-            username=self.kwargs.get("username")
-        )
-        unit = models.Unit.objects.get(code=self.kwargs.get("unit").upper())
-        grade = (
-            unit.grades.filter(student=user, status__in=("sent", "grading"))
-            .order_by("-created")
-            .first()
-        )
-        if grade is None:
-            logger.critical(
-                "Received unexpected grade for %s %s", unit.code, user.username
-            )
-            grade = models.Grade.objects.create(student=user, unit=unit)
-
-        # May raise a permission denied
-        self.check_object_permissions(self.request, grade)
-        logger.info("Received grade for %s %s", unit.code, user.username)
-
-        return grade
-
-
-class ChecksumView(generics.RetrieveUpdateAPIView):
-    queryset = models.Unit.objects.all()
-    serializer_class = serializers.ChecksumSerializer
-    lookup_url_kwarg = "pk"
-    lookup_field = "pk__iexact"
-
-    def get_object(self):
-        queryset = self.filter_queryset(self.get_queryset())
-
-        filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_url_kwarg]}
-        obj = get_object_or_404(queryset, **filter_kwargs)
-
-        # May raise a permission denied
-        self.check_object_permissions(self.request, obj)
-
-        return obj

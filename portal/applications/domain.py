@@ -8,7 +8,8 @@ from django.db import models
 from django.conf import settings
 
 
-from portal.applications.models import Application, Submission, SubmissionType, SubmissionTypes
+from portal.applications.models import Application, Submission, Challenge
+from portal.admissions import emails
 
 logger = getLogger(__name__)
 
@@ -35,39 +36,37 @@ class Domain:
     # buffer to upload submissions
     submission_timedelta_buffer = timedelta(minutes=2)
 
-    @staticmethod
-    def get_application_status(application: Application) -> ApplicationStatus:
-        return Domain.get_application_detailed_status(application)[
-            "application"
-        ]
+    @classmethod
+    def get_application_status(
+        cls, application: Application
+    ) -> ApplicationStatus:
+        return cls.get_application_detailed_status(application)["application"]
 
-    @staticmethod
-    def get_application_detailed_status(
-        application: Application,
-    ) -> Dict[str, Status]:
-        sub_type_status = {}
-        for sub_type in SubmissionTypes.all:
-            sub_type_status[sub_type.uname] = Domain.get_sub_type_status(
-                application, sub_type
+    @classmethod
+    def get_application_detailed_status(cls, application) -> Dict[str, Status]:
+        chall_status = {}
+        for chall in Challenge.objects.all():
+            chall_status[chall.code] = cls.get_sub_type_status(
+                application, chall
             )
 
         application_status = None
         if any(
-            (s == SubmissionStatus.failed for _, s in sub_type_status.items())
+            (s == SubmissionStatus.failed for _, s in chall_status.items())
         ):
             application_status = ApplicationStatus.failed
         elif any(
-            (s == SubmissionStatus.ongoing for _, s in sub_type_status.items())
+            (s == SubmissionStatus.ongoing for _, s in chall_status.items())
         ):
             application_status = ApplicationStatus.ongoing
         elif all(
-            (s == SubmissionStatus.passed for _, s in sub_type_status.items())
+            (s == SubmissionStatus.passed for _, s in chall_status.items())
         ):
             application_status = ApplicationStatus.passed
         elif all(
             (
                 s == SubmissionStatus.not_started
-                for _, s in sub_type_status.items()
+                for _, s in chall_status.items()
             )
         ):
             application_status = ApplicationStatus.not_started
@@ -75,18 +74,16 @@ class Domain:
             # some tests passed, some not started
             application_status = ApplicationStatus.ongoing
 
-        return {"application": application_status, **sub_type_status}
+        return {"application": application_status, **chall_status}
 
-    @staticmethod
-    def get_sub_type_status(
-        application: Application, sub_type: SubmissionType
-    ) -> SubmissionStatus:
-        if Domain.has_positive_score(application, sub_type):
+    @classmethod
+    def get_sub_type_status(cls, application, challenge):
+        if cls.has_positive_score(application, challenge):
             return SubmissionStatus.passed
 
         dt_now = datetime.now(timezone.utc)
-        start_date = Domain.get_start_date(application, sub_type)
-        end_date = Domain.get_end_date(application, sub_type)
+        start_date = cls.get_start_date(application, challenge)
+        end_date = cls.get_end_date(application, challenge)
 
         if end_date < dt_now:
             return SubmissionStatus.failed
@@ -97,65 +94,52 @@ class Domain:
         return SubmissionStatus.ongoing
 
     @staticmethod
-    def get_start_date(
-        application: Application, sub_type: SubmissionType
-    ) -> Optional[datetime]:
-        if sub_type == SubmissionTypes.coding_test:
+    def get_start_date(application, challenge):
+        if challenge.code == "coding_test":
             start_date = getattr(
-                application, f"{sub_type.uname}_started_at", None
+                application, f"{challenge.code}_started_at", None
             )
         else:
-            start_date = config.ADMISSIONS_APPLICATIONS_OPENING_DATE
+            start_date = config.ADMISSIONS_APPLICATIONS_START
 
         return start_date
 
-    @staticmethod
-    def get_end_date(
-        application: Application,
-        sub_type: SubmissionType,
-        *,
-        apply_buffer: bool = False,
-    ) -> datetime:
-        start_date = Domain.get_start_date(application, sub_type)
+    @classmethod
+    def get_end_date(cls, application, challenge, *, apply_buffer=False):
+        start_date = cls.get_start_date(application, challenge)
 
-        if sub_type == SubmissionTypes.coding_test:
+        if challenge.code == "coding_test":
             if start_date is not None:
-                close_date = start_date + timedelta(
-                    minutes=config.ADMINSSIONS_CODING_TEST_DURATION
+                close_date = (
+                    start_date + config.ADMISSIONS_CODING_TEST_DURATION
                 )
             else:
-                close_date = config.ADMISSIONS_APPLICATIONS_CLOSING_DATE
+                close_date = config.ADMISSIONS_SELECTION_START
         else:
-            close_date = config.ADMISSIONS_APPLICATIONS_CLOSING_DATE
+            close_date = config.ADMISSIONS_SELECTION_START
 
         if apply_buffer:
             # buffer is applied to account for possible latency (lambda grader func may take a while)
-            return close_date + Domain.submission_timedelta_buffer
+            return close_date + cls.submission_timedelta_buffer
         else:
             return close_date
 
     @staticmethod
-    def get_best_score(
-        application: Application, sub_type: SubmissionType
-    ) -> Optional[int]:
+    def get_best_score(application, challenge):
         return Submission.objects.filter(
-            application=application, submission_type=sub_type.uname
+            application=application, unit=challenge
         ).aggregate(models.Max("score"))["score__max"]
 
-    @staticmethod
-    def has_positive_score(
-        application: Application, sub_type: SubmissionType
-    ) -> bool:
-        score = Domain.get_best_score(application, sub_type)
-        return score is not None and score >= sub_type.pass_score
+    @classmethod
+    def has_positive_score(cls, application, challenge):
+        score = cls.get_best_score(application, challenge)
+        return score is not None and score >= challenge.pass_score
 
-    @staticmethod
-    def can_add_submission(
-        application: Application, sub_type: SubmissionType
-    ) -> bool:
+    @classmethod
+    def can_add_submission(cls, application, challenge):
         dt_now = datetime.now(timezone.utc)
 
-        start_dt = Domain.get_start_date(application, sub_type)
+        start_dt = cls.get_start_date(application, challenge)
 
         if start_dt is None:
             return False
@@ -163,16 +147,16 @@ class Domain:
         if dt_now < start_dt:
             return False
 
-        if dt_now > Domain.get_end_date(
-            application, sub_type, apply_buffer=True
+        if dt_now > cls.get_end_date(
+            application, challenge, apply_buffer=True
         ):
             return False
 
         if (
             Submission.objects.filter(
-                application=application, submission_type=sub_type.uname
+                application=application, unit=challenge
             ).count()
-            >= Domain.max_submissions
+            >= cls.max_submissions
         ):
             logger.warning(
                 f"user `{application.user.email}` reached max submissions."
@@ -181,15 +165,13 @@ class Domain:
 
         return True
 
-    @staticmethod
-    def add_submission(
-        application: Application, sub_type: SubmissionType, sub: Submission
-    ) -> None:
-        if not Domain.can_add_submission(application, sub_type):
+    @classmethod
+    def add_submission(cls, application, challenge, sub):
+        if not cls.can_add_submission(application, challenge):
             raise DomainException("Can't add submission")
 
         sub.application = application
-        sub.submission_type = sub_type.uname
+        sub.challenge = challenge
         sub.save()
 
     @staticmethod
@@ -201,14 +183,14 @@ class Domain:
 
         status = Domain.get_application_status(application)
         if status == ApplicationStatus.passed:
-            settings.email_client.send_application_is_over_passed(
+            emails.send_application_is_over_passed(
                 to_email=application.user.email, to_name=to_name
             )
             application.application_over_email_sent = "passed"
             application.save()
 
         else:
-            settings.email_client.send_application_is_over_failed(
+            emails.send_application_is_over_failed(
                 to_email=application.user.email, to_name=to_name
             )
             application.application_over_email_sent = "failed"

@@ -1,8 +1,8 @@
+from typing import Any, Dict, List, NamedTuple
+
 from django.db.models import F
 
-from users.models import User
-import csv
-from typing import Any, Dict, List, NamedTuple
+from portal.users.models import User
 
 
 class ExportData(NamedTuple):
@@ -22,13 +22,13 @@ def get_all_candidates() -> ExportData:
         "coc_accepted": "code_of_conduct_accepted",
         "applying_for_scholarship": "applying_for_scholarship",
         # profile
-        "profile_create_at": "profile__created_at",
-        "profile_updated_at": "profile__updated_at",
-        "name": "profile__full_name",
-        "profession": "profile__profession",
-        "gender": "profile__gender",
-        "ticket_type": "profile__ticket_type",
-        "company": "profile__company",
+        "profile_create_at": "created_at",
+        "profile_updated_at": "updated_at",
+        "name": "name",
+        "profession": "profession",
+        "gender": "gender",
+        "ticket_type": "ticket_type",
+        "company": "company",
         # selection
         "selection_create_at": "selection__created_at",
         "selection_updated_at": "selection__updated_at",
@@ -39,8 +39,7 @@ def get_all_candidates() -> ExportData:
     }
 
     rows = (
-        User.objects
-        .exclude(is_staff=True)
+        User.objects.exclude(is_staff=True)
         .order_by("id")
         .values("id")
         .annotate(**{k: F(v) for k, v in headers.items()})

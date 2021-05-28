@@ -1,0 +1,5 @@
+{% load i18n %}{% autoescape off %}<p>Hello from LDSA!</p>
+
+{% block content %}{% endblock %}
+
+{% endautoescape %}
