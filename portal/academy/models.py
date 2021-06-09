@@ -1,5 +1,6 @@
 import random
 import string
+from datetime import datetime
 
 from django.db import models
 from django.conf import settings
@@ -39,16 +40,23 @@ class Unit(models.Model):
 
 
 def notebook_path(instance, filename):
-    date = str(timezone.now()).split(" ")[0]
-    randstr = "".join(random.choices(string.ascii_lowercase, k=8))
+    now = datetime.now().isoformat(timespec="seconds")
     return (
-        f"{instance.student.username}_{instance.unit.code}"
-        f"_{date}_{randstr}.ipynb"
+        f"{instance.unit.code}/{instance.user.username}/"
+        f"notebook_{now}.ipynb"
+    )
+
+
+def feedback_path(instance, filename):
+    now = datetime.now().isoformat(timespec="seconds")
+    return (
+        f"{instance.unit.code}/{instance.user.username}/"
+        f"feeback_{now}.ipynb"
     )
 
 
 class Grade(models.Model):
-    student = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="grades",
@@ -56,7 +64,7 @@ class Grade(models.Model):
     unit = models.ForeignKey(
         Unit, on_delete=models.CASCADE, related_name="grades"
     )
-    score = models.FloatField(null=True)
+    created = models.DateTimeField(auto_now_add=True)
     notebook = models.FileField(upload_to=notebook_path, null=True)
 
     STATUSES = (
@@ -65,10 +73,12 @@ class Grade(models.Model):
         ("grading", "Grading"),
         ("failed", "Grading failed"),
         ("out-of-date", "Out-of-date"),
+        ("checksum-failed", "Checksum verification failed"),
         ("graded", "Graded"),
     )
     status = models.CharField(
         max_length=1024, choices=STATUSES, default="never-submitted"
     )
+    score = models.FloatField(null=True)
     message = models.TextField(blank=True)
-    created = models.DateTimeField(auto_now_add=True)
+    feedback = models.FileField(upload_to=feedback_path, null=True)

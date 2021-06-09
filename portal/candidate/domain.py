@@ -3,7 +3,7 @@ from typing import Dict, NamedTuple, Optional
 from portal.applications.domain import ApplicationStatus
 from portal.applications.domain import Domain as ApplicationsDomain
 from portal.applications.domain import SubmissionStatus
-from portal.applications.models import Application, SubmissionTypes
+from portal.applications.models import Application, Challenge
 from portal.selection.domain import SelectionDomain
 from portal.selection.models import Selection
 from portal.selection.status import SelectionStatusType
@@ -43,10 +43,18 @@ class Domain:
             application
         )
         state["application_status"] = status["application"]
-        state["coding_test_status"] = status[SubmissionTypes.coding_test.uname]
-        state["slu01_status"] = status[SubmissionTypes.slu01.uname]
-        state["slu02_status"] = status[SubmissionTypes.slu02.uname]
-        state["slu03_status"] = status[SubmissionTypes.slu03.uname]
+        state["coding_test_status"] = status[
+            Challenge.objects.get(code="coding_test").code
+        ]
+        state["slu01_status"] = status[
+            Challenge.objects.get(code="slu01").code
+        ]
+        state["slu02_status"] = status[
+            Challenge.objects.get(code="slu02").code
+        ]
+        state["slu03_status"] = status[
+            Challenge.objects.get(code="slu03").code
+        ]
 
         try:
             state["selection_status"] = SelectionDomain.get_status(

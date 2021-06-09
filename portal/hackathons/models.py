@@ -72,7 +72,7 @@ class Attendance(models.Model):
     hackathon = models.ForeignKey(
         Hackathon, on_delete=models.CASCADE, related_name="attendance"
     )
-    student = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="attendance",
@@ -87,7 +87,7 @@ class Team(models.Model):
     )
     hackathon_team_id = models.IntegerField(default=0)
     # remote = models.BooleanField(default=False)
-    students = models.ManyToManyField(
+    users = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="hackathon_teams"
     )
     name = models.TextField(blank=True)

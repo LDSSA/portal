@@ -16,7 +16,7 @@
             {% for s in submissions %}
             <tr>
                 <td>
-                    {% if s.score >= submission_type.pass_score %}
+                    {% if s.score >= challenge.pass_score %}
                     <span class="badge badge-success">Passed</span>
                     {% else %}
                     <span class="badge badge-danger">Failed</span>
@@ -24,8 +24,8 @@
                 </td>
                 <td>{{ s.created_at }}</td>
                 <td>{{ s.score }}</td>
-                <td> <a href="/candidate/submission/{{ submission_type.uname }}/{{ s.id }}" class="badge badge-secondary" target="_blank">Open</a></td>
-                <td> <a href="/candidate/submission/feedback/{{ submission_type.uname }}/{{ s.id }}" class="badge badge-secondary">Open</a></td>
+                <td> <a href="{% url 'admissions:candidate:submission-download' s.pk %}" class="badge badge-secondary" target="_blank">Open</a></td>
+                <td> <a href="{% url 'admissions:candidate:submission-download' s.pk %}" class="badge badge-secondary">Open</a></td>
             </tr>
             {% endfor %}
             </tbody>

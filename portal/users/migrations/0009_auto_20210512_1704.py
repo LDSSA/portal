@@ -7,52 +7,63 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0008_auto_20210307_1246'),
+        ("users", "0008_auto_20210307_1246"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='applying_for_scholarship',
+            model_name="user",
+            name="applying_for_scholarship",
             field=models.BooleanField(default=None, null=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='code_of_conduct_accepted',
+            model_name="user",
+            name="code_of_conduct_accepted",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='user',
-            name='company',
-            field=models.CharField(default='', max_length=100),
+            model_name="user",
+            name="company",
+            field=models.CharField(default="", max_length=100),
         ),
         migrations.AddField(
-            model_name='user',
-            name='created_at',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="user",
+            name="created_at",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='user',
-            name='gender',
-            field=models.CharField(default='other', max_length=25),
+            model_name="user",
+            name="gender",
+            field=models.CharField(default="other", max_length=25),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='user',
-            name='profession',
-            field=models.CharField(default='NA', max_length=50),
+            model_name="user",
+            name="profession",
+            field=models.CharField(default="NA", max_length=50),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='user',
-            name='ticket_type',
-            field=models.CharField(choices=[('student', 'Student'), ('regular', 'Regular'), ('company', 'Company'), ('scholarship', 'Scholarship')], default='regular', max_length=25),
+            model_name="user",
+            name="ticket_type",
+            field=models.CharField(
+                choices=[
+                    ("student", "Student"),
+                    ("regular", "Regular"),
+                    ("company", "Company"),
+                    ("scholarship", "Scholarship"),
+                ],
+                default="regular",
+                max_length=25,
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='user',
-            name='updated_at',
+            model_name="user",
+            name="updated_at",
             field=models.DateTimeField(auto_now=True),
         ),
     ]

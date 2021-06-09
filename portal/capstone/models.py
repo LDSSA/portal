@@ -35,7 +35,7 @@ class Capstone(models.Model):
 
 class StudentApi(models.Model):
     capstone = models.ForeignKey(Capstone, models.CASCADE)
-    student = models.ForeignKey(User, models.CASCADE)
+    user = models.ForeignKey(User, models.CASCADE)
     url = models.CharField(max_length=255, blank=True)
     score = models.FloatField(default=0)
 
@@ -126,7 +126,7 @@ class Simulator(models.Model):
                 DueDatapoint(
                     simulator=self,
                     datapoint=datapoint,
-                    student=student_api.student,
+                    user=student_api.student,
                     due=due,
                     url=url,
                 )
@@ -159,7 +159,7 @@ class DueDatapoint(models.Model):
     )
     url = models.TextField()
     datapoint = models.ForeignKey(Datapoint, models.CASCADE)
-    student = models.ForeignKey(User, models.CASCADE)
+    user = models.ForeignKey(User, models.CASCADE)
 
     due = models.DateTimeField(null=True)
     STATE_CHOICES = (

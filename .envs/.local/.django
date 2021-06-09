@@ -2,18 +2,18 @@ IPYTHONDIR=/app/.ipython
 
 # GRADING
 # ------------------------------------------------------------------------------
-GRADING_FCN=portal.academy.services.simulate_grading_local
+GRADING_CLASS=portal.grading.services.AcademyDockerGrading
+GRADING_ADMISSIONS_CLASS=portal.grading.services.AdmissionsDockerGrading
 BASE_URL=http://django:8000/
 GRADING_USERNAME=portal-api
-STUDENT_REPO_NAME=batch4-workspace
+STUDENT_REPO_NAME=batch5-workspace
 # ADMISSIONS
 # ------------------------------------------------------------------------------
-ADMISSIONS_ENABLED=False
 # GENERAL
 # ------------------------------------------------------------------------------
 DJANGO_DEBUG=true
 DJANGO_SECRET_KEY=OcGLMX2mG2WiRrC8d3ZJFDzUltYV5VGsIYzjtfBupHjr8WcGQx8DRcgGlDmbUQEu
-DJANGO_ALLOWED_HOSTS=localhost,0.0.0.0,127.0.0.1,django
+DJANGO_ALLOWED_HOSTS=localhost,0.0.0.0,127.0.0.1,django,academy-portal.eu.ngrok.io
 # DATABASES
 # ------------------------------------------------------------------------------
 # CACHES
@@ -44,9 +44,13 @@ DJANGO_SECURITY_EXTRAS=False
 # EMAIL
 # ------------------------------------------------------------------------------
 DJANGO_DEFAULT_FROM_EMAIL=notifications@lisbondatascience.org
+DJANGO_EMAIL_BACKEND=portal.anymail_elasticmail.elasticmail.ElasticmailBackend
 # ADMIN
 # ------------------------------------------------------------------------------
 # django-allauth
+# ------------------------------------------------------------------------------
+# django-anymail
+ELASTICMAIL_API_KEY=
 # ------------------------------------------------------------------------------
 # django-compressor
 # ------------------------------------------------------------------------------

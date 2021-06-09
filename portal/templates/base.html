@@ -87,7 +87,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'admissions:candidate:scholarship' %}">Scholarships</a>
                 </li>
-                {% if user_has_profile and applications_are_open %}
+                {% if PORTAL_STATUS == "admissions:applications" %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       Submissions
@@ -96,7 +96,7 @@
                       <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu01' %}">SLU01</a>
                       <a class="dropdown-item" href="{% url 'admissions:candidate:coding-test' %}">Coding Test</a>
                       <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu02' %}">SLU02</a>
-                      <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu02' %}">SLU03</a>
+                      <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu03' %}">SLU03</a>
                     </div>
                   </li>
                 {% if user_has_payment %}

@@ -23,7 +23,7 @@ class StudentCapstoneListView(StudentMixin, ListView):
         data = []
         for capstone in self.object_list:
             api, _ = models.StudentApi.objects.get_or_create(
-                capstone=capstone, student=request.user
+                capstone=capstone, user=request.user
             )
             data.append((capstone, api))
 
@@ -40,7 +40,7 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):
         self.object = super().get_object(queryset=queryset)
 
         api, _ = models.StudentApi.objects.get_or_create(
-            capstone=self.object, student=self.request.user
+            capstone=self.object, user=self.request.user
         )
 
         return self.object, api

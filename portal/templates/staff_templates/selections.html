@@ -125,13 +125,13 @@
     
         <div class="row pt-4">
             <div class="col-2">
-                <form action="/staff/selections/draw" enctype="multipart/form-data" method="POST" class="mb-0">
+                <form action="{% url 'admissions:staff:selection-draw' %}" enctype="multipart/form-data" method="POST" class="mb-0">
                     {% csrf_token %}
                     <button class="btn btn-primary" type="submit">Draw Candidates</button>
                 </form>
             </div>
             <div class="col-2">
-                <form action="/staff/selections/select" enctype="multipart/form-data" method="POST" class="mb-0">
+                <form action="{% url 'admissions:staff:selection-select' %}" enctype="multipart/form-data" method="POST" class="mb-0">
                     {% csrf_token %}
                     <button class="btn btn-primary" type="submit">Select Candidates</button>
                 </form>
@@ -152,7 +152,7 @@
             <th scope="col" data-sortable="true">Gender</th>
             <th scope="col" data-sortable="true">Ticket Type</th>
             <th scope="col" data-sortable="true">Company</th>
-            <th scope="col" data-sortable="true">Statuts</th>
+            <th scope="col" data-sortable="true">Status</th>
             <th scope="col">Drop Draw</th>
             </tr>
         </thead>
@@ -161,10 +161,10 @@
             <tr>
                 <td>{{ c.draw_rank }}</a></td>
                 <td>{{ c.user.email }}</a></td>
-                <td>{{ c.user.profile.full_name }}</td>
-                <td>{{ c.user.profile.gender }}</td>
-                <td>{{ c.user.profile.ticket_type }}</td>
-                <td>{{ c.user.profile.company }}</td>
+                <td>{{ c.user.name }}</td>
+                <td>{{ c.user.gender }}</td>
+                <td>{{ c.user.ticket_type }}</td>
+                <td>{{ c.user.company }}</td>
                 <td>{{ c.status }}</td>
                 <td></td>
             </tr>
@@ -174,13 +174,13 @@
             <tr>
                 <td>{{ c.draw_rank }}</a></td>
                 <td>{{ c.user.email }}</a></td>
-                <td>{{ c.user.profile.full_name }}</td>
-                <td>{{ c.user.profile.gender }}</td>
-                <td>{{ c.user.profile.ticket_type }}</td>
-                <td>{{ c.user.profile.company }}</td>
+                <td>{{ c.user.full_name }}</td>
+                <td>{{ c.user.gender }}</td>
+                <td>{{ c.user.ticket_type }}</td>
+                <td>{{ c.user.company }}</td>
                 <td>{{ c.status }}</td>
                 <td>
-                    <form action="/staff/selections/reject-draw/{{ c.id }}" enctype="multipart/form-data" method="POST" class="mb-0">
+                    <form action="{% url 'admissions:staff:selection-reject' c.id %}" enctype="multipart/form-data" method="POST" class="mb-0">
                         {% csrf_token %}
                         <button class="btn btn-danger" type="submit">
                             <i class="fas fa-trash-alt"></i>

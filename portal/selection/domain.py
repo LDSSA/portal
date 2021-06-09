@@ -6,14 +6,18 @@ from .status import SelectionStatusType
 class SelectionDomain:
     @staticmethod
     def create(user):
-        return Selection.objects.create(user=user)
+        return Selection.objects.get_or_create(user=user)[0]
 
     @staticmethod
     def get_status(selection):
         return SelectionStatusType(selection.status)
 
     @staticmethod
-    def update_status(selection, status, *, draw_rank=None,
+    def update_status(
+        selection,
+        status,
+        *,
+        draw_rank=None,
         user=None,
     ):
         old_status = SelectionDomain.get_status(selection)

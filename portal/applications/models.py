@@ -1,40 +1,34 @@
 from datetime import datetime, timezone
 from logging import getLogger
-from typing import NamedTuple
 
+from django.conf import settings
 from django.db import models
 
 logger = getLogger(__name__)
 
 
-class SubmissionType(NamedTuple):
-    uname: str
-    max_score: int
-    pass_score: int
-
-
-class SubmissionTypes:
-    coding_test = SubmissionType(
-        uname="coding_test", max_score=20, pass_score=16
-    )
-    slu01 = SubmissionType(uname="slu01", max_score=20, pass_score=16)
-    slu02 = SubmissionType(uname="slu02", max_score=20, pass_score=16)
-    slu03 = SubmissionType(uname="slu03", max_score=20, pass_score=16)
-
-    all = [coding_test, slu01, slu02, slu03]
-
-
-# TODO
 class Challenge(models.Model):
     code = models.CharField(max_length=50, primary_key=True)
-    file = models.FileField()
+    file = models.FileField(blank=True)
+    checksum = models.TextField(blank=True)
     max_score = models.FloatField(default=20)
     pass_score = models.FloatField(default=16)
 
 
-def get_path(instance, filename):
-    now_str = datetime.now(timezone.utc).strftime("%m_%d_%Y__%H_%M_%S")
-    return f"{instance.submission_type}/{instance.application.user.username}/{filename}@{now_str}"
+def notebook_path(instance, filename):
+    now = datetime.now().isoformat(timespec="seconds")
+    return (
+        f"{instance.unit.code}/{instance.user.username}/"
+        f"notebook_{now}.ipynb"
+    )
+
+
+def feedback_path(instance, filename):
+    now = datetime.now().isoformat(timespec="seconds")
+    return (
+        f"{instance.unit.code}/{instance.user.username}/"
+        f"feeback_{now}.ipynb"
+    )
 
 
 class Submission(models.Model):
@@ -43,16 +37,26 @@ class Submission(models.Model):
         on_delete=models.CASCADE,
         related_name="submissions",
     )
-
-    submission_type = models.CharField(null=False, max_length=20)
-
-    file = models.FileField(upload_to=get_path, null=True, blank=True)
-    feedback = models.FileField(upload_to=get_path, null=True, blank=True)
-
-    score = models.IntegerField(default=0, null=False)
-
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+    )
+    unit = models.ForeignKey(Challenge, on_delete=models.CASCADE)
+    notebook = models.FileField(upload_to=notebook_path, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # From grading
+    STATUSES = (
+        ("grading", "Grading"),
+        ("failed", "Grading failed"),
+        ("graded", "Graded"),
+    )
+    status = models.CharField(
+        max_length=1024, choices=STATUSES, default="never-submitted"
+    )
+    score = models.IntegerField(default=0, null=False)
+    message = models.TextField(blank=True)
+    feedback = models.FileField(upload_to=feedback_path, null=True, blank=True)
 
 
 class SubmissionsException(Exception):
@@ -81,5 +85,8 @@ class Application(models.Model):
     # passed -> `you have passed` email sent
     # failed -> `you have failed` email sent
     application_over_email_sent = models.CharField(
-        null=True, default=None, max_length=10, choices=[("passed", "failed")]
+        null=True,
+        default=None,
+        max_length=10,
+        choices=[("passed", "Passed"), ("failed", "Failed")],
     )

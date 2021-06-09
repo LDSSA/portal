@@ -9,13 +9,35 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from djchoices import ChoiceItem, DjangoChoices
 
 
 class UserWhitelist(models.Model):
     username = models.CharField(_("Username"), max_length=255, unique=True)
-    student = models.BooleanField(default=True)
+    is_student = models.BooleanField(default=False)
+    is_instructor = models.BooleanField(default=False)
 
 
+class Gender(DjangoChoices):
+    female = ChoiceItem("female", "Female")
+    male = ChoiceItem("male", "Male")
+    other = ChoiceItem("other", "Other/Prefer not to say")
+
+
+class TicketTypeSelectable(DjangoChoices):
+    student = ChoiceItem("student", "Student")
+    regular = ChoiceItem("regular", "Regular")
+    company = ChoiceItem("company", "Company")
+
+
+class TicketType(DjangoChoices):
+    student = ChoiceItem("student", "Student")
+    regular = ChoiceItem("regular", "Regular")
+    company = ChoiceItem("company", "Company")
+    scholarship = ChoiceItem("scholarship", "Scholarship")
+
+
+# TODO TODO custom user manager to filter out users with unverified email addresses
 class User(AbstractUser):
 
     # First Name and Last Name do not cover name patterns
@@ -23,7 +45,6 @@ class User(AbstractUser):
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
 
     # Academy
-    # student = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
     logo = models.TextField(blank=True)
@@ -33,23 +54,16 @@ class User(AbstractUser):
     deploy_public_key = models.TextField(blank=True)
 
     # Admissions
-    code_of_conduct_accepted = models.BooleanField(default=False, null=False)
+    code_of_conduct_accepted = models.BooleanField(default=False)
     applying_for_scholarship = models.BooleanField(default=None, null=True)
-    profession = models.CharField(null=False, max_length=50)
-    GENDERS = [
-        ('male', 'Male'),
-        ('female', 'Female'),
-        ('other', 'Other/Prefer not to say'),
-    ]
-    gender = models.CharField(null=False, max_length=25, choices=GENDERS)
-    TICKET_TYPE = [
-        ("student", "Student"),
-        ("regular", "Regular"),
-        ("company", "Company"),
-        ("scholarship", "Scholarship"),
-    ]
-    ticket_type = models.CharField(null=False, max_length=25, choices=TICKET_TYPE)
-    company = models.CharField(null=False, default="", max_length=100)
+    profession = models.CharField(blank=True, max_length=50)
+    gender = models.CharField(
+        null=False, max_length=25, choices=Gender.choices
+    )
+    ticket_type = models.CharField(
+        null=False, max_length=25, choices=TicketType.choices
+    )
+    company = models.CharField(blank=True, max_length=100)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

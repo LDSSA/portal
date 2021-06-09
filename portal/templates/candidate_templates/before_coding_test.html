@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block content %}
+{% timezone "Europe/Lisbon" %}
 
 <div class="container">
     <h2 class="py-5">Coding Test</h2>
@@ -9,13 +11,13 @@
         <h2 class="pb-4">Attention!</h4>
 
         <p>You're about to start the coding test.</p>
-        <p>Once you start it, you'll only have <b>{{ coding_test_duration_hours|floatformat }} hours</b> to complete it.
+        <p>Once you start it, you'll only have <b>{{ ADMISSIONS_CODING_TEST_DURATION }} hours</b> to complete it.
             You can make as many submissions as you want, and you only need 1 passing submission (at least <b>{{ coding_test_subtype.pass_score|floatformat }}</b> out of <b>{{ coding_test_subtype.max_score|floatformat }}</b> points).
         </p>
         <p>We'll only consider your <b>best</b> submission, not your last one.</p>
         <p>
             Your time will start once you click the button below, and it can't be stopped.
-            So make sure you're free for the next {{ coding_test_duration_hours|floatformat }} hours!
+            So make sure you're free for the next {{ ADMISSIONS_CODING_TEST_DURATION }} hours!
         </p>
 
         <p><h4>
@@ -30,4 +32,5 @@
 
 </div>
 
+{% endtimezone %}
 {% endblock %}

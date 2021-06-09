@@ -6,17 +6,20 @@ argon2-cffi  # https://github.com/hynek/argon2_cffi
 redis  # https://github.com/antirez/redis
 cryptography
 pyyaml
+python-dateutil
 
 # Django
 # ------------------------------------------------------------------------------
 django  # https://www.djangoproject.com/
+django-anymail
+django-allauth  # https://github.com/pennersr/django-allauth
+django-choices
+django-compressor  # https://github.com/django-compressor/django-compressor
+django-constance[database]
+django-crispy-forms  # https://github.com/django-crispy-forms/django-crispy-forms
 django-environ  # https://github.com/joke2k/django-environ
 django-model-utils  # https://github.com/jazzband/django-model-utils
-django-allauth  # https://github.com/pennersr/django-allauth
-django-crispy-forms  # https://github.com/django-crispy-forms/django-crispy-forms
-django-compressor  # https://github.com/django-compressor/django-compressor
 django-redis  # https://github.com/niwinz/django-redis
-django-constance[database]
 
 # Django REST Framework
 djangorestframework  # https://github.com/encode/django-rest-framework

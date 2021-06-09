@@ -1,4 +1,5 @@
 from logging import getLogger
+from portal.users.models import TicketType, Gender
 from typing import Iterable, List, NamedTuple, Optional
 
 from .domain import SelectionDomain
@@ -36,10 +37,10 @@ class DrawCounters:
 
         self.total += 1
 
-        if user.gender == 'female':
+        if user.gender == "female":
             self.female += 1
 
-        if user.ticket_type == 'company':
+        if user.ticket_type == "company":
             self.company += 1
 
 
@@ -74,11 +75,11 @@ def draw_next(
     if not scholarships:
         q = SelectionQueries.draw_filter(
             forbidden_genders, forbidden_ticket_types
-        ).exclude(user__profile__ticket_type=ProfileTicketTypes.scholarship)
+        ).exclude(user__ticket_type=TicketType.scholarship)
     else:
         q = SelectionQueries.draw_filter(
             forbidden_genders, forbidden_ticket_types
-        ).filter(user__profile__ticket_type=ProfileTicketTypes.scholarship)
+        ).filter(user__ticket_type=TicketType.scholarship)
 
     return SelectionQueries.random(q)
 
@@ -95,11 +96,11 @@ def draw(params: DrawParams, *, scholarships: bool) -> None:
     )
     if scholarships:
         current_candidates = current_candidates.filter(
-            user__profile__ticket_type=ProfileTicketTypes.scholarship
+            user__ticket_type=TicketType.scholarship
         )
     else:
         current_candidates = current_candidates.exclude(
-            user__profile__ticket_type=ProfileTicketTypes.scholarship
+            user__ticket_type=TicketType.scholarship
         )
 
     counters = get_draw_counters(current_candidates)
@@ -107,12 +108,12 @@ def draw(params: DrawParams, *, scholarships: bool) -> None:
 
     while counters.total != params.number_of_seats:
         forbidden_genders = (
-            [ProfileGenders.male, ProfileGenders.other]
+            [Gender.male, Gender.other]
             if must_pick_female(params, counters)
             else []
         )
         forbidden_ticket_types = (
-            [ProfileTicketTypes.company]
+            [TicketType.company]
             if must_not_pick_company(params, counters)
             else []
         )

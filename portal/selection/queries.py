@@ -3,6 +3,7 @@ from typing import List, Optional
 from django.db.models import Max
 
 
+from portal.users.models import TicketType
 from .models import Selection, SelectionDocument
 from .status import SelectionStatus, SelectionStatusType
 
@@ -24,8 +25,8 @@ class SelectionQueries:
     ):
         return (
             Selection.objects.filter(status=SelectionStatus.PASSED_TEST)
-            .exclude(user__profile__gender__in=forbidden_genders)
-            .exclude(user__profile__ticket_type__in=forbidden_ticket_types)
+            .exclude(user__gender__in=forbidden_genders)
+            .exclude(user__ticket_type__in=forbidden_ticket_types)
         )
 
     @staticmethod
@@ -38,15 +39,11 @@ class SelectionQueries:
 
     @staticmethod
     def scholarships(q):
-        return q.filter(
-            user__profile__ticket_type=ProfileTicketTypes.scholarship
-        )
+        return q.filter(user__ticket_type=TicketType.scholarship)
 
     @staticmethod
     def no_scholarships(q):
-        return q.exclude(
-            user__profile__ticket_type=ProfileTicketTypes.scholarship
-        )
+        return q.exclude(user__ticket_type=TicketType.scholarship)
 
 
 class SelectionDocumentQueries:

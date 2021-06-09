@@ -10,7 +10,7 @@ from portal.academy.views import HomeRedirectView
 urlpatterns = [
     # General
     path("accounts/", include("allauth.urls")),
-    # path("accounts/instructor/signup", include("")),  # TODO TODO TODO
+    # path("accounts/instructor/signup", include("")),  # TODO LDSSA/portal#98
     # path("",
     #      TemplateView.as_view(template_name="pages/home.html"),
     #      name="home"),
@@ -31,6 +31,8 @@ urlpatterns = [
     path("academy/", include("academy.urls")),
     path("hackathons/", include("hackathons.urls")),
     path("capstone/", include("capstone.urls")),
+    # Grading
+    path("grading/", include("grading.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

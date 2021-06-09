@@ -84,7 +84,7 @@
             <div class="card-body">
                 <h5 class="card-title">Uploaded</h5>
                 {% for doc in payment_proofs %}
-                <p><a href="/candidate/payment/download-document/{{ doc.id }}" class="card-link">{{ doc.filename }}</a></p>
+                <p><a href="{% url 'admissions:candidate:payment-document-download' doc.id %}" class="card-link">{{ doc.doc.name }}</a></p>
                 {% endfor %}
             </div>
             {% endif %}
@@ -92,7 +92,7 @@
             {% if can_update %}
             <div class="card-body">
                 <h5 class="card-title">Upload new</h5>
-                <form action="/candidate/payment/upload-payment-proof" enctype="multipart/form-data" method="POST" class="mb-0">
+                <form action="{% url 'admissions:candidate:payment-proof-upload' %}" enctype="multipart/form-data" method="POST" class="mb-0">
                     {% csrf_token %}
                     <div class="custom-file mb-3">
                         <input type="file" class="custom-file-input" id="paymentInputFile" name="file" required {% if not can_update %} disabled {% endif %}>
@@ -118,7 +118,7 @@
             <div class="card-body">
                 <h5 class="card-title">Uploaded</h5>
                 {% for doc in student_ids %}
-                <p><a href="/candidate/payment/download-document/{{ doc.id }}" class="card-link">{{ doc.filename }}</a></p>
+                <p><a href="{% url 'admissions:candidate:payment-document-download' doc.id %}" class="card-link">{{ doc.filename }}</a></p>
                 {% endfor %}
             </div>
             {% endif %}
@@ -126,7 +126,7 @@
             {% if can_update %}
             <div class="card-body">
                 <h5 class="card-title">Upload new</h5>
-                <form action="/candidate/payment/upload-student-id" enctype="multipart/form-data" method="POST" class="mb-0">
+                <form action="{% url 'admissions:candidate:student-id-upload' %}" enctype="multipart/form-data" method="POST" class="mb-0">
                     {% csrf_token %}
                     <div class="custom-file mb-3">
                         <input type="file" class="custom-file-input" id="studentIdInputFile" name="file" required {% if not can_update %} disabled {% endif %}>
