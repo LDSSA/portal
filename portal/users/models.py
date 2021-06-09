@@ -37,7 +37,6 @@ class TicketType(DjangoChoices):
     scholarship = ChoiceItem("scholarship", "Scholarship")
 
 
-
 # TODO TODO custom user manager to filter out users with unverified email addresses
 class User(AbstractUser):
 

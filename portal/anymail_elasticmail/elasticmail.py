@@ -4,7 +4,10 @@ from config.settings.settings import ANYMAIL
 import logging
 import json
 
-from anymail.backends.base_requests import RequestsPayload, AnymailRequestsBackend
+from anymail.backends.base_requests import (
+    RequestsPayload,
+    AnymailRequestsBackend,
+)
 from anymail.utils import get_anymail_setting
 
 
@@ -35,24 +38,34 @@ class ElasticmailBackend(AnymailRequestsBackend):
         # self.debug_api_requests = True
 
     def build_message_payload(self, message, defaults):
-        return ElasticmailV4Payload(message, defaults, self, headers={
-            'X-ElasticEmail-ApiKey': self.api_key,
-        })
+        return ElasticmailV4Payload(
+            message,
+            defaults,
+            self,
+            headers={
+                "X-ElasticEmail-ApiKey": self.api_key,
+            },
+        )
 
     def parse_recipient_status(self, response, payload, message):
         try:
-            parsed_response = self.deserialize_json_response(response, payload, message)
+            parsed_response = self.deserialize_json_response(
+                response, payload, message
+            )
         except json.JSONDecodeError as exc:
             raise AnymailRequestsAPIError(
                 "Invalid Elasticmail API response format",
-                email_message=message, payload=payload, response=response,
-                backend=self) from exc
+                email_message=message,
+                payload=payload,
+                response=response,
+                backend=self,
+            ) from exc
 
         return {
             message.to[0]: AnymailRecipientStatus(
-                message_id=parsed_response['MessageID'],
-                status='sent')
-        } 
+                message_id=parsed_response["MessageID"], status="sent"
+            )
+        }
 
 
 class ElasticmailV4Payload(RequestsPayload):
@@ -116,7 +129,7 @@ class ElasticmailV4Payload(RequestsPayload):
         self.unsupported_feature("extra_headers")
 
     def set_text_body(self, body):
-        self.data['Content']["Merge"].update({'message': body})
+        self.data["Content"]["Merge"].update({"message": body})
         # self.data["Content"]["Body"].append(
         #     {
         #         "ContentType": "PlainText",
@@ -126,7 +139,7 @@ class ElasticmailV4Payload(RequestsPayload):
         # )
 
     def set_html_body(self, body):
-        self.data['Content']["Merge"].update({'message': body})
+        self.data["Content"]["Merge"].update({"message": body})
         # self.data["Content"]["Body"].append(
         #     {
         #         "ContentType": "HTML",
@@ -136,10 +149,12 @@ class ElasticmailV4Payload(RequestsPayload):
         # )
 
     def add_alternative(self, content, mimetype):
-        if mimetype == 'text/plain':
+        if mimetype == "text/plain":
             self.set_txt_body(content)
         else:
-            self.unsupported_feature("alternative part with type '%s'" % mimetype)
+            self.unsupported_feature(
+                "alternative part with type '%s'" % mimetype
+            )
 
     # TODO ignore
     def add_attachment(self, attachment):
@@ -216,10 +231,12 @@ class ElasticmailV2Payload(RequestsPayload):
         self.params["bodyHtml"] = body
 
     def add_alternative(self, content, mimetype):
-        if mimetype == 'text/plain':
+        if mimetype == "text/plain":
             self.set_txt_body(content)
         else:
-            self.unsupported_feature("alternative part with type '%s'" % mimetype)
+            self.unsupported_feature(
+                "alternative part with type '%s'" % mimetype
+            )
 
     # TODO ignore
     def add_attachment(self, attachment):
@@ -229,12 +246,10 @@ class ElasticmailV2Payload(RequestsPayload):
         self.params["template"] = template_id
 
     def set_metadata(self, metadata):
-        self.params.update({f'merge_{k}': v for k, v in metadata.items()})
+        self.params.update({f"merge_{k}": v for k, v in metadata.items()})
 
     def set_track_clicks(self, track_clicks):
-        self.params["trackClicks"] = (
-            "true" if track_clicks else "false"
-        )
+        self.params["trackClicks"] = "true" if track_clicks else "false"
 
     def set_track_opens(self, track_opens):
         self.params["trackOpens"] = "true" if track_opens else "false"

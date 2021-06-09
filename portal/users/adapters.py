@@ -27,7 +27,9 @@ class AccountAdapter(DefaultAccountAdapter):
         e-mail that is to be sent, e.g. "account/email/email_confirmation"
         """
         to = [email] if isinstance(email, str) else email
-        subject = render_to_string("{0}_subject.txt".format(template_prefix), context)
+        subject = render_to_string(
+            "{0}_subject.txt".format(template_prefix), context
+        )
         # remove superfluous line breaks
         subject = " ".join(subject.splitlines()).strip()
         subject = self.format_email_subject(subject)
@@ -35,7 +37,7 @@ class AccountAdapter(DefaultAccountAdapter):
         from_email = self.get_from_email()
 
         logger.info(template_prefix)
-        template_name = "{0}_message.{1}".format(template_prefix, 'txt')
+        template_name = "{0}_message.{1}".format(template_prefix, "txt")
         logger.info(template_name)
         body = render_to_string(
             template_name,
