@@ -13,22 +13,18 @@ logger = logging.getLogger(__name__)
 
 class AcademyGradingView(generics.RetrieveUpdateAPIView):
     """Receive notebook grade"""
-
     queryset = models.Grade.objects.all()
     serializer_class = serializers.GradeSerializer
 
 
 class AcademyChecksumView(generics.RetrieveUpdateAPIView):
     """Receive and retrieve notebook checksum"""
-
-    lookup_field = "code"
     queryset = models.Unit.objects.all()
     serializer_class = serializers.ChecksumSerializer
 
 
 class AdmissionsGradingView(generics.RetrieveUpdateAPIView):
     """Receive notebook grade"""
-
     queryset = Submission.objects.all()
     serializer_class = serializers.AdmissionsGradeSerializer
 
