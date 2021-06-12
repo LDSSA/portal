@@ -137,19 +137,7 @@ class Domain:
 
     @classmethod
     def can_add_submission(cls, application, challenge):
-        dt_now = datetime.now(timezone.utc)
-
-        start_dt = cls.get_start_date(application, challenge)
-
-        if start_dt is None:
-            return False
-
-        if dt_now < start_dt:
-            return False
-
-        if dt_now > cls.get_end_date(
-            application, challenge, apply_buffer=True
-        ):
+        if config.PORTAL_STATUS != 'admissions:applications':
             return False
 
         if (
