@@ -118,7 +118,8 @@ class AcademyGradingMixin:
 
     def get_name(self):
         id_ = "".join(random.choices(string.ascii_lowercase, k=8))
-        return f"{self.grade.unit.code.lower()}-{self.grade.user.username.lower()}-{id_}"
+        name = f"{self.grade.unit.code.lower()}-{self.grade.user.username.lower()}-{id_}"
+        return name.replace('_', '-')
 
     def get_env(self):
         grader = get_user_model().objects.get(
