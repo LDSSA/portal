@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.mail import EmailMessage
 
 
@@ -24,6 +25,7 @@ def send_reset_password_email(to_email, reset_password_url):
 def send_application_is_over_passed(to_email, to_name):
     email = EmailMessage(
         to=[to_email],
+        from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="Keep your fingers crossed!",
     )
     email.template_id = "Admissions - passed admission tests"
@@ -34,6 +36,7 @@ def send_application_is_over_passed(to_email, to_name):
 def send_application_is_over_failed(to_email, to_name):
     email = EmailMessage(
         to=[to_email],
+        from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="Sorry! Try again next year",
     )
     email.template_id = "Admissions - failed admission tests"
@@ -44,6 +47,7 @@ def send_application_is_over_failed(to_email, to_name):
 def send_admissions_are_over_not_selected(to_email, to_name):
     email = EmailMessage(
         to=[to_email],
+        from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="Sorry! Try again next year",
     )
     email.template_id = "Admissions - over not selected"
@@ -56,6 +60,7 @@ def send_selected_and_payment_details(
 ):
     email = EmailMessage(
         to=[to_email],
+        from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="You’re ALMOST IN!",
     )
     email.template_id = "Admissions - selected and payment details"
@@ -70,6 +75,7 @@ def send_selected_and_payment_details(
 def send_payment_accepted_proof_email(to_email, to_name, *, message):
     email = EmailMessage(
         to=[to_email],
+        from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="You’re IN!",
     )
     email.template_id = "Admissions - payment accepted"
@@ -82,6 +88,7 @@ def send_payment_need_additional_proof_email(
 ):
     email = EmailMessage(
         to=[to_email],
+        from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="You’re ALMOST IN!",
     )
     email.template_id = "Admissions - payment need additional proof"
@@ -92,6 +99,7 @@ def send_payment_need_additional_proof_email(
 def send_payment_refused_proof_email(to_email, to_name, *, message):
     email = EmailMessage(
         to=[to_email],
+        from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="Oh no! There was something wrong here...",
     )
     email.template_id = "Admissions - payment refused"
@@ -104,6 +112,7 @@ def send_interview_passed_email(
 ):
     email = EmailMessage(
         to=[to_email],
+        from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="The results are out - You’ve made it!",
     )
     email.template_id = "Admissions - interview passed and payment details"
@@ -118,6 +127,7 @@ def send_interview_passed_email(
 def send_interview_failed_email(to_email: str, to_name: str, *, message: str):
     email = EmailMessage(
         to=[to_email],
+        from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="Update on your LDSSA scholarship interview",
     )
     email.template_id = "Admissions - interview failed"
@@ -128,6 +138,7 @@ def send_interview_failed_email(to_email: str, to_name: str, *, message: str):
 def send_selected_interview_details(to_email, to_name):
     email = EmailMessage(
         to=[to_email],
+        from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="LDSSA scholarship interview details",
     )
     email.template_id = "Admissions - selected interview details"
@@ -138,6 +149,7 @@ def send_selected_interview_details(to_email, to_name):
 def send_contact_us_email(from_email, user_name, user_url, message):
     email = EmailMessage(
         to=["admissions@lisbondatascience.org"],
+        reply_to=from_email,
         subject=f"[Admissions Portal] Support request from {from_email}",
     )
     email.template_id = "Admissions - contact us"

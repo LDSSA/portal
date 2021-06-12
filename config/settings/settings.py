@@ -399,6 +399,7 @@ EMAIL_BACKEND = env(
 DEFAULT_FROM_EMAIL = env(
     "DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org"
 )
+ADMISSIONS_FROM_EMAIL = env('ADMISSIONS_FROM_EMAIL', default="admissions@lisbondatascience.org")
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
