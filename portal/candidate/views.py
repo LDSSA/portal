@@ -149,7 +149,6 @@ class ContactView(AdmissionsCandidateViewMixin, TemplateView):
         )
         user.save()
 
-        # TODO get_sucess_url
         template = loader.get_template(
             "./candidate_templates/contactus-success.html"
         )
@@ -339,6 +338,8 @@ class SubmissionDownloadView(generic.DetailView):
     queryset = Submission.objects.all()
 
     def get_queryset(self):
+        if self.request.user.is_staff:
+            return super().get_queryset()
         return super().get_queryset().filter(user=self.request.user)
 
     def get(self, request, *args, **kwargs):
@@ -396,17 +397,20 @@ class CandidatePaymentView(generic.DetailView):
         return HttpResponseRedirect(reverse("admissions:candidate:payment"))
 
 
-# TODO permissions user and staff can download
 class SelectionDocumentDownloadView(generic.DetailView):
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return super().get_queryset()
+        return super().get_queryset().filter(user=self.request.user)
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
         return FileResponse(obj.doc)
 
 
-# TODO permissions only user can upload
 class SelectionDocumentUploadView(generic.DetailView):
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")

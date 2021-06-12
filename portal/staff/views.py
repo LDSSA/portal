@@ -682,7 +682,7 @@ class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
                 payment_due_date=payment_due_date,
             )
 
-        return redirect(request.path_info)  # TODO check get_success_url
+        return redirect(request.path_info)
 
 
 class PaymentListView(AdmissionsStaffViewMixin, TemplateView):
@@ -764,7 +764,7 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
                 message=msg,
             )
 
-        return redirect(request.path_info)  # TODO check get_success_url
+        return redirect(request.path_info)
 
 
 class PaymentResetView(AdmissionsStaffViewMixin, View):

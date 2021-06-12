@@ -14,17 +14,26 @@ logger = logging.getLogger(__name__)
 
 
 class UserRequiredFieldsMixin:
-    required_fields = (
+    required_academy_fields = (
         "name",
         "slack_member_id",
         "github_username",
     )
+    required_admissions_fields = (
+        "name",
+        "gender",
+        "ticket_type",
+    )
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
+            if config.PORTAL_STATUS.startswith('admissions'):
+                required_fields = self.required_admissions_fields
+            elif config.PORTAL_STATUS.startswith('academy'):
+                required_fields = self.required_academy_fields
             if any(
                 getattr(request.user, field) == ""
-                for field in self.required_fields
+                for field in required_fields
             ):
                 return redirect("users:profile")
 
@@ -110,7 +119,6 @@ class CandidateAcceptedCoCMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-# TODO TODO
 class CandidateScholarshipDecidedMixin(
     AdmissionsCandidateMixin, UserPassesTestMixin
 ):

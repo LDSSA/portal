@@ -156,7 +156,6 @@ class ElasticmailV4Payload(RequestsPayload):
                 "alternative part with type '%s'" % mimetype
             )
 
-    # TODO ignore
     def add_attachment(self, attachment):
         pass
 
@@ -238,7 +237,6 @@ class ElasticmailV2Payload(RequestsPayload):
                 "alternative part with type '%s'" % mimetype
             )
 
-    # TODO ignore
     def add_attachment(self, attachment):
         pass
 
