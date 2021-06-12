@@ -25,7 +25,7 @@
                 <td>{{ s.created_at }}</td>
                 <td>{{ s.score }}</td>
                 <td> <a href="{% url 'admissions:candidate:submission-download' s.pk %}" class="badge badge-secondary" target="_blank">Open</a></td>
-                <td> <a href="{% url 'admissions:candidate:submission-download' s.pk %}" class="badge badge-secondary">Open</a></td>
+                <td> <a href="{% url 'admissions:candidate:submissions-feedback-download' s.pk %}" class="badge badge-secondary">Open</a></td>
             </tr>
             {% endfor %}
             </tbody>

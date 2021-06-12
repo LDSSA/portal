@@ -393,7 +393,10 @@ class SubmissionDownloadView(AdmissionsStaffViewMixin, View):
         except Submission.DoesNotExist:
             raise Http404
 
-        return FileResponse(submission.notebook)
+        try:
+            return FileResponse(submission.notebook)
+        except ValueError:
+            raise Http404
 
 
 class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):
@@ -403,7 +406,10 @@ class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):
         except Submission.DoesNotExist:
             raise Http404
 
-        return FileResponse(submission.feedback)
+        try:
+            return FileResponse(submission.feedback)
+        except ValueError:
+            raise Http404
 
 
 class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
