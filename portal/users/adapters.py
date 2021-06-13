@@ -4,20 +4,27 @@ from typing import Any
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from allauth.utils import build_absolute_uri
+from allauth.account.utils import filter_users_by_email, user_pk_to_url_str
+from allauth.account.forms import EmailAwarePasswordResetTokenGenerator
 from constance import config
 from django.http import HttpRequest
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
 from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.urls import reverse
 
 from portal.users.models import UserWhitelist
+from portal.admissions.emails import send_signup_email, send_reset_password_email
 
 
 logger = logging.getLogger(__name__)
 
 
 class AccountAdapter(DefaultAccountAdapter):
+    default_token_generator = EmailAwarePasswordResetTokenGenerator()
+
     def is_open_for_signup(self, request: HttpRequest):
         return getattr(config, "ACCOUNT_ALLOW_REGISTRATION", True)
 
@@ -55,9 +62,25 @@ class AccountAdapter(DefaultAccountAdapter):
         # msg.content_subtype = "html"  # Main content is now text/html
         return msg
 
-    # def send_mail(self, template_prefix, email, context):
-    #     msg = self.render_mail(template_prefix, email, context)
-    #     msg.send()
+    def send_mail(self, template_prefix, email, context):
+        if template_prefix == 'account/email/password_reset_key':
+            user = filter_users_by_email(email, is_active=True)[0]
+            temp_key = self.default_token_generator.make_token(user)
+            path = reverse(
+                "account_reset_password_from_key",
+                kwargs=dict(uidb36=user_pk_to_url_str(user), key=temp_key),
+            )
+            url = build_absolute_uri(request=None, path=path)
+            send_reset_password_email(to_email=email, reset_password_url=url)
+        else:
+            super.send_mail(template_prefix, email, context)
+
+    def send_confirmation_mail(self, request, emailconfirmation, signup):
+        # We assume signup is always True
+        send_signup_email(
+            to_email=emailconfirmation.email_address.email, 
+            email_confirmation_url=self.get_email_confirmation_url(request, emailconfirmation)
+        )
 
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
