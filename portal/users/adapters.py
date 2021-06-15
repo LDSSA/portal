@@ -70,7 +70,7 @@ class AccountAdapter(DefaultAccountAdapter):
                 "account_reset_password_from_key",
                 kwargs=dict(uidb36=user_pk_to_url_str(user), key=temp_key),
             )
-            url = build_absolute_uri(request=None, path=path)
+            url = build_absolute_uri(request=None, location=path)
             send_reset_password_email(to_email=email, reset_password_url=url)
         else:
             super.send_mail(template_prefix, email, context)
@@ -78,7 +78,7 @@ class AccountAdapter(DefaultAccountAdapter):
     def send_confirmation_mail(self, request, emailconfirmation, signup):
         # We assume signup is always True
         send_signup_email(
-            to_email=emailconfirmation.email_address.email, 
+            to_email=emailconfirmation.email_address.email,
             email_confirmation_url=self.get_email_confirmation_url(request, emailconfirmation)
         )
 
