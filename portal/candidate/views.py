@@ -181,16 +181,14 @@ class CandidateBeforeCodingTestView(
     template_name = "candidate_templates/before_coding_test.html"
 
     def get_context_data(self, **kwargs):
-        ctx = (
-            {
+        ctx = {
                 "coding_test_duration_hours": str(
                     config.ADMISSIONS_CODING_TEST_DURATION
                 ),
                 "coding_test_subtype": Challenge.objects.get(
                     code="coding_test"
                 ),
-            },
-        )
+        }
         return super().get_context_data(**ctx)
 
     def post(self, request, *args, **kwargs):
