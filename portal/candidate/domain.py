@@ -1,5 +1,8 @@
 from typing import Dict, NamedTuple, Optional
 
+import nbformat
+import nbconvert
+
 from portal.applications.domain import ApplicationStatus
 from portal.applications.domain import Domain as ApplicationsDomain
 from portal.applications.domain import SubmissionStatus
@@ -8,6 +11,14 @@ from portal.selection.domain import SelectionDomain
 from portal.selection.models import Selection
 from portal.selection.status import SelectionStatusType
 from portal.users.models import User
+
+
+def notebook_to_html(nb):
+    nb = nbformat.reads(nb, as_version=4)
+    html_exporter = nbconvert.HTMLExporter()
+    html_exporter.template_name = "classic"
+    body, _ = html_exporter.from_notebook_node(nb)
+    return body
 
 
 class CandidateState(NamedTuple):

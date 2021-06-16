@@ -25,7 +25,7 @@ from portal.applications.models import (
     Challenge,
     Submission,
 )
-from portal.candidate.domain import Domain as CandidateDomain
+from portal.candidate.domain import Domain as CandidateDomain, notebook_to_html
 from portal.admissions import emails
 from portal.selection.domain import SelectionDomain
 from portal.selection.models import Selection, SelectionDocument
@@ -98,26 +98,26 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):
         first_name = self.request.user.name.split(" ")[0]
 
         ctx = {
-                "user": self.request.user,
-                "state": state,
-                "selection_status_values": SelectionStatus,
-                "action_point": action_point,
-                "first_name": first_name,
-                "portal_status": config.PORTAL_STATUS,
-                "applications_open_datetime": config.ADMISSIONS_APPLICATIONS_START.strftime(
-                    "%Y-%m-%d %H:%M"
-                ),
-                "applications_close_datetime": config.ADMISSIONS_SELECTION_START.strftime(
-                    "%Y-%m-%d %H:%M"
-                ),
-                "applications_close_date": config.ADMISSIONS_SELECTION_START.strftime(
-                    "%Y-%m-%d"
-                ),
-                "coding_test_duration": str(
-                    config.ADMISSIONS_CODING_TEST_DURATION
-                ),
-                "accordion_enabled_status": accordion_enabled_status,
-            }
+            "user": self.request.user,
+            "state": state,
+            "selection_status_values": SelectionStatus,
+            "action_point": action_point,
+            "first_name": first_name,
+            "portal_status": config.PORTAL_STATUS,
+            "applications_open_datetime": config.ADMISSIONS_APPLICATIONS_START.strftime(
+                "%Y-%m-%d %H:%M"
+            ),
+            "applications_close_datetime": config.ADMISSIONS_SELECTION_START.strftime(
+                "%Y-%m-%d %H:%M"
+            ),
+            "applications_close_date": config.ADMISSIONS_SELECTION_START.strftime(
+                "%Y-%m-%d"
+            ),
+            "coding_test_duration": str(
+                config.ADMISSIONS_CODING_TEST_DURATION
+            ),
+            "accordion_enabled_status": accordion_enabled_status,
+        }
         return super().get_context_data(**ctx)
 
 
@@ -181,7 +181,8 @@ class CandidateBeforeCodingTestView(
     template_name = "candidate_templates/before_coding_test.html"
 
     def get_context_data(self, **kwargs):
-        ctx = {
+        ctx = (
+            {
                 "coding_test_duration_hours": str(
                     config.ADMISSIONS_CODING_TEST_DURATION
                 ),
@@ -189,6 +190,7 @@ class CandidateBeforeCodingTestView(
                     code="coding_test"
                 ),
             },
+        )
         return super().get_context_data(**ctx)
 
     def post(self, request, *args, **kwargs):
@@ -330,7 +332,7 @@ class SubmissionFeedbackDownloadView(AdmissionsViewMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
         try:
-            return FileResponse(obj.feedback)
+            return HttpResponse(notebook_to_html(obj.feedback.read()))
         except ValueError:
             raise Http404
 

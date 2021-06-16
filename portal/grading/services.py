@@ -11,7 +11,7 @@ from rest_framework.reverse import reverse
 
 
 logger = logging.getLogger(__name__)
-pattern = re.compile('[^a-zA-Z0-9-]+')
+pattern = re.compile("[^a-zA-Z0-9-]+")
 
 
 class Grading:
@@ -122,7 +122,7 @@ class AcademyGradingMixin:
         id_ = "".join(random.choices(string.ascii_lowercase, k=8))
         username = self.grade.user.username.lower()[:50]
         name = f"{self.grade.unit.code.lower()}-{username}-{id_}"
-        return pattern.sub('', name)
+        return pattern.sub("", name)
 
     def get_env(self):
         grader = get_user_model().objects.get(

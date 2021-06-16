@@ -44,7 +44,7 @@ DJANGO_SECURITY_EXTRAS=False
 # EMAIL
 # ------------------------------------------------------------------------------
 DJANGO_DEFAULT_FROM_EMAIL=notifications@lisbondatascience.org
-DJANGO_EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+DJANGO_EMAIL_BACKEND=portal.anymail_elasticmail.smtp.PortalEmailBackend
 # ADMIN
 # ------------------------------------------------------------------------------
 # django-allauth

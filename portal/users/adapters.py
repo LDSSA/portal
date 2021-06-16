@@ -16,7 +16,10 @@ from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.urls import reverse
 
 from portal.users.models import UserWhitelist
-from portal.admissions.emails import send_signup_email, send_reset_password_email
+from portal.admissions.emails import (
+    send_signup_email,
+    send_reset_password_email,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -63,7 +66,7 @@ class AccountAdapter(DefaultAccountAdapter):
         return msg
 
     def send_mail(self, template_prefix, email, context):
-        if template_prefix == 'account/email/password_reset_key':
+        if template_prefix == "account/email/password_reset_key":
             user = filter_users_by_email(email, is_active=True)[0]
             temp_key = self.default_token_generator.make_token(user)
             path = reverse(
@@ -79,7 +82,9 @@ class AccountAdapter(DefaultAccountAdapter):
         # We assume signup is always True
         send_signup_email(
             to_email=emailconfirmation.email_address.email,
-            email_confirmation_url=self.get_email_confirmation_url(request, emailconfirmation)
+            email_confirmation_url=self.get_email_confirmation_url(
+                request, emailconfirmation
+            ),
         )
 
 
