@@ -1,5 +1,6 @@
 import logging
 import random
+import re
 import string
 import subprocess
 from urllib.parse import urljoin, unquote
@@ -10,6 +11,7 @@ from rest_framework.reverse import reverse
 
 
 logger = logging.getLogger(__name__)
+pattern = re.compile('[^a-zA-Z0-9-]+')
 
 
 class Grading:
@@ -118,8 +120,9 @@ class AcademyGradingMixin:
 
     def get_name(self):
         id_ = "".join(random.choices(string.ascii_lowercase, k=8))
-        name = f"{self.grade.unit.code.lower()}-{self.grade.user.username.lower()}-{id_}"
-        return name.replace('_', '-')
+        username = self.grade.user.username.lower()[:50]
+        name = f"{self.grade.unit.code.lower()}-{username}-{id_}"
+        return pattern.sub('', name)
 
     def get_env(self):
         grader = get_user_model().objects.get(
