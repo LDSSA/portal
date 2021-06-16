@@ -288,7 +288,10 @@ class AssignmentDownloadView(AdmissionsCandidateViewMixin, TemplateView):
             raise Http404
 
         obj = Challenge.objects.get(code=assignment_id)
-        return FileResponse(obj.file)
+        try:
+            return FileResponse(obj.file)
+        except ValueError:
+            raise Http404
 
 
 class SluView(AdmissionsCandidateViewMixin, TemplateView):
@@ -344,7 +347,10 @@ class SubmissionDownloadView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        return FileResponse(obj.notebook)
+        try:
+            return FileResponse(obj.notebook)
+        except ValueError:
+            raise Http404
 
 
 class SubmissionFeedbackDownloadView(generic.DetailView):
@@ -355,7 +361,10 @@ class SubmissionFeedbackDownloadView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        return FileResponse(obj.feedback)
+        try:
+            return FileResponse(obj.feedback)
+        except ValueError:
+            raise Http404
 
 
 class CandidatePaymentView(generic.DetailView):
@@ -408,7 +417,10 @@ class SelectionDocumentDownloadView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        return FileResponse(obj.doc)
+        try:
+            return FileResponse(obj.doc)
+        except ValueError:
+            raise Http404
 
 
 class SelectionDocumentUploadView(generic.DetailView):
