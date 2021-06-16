@@ -105,9 +105,17 @@ class AdmissionsCandidateMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
+class AdmissionsViewMixin(
+    LoginRequiredMixin,
+    AdmissionsOngoingMixin,
+):
+    pass
+
+
 class AdmissionsCandidateViewMixin(
     LoginRequiredMixin,
     AdmissionsOngoingMixin,
+    AdmissionsCandidateMixin,
 ):
     pass
 

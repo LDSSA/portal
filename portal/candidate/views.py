@@ -36,6 +36,7 @@ from portal.selection.status import SelectionStatus
 from portal.users.views import (
     AdmissionsCandidateViewMixin,
     CandidateAcceptedCoCMixin,
+    AdmissionsViewMixin,
 )
 
 
@@ -277,7 +278,7 @@ class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         return HttpResponse(template.render(ctx, request))
 
 
-class AssignmentDownloadView(AdmissionsCandidateViewMixin, TemplateView):
+class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         assignment_id = kwargs.get("pk")
         application = Application.objects.get(user=request.user)
@@ -311,7 +312,7 @@ class SluView(AdmissionsCandidateViewMixin, TemplateView):
         return HttpResponse(template.render(ctx, request))
 
 
-class SubmissionView(generic.View):
+class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
     """Submit challenges"""
 
     def post(self, request, *args, **kwargs):
@@ -337,7 +338,7 @@ class SubmissionView(generic.View):
         )
 
 
-class SubmissionDownloadView(generic.DetailView):
+class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):
     queryset = Submission.objects.all()
 
     def get_queryset(self):
@@ -353,7 +354,7 @@ class SubmissionDownloadView(generic.DetailView):
             raise Http404
 
 
-class SubmissionFeedbackDownloadView(generic.DetailView):
+class SubmissionFeedbackDownloadView(AdmissionsViewMixin, generic.DetailView):
     queryset = Submission.objects.all()
 
     def get_queryset(self):
@@ -367,7 +368,7 @@ class SubmissionFeedbackDownloadView(generic.DetailView):
             raise Http404
 
 
-class CandidatePaymentView(generic.DetailView):
+class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         try:
             selection = request.user.selection
@@ -406,7 +407,7 @@ class CandidatePaymentView(generic.DetailView):
         return HttpResponseRedirect(reverse("admissions:candidate:payment"))
 
 
-class SelectionDocumentDownloadView(generic.DetailView):
+class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")
 
@@ -423,7 +424,7 @@ class SelectionDocumentDownloadView(generic.DetailView):
             raise Http404
 
 
-class SelectionDocumentUploadView(generic.DetailView):
+class SelectionDocumentUploadView(AdmissionsViewMixin, generic.DetailView):
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")
     document_type = None
