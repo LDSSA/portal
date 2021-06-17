@@ -6,13 +6,25 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('applications', '0013_alter_application_application_over_email_sent'),
+        ("applications", "0013_alter_application_application_over_email_sent"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='submission',
-            name='status',
-            field=models.CharField(choices=[('never-submitted', 'Unsubmitted'), ('sent', 'Sent'), ('grading', 'Grading'), ('failed', 'Grading failed'), ('out-of-date', 'Out-of-date'), ('checksum-failed', 'Checksum verification failed'), ('graded', 'Graded')], default='never-submitted', max_length=1024),
+            model_name="submission",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("never-submitted", "Unsubmitted"),
+                    ("sent", "Sent"),
+                    ("grading", "Grading"),
+                    ("failed", "Grading failed"),
+                    ("out-of-date", "Out-of-date"),
+                    ("checksum-failed", "Checksum verification failed"),
+                    ("graded", "Graded"),
+                ],
+                default="never-submitted",
+                max_length=1024,
+            ),
         ),
     ]

@@ -182,12 +182,10 @@ class CandidateBeforeCodingTestView(
 
     def get_context_data(self, **kwargs):
         ctx = {
-                "coding_test_duration_hours": str(
-                    config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600
-                ),
-                "coding_test_subtype": Challenge.objects.get(
-                    code="coding_test"
-                ),
+            "coding_test_duration_hours": str(
+                config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600
+            ),
+            "coding_test_subtype": Challenge.objects.get(code="coding_test"),
         }
         return super().get_context_data(**ctx)
 
