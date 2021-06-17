@@ -46,9 +46,7 @@ class AccountAdapter(DefaultAccountAdapter):
 
         from_email = self.get_from_email()
 
-        logger.info(template_prefix)
         template_name = "{0}_message.{1}".format(template_prefix, "txt")
-        logger.info(template_name)
         body = render_to_string(
             template_name,
             context,
@@ -73,7 +71,9 @@ class AccountAdapter(DefaultAccountAdapter):
                 "account_reset_password_from_key",
                 kwargs=dict(uidb36=user_pk_to_url_str(user), key=temp_key),
             )
-            url = build_absolute_uri(request=None, location=path)
+            url = build_absolute_uri(
+                request=getattr(self, "request", None), location=path
+            )
             send_reset_password_email(to_email=email, reset_password_url=url)
         else:
             super.send_mail(template_prefix, email, context)
