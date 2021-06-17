@@ -27,14 +27,20 @@ class UserRequiredFieldsMixin:
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
-            if config.PORTAL_STATUS.startswith('admissions'):
-                required_fields = self.required_admissions_fields
-            elif config.PORTAL_STATUS.startswith('academy'):
+            if config.PORTAL_STATUS.startswith("admissions"):
+                if request.user.is_staff:
+                    required_fields = []
+                else:
+                    required_fields = self.required_admissions_fields
+            elif config.PORTAL_STATUS.startswith("academy"):
                 required_fields = self.required_academy_fields
-            if any(
-                getattr(request.user, field) == ""
+            missing_fields = [
+                field
                 for field in required_fields
-            ):
+                if getattr(request.user, field) == ""
+            ]
+            if missing_fields:
+                logger.info("Missing fields %s", missing_fields)
                 return redirect("users:profile")
 
         return super().dispatch(request, *args, **kwargs)
@@ -105,9 +111,17 @@ class AdmissionsCandidateMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
+class AdmissionsViewMixin(
+    LoginRequiredMixin,
+    AdmissionsOngoingMixin,
+):
+    pass
+
+
 class AdmissionsCandidateViewMixin(
     LoginRequiredMixin,
     AdmissionsOngoingMixin,
+    AdmissionsCandidateMixin,
 ):
     pass
 

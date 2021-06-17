@@ -399,7 +399,9 @@ EMAIL_BACKEND = env(
 DEFAULT_FROM_EMAIL = env(
     "DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org"
 )
-ADMISSIONS_FROM_EMAIL = env('ADMISSIONS_FROM_EMAIL', default="admissions@lisbondatascience.org")
+ADMISSIONS_FROM_EMAIL = env(
+    "ADMISSIONS_FROM_EMAIL", default="admissions@lisbondatascience.org"
+)
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
@@ -407,7 +409,10 @@ EMAIL_SUBJECT_PREFIX = env(
     "DJANGO_EMAIL_SUBJECT_PREFIX", default="[LDSSA Portal]"
 )
 
-if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend":
+if EMAIL_BACKEND in (
+    "django.core.mail.backends.smtp.EmailBackend",
+    "portal.anymail_elasticmail.smtp.PortalEmailBackend",
+):
     if DEBUG:
         # https://docs.djangoproject.com/en/dev/ref/settings/#email-host
         EMAIL_HOST = env("EMAIL_HOST", default="mailhog")
@@ -570,7 +575,14 @@ if SENTRY_DSN:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
 
-    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()])
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=0.25,
+        # If you wish to associate users to errors (assuming you are using
+        # django.contrib.auth) you may enable sending PII data.
+        send_default_pii=True,
+    )
 
 # LOGGING
 # ------------------------------------------------------------------------------

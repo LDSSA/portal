@@ -60,4 +60,4 @@ def update_portal_status():
 
     elif config.PORTAL_STATUS == "admissions:selection":
         if dt >= config.ACADEMY_START:
-            config.PORTAL_STATUS = "admissions:academy"
+            config.PORTAL_STATUS = "academy"
