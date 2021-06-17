@@ -47,8 +47,12 @@ class Submission(models.Model):
 
     # From grading
     STATUSES = (
+        ("never-submitted", "Unsubmitted"),
+        ("sent", "Sent"),
         ("grading", "Grading"),
         ("failed", "Grading failed"),
+        ("out-of-date", "Out-of-date"),
+        ("checksum-failed", "Checksum verification failed"),
         ("graded", "Graded"),
     )
     status = models.CharField(
