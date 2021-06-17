@@ -183,7 +183,7 @@ class CandidateBeforeCodingTestView(
     def get_context_data(self, **kwargs):
         ctx = {
                 "coding_test_duration_hours": str(
-                    config.ADMISSIONS_CODING_TEST_DURATION
+                    config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600
                 ),
                 "coding_test_subtype": Challenge.objects.get(
                     code="coding_test"
@@ -238,7 +238,7 @@ class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         ctx = {
             **submission_view_ctx(application, submission_type_),
             "coding_test_duration_hours": str(
-                config.ADMISSIONS_CODING_TEST_DURATION
+                config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600
             ),
         }
         template = loader.get_template(
