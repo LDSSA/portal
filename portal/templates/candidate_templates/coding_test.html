@@ -108,7 +108,7 @@
 </div>
 
 <script>
-    var testDurationHours = {{ coding_test_duration_hours.hours }}; // TODO: Update this!!!
+    var testDurationHours = {{ coding_test_duration_hours }};
     var testStartedAt = {{ coding_test_started_at_ms }};
     var yourDateToGo = new Date(testStartedAt + testDurationHours * 60 * 60 * 1000);
     var timing = setInterval(
