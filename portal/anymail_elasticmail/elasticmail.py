@@ -89,7 +89,7 @@ class ElasticmailV4Payload(RequestsPayload):
             },
             "Options": {
                 "TrackOpens": "true",
-                "TrackClicks": "true",
+                "TrackClicks": "false",
             },
         }
         # self.files = []
