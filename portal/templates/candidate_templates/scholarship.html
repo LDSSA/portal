@@ -4,8 +4,7 @@
 
 <div class="container">
     <h2 class="py-5">Scholarships</h2>
-
-    {% if decision_made %}
+    {% if scholarship_decided %}
       {% if applying_for_scholarship %}
         <div class="alert alert-success text-justify" role="alert">
           You are applying for a scholarship!
@@ -71,7 +70,7 @@
     <br>
   </div>
 
-  {% if not decision_made %}
+  {% if not scholarship_decided %}
     <div class="jumbotron p-3">
         <p>
           Do you want to apply for a scholarship?

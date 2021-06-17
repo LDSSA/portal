@@ -25,8 +25,7 @@ from portal.applications.models import (
     Challenge,
     Submission,
 )
-from portal.candidate.domain import Domain as CandidateDomain
-from portal.candidate.helpers import build_context
+from portal.candidate.domain import Domain as CandidateDomain, notebook_to_html
 from portal.admissions import emails
 from portal.selection.domain import SelectionDomain
 from portal.selection.models import Selection, SelectionDocument
@@ -36,6 +35,7 @@ from portal.selection.status import SelectionStatus
 from portal.users.views import (
     AdmissionsCandidateViewMixin,
     CandidateAcceptedCoCMixin,
+    AdmissionsViewMixin,
 )
 
 
@@ -97,30 +97,27 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):
 
         first_name = self.request.user.name.split(" ")[0]
 
-        ctx = build_context(
-            self.request.user,
-            {
-                "user": self.request.user,
-                "state": state,
-                "selection_status_values": SelectionStatus,
-                "action_point": action_point,
-                "first_name": first_name,
-                "portal_status": config.PORTAL_STATUS,
-                "applications_open_datetime": config.ADMISSIONS_APPLICATIONS_START.strftime(
-                    "%Y-%m-%d %H:%M"
-                ),
-                "applications_close_datetime": config.ADMISSIONS_SELECTION_START.strftime(
-                    "%Y-%m-%d %H:%M"
-                ),
-                "applications_close_date": config.ADMISSIONS_SELECTION_START.strftime(
-                    "%Y-%m-%d"
-                ),
-                "coding_test_duration": str(
-                    config.ADMISSIONS_CODING_TEST_DURATION
-                ),
-                "accordion_enabled_status": accordion_enabled_status,
-            },
-        )
+        ctx = {
+            "user": self.request.user,
+            "state": state,
+            "selection_status_values": SelectionStatus,
+            "action_point": action_point,
+            "first_name": first_name,
+            "portal_status": config.PORTAL_STATUS,
+            "applications_open_datetime": config.ADMISSIONS_APPLICATIONS_START.strftime(
+                "%Y-%m-%d %H:%M"
+            ),
+            "applications_close_datetime": config.ADMISSIONS_SELECTION_START.strftime(
+                "%Y-%m-%d %H:%M"
+            ),
+            "applications_close_date": config.ADMISSIONS_SELECTION_START.strftime(
+                "%Y-%m-%d"
+            ),
+            "coding_test_duration": str(
+                config.ADMISSIONS_CODING_TEST_DURATION
+            ),
+            "accordion_enabled_status": accordion_enabled_status,
+        }
         return super().get_context_data(**ctx)
 
 
@@ -128,10 +125,6 @@ class ContactView(AdmissionsCandidateViewMixin, TemplateView):
     """Send email to site admins"""
 
     template_name = "candidate_templates/contactus.html"
-
-    def get_context_data(self, **kwargs):
-        ctx = build_context(self.request.user)
-        return super().get_context_data(**ctx)
 
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -152,21 +145,13 @@ class ContactView(AdmissionsCandidateViewMixin, TemplateView):
         template = loader.get_template(
             "./candidate_templates/contactus-success.html"
         )
-        ctx = build_context(request.user)
-        return HttpResponse(template.render(ctx, request))
+        return HttpResponse(template.render({}, request))
 
 
 class CodeOfConductView(AdmissionsCandidateViewMixin, TemplateView):
     """View and accept code of conduct"""
 
     template_name = "candidate_templates/code_of_conduct.html"
-
-    def get_context_data(self, **kwargs):
-        user = self.request.user
-        ctx = build_context(
-            user, {"code_of_conduct_accepted": user.code_of_conduct_accepted}
-        )
-        return super().get_context_data(**ctx)
 
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -182,17 +167,6 @@ class ScholarshipView(
 
     template_name = "candidate_templates/scholarship.html"
 
-    def get_context_data(self, **kwargs):
-        user = self.request.user
-        ctx = build_context(
-            self.request.user,
-            {
-                "decision_made": user.applying_for_scholarship is not None,
-                "applying_for_scholarship": user.applying_for_scholarship,
-            },
-        )
-        return super().get_context_data(**ctx)
-
     def post(self, request, *args, **kwargs):
         user = request.user
         user.applying_for_scholarship = request.POST["decision"] == "yes"
@@ -207,17 +181,14 @@ class CandidateBeforeCodingTestView(
     template_name = "candidate_templates/before_coding_test.html"
 
     def get_context_data(self, **kwargs):
-        ctx = build_context(
-            self.request.user,
-            {
+        ctx = {
                 "coding_test_duration_hours": str(
                     config.ADMISSIONS_CODING_TEST_DURATION
                 ),
                 "coding_test_subtype": Challenge.objects.get(
                     code="coding_test"
                 ),
-            },
-        )
+        }
         return super().get_context_data(**ctx)
 
     def post(self, request, *args, **kwargs):
@@ -264,20 +235,19 @@ class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
             )
 
         submission_type_ = Challenge.objects.get(code="coding_test")
-        sub_view_ctx = {
+        ctx = {
             **submission_view_ctx(application, submission_type_),
             "coding_test_duration_hours": str(
                 config.ADMISSIONS_CODING_TEST_DURATION
             ),
         }
-        ctx = build_context(request.user, sub_view_ctx)
         template = loader.get_template(
             "./candidate_templates/coding_test.html"
         )
         return HttpResponse(template.render(ctx, request))
 
 
-class AssignmentDownloadView(AdmissionsCandidateViewMixin, TemplateView):
+class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         assignment_id = kwargs.get("pk")
         application = Application.objects.get(user=request.user)
@@ -288,7 +258,10 @@ class AssignmentDownloadView(AdmissionsCandidateViewMixin, TemplateView):
             raise Http404
 
         obj = Challenge.objects.get(code=assignment_id)
-        return FileResponse(obj.file)
+        try:
+            return FileResponse(obj.file)
+        except ValueError:
+            raise Http404
 
 
 class SluView(AdmissionsCandidateViewMixin, TemplateView):
@@ -301,14 +274,12 @@ class SluView(AdmissionsCandidateViewMixin, TemplateView):
 
         application, _ = Application.objects.get_or_create(user=request.user)
         challenge = Challenge.objects.get(code=kwargs["pk"])
-        ctx = build_context(
-            request.user, submission_view_ctx(application, challenge)
-        )
+        ctx = submission_view_ctx(application, challenge)
         template = loader.get_template("./candidate_templates/slu.html")
         return HttpResponse(template.render(ctx, request))
 
 
-class SubmissionView(generic.View):
+class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
     """Submit challenges"""
 
     def post(self, request, *args, **kwargs):
@@ -334,7 +305,7 @@ class SubmissionView(generic.View):
         )
 
 
-class SubmissionDownloadView(generic.DetailView):
+class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):
     queryset = Submission.objects.all()
 
     def get_queryset(self):
@@ -344,10 +315,13 @@ class SubmissionDownloadView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        return FileResponse(obj.notebook)
+        try:
+            return FileResponse(obj.notebook)
+        except ValueError:
+            raise Http404
 
 
-class SubmissionFeedbackDownloadView(generic.DetailView):
+class SubmissionFeedbackDownloadView(AdmissionsViewMixin, generic.DetailView):
     queryset = Submission.objects.all()
 
     def get_queryset(self):
@@ -355,10 +329,13 @@ class SubmissionFeedbackDownloadView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        return FileResponse(obj.feedback)
+        try:
+            return HttpResponse(notebook_to_html(obj.feedback.read()))
+        except ValueError:
+            raise Http404
 
 
-class CandidatePaymentView(generic.DetailView):
+class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         try:
             selection = request.user.selection
@@ -382,8 +359,6 @@ class CandidatePaymentView(generic.DetailView):
             "payment_proofs": payment_proofs,
             "student_ids": student_ids,
         }
-        context = build_context(request.user, context)
-
         return HttpResponse(template.render(context, request))
 
     def post(self, request, *args, **kwargs):
@@ -397,7 +372,7 @@ class CandidatePaymentView(generic.DetailView):
         return HttpResponseRedirect(reverse("admissions:candidate:payment"))
 
 
-class SelectionDocumentDownloadView(generic.DetailView):
+class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")
 
@@ -408,10 +383,13 @@ class SelectionDocumentDownloadView(generic.DetailView):
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        return FileResponse(obj.doc)
+        try:
+            return FileResponse(obj.doc)
+        except ValueError:
+            raise Http404
 
 
-class SelectionDocumentUploadView(generic.DetailView):
+class SelectionDocumentUploadView(AdmissionsViewMixin, generic.DetailView):
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")
     document_type = None

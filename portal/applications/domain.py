@@ -137,7 +137,7 @@ class Domain:
 
     @classmethod
     def can_add_submission(cls, application, challenge):
-        if config.PORTAL_STATUS != 'admissions:applications':
+        if config.PORTAL_STATUS != "admissions:applications":
             return False
 
         if (

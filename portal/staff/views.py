@@ -1,6 +1,7 @@
 import csv
 from datetime import datetime, timedelta, timezone
 from logging import getLogger
+from portal.candidate.domain import notebook_to_html
 from typing import Any, Dict
 
 from dateutil import tz
@@ -407,7 +408,7 @@ class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):
             raise Http404
 
         try:
-            return FileResponse(submission.feedback)
+            return FileResponse(notebook_to_html(submission.feedback.read()))
         except ValueError:
             raise Http404
 

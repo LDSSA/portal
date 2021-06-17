@@ -149,7 +149,7 @@ def send_selected_interview_details(to_email, to_name):
 def send_contact_us_email(from_email, user_name, user_url, message):
     email = EmailMessage(
         to=["admissions@lisbondatascience.org"],
-        reply_to=from_email,
+        reply_to=[from_email],
         subject=f"[Admissions Portal] Support request from {from_email}",
     )
     email.template_id = "Admissions - contact us"
