@@ -111,7 +111,7 @@ class ElasticmailV4Payload(RequestsPayload):
         type_map = {
             "to": "To",
             "cc": "CC",
-            "BCC": "BCC",
+            "bcc": "BCC",
         }
         self.data["Recipients"][type_map[recipient_type]].append(email.address)
 
