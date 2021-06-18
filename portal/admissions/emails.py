@@ -5,7 +5,7 @@ from django.core.mail import EmailMessage
 def send_signup_email(to_email, email_confirmation_url):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         subject="Action needed: Confirm your email address",
     )
     email.template_id = "Admissions - confirm email"
@@ -16,7 +16,7 @@ def send_signup_email(to_email, email_confirmation_url):
 def send_reset_password_email(to_email, reset_password_url):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         subject="Reset your Password on the LDSSA Admissions Portal",
     )
     email.template_id = "Admissions - forgot password"
@@ -27,7 +27,7 @@ def send_reset_password_email(to_email, reset_password_url):
 def send_application_is_over_passed(to_email, to_name):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="Keep your fingers crossed!",
     )
@@ -39,7 +39,7 @@ def send_application_is_over_passed(to_email, to_name):
 def send_application_is_over_failed(to_email, to_name):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="Sorry! Try again next year",
     )
@@ -51,7 +51,7 @@ def send_application_is_over_failed(to_email, to_name):
 def send_admissions_are_over_not_selected(to_email, to_name):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="Sorry! Try again next year",
     )
@@ -65,7 +65,7 @@ def send_selected_and_payment_details(
 ):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="You’re ALMOST IN!",
     )
@@ -81,7 +81,7 @@ def send_selected_and_payment_details(
 def send_payment_accepted_proof_email(to_email, to_name, *, message):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="You’re IN!",
     )
@@ -95,7 +95,7 @@ def send_payment_need_additional_proof_email(
 ):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="You’re ALMOST IN!",
     )
@@ -107,7 +107,7 @@ def send_payment_need_additional_proof_email(
 def send_payment_refused_proof_email(to_email, to_name, *, message):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="Oh no! There was something wrong here...",
     )
@@ -121,7 +121,7 @@ def send_interview_passed_email(
 ):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="The results are out - You’ve made it!",
     )
@@ -137,7 +137,7 @@ def send_interview_passed_email(
 def send_interview_failed_email(to_email: str, to_name: str, *, message: str):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="Update on your LDSSA scholarship interview",
     )
@@ -149,7 +149,7 @@ def send_interview_failed_email(to_email: str, to_name: str, *, message: str):
 def send_selected_interview_details(to_email, to_name):
     email = EmailMessage(
         to=[to_email],
-        bcc=[to_email],
+        bcc=['admissions@lisbondatascience.org'],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="LDSSA scholarship interview details",
     )
