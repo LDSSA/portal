@@ -170,7 +170,8 @@ class ScholarshipView(
     def post(self, request, *args, **kwargs):
         user = request.user
         user.applying_for_scholarship = request.POST["decision"] == "yes"
-        user.ticket_type = TicketType.scholarship
+        if user.applying_for_scholarship:
+            user.ticket_type = TicketType.scholarship
         user.save()
         return redirect("admissions:candidate:home")
 
