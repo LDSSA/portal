@@ -11,7 +11,7 @@
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
 
-                <div class="form-group">                    
+                <div class="form-group">
                     <label for="id_full_name">Full name</label>
                     <input type="text" class="form-control" name="full_name" maxlength="100" id="id_full_name" placeholder="John Doe" value="{{profile.full_name}}" required>
                 </div>
@@ -36,7 +36,7 @@
                     <p class="text-muted"><i>
                         If you chose a student ticket, you'll need to show us a valid student card at payment time.<br>
                         To issue an invoice to a company, you must select the company ticket.<br>
-                        Find all the information about our fees <a href="https://github.com/LDSSA/wiki/wiki/Application-process#fees">here</a>.
+                        Find all the information about our fees <a href="https://ldssa.github.io/wiki/Applicants/Application-process/">here</a>.
                     </i></p>
                     <select class="form-control" name="ticket_type" id="id_ticket_type"required>
                         <option value="" {% if not profile.ticket_type %}selected{% endif %}>---------</option>
