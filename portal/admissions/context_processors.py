@@ -26,8 +26,7 @@ def admissions_context_processor(request):
                 "code_of_conduct_accepted": request.user.code_of_conduct_accepted,
                 "scholarship_decided": request.user.applying_for_scholarship
                 is not None,
-                "applying_for_scholarship": request.user.applying_for_scholarship
-                is not None,
+                "applying_for_scholarship": request.user.applying_for_scholarship,
                 "user_has_payment": user_has_payment(request.user),
             }
         )
