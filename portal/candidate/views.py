@@ -10,7 +10,7 @@ from django.http import (
     HttpResponse,
     HttpResponseRedirect,
 )
-from django.http.response import FileResponse
+from django.http.response import FileResponse, HttpResponseBadRequest
 from django.shortcuts import redirect
 from django.template import loader
 from django.urls import reverse
@@ -18,7 +18,7 @@ from django.views import generic
 from django.views.generic import TemplateView
 from rest_framework.settings import import_string
 
-from portal.applications.domain import Domain, DomainException, Status
+from portal.applications.domain import Domain, Status
 from portal.users.models import TicketType
 from portal.applications.models import (
     Application,
@@ -287,7 +287,7 @@ class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
         challenge = Challenge.objects.get(code=pk)
 
         if not Domain.can_add_submission(request.user.application, challenge):
-            raise DomainException("Can't add submission")
+            raise HttpResponseBadRequest("Can't add submission")
 
         sub = Submission.objects.create(
             application=request.user.application,
