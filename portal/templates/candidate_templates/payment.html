@@ -118,7 +118,7 @@
             <div class="card-body">
                 <h5 class="card-title">Uploaded</h5>
                 {% for doc in student_ids %}
-                <p><a href="{% url 'admissions:candidate:payment-document-download' doc.id %}" class="card-link">{{ doc.filename }}</a></p>
+                <p><a href="{% url 'admissions:candidate:payment-document-download' doc.id %}" class="card-link">{{ doc.doc.name }}</a></p>
                 {% endfor %}
             </div>
             {% endif %}
