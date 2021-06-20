@@ -381,7 +381,7 @@ class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):
     def get_queryset(self):
         if self.request.user.is_staff:
             return super().get_queryset()
-        return super().get_queryset().filter(user=self.request.user)
+        return super().get_queryset().filter(user=self.request.user.selection)
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
