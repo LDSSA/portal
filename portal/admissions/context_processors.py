@@ -1,5 +1,5 @@
 from constance import config
-from django.config import settings
+from django.conf import settings
 
 from portal.selection.models import Selection
 from portal.users.models import User
