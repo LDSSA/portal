@@ -303,7 +303,7 @@
                         See all the details in the <a href="{% url 'admissions:candidate:payment' %}">payments page</a>.
                     {% elif state.selection_status == selection_status_values.TO_BE_ACCEPTED %}
                         We're analysing your payment proof. We'll get back to you ASAP!
-                        You can follow your payment process in the <a href="{% url 'admissions:/candidate:payment' %}">payments page</a>.
+                        You can follow your payment process in the <a href="{% url 'admissions:candidate:payment' %}">payments page</a>.
                     {% elif state.selection_status == selection_status_values.ACCEPTED %}
                         Your payment has been accepted! Welcome to <b>Batch 5</b> of the Lisbon Data Science Starters Academy!
                     {% elif state.selection_status == selection_status_values.REJECTED %}
