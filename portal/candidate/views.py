@@ -224,7 +224,7 @@ def submission_view_ctx(application, challenge) -> Dict[str, Any]:
 
 class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
     def get(self, request, *args, **kwargs):
-        if config.PORTAL_STATUS != "admissions:applications":
+        if config.PORTAL_STATUS not in settings.ADMISSIONS_APPLICATIONS_STARTED_STATUSES:
             return HttpResponseRedirect(reverse("home"))
 
         application, _ = Application.objects.get_or_create(user=request.user)
@@ -268,7 +268,7 @@ class SluView(AdmissionsCandidateViewMixin, TemplateView):
         if kwargs["pk"] == "coding_test":
             raise Http404
 
-        if config.PORTAL_STATUS != "admissions:applications":
+        if config.PORTAL_STATUS not in settings.ADMISSIONS_APPLICATIONS_STARTED_STATUSES:
             return HttpResponseRedirect(reverse("home"))
 
         application, _ = Application.objects.get_or_create(user=request.user)

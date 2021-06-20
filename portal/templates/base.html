@@ -88,7 +88,7 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'admissions:candidate:scholarship' %}">Scholarships</a>
                 </li>
-                {% if PORTAL_STATUS == "admissions:applications" and scholarship_decided %}
+                {% if PORTAL_STATUS in ADMISSIONS_APPLICATIONS_STARTED_STATUSES and scholarship_decided %}
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                       Submissions

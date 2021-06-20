@@ -1,4 +1,5 @@
 from constance import config
+from django.config import settings
 
 from portal.selection.models import Selection
 from portal.users.models import User
@@ -22,6 +23,7 @@ def admissions_context_processor(request):
         "ADMISSIONS_CODING_TEST_DURATION_HOURS": str(
             config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600
         ),
+        "ADMISSIONS_APPLICATIONS_STARTED_STATUSES": settings.ADMISSIONS_APPLICATIONS_STARTED_STATUSES,
     }
     if request.user.is_authenticated:
         my_dict.update(
