@@ -18,7 +18,7 @@ from django.views import generic
 from django.views.generic import TemplateView
 from rest_framework.settings import import_string
 
-from portal.applications.domain import Domain, Status
+from portal.applications.domain import Domain, DomainException, Status
 from portal.users.models import TicketType
 from portal.applications.models import (
     Application,
@@ -285,6 +285,9 @@ class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
         # Send to grading
         pk = kwargs.get("pk")
         challenge = Challenge.objects.get(code=pk)
+
+        if not Domain.can_add_submission(request.user.application, challenge):
+            raise DomainException("Can't add submission")
 
         sub = Submission.objects.create(
             application=request.user.application,

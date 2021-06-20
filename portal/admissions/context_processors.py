@@ -19,6 +19,9 @@ def admissions_context_processor(request):
         "ADMISSIONS_APPLICATIONS_START": config.ADMISSIONS_APPLICATIONS_START,
         "ADMISSIONS_SELECTION_START": config.ADMISSIONS_SELECTION_START,
         "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": config.ADMISSIONS_ACCEPTING_PAYMENT_PROFS,
+        "ADMISSIONS_CODING_TEST_DURATION_HOURS": str(
+            config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600
+        ),
     }
     if request.user.is_authenticated:
         my_dict.update(

@@ -140,6 +140,18 @@ class Domain:
         if config.PORTAL_STATUS != "admissions:applications":
             return False
 
+        dt_now = datetime.now(timezone.utc)
+        start_dt = Domain.get_start_date(application, challenge)
+
+        if start_dt is None:
+            return False
+
+        if dt_now < start_dt:
+            return False
+
+        if dt_now > Domain.get_end_date(application, challenge, apply_buffer=True):
+            return False
+
         if (
             Submission.objects.filter(
                 application=application, unit=challenge
