@@ -58,7 +58,7 @@ class Submission(models.Model):
     status = models.CharField(
         max_length=1024, choices=STATUSES, default="never-submitted"
     )
-    score = models.IntegerField(default=0, null=False)
+    score = models.FloatField(default=0, null=False)
     message = models.TextField(blank=True)
     feedback = models.FileField(upload_to=feedback_path, null=True, blank=True)
 
