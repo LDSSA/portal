@@ -287,7 +287,7 @@ class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
         challenge = Challenge.objects.get(code=pk)
 
         if not Domain.can_add_submission(request.user.application, challenge):
-            raise HttpResponseBadRequest("Can't add submission")
+            return HttpResponseBadRequest("Can't add submission")
 
         sub = Submission.objects.create(
             application=request.user.application,
