@@ -1,9 +1,9 @@
-from typing import List, Optional
+from typing import List
 
 from django.db.models import Max
 
 
-from portal.users.models import TicketType
+from portal.users.models import Gender, TicketType
 from .models import Selection, SelectionDocument
 from .status import SelectionStatus, SelectionStatusType
 
@@ -21,7 +21,7 @@ class SelectionQueries:
 
     @staticmethod
     def draw_filter(
-        forbidden_genders: List[str], forbidden_ticket_types: List[str]
+        forbidden_genders: List[Gender], forbidden_ticket_types: List[TicketType]
     ):
         return (
             Selection.objects.filter(status=SelectionStatus.PASSED_TEST)

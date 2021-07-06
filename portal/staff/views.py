@@ -591,8 +591,7 @@ class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
 
 class SelectionDrawView(AdmissionsStaffViewMixin, View):
     def post(self, request, *args, **kwargs):
-        draw(default_draw_params, scholarships=False)
-        draw(default_draw_params, scholarships=True)
+        draw(default_draw_params)
         return redirect("admissions:staff:selection-list")
 
 
