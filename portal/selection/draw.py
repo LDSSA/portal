@@ -23,7 +23,7 @@ class DrawParams(NamedTuple):
 
 
 default_draw_params = DrawParams(
-    number_of_seats=60, min_scholarships_quota=10/60, min_female_quota=0.35, max_company_quota=10/60
+    number_of_seats=65, min_scholarships_quota=10/65, min_female_quota=0.35, max_company_quota=10/65
 )
 
 
