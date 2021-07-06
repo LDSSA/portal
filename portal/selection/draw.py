@@ -99,16 +99,16 @@ def iter_draw_constraints(
     if must_not_pick_company(params, counters):
         forbidden_ticket_types.add(TicketType.company)
 
-    def forget_none(fg: set[Gender], ftt: set[TicketType]) -> None:
+    def forget_none(fg: Set[Gender], ftt: Set[TicketType]) -> None:
         pass
 
-    def forget_female_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
+    def forget_female_ratio(fg: Set[Gender], ftt: Set[TicketType]) -> None:
         fg.difference_update([Gender.male, Gender.other])
 
-    def forget_company_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
+    def forget_company_ratio(fg: Set[Gender], ftt: Set[TicketType]) -> None:
         ftt.discard(TicketType.company)
 
-    def forget_scholarship_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
+    def forget_scholarship_ratio(fg: Set[Gender], ftt: Set[TicketType]) -> None:
         ftt.difference_update([TicketType.regular, TicketType.student, TicketType.company])
 
     for loosen_funcs in [
