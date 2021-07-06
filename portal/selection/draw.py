@@ -1,6 +1,6 @@
 from logging import getLogger
 from portal.users.models import TicketType, Gender
-from typing import Iterable, List, NamedTuple, Optional
+from typing import Iterable, Iterator, NamedTuple, Optional, Set, Tuple
 
 from .domain import SelectionDomain
 from .models import Selection
@@ -17,12 +17,13 @@ class DrawException(Exception):
 class DrawParams(NamedTuple):
     # number of desired "currently" selected
     number_of_seats: int
+    min_scholarships_quota: float
     min_female_quota: float
     max_company_quota: float
 
 
 default_draw_params = DrawParams(
-    number_of_seats=50, min_female_quota=0.35, max_company_quota=0.2
+    number_of_seats=60, min_scholarships_quota=10/60, min_female_quota=0.35, max_company_quota=10/60
 )
 
 
@@ -30,6 +31,7 @@ class DrawCounters:
     def __init__(self) -> None:
         self.total = 0
         self.female = 0
+        self.scholarships = 0
         self.company = 0
 
     def update(self, selection: Selection) -> None:
@@ -40,22 +42,32 @@ class DrawCounters:
         if user.gender == "female":
             self.female += 1
 
+        if user.ticket_type == "scholarship":
+            self.scholarships += 1
+
         if user.ticket_type == "company":
             self.company += 1
 
 
-def must_pick_female(params: DrawParams, counters: DrawCounters) -> bool:
-    female_fraction_if_non_female_drawn = counters.female / (
+def must_pick_scholarship(params: DrawParams, counters: DrawCounters) -> bool:
+    fraction_if_not_drawn = counters.scholarships / (
         counters.total + 1
     )
-    return female_fraction_if_non_female_drawn < params.min_female_quota
+    return fraction_if_not_drawn < params.min_scholarships_quota
+
+
+def must_pick_female(params: DrawParams, counters: DrawCounters) -> bool:
+    fraction_if_not_drawn = counters.female / (
+        counters.total + 1
+    )
+    return fraction_if_not_drawn < params.min_female_quota
 
 
 def must_not_pick_company(params: DrawParams, counters: DrawCounters) -> bool:
-    company_fraction_if_company_drawn = (counters.company + 1) / (
+    fraction_if_drawn = (counters.company + 1) / (
         counters.total + 1
     )
-    return company_fraction_if_company_drawn >= params.max_company_quota
+    return fraction_if_drawn >= params.max_company_quota
 
 
 def get_draw_counters(candidates: Iterable[Selection]) -> DrawCounters:
@@ -67,24 +79,69 @@ def get_draw_counters(candidates: Iterable[Selection]) -> DrawCounters:
     return counters
 
 
+def iter_draw_constraints(
+        params: DrawParams,
+        counters: DrawCounters,
+) -> Iterator[Tuple[Set[Gender], Set[TicketType]]]:
+    # this function controls how we compute and loosen the draw constraints
+    # loosening the constraints is required when we still need to draw
+    # candidates and none matches the current criteria
+
+    forbidden_genders: Set[Gender] = set()
+    forbidden_ticket_types: Set[TicketType] = set()
+
+    if must_pick_female(params, counters):
+        forbidden_genders.update([Gender.male, Gender.other])
+
+    if must_pick_scholarship(params, counters):
+        forbidden_ticket_types.update([TicketType.regular, TicketType.student, TicketType.company])
+
+    if must_not_pick_company(params, counters):
+        forbidden_ticket_types.add(TicketType.company)
+
+    def forget_none(fg: set[Gender], ftt: set[TicketType]) -> None:
+        pass
+
+    def forget_female_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
+        fg.difference_update([Gender.male, Gender.other])
+
+    def forget_company_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
+        ftt.discard(TicketType.company)
+
+    def forget_scholarship_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
+        ftt.difference_update([TicketType.regular, TicketType.student, TicketType.company])
+
+    for loosen_funcs in [
+        (forget_none,),
+        (forget_female_ratio,),
+        (forget_company_ratio,),
+        (forget_female_ratio, forget_company_ratio),
+        (forget_scholarship_ratio,),
+        (forget_scholarship_ratio, forget_female_ratio),
+        (forget_scholarship_ratio, forget_company_ratio),
+        (forget_scholarship_ratio, forget_female_ratio, forget_company_ratio,),
+    ]:
+        forbidden_genders_cp = forbidden_genders.copy()
+        forbidden_ticket_types_cp = forbidden_ticket_types.copy()
+        for loosen_func in loosen_funcs:
+            loosen_func(forbidden_genders_cp, forbidden_ticket_types_cp)
+        yield forbidden_genders_cp, forbidden_ticket_types_cp
+
+
 def draw_next(
-    scholarships: bool,
-    forbidden_genders: List[str],
-    forbidden_ticket_types: List[str],
+        params: DrawParams,
+        counters: DrawCounters,
 ) -> Optional[Selection]:
-    if not scholarships:
-        q = SelectionQueries.draw_filter(
-            forbidden_genders, forbidden_ticket_types
-        ).exclude(user__ticket_type=TicketType.scholarship)
-    else:
-        q = SelectionQueries.draw_filter(
-            forbidden_genders, forbidden_ticket_types
-        ).filter(user__ticket_type=TicketType.scholarship)
+    for fg, ftt in iter_draw_constraints(params, counters):
+        q = SelectionQueries.draw_filter(list(fg), list(ftt))
+        sel = SelectionQueries.random(q)
+        if sel is not None:
+            return sel
 
-    return SelectionQueries.random(q)
+    return None
 
 
-def draw(params: DrawParams, *, scholarships: bool) -> None:
+def draw(params: DrawParams) -> None:
     current_candidates = SelectionQueries.filter_by_status_in(
         [
             SelectionStatus.DRAWN,
@@ -94,41 +151,12 @@ def draw(params: DrawParams, *, scholarships: bool) -> None:
             SelectionStatus.ACCEPTED,
         ]
     )
-    if scholarships:
-        current_candidates = current_candidates.filter(
-            user__ticket_type=TicketType.scholarship
-        )
-    else:
-        current_candidates = current_candidates.exclude(
-            user__ticket_type=TicketType.scholarship
-        )
 
     counters = get_draw_counters(current_candidates)
     draw_rank = SelectionQueries.max_rank(current_candidates) + 1
 
     while counters.total != params.number_of_seats:
-        forbidden_genders = (
-            [Gender.male, Gender.other]
-            if must_pick_female(params, counters)
-            else []
-        )
-        forbidden_ticket_types = (
-            [TicketType.company]
-            if must_not_pick_company(params, counters)
-            else []
-        )
-
-        selection = draw_next(
-            scholarships, forbidden_genders, forbidden_ticket_types
-        )
-        if selection is None:
-            selection = draw_next(scholarships, [], forbidden_ticket_types)
-        if selection is None:
-            selection = draw_next(scholarships, forbidden_genders, [])
-        if selection is None:
-            selection = draw_next(scholarships, [], [])
-        if selection is None:
-            selection = draw_next(False, [], [])
+        selection = draw_next(params, counters)
         if selection is None:
             # no more suitable candidates
             break
