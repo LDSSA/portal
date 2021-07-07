@@ -93,6 +93,9 @@ class Events:
         sent_count = 0
         for selection in SelectionQueries.get_all():
             selection_status = SelectionDomain.get_status(selection)
+            if selection_status == SelectionStatus.ACCEPTED:
+                selection.user.is_student = True
+
             if selection_status == SelectionStatus.PASSED_TEST:
                 # this user was never selected
                 SelectionDomain.update_status(
