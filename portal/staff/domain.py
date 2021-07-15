@@ -95,6 +95,7 @@ class Events:
             selection_status = SelectionDomain.get_status(selection)
             if selection_status == SelectionStatus.ACCEPTED:
                 selection.user.is_student = True
+                selection.user.save()
 
             if selection_status == SelectionStatus.PASSED_TEST:
                 # this user was never selected
