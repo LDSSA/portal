@@ -5,12 +5,12 @@ from .models import Application, Challenge, Submission
 
 class AdminApplications(admin.ModelAdmin):
     list_display = ("user",)
-    search_fields = ("user__email", "user__uuid")
+    search_fields = ("user__email")
 
 
 class AdminSubmissions(admin.ModelAdmin):
     list_display = ("pk", "user", "application", "unit")
-    search_fields = ("application__user__email", "application__user__uuid")
+    search_fields = ("application__user__email")
 
 
 class AdminChallenge(admin.ModelAdmin):
