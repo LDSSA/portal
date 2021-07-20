@@ -11,8 +11,7 @@ from constance import config
 from django.http import HttpRequest
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from django.template import TemplateDoesNotExist
-from django.core.mail import EmailMessage, EmailMultiAlternatives
+from django.core.mail import EmailMessage
 from django.urls import reverse
 
 from portal.users.models import UserWhitelist
@@ -29,6 +28,8 @@ class AccountAdapter(DefaultAccountAdapter):
     default_token_generator = EmailAwarePasswordResetTokenGenerator()
 
     def is_open_for_signup(self, request: HttpRequest):
+        if request.path == reverse('instructors_signup'):
+            return True
         return getattr(config, "ACCOUNT_ALLOW_REGISTRATION", True)
 
     def render_mail(self, template_prefix, email, context):

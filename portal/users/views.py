@@ -1,5 +1,6 @@
 import logging
 
+from allauth.account.views import SignupView
 from constance import config
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -189,3 +190,7 @@ class UserRedirectView(LoginRequiredMixin, RedirectView):
 
 
 user_redirect_view = UserRedirectView.as_view()
+
+
+class InstructorsSignupView(SignupView):
+    template_name = "users/instructors_signup.html"

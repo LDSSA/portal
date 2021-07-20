@@ -3,14 +3,14 @@ from django.urls import include, path, re_path
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views import defaults as default_views
-from allauth.account import views
 
 from portal.academy.views import HomeRedirectView
+from portal.users.views import InstructorsSignupView
 
 urlpatterns = [
     # General
     path("accounts/", include("allauth.urls")),
-    # path("accounts/instructor/signup", include("")),  # TODO LDSSA/portal#98
+    path("accounts/instructor/signup/", InstructorsSignupView.as_view(), name="instructors_signup"),
     # path("",
     #      TemplateView.as_view(template_name="pages/home.html"),
     #      name="home"),
