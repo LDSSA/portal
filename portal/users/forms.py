@@ -1,4 +1,5 @@
 import logging
+from typing import Type
 # from allauth.account.forms import SignupForm
 
 import django.forms as forms
@@ -23,30 +24,40 @@ class UserChangeForm(forms.ModelForm):
     def __init__(self, *args, **kwawgs):
         super().__init__(*args, **kwawgs)
         if config.PORTAL_STATUS == "academy":
-            self.fields["logo"] = forms.CharField()
-            self.fields["github_username"] = forms.CharField()
-            self.fields["slack_member_id"] = forms.CharField()
-        if config.PORTAL_STATUS not in (
-            "admissions",
-            "admissions:applications",
-        ):
-            self.fields["ticket_type"] = forms.ChoiceField(
-                choices=TicketType.choices, disabled=True
-            )
+            del self.fields["gender"]
+            del self.fields["profession"]
+            del self.fields["company"]
+            del self.fields["ticket_type"]
+
         else:
-            self.fields["ticket_type"] = forms.ChoiceField(
-                choices=TicketTypeSelectable.choices
-            )
+            del self.fields["logo"]
+            del self.fields["github_username"]
+            del self.fields["slack_member_id"]
+            if config.PORTAL_STATUS not in (
+                "admissions",
+                "admissions:applications",
+            ):
+                self.fields["ticket_type"] = forms.ChoiceField(
+                    choices=TicketType.choices, disabled=True
+                )
 
     class Meta:
         model = User
         fields = (
             "name",
+            "logo",
+            "github_username",
+            "slack_member_id",
             "gender",
             "profession",
             "company",
             "ticket_type",
         )
+        widgets = { 
+            "logo": forms.TextInput(),
+            "github_username": forms.TextInput(),
+            "slack_member_id": forms.TextInput(),
+        }
 
 
 class UserCreationForm(auth.forms.UserCreationForm):
