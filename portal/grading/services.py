@@ -142,7 +142,7 @@ class AcademyGradingMixin:
             "PORTAL_CHECKSUM_URL": checksum_url,
             "DEPLOY_KEY": key,
             "CODENAME": self.grade.unit.code,
-            "USERNAME": self.grade.user.username,
+            "USERNAME": self.grade.user.github_username,
             "REPO_NAME": settings.STUDENT_REPO_NAME,
         }
 
