@@ -116,7 +116,7 @@ class AcademyGradingMixin:
         return urljoin(settings.BASE_URL, url)
 
     def get_image(self):
-        return f"ldssa/{self.grade.unit.code.lower()}"
+        return f"ldssa/batch5-{self.grade.unit.code.lower()}"
 
     def get_name(self):
         id_ = "".join(random.choices(string.ascii_lowercase, k=8))
