@@ -2,7 +2,7 @@
 {% load query_param_tags %}
 
 {% if grade.status == "graded" %}
-  <a href="{% get_media_prefix %}{{ grade.notebook }}">
+  <a href="{% get_media_prefix %}{{ grade.feedback }}">
     {% if grade.score >= 16 %}
       <span class="badge badge-success">{{ grade.score }}</span>
     {% else %}
