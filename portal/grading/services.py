@@ -148,7 +148,9 @@ class AcademyGradingMixin:
 
 
 class AcademyKubernetesGrading(AcademyGradingMixin, KubernetesGrading):
-    pass
+    def run_command(self, cmd):
+        """Do not wait for process to complete"""
+        subprocess.Popen(cmd)
 
 
 class AcademyDockerGrading(AcademyGradingMixin, KubernetesGrading):
