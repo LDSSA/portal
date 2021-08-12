@@ -110,7 +110,7 @@ class StudentHackathonDetailView(StudentMixin, generic.DetailView):
 
         team = models.Team.objects.filter(
             hackathon=hackathon,
-            user=self.request.user,
+            users=self.request.user,
         ).first()
 
         return hackathon, attendance, team
