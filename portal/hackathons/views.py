@@ -302,8 +302,17 @@ class InstructorHackathonDetailView(InstructorMixin, generic.DetailView):
             score = services.submission(
                 self.object, request.user, request.FILES["data"]
             )
-        except Exception as exc:
-            messages.add_message(request, messages.ERROR, str(exc))
+        except services.ValidationError as exc:
+            messages.add_message(
+                request, messages.ERROR, str(exc.__cause__ or exc)
+            )  # Use root exception if defined
+        except Exception:
+            messages.add_message(
+                request,
+                messages.ERROR,
+                "An unexpected error occurred! Oh noes! The dev-ops team has been notified.",
+            )
+            logger.exception("Unhandled Exception during scoring")
 
         else:
             messages.add_message(
