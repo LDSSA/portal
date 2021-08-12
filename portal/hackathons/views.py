@@ -151,7 +151,7 @@ class StudentHackathonDetailView(StudentMixin, generic.DetailView):
                 messages.add_message(
                     request, messages.ERROR, str(exc.__cause__ or exc)
                 )  # Use root exception if defined
-            except Exception as exc:
+            except Exception:
                 messages.add_message(
                     request,
                     messages.ERROR,

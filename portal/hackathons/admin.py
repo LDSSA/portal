@@ -11,6 +11,7 @@ class HackathonAdmin(admin.ModelAdmin):
         "status",
         "code",
         "name",
+        "due_date",
         "max_submissions",
         "team_size",
         "max_team_size",

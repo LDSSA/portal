@@ -21,7 +21,7 @@ def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
     present = models.Attendance.objects.filter(
         hackathon=hackathon, present=True
     )
-    present = [p.student for p in present]
+    present = [p.user for p in present]
     logger.debug("Present %s", present)
 
     for i in range(team_size, max_team_size + 1):
@@ -61,11 +61,11 @@ def generate_teams_with_remote(
     present = models.Attendance.objects.filter(
         hackathon=hackathon, present=True, remote=False
     )
-    present = [p.student for p in present]
+    present = [p.user for p in present]
     remote = models.Attendance.objects.filter(
         hackathon=hackathon, present=True, remote=True
     )
-    remote = [p.student for p in remote]
+    remote = [p.user for p in remote]
     logger.debug("Present %s", present)
     logger.debug("Remote %s", remote)
 
@@ -136,7 +136,7 @@ class ValidationError(Exception):
 
 
 def submission(hackathon, user, file):
-    if user.student:
+    if user.is_student:
         if hackathon.status not in ("submissions_open", "complete"):
             raise RuntimeError("Hackathon closed")  # TODO
 
