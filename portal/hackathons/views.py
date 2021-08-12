@@ -210,7 +210,7 @@ class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
                     "hackathon_team_id": team.hackathon_team_id
                     if team is not None
                     else 0,
-                    "student": att.student,
+                    "student": att.user,
                     "team": team,
                     "attendance": att,
                 }
