@@ -87,14 +87,14 @@ class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
         return self.render_to_response(context)
 
 
-class StudentHackathonListView(StudentMixin, generic.ListView):
+class StudentHackathonListView(StudentViewsMixin, generic.ListView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/student/hackathon_list.html"
 
 
 # noinspection PyUnusedLocal
-class StudentHackathonDetailView(StudentMixin, generic.DetailView):
+class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/student/hackathon_detail.html"
