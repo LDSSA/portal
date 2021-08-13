@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.views import generic
 from rest_framework import generics
 
-from portal.users.views import StudentMixin, InstructorMixin
+from portal.users.views import StudentViewsMixin, InstructorViewsMixin
 from portal.hackathons import models, serializers, forms, services
 from portal.capstone.models import StudentApi, Capstone
 
@@ -172,13 +172,13 @@ class StudentHackathonDetailView(StudentMixin, generic.DetailView):
         )
 
 
-class InstructorHackathonListView(InstructorMixin, generic.ListView):
+class InstructorHackathonListView(InstructorViewsMixin, generic.ListView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_list.html"
 
 
-class InstructorHackathonSettingsView(InstructorMixin, generic.UpdateView):
+class InstructorHackathonSettingsView(InstructorViewsMixin, generic.UpdateView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_settings.html"
@@ -191,7 +191,7 @@ class InstructorHackathonSettingsView(InstructorMixin, generic.UpdateView):
 
 
 # noinspection PyAttributeOutsideInit,PyUnusedLocal
-class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
+class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_admin.html"
@@ -282,7 +282,7 @@ class InstructorHackathonAdminView(InstructorMixin, generic.DetailView):
 
 
 # noinspection PyUnusedLocal
-class InstructorHackathonDetailView(InstructorMixin, generic.DetailView):
+class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_detail.html"
