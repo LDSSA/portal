@@ -50,7 +50,7 @@ def get_grade(unit, user):
 
 class BaseUnitListView(ListView):
     model = models.Unit
-    queryset = models.Unit.objects.order_by("-specialization", "-code")
+    queryset = models.Unit.objects.order_by("specialization", "code")
     template_name = None
     detail_view_name = None
 
@@ -128,7 +128,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
     def get_queryset(self):
         user_id = self.request.GET.get("user_id")
         if user_id:
-            return self.queryset.filter(id=user_id)
+            return self.queryset.filter(id=user_id).order_by("name")
         return self.queryset.all()
 
     # noinspection PyAttributeOutsideInit
@@ -167,7 +167,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
             qs = models.Unit.objects.filter(specialization=spc)
             if unit_code:
                 qs = qs.filter(code=unit_code)
-            qs = qs.order_by("due_date")
+            qs = qs.order_by("due_date", "code")
             max_score += qs.count() * 20
             spc.unit_count = qs.count()
             spc_list.append(spc)
