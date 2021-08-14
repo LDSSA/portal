@@ -23,6 +23,11 @@ urlpatterns = [
         name="instructor-user-list",
     ),
     path(
+        r'instructor/students/<str:download>/',
+        view=views.InstructorUserListView.as_view(),
+        name='instructor-user-list-export'
+    ),
+    path(
         r"instructor/units/",
         view=views.InstructorUnitListView.as_view(),
         name="instructor-unit-list",
