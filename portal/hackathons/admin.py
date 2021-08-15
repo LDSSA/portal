@@ -84,6 +84,6 @@ class SubmissionAdmin(admin.ModelAdmin):
 
     def get_name(self, obj):
         if isinstance(obj.content_object, User):
-            return obj.username
+            return obj.content_object.username
         else:
             return f"[{obj.content_object.hackathon_team_id}] {obj.content_object.name}"
