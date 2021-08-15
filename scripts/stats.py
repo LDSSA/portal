@@ -10,7 +10,7 @@ for h in hmodels.Hackathon.objects.order_by("code").exclude(
     teamed_students = []
     hack_students = {a.student for a in h.attendance.all() if a.present}
     teamed_students.extend(
-        [s for t in h.teams.all() for s in t.students.all()]
+        [s for t in h.teams.all() for s in t.users.all()]
     )
     teamed_students = set(teamed_students)
     # print(teamed_students)
@@ -26,7 +26,7 @@ for h in hmodels.Hackathon.objects.order_by("code").exclude(
     # Teams
     for t in h.teams.all():
         print(f"\n## Team {t.hackathon_team_id}")
-        for s in t.students.all():
+        for s in t.users.all():
             print(f"    * {s.username}")
     # Missing
     print("\n## Missed hackathon")

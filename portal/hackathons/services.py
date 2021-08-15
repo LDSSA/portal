@@ -44,7 +44,7 @@ def create_teams(hackathon, present_teams):
         team = models.Team.objects.create(
             hackathon=hackathon, hackathon_team_id=hackathon_team_id
         )
-        team.students.set(students)
+        team.users.set(students)
         logger.info("Team %s students %s", hackathon_team_id, students)
         hackathon_team_id += 1
 
@@ -90,7 +90,7 @@ def create_teams_with_remote(hackathon, present_teams, remote_teams):
         team = models.Team.objects.create(
             hackathon=hackathon, hackathon_team_id=hackathon_team_id
         )
-        team.students.set(students)
+        team.users.set(students)
         logger.info("Team %s students %s", hackathon_team_id, students)
         hackathon_team_id += 1
 
@@ -100,7 +100,7 @@ def create_teams_with_remote(hackathon, present_teams, remote_teams):
             hackathon_team_id=hackathon_team_id,
             remote=True,
         )
-        team.students.set(students)
+        team.users.set(students)
         logger.info(
             "(remote) Team %s students %s", hackathon_team_id, students
         )
