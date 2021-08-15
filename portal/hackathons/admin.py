@@ -77,7 +77,7 @@ class SubmissionAdmin(admin.ModelAdmin):
     list_filter = ("hackathon",)
 
     def get_name(self, obj):
-        if isinstance(obj.content_objec, User):
+        if isinstance(obj.content_object, User):
             return obj.username
         else:
             return f"[{obj.hackathon_team_id}] {obj.name}"
