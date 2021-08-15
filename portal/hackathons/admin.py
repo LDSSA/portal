@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 
 from portal.hackathons import models
+from portal.users.models import User
 
 
 @admin.register(models.Hackathon)
@@ -62,11 +63,22 @@ class AttendanceAdmin(admin.ModelAdmin):
 
 @admin.register(models.Submission)
 class SubmissionAdmin(admin.ModelAdmin):
-    list_display = ("hackathon", "content_object", "score", "created")
-    fields = (
+    list_display = (
         "hackathon",
         "content_object",
         "score",
         "created",
+        )
+    fields = (
+        "id",
+        "hackathon",
+        "content_object",
+        "score",
     )
     list_filter = ("hackathon",)
+
+    def get_name(self, obj):
+        if isinstance(obj.content_objec, User):
+            return obj.username
+        else:
+            return f"[{obj.hackathon_team_id}] {obj.name}"
