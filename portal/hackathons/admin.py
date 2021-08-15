@@ -65,12 +65,11 @@ class AttendanceAdmin(admin.ModelAdmin):
 class SubmissionAdmin(admin.ModelAdmin):
     list_display = (
         "hackathon",
-        "content_object",
+        "get_name",
         "score",
         "created",
         )
     fields = (
-        "id",
         "hackathon",
         "content_object",
         "score",
