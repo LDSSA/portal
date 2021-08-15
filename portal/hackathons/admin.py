@@ -73,6 +73,12 @@ class SubmissionAdmin(admin.ModelAdmin):
         "hackathon",
         "content_object",
         "score",
+        "created",
+    )
+    readonly_fields = (
+        "hackathon",
+        "created",
+        "content_object",
     )
     list_filter = ("hackathon",)
 
@@ -80,4 +86,4 @@ class SubmissionAdmin(admin.ModelAdmin):
         if isinstance(obj.content_object, User):
             return obj.username
         else:
-            return f"[{obj.hackathon_team_id}] {obj.name}"
+            return f"[{obj.content_object.hackathon_team_id}] {obj.content_object.name}"
