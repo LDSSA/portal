@@ -13,9 +13,10 @@ class TestUserCreationForm:
 
         form = UserCreationForm(
             {
+                "email": proto_user.email,
                 "username": proto_user.username,
-                "password1": proto_user._password,
-                "password2": proto_user._password,
+                "password1": proto_user.password,
+                "password2": proto_user.password,
             }
         )
 
@@ -29,9 +30,10 @@ class TestUserCreationForm:
         # hence cannot be created.
         form = UserCreationForm(
             {
+                "email": proto_user.email,
                 "username": proto_user.username,
-                "password1": proto_user._password,
-                "password2": proto_user._password,
+                "password1": proto_user.password,
+                "password2": proto_user.password,
             }
         )
 

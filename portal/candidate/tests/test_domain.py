@@ -2,14 +2,14 @@ from datetime import datetime, timedelta
 
 from django.test import TestCase
 
-from applications.domain import ApplicationStatus, SubmissionStatus
-from applications.models import Application
-from candidate.domain import CandidateState, Domain
-from interface import interface
-from profiles.models import Profile
-from selection.models import Selection
-from selection.status import SelectionStatus
-from users.models import User
+from portal.applications.domain import ApplicationStatus, SubmissionStatus
+from portal.applications.models import Application
+from portal.candidate.domain import CandidateState, Domain
+from portal.interface import interface
+from portal.profiles.models import Profile
+from portal.selection.models import Selection
+from portal.selection.status import SelectionStatus
+from portal.users.models import User
 
 
 class TestDomain(TestCase):
