@@ -5,16 +5,25 @@ Your friendly neighborhood LDSA Academy portal.
 
 ## Local development
 
-The first time you need to create the database and a super user.
+### Setup
+
+The first time you run this you need to create the database and a super user.
+
+Start by running the following command:
+
 ```bash
 docker-compose run --rm django ./manage.py migrate
-docker-compose run --rm django ./manage.py loaddata fixtures/initial.yaml
 ```
 
-To test submissions get the hash for the exercise notebook using ldsagrader add
-it to the unit.
-Then create a student user with your github username and add the deploy key to
-your repository.
+Then create an admin:
+
+```bash
+docker-compose run --rm django ./manage.py createsuperuser
+```
+
+This will prompt you for a user, password and email. Once you have these
+you can access the admin site (see below) and create the remaining
+entities.
 
 ### Starting
 
@@ -39,6 +48,24 @@ Entering the container:
 docker-compose exec django bash
 source docker/production/django/entrypoint
 ```
+
+#### Temporarily deprecated - data initialization from fixtures
+
+Currently the data under `fixtures/initial.yaml` is out of date and as such the 
+following command is deprecated
+
+```bash
+docker-compose run --rm django ./manage.py loaddata fixtures/initial.yaml
+```
+
+### Test submissions
+
+To test submissions get the hash for the exercise notebook using ldsagrader add
+it to the unit.
+Then create a student user with your github username and add the deploy key to
+your repository.
+
+
 
 
 ### Updating Fixtures
