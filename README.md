@@ -68,6 +68,13 @@ your repository.
 
 
 
+### Running tests
+
+```bash
+docker-compose run tests
+```
+
+
 ### Updating Fixtures
 
 ```bash

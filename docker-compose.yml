@@ -5,7 +5,23 @@ volumes:
   local_postgres_data_backups: {}
 
 services:
+  portal:
+    image: portal
+    build:
+      context: .
+      dockerfile: ./docker/local/django/Dockerfile
+    depends_on:
+      - postgres
+      - mailhog
+    volumes:
+      - .:/app
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    command: ./manage.py run_scheduler
+
   django:
+    image: portal
     build:
       context: .
       dockerfile: ./docker/local/django/Dockerfile
@@ -24,6 +40,7 @@ services:
     command: python -m debugpy --listen 0.0.0.0:5678 manage.py runserver_plus 0.0.0.0:8000
 
   scheduler:
+    image: portal
     build:
       context: .
       dockerfile: ./docker/local/django/Dockerfile
@@ -37,19 +54,18 @@ services:
       - ./.envs/.local/.postgres
     command: ./manage.py run-scheduler
 
-  # :
-  #   build:
-  #     context: .
-  #     dockerfile: ./docker/local/django/Dockerfile
-  #   depends_on:
-  #     - postgres
-  #     - mailhog
-  #   volumes:
-  #     - .:/app
-  #   env_file:
-  #     - ./.envs/.local/.django
-  #     - ./.envs/.local/.postgres
-  #   command: ./manage.py run_scheduler
+  tests:
+    image: portal
+    depends_on:
+      - postgres
+      - mailhog
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    command: pytest portal --ignore=portal/applications --ignore=portal/candidate --ignore=portal/selection --ignore=portal/staff
 
   postgres:
     build:

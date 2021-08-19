@@ -1,8 +1,115 @@
 import pytest
+from datetime import datetime
 from django.conf import settings
 from django.test import RequestFactory
+from portal.users.models import User
+from portal.academy.models import Specialization, Unit, Grade
 
 from portal.users.tests.factories import UserFactory
+
+
+@pytest.mark.django_db
+@pytest.fixture(autouse=True)
+def cleanup_db():
+    User.objects.all().delete()
+    Specialization.objects.all().delete()
+    Unit.objects.all().delete()
+    Grade.objects.all().delete()
+
+
+@pytest.fixture
+def student():
+    user = User.objects.create(
+        username="test_student",
+        name="test_student",
+        github_username="TestUser",
+        slack_member_id="U12J14XV12Z",
+        is_student=True,
+        is_instructor=False,
+    )
+    return user
+
+
+@pytest.fixture
+def instructor():
+    user = User.objects.create(
+        username="test_instructor",
+        name="test_instructor",
+        github_username="TestInstructor",
+        slack_member_id="U8474XV12Z",
+        is_student=False,
+        is_instructor=True,
+    )
+    return user
+
+
+@pytest.fixture
+def specialization():
+    spec = Specialization.objects.create(
+        code="S01",
+        name="bootcamp",
+        description="This is a test bootcamp",
+        created=datetime(year=2021, month=8, day=10),
+    )
+    return spec
+
+
+@pytest.fixture
+def slu1(specialization, instructor):
+    unit = Unit.objects.create(
+        specialization=specialization,
+        code="SLU01",
+        name="unit 1",
+        description="This is a test unit",
+        instructor=instructor,
+        due_date=datetime(year=2021, month=8, day=30),
+        open=True,
+        checksum="a424e2aa-adb2-473c-b782-65b9f879a628",
+        created=datetime(year=2021, month=8, day=11),
+    )
+    return unit
+
+
+@pytest.fixture
+def slu2(specialization, instructor):
+    unit = Unit.objects.create(
+        specialization=specialization,
+        code="SLU02",
+        name="unit 2",
+        description="This is a test unit",
+        instructor=instructor,
+        due_date=datetime(year=2021, month=8, day=30),
+        open=True,
+        checksum="a424e2aa-adb2-473c-b782-65b9f879a628",
+        created=datetime(year=2021, month=8, day=11),
+    )
+    return unit
+
+
+@pytest.fixture
+def grade_slu1(student, slu1):
+    grade = Grade.objects.create(
+        user=student,
+        unit=slu1,
+        created=datetime(year=2021, month=8, day=15),
+        status="graded",
+        score=18,
+        message="",
+    )
+    return grade
+
+
+@pytest.fixture
+def grade_slu2(student, slu2):
+    grade = Grade.objects.create(
+        user=student,
+        unit=slu2,
+        created=datetime(year=2021, month=8, day=15),
+        status="graded",
+        score=20,
+        message="",
+    )
+    return grade
 
 
 @pytest.fixture(autouse=True)

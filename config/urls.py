@@ -26,13 +26,13 @@ urlpatterns = [
         include("portal.users.urls", namespace="users"),
     ),
     # Admissions
-    path("admissions/", include("admissions.urls")),
+    path("admissions/", include("portal.admissions.urls")),
     # Academy
-    path("academy/", include("academy.urls")),
-    path("hackathons/", include("hackathons.urls")),
-    path("capstone/", include("capstone.urls")),
+    path("academy/", include("portal.academy.urls")),
+    path("hackathons/", include("portal.hackathons.urls")),
+    path("capstone/", include("portal.capstone.urls")),
     # Grading
-    path("grading/", include("grading.urls")),
+    path("grading/", include("portal.grading.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
