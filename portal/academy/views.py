@@ -50,7 +50,6 @@ def get_grade(unit, user):
     return grade
 
 
-
 class BaseUnitListView(ListView):
     model = models.Unit
     queryset = models.Unit.objects.order_by("specialization", "code")
@@ -229,7 +228,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
 
         if "download" in kwargs and kwargs["download"] == "csv":
             response = HttpResponse(csvdata(spc_list, unit_list, object_list), content_type="text/csv")
-            response["Content-Disposition"] = "attachment; filename=test.csv"
+            response["Content-Disposition"] = "attachment; filename=student-grades.csv"
             return response
         else:
             context = self.get_context_data(
