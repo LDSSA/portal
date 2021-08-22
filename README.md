@@ -25,6 +25,38 @@ This will prompt you for a user, password and email. Once you have these
 you can access the admin site (see below) and create the remaining
 entities.
 
+### Creating entities
+
+Create an instructor:
+
+```
+./manage.py create-instructor \
+  -u 'ana' \
+  -p 'ana1234' \
+  -e 'ana@lisbondatascience.org' \
+  -n 'Ana' \
+  -git 'Ana' \
+  -s 'U21392ANA' \
+  -g 'female' \
+  -t 'regular' \
+```
+
+Create a student:
+
+```
+./manage.py create-student \
+  -u 'joao' \
+  -p 'joao1234' \
+  -e 'joao@lisbondatascience.org' \
+  -n 'Joao' \
+  -git 'Joao' \
+  -s 'U21392JOAO' \
+  -g 'male' \
+  -t 'regular' \
+```
+
+
+
 ### Starting
 
 ```bash
