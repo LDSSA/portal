@@ -74,6 +74,17 @@ docker-compose run --rm django ./manage.py create-unit \
   --open
 ```
 
+### Seeding the db
+
+To seed the entire db with pre-arranged data, run:
+
+```
+docker-compose run --rm django ./scripts/db_seed.sh
+```
+
+You can then login with any of the users created, for which the passwords are `<user>1234` or 
+with the admin (user `admin`, password `123`)
+
 ### Starting
 
 ```bash
