@@ -1,11 +1,13 @@
 import logging
+from io import StringIO
+import csv
 
 from constance import config
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView, ListView, RedirectView
@@ -50,7 +52,7 @@ def get_grade(unit, user):
 
 class BaseUnitListView(ListView):
     model = models.Unit
-    queryset = models.Unit.objects.order_by("-specialization", "-code")
+    queryset = models.Unit.objects.order_by("specialization", "code")
     template_name = None
     detail_view_name = None
 
@@ -120,6 +122,30 @@ class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):
     template_name = "academy/student/unit_detail.html"
 
 
+
+def csvdata(spc_list, unit_list, object_list):
+    csvfile = StringIO()
+    csvwriter = csv.writer(csvfile)
+
+    headers = ["username", "slack_id", "submission_date", "total_score"]
+    specs = []
+    for spc in spc_list:
+        specs.extend([spc.code for _ in range(spc.unit_count)])
+
+    first_row = headers + [spc + "-" + unit.code for spc, unit in zip(specs, unit_list)]
+
+    rows = [first_row]
+    for obj in object_list:
+        user = [obj["user"].username, obj["user"].slack_member_id, obj["submission_date"], obj["total_score"]]
+        user_row = user + [grade.score or grade.status for grade in obj["grades"] if grade]
+        rows.append(user_row)
+
+    for row in rows:
+        csvwriter.writerow(row)
+
+    return csvfile.getvalue()
+
+
 class InstructorUserListView(InstructorViewsMixin, ListView):
     model = get_user_model()
     queryset = get_user_model().objects.filter(is_student=True)
@@ -128,7 +154,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
     def get_queryset(self):
         user_id = self.request.GET.get("user_id")
         if user_id:
-            return self.queryset.filter(id=user_id)
+            return self.queryset.filter(id=user_id).order_by("name")
         return self.queryset.all()
 
     # noinspection PyAttributeOutsideInit
@@ -167,7 +193,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
             qs = models.Unit.objects.filter(specialization=spc)
             if unit_code:
                 qs = qs.filter(code=unit_code)
-            qs = qs.order_by("due_date")
+            qs = qs.order_by("due_date", "code")
             max_score += qs.count() * 20
             spc.unit_count = qs.count()
             spc_list.append(spc)
@@ -200,14 +226,19 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
             user_data["submission_date"] = grade.created
             object_list.append(user_data)
 
-        context = self.get_context_data(
-            object_list=object_list,
-            spc_list=spc_list,
-            unit_list=unit_list,
-            max_score=max_score,
-            workspace_url=settings.SLACK_WORKSPACE,
-        )
-        return self.render_to_response(context)
+        if "download" in kwargs and kwargs["download"] == "csv":
+            response = HttpResponse(csvdata(spc_list, unit_list, object_list), content_type="text/csv")
+            response["Content-Disposition"] = "attachment; filename=student-grades.csv"
+            return response
+        else:
+            context = self.get_context_data(
+                object_list=object_list,
+                spc_list=spc_list,
+                unit_list=unit_list,
+                max_score=max_score,
+                workspace_url=settings.SLACK_WORKSPACE,
+            )
+            return self.render_to_response(context)
 
 
 class InstructorUnitListView(InstructorViewsMixin, BaseUnitListView):
