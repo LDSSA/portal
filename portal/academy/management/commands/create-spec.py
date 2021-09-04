@@ -11,7 +11,6 @@ class Command(BaseCommand):
         parser.add_argument('-d', '--description', type=str, default="")
 
     def handle(self, *args, **options):
-
         # TODO: revisit uniqueness of primary key
         spec = Specialization.objects.filter(code=options["code"]).first()
         if spec:
