@@ -30,7 +30,7 @@ entities.
 Create an instructor:
 
 ```
-./manage.py create-instructor \
+docker-compose run --rm django ./manage.py create-instructor \
   -u 'ana' \
   -p 'ana1234' \
   -e 'ana@lisbondatascience.org' \
@@ -44,7 +44,7 @@ Create an instructor:
 Create a student:
 
 ```
-./manage.py create-student \
+docker-compose run --rm django ./manage.py create-student \
   -u 'joao' \
   -p 'joao1234' \
   -e 'joao@lisbondatascience.org' \
@@ -55,7 +55,24 @@ Create a student:
   -t 'regular' \
 ```
 
+Create a specialization:
 
+```
+docker-compose run --rm django ./manage.py create-spec \
+  -c S01 \
+  -n 'Bootcamp'
+```
+
+Create a unit:
+
+```
+docker-compose run --rm django ./manage.py create-unit \
+  -s S01 \
+  -c SLU01 \
+  -n 'SLU01 - Pandas' \
+  -due '2020-04-10' \
+  --open
+```
 
 ### Starting
 
