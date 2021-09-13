@@ -3,7 +3,7 @@ import logging
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -147,17 +147,15 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
                 score = services.submission(
                     hackathon, request.user, request.FILES["data"]
                 )
-            except services.ValidationError as exc:
-                messages.add_message(
-                    request, messages.ERROR, str(exc.__cause__ or exc)
-                )  # Use root exception if defined
-            except Exception:
+            except Exception as exc:
                 messages.add_message(
                     request,
                     messages.ERROR,
-                    "An unexpected error occurred! Oh noes! The dev-ops team has been notified.",
-                )
-                logger.exception("Unhandled Exception during scoring")
+                    request, messages.ERROR, str(exc.__cause__ or exc)
+                )  # Use root exception if defined
+
+                if not isinstance(exc, ValidationError):
+                    logger.exception("Unhandled Exception during scoring")
 
             else:
                 messages.add_message(
