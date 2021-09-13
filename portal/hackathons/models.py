@@ -77,7 +77,7 @@ class Attendance(models.Model):
         on_delete=models.CASCADE,
         related_name="attendance",
     )
-    present = models.BooleanField(default=True)
+    present = models.BooleanField(default=False)
     # remote = models.BooleanField(default=False)
 
 
