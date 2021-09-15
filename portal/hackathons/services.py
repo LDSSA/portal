@@ -138,7 +138,7 @@ class ValidationError(Exception):
 def submission(hackathon, user, file):
     if user.is_student:
         if hackathon.status not in ("submissions_open", "complete"):
-            raise RuntimeError("Hackathon closed")  # TODO
+            raise ValidationError("Hackathon closed")
 
         # Replace students with team
         if hackathon.status == "submissions_open":
@@ -156,7 +156,7 @@ def submission(hackathon, user, file):
                     object_id=user.id,
                 ).count()
                 if num >= hackathon.max_submissions:
-                    raise RuntimeError("Max submissions")  # TODO
+                    raise ValidationError("Max submissions")
 
     # Load hackathon functions
     glob = {}
