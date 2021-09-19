@@ -4,6 +4,7 @@ from django.conf import settings
 from django.test import RequestFactory
 from portal.users.models import User
 from portal.academy.models import Specialization, Unit, Grade
+from portal.hackathons.models import Hackathon, Attendance
 
 from portal.users.tests.factories import UserFactory
 
@@ -15,6 +16,8 @@ def cleanup_db():
     Specialization.objects.all().delete()
     Unit.objects.all().delete()
     Grade.objects.all().delete()
+    Attendance.objects.all().delete()
+    Hackathon.objects.all().delete()
 
 
 @pytest.fixture
@@ -84,6 +87,39 @@ def slu2(specialization, instructor):
         created=datetime(year=2021, month=8, day=11),
     )
     return unit
+
+
+@pytest.fixture
+def hackathon1(specialization, instructor):
+    hack = Hackathon.objects.create(
+        code="HCKT01",
+        name="Hackathon 1 - Binary classification",
+        due_date=datetime(year=2021, month=8, day=30),
+        descending=False,
+    )
+    return hack
+
+
+@pytest.fixture
+def hackathon2(specialization, instructor):
+    hack = Hackathon.objects.create(
+        code="HCKT02",
+        name="Hackathon 2 - Data wrangling",
+        due_date=datetime(year=2021, month=9, day=30),
+        descending=False,
+    )
+    return hack
+
+
+@pytest.fixture
+def hackathon3(specialization, instructor):
+    hack = Hackathon.objects.create(
+        code="HCKT03",
+        name="Hackathon 3 - Time series",
+        due_date=datetime(year=2021, month=10, day=30),
+        descending=True,
+    )
+    return hack
 
 
 @pytest.fixture
