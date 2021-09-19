@@ -5,8 +5,8 @@ from io import StringIO
 
 from django.contrib.contenttypes.models import ContentType
 
-from portal.hackathons.models import Hackathon
-from portal.hackathons.models import Attendance
+from portal.academy.models import Specialization, Grade, Unit
+from portal.hackathons.models import Hackathon, Attendance
 from portal.users.models import User
 
 
@@ -42,3 +42,34 @@ def check_graduation_status(user: User):
 
     logger.info(f"Student {user.username} can graduate")
     return True
+
+
+def check_complete_specialization(user: User, spec: Specialization):
+    """
+    Check student completed a specialization by verifying
+    they passed on all units
+    """
+    logger.info(f"Checking {user.name} completion of specialization: {spec.name}")
+
+    spec_units = [unit for unit in Unit.objects.filter(specialization=spec)]
+    spec_units_codes = [u.code for u in spec_units]
+
+    # TODO: when grades contain info about submission before/after deadline
+    #  filter only by grades submitted within deadline
+    passed_unit_codes = []
+    for unit in spec_units:
+        unit_grades = Grade.objects.filter(user=user, unit=unit)
+        scores = [g.score for g in unit_grades]
+        top_score = max(scores) if scores else 0.0
+
+        if top_score >= 16:
+            passed_unit_codes.append(unit.code)
+
+    logger.info(f"Student {user.username} has passed units {passed_unit_codes} in {spec.name}")
+
+    if sorted(passed_unit_codes) == sorted(spec_units_codes):
+        logger.info(f"Student {user.username} completed specialization {spec.name}")
+        return True
+
+    logger.info(f"Student {user.username} did not complete specialization {spec.name}")
+    return False
