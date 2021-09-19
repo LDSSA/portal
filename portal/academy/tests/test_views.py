@@ -6,6 +6,10 @@ from portal.academy.views import csvdata
 
 @pytest.mark.django_db(transaction=True)
 def test_csvdata(db, specialization, slu1, slu2, student, grade_slu1, grade_slu2):
+    """
+    Test creation of csv file from table of student/unit grades
+    """
+
     specialization.unit_count = 2
     spc_list = [specialization]
     unit_list = [slu1, slu2]
