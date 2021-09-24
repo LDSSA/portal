@@ -32,13 +32,13 @@ def check_graduation_status(user: User):
     num_presences = attendances.filter(present=True).count()
     present_in_first = attendances.filter(hackathon=first_hackathon).first().present
 
-    logger.info(f"Student {user.name} has been in {num_presences} out of {num_hackathons} "
+    logger.info(f"Student {user.username} has been in {num_presences} out of {num_hackathons} "
                 f"hackathons and has {'completed' if present_in_first else 'missed'} the"
                 f"first hackathon")
 
     if not present_in_first or num_presences < num_hackathons - 1:
-        logger.info(f"Student {user.name} can not graduate")
+        logger.info(f"Student {user.username} can not graduate")
         return False
 
-    logger.info(f"Student {user.name} can graduate")
+    logger.info(f"Student {user.username} can graduate")
     return True
