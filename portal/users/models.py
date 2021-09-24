@@ -67,6 +67,10 @@ class User(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Academy graduation eligibility fields
+    can_graduate = models.BooleanField(default=True)
+    can_attend_next = models.BooleanField(default=True)
+
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
 
