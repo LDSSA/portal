@@ -153,8 +153,14 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
 
     def get_queryset(self):
         user_id = self.request.GET.get("user_id")
+        can_graduate = self.request.GET.get("can_graduate")
+
+        if can_graduate is not None:
+            return self.queryset.filter(can_graduate=can_graduate).order_by("name")
+
         if user_id:
             return self.queryset.filter(id=user_id).order_by("name")
+
         return self.queryset.all()
 
     # noinspection PyAttributeOutsideInit
@@ -174,14 +180,15 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
             return redirect("academy:instructor-user-list")
         query_params = validator.validated_data
 
-        self.object_list = self.get_queryset()
-        specializations = models.Specialization.objects
-
         grade_status = query_params.get("grade_status")
         score__gte = query_params.get("score__gte")
         score__lte = query_params.get("score__lte")
         unit_code = query_params.get("unit_code")
         spc_code = query_params.get("spc_code")
+
+        self.object_list = self.get_queryset()
+        specializations = models.Specialization.objects
+
         if spc_code:
             specializations = specializations.filter(code=spc_code)
 
@@ -224,6 +231,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
                 continue
             user_data["total_score"] = total_score
             user_data["submission_date"] = grade.created
+            user_data["can_graduate"] = user.can_graduate
             object_list.append(user_data)
 
         if "download" in kwargs and kwargs["download"] == "csv":

@@ -26,6 +26,7 @@ class UserAdmin(auth_admin.UserAdmin):
                     "is_student",
                     "is_instructor",
                     "code_of_conduct_accepted",
+                    "can_graduate",
                     "applying_for_scholarship",
                     "ticket_type",
                     "gender",

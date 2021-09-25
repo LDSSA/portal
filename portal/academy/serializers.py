@@ -12,3 +12,4 @@ class InstructorsViewFiltersSerializer(serializers.Serializer):
     )
     score__gte = serializers.FloatField(required=False)
     score__lte = serializers.FloatField(required=False)
+    can_graduate = serializers.BooleanField(required=False)
