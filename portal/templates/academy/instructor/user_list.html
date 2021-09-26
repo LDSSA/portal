@@ -22,6 +22,7 @@
             <th scope="col" rowspan="2">Submission Date</th>
             <th scope="col" rowspan="2">Total</th>
             <th scope="col" rowspan="2">Eligible for graduation</th>
+            <th scope="col" rowspan="2">Eligible for next hackathon</th>
             {% for spc in spc_list %}
             <th scope="col" colspan="{{ spc.unit_count }}">
               <a href="{% add_query_param 'spc_code' spc.code %}" class="text-dark" title="Filter by specialization">{{ spc.code }}</a>
@@ -42,6 +43,7 @@
             <td><a href="{% add_query_param 'submission_date' obj.submission_date %}" class="text-dark"> {{ obj.submission_date }} </a></td>
             <td><a href="{% add_query_param 'score__gte' obj.total_score %}" class="text-dark">{{ obj.total_score }}&#47;{{ max_score }}</a></td>
             <th><a href="{% add_query_param 'can_graduate' obj.user.can_graduate %}" class="text-dark" title="Filter by graduation status">{% if obj.user.can_graduate %}Yes{% else %}No{% endif %}</a></th>
+            <th><a href="{% add_query_param 'can_attend_next' obj.user.can_attend_next %}" class="text-dark" title="Filter by eligibility to next hackathon">{% if obj.user.can_attend_next %}Yes{% else %}No{% endif %}</a></th>
             {% for grade in obj.grades %}
             <td>{% show_grade grade %}</td>
             {% endfor %}

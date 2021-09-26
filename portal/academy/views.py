@@ -160,11 +160,15 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
     def get_queryset(self):
         user_id = self.request.GET.get("user_id")
         can_graduate = self.request.GET.get("can_graduate")
+        can_attend_next = self.request.GET.get("can_attend_next")
 
         if can_graduate is not None:
             return self.queryset.filter(can_graduate=can_graduate).order_by(
                 "name"
             )
+
+        if can_attend_next is not None:
+            return self.queryset.filter(can_graduate=can_attend_next).order_by("name")
 
         if user_id:
             return self.queryset.filter(id=user_id).order_by("name")
