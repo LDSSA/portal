@@ -7,6 +7,7 @@ from . import serializers
 from portal.academy import models
 from portal.applications.models import Challenge, Submission
 
+from portal.academy.services import check_complete_specialization
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,19 @@ class AcademyGradingView(generics.RetrieveUpdateAPIView):
 
     queryset = models.Grade.objects.all()
     serializer_class = serializers.GradeSerializer
+
+    def update(self, request, *args, **kwargs):
+        update_result = super().update(request, *args, **kwargs)
+
+        grade = self.get_object()
+        user = grade.user
+        spec = grade.unit.specialization
+
+        # Check attendance for next hackathon based on last grade received
+        user.can_attend_next = check_complete_specialization(user, spec)
+        user.save()
+
+        return update_result
 
 
 class CaseInsensitiveGetObjectMixin:

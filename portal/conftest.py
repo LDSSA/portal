@@ -21,6 +21,20 @@ def cleanup_db():
 
 
 @pytest.fixture
+def grader():
+    user = User.objects.create(
+        username="grader",
+        name="Grader User",
+        github_username="GraderUser",
+        slack_member_id="GRADER1234",
+        is_student=True,
+        is_instructor=True,
+        is_staff=True,
+    )
+    return user
+
+
+@pytest.fixture
 def student():
     user = User.objects.create(
         username="test_student",

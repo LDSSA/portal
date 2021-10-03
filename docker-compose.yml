@@ -58,7 +58,6 @@ services:
     image: portal
     depends_on:
       - postgres
-      - mailhog
     volumes:
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock
