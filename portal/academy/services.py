@@ -80,9 +80,7 @@ def check_complete_specialization(user: User, spec: Specialization):
     #  filter only by grades submitted within deadline
     passed_unit_codes = []
     for unit in spec_units:
-        unit_grades = Grade.objects.filter(user=user, unit=unit)
-        scores = [g.score for g in unit_grades]
-        top_score = max(scores) if scores else 0.0
+        top_score = Grade.objects.filter(user=user, unit=unit).aggregate(Max('score'))['score__max'] or 0
 
         if top_score >= 16:
             passed_unit_codes.append(unit.code)
