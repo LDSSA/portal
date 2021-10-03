@@ -65,9 +65,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "code",
-                    models.CharField(
-                        max_length=255, primary_key=True, serialize=False
-                    ),
+                    models.CharField(max_length=255, primary_key=True, serialize=False),
                 ),
                 ("name", models.CharField(max_length=255)),
                 ("description", models.TextField(blank=True)),
@@ -79,9 +77,7 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "code",
-                    models.CharField(
-                        max_length=255, primary_key=True, serialize=False
-                    ),
+                    models.CharField(max_length=255, primary_key=True, serialize=False),
                 ),
                 ("name", models.CharField(max_length=255)),
                 ("description", models.TextField(blank=True)),
