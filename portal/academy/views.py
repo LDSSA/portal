@@ -1,6 +1,4 @@
 import logging
-from io import StringIO
-import csv
 
 from constance import config
 from django.conf import settings
@@ -14,6 +12,7 @@ from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework.settings import import_string
 
 from portal.academy import models, serializers
+from portal.academy.services import csvdata
 from portal.users.views import StudentViewsMixin, InstructorViewsMixin
 
 
@@ -120,30 +119,6 @@ class StudentUnitListView(StudentViewsMixin, BaseUnitListView):
 
 class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):
     template_name = "academy/student/unit_detail.html"
-
-
-
-def csvdata(spc_list, unit_list, object_list):
-    csvfile = StringIO()
-    csvwriter = csv.writer(csvfile)
-
-    headers = ["username", "slack_id", "submission_date", "total_score"]
-    specs = []
-    for spc in spc_list:
-        specs.extend([spc.code for _ in range(spc.unit_count)])
-
-    first_row = headers + [spc + "-" + unit.code for spc, unit in zip(specs, unit_list)]
-
-    rows = [first_row]
-    for obj in object_list:
-        user = [obj["user"].username, obj["user"].slack_member_id, obj["submission_date"], obj["total_score"]]
-        user_row = user + [grade.score or grade.status for grade in obj["grades"] if grade]
-        rows.append(user_row)
-
-    for row in rows:
-        csvwriter.writerow(row)
-
-    return csvfile.getvalue()
 
 
 class InstructorUserListView(InstructorViewsMixin, ListView):

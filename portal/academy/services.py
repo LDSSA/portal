@@ -1,9 +1,8 @@
+import csv
 import logging
-import random
-from itertools import zip_longest
 from io import StringIO
 
-from django.contrib.contenttypes.models import ContentType
+from django.db.models import Max
 
 from portal.academy.models import Specialization, Grade, Unit
 from portal.hackathons.models import Hackathon, Attendance
@@ -11,6 +10,29 @@ from portal.users.models import User
 
 
 logger = logging.getLogger(__name__)
+
+
+def csvdata(spc_list, unit_list, object_list):
+    csvfile = StringIO()
+    csvwriter = csv.writer(csvfile)
+
+    headers = ["username", "slack_id", "submission_date", "total_score"]
+    specs = []
+    for spc in spc_list:
+        specs.extend([spc.code for _ in range(spc.unit_count)])
+
+    first_row = headers + [spc + "-" + unit.code for spc, unit in zip(specs, unit_list)]
+
+    rows = [first_row]
+    for obj in object_list:
+        user = [obj["user"].username, obj["user"].slack_member_id, obj["submission_date"], obj["total_score"]]
+        user_row = user + [grade.score or grade.status for grade in obj["grades"] if grade]
+        rows.append(user_row)
+
+    for row in rows:
+        csvwriter.writerow(row)
+
+    return csvfile.getvalue()
 
 
 def check_graduation_status(user: User):
