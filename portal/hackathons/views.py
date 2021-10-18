@@ -13,6 +13,7 @@ from rest_framework import generics
 from portal.users.views import StudentViewsMixin, InstructorViewsMixin
 from portal.hackathons import models, serializers, forms, services
 from portal.capstone.models import StudentApi, Capstone
+from portal.academy.services import check_graduation_status
 
 
 logger = logging.getLogger(__name__)
@@ -266,6 +267,12 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
                 attendance, _ = models.Attendance.objects.get_or_create(
                     user=user, hackathon=self.object
                 )
+
+        # Update graduation eligibility status of user
+        elif new_status == "complete" and cur_status == "submissions_closed":
+            for user in get_user_model().objects.filter(is_student=True):
+                user.can_graduate = check_graduation_status(user)
+                user.save()
 
         # Delete test submissions
         elif new_status == "closed" and cur_status == "closed":
