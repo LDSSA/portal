@@ -1,11 +1,16 @@
 import pytest
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+
+from django.urls import reverse
 
 from portal.academy.views import csvdata
+from portal.academy.services import get_last_grade
 
 
 @pytest.mark.django_db(transaction=True)
-def test_csvdata(db, specialization, slu1, slu2, student, grade_slu1, grade_slu2):
+def test_csvdata(
+    db, specialization, slu1, slu2, student, grade_slu1, grade_slu2
+):
     """
     Test creation of csv file from table of student/unit grades
     """
@@ -22,5 +27,24 @@ def test_csvdata(db, specialization, slu1, slu2, student, grade_slu1, grade_slu2
         }
     ]
     text = csvdata(spc_list, unit_list, object_list)
-    assert text == "username,slack_id,submission_date,total_score,S01-SLU01,S01-SLU02\r\n" \
-                   "test_student,U12J14XV12Z,2021-08-15 00:00:00,38,18,20\r\n"
+    assert (
+        text
+        == "username,slack_id,submission_date,total_score,S01-SLU01,S01-SLU02\r\n"
+        "test_student,U12J14XV12Z,2021-08-15 00:00:00,38,18,20\r\n"
+    )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_grade_on_time(client, student, slu1):
+    slu1.due_date = datetime.now(timezone.utc) + timedelta(days=5)
+    slu1.save()
+
+    client.force_login(student)
+    client.post(reverse("academy:student-unit-detail", args=(slu1.pk,)))
+    assert get_last_grade(slu1, student).on_time == True
+
+    slu1.due_date = datetime.now(timezone.utc) - timedelta(days=5)
+    slu1.save()
+
+    client.post(reverse("academy:student-unit-detail", args=(slu1.pk,)))
+    assert get_last_grade(slu1, student).on_time == False

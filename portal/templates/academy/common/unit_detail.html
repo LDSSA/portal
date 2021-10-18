@@ -11,7 +11,12 @@
         <h1>{{ unit.code }}: {{ unit.name }}</h1>
       </div>
       <div class="col-md-auto">
+        Last Grade:
         {% show_grade grade %}
+      </div>
+      <div class="col-md-auto">
+        Best Grade:
+        {% show_grade best_grade %}
       </div>
       {% if unit.open %}
         <div class="col-md-auto">

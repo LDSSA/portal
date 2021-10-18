@@ -1,6 +1,7 @@
+import csv
 import logging
 from io import StringIO
-import csv
+from datetime import datetime, timezone
 
 from constance import config
 from django.conf import settings
@@ -14,6 +15,7 @@ from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework.settings import import_string
 
 from portal.academy import models, serializers
+from portal.academy.services import get_last_grade, get_best_grade
 from portal.users.views import StudentViewsMixin, InstructorViewsMixin
 
 
@@ -43,13 +45,6 @@ class HomeRedirectView(LoginRequiredMixin, RedirectView):
         return super().get_redirect_url(*args, **kwargs)
 
 
-def get_grade(unit, user):
-    grade = unit.grades.filter(user=user).order_by("-created").first()
-    if grade is None:
-        grade = models.Grade(user=user, unit=unit)
-    return grade
-
-
 class BaseUnitListView(ListView):
     model = models.Unit
     queryset = models.Unit.objects.order_by("specialization", "code")
@@ -61,7 +56,7 @@ class BaseUnitListView(ListView):
         self.object_list = self.get_queryset()
         data = []
         for unit in self.object_list:
-            grade = get_grade(unit, request.user)
+            grade = get_best_grade(unit, request.user)
             data.append((unit, grade))
 
         context = self.get_context_data(
@@ -75,29 +70,32 @@ class BaseUnitDetailView(DetailView):
     template_name = None
 
     def get(self, request, *args, **kwargs):
-        unit, grade = self.get_object()
-        context = self.get_context_data(unit=unit, grade=grade)
+        unit, grade, best_grade = self.get_object()
+        context = self.get_context_data(
+            unit=unit, grade=grade, best_grade=best_grade
+        )
         return self.render_to_response(context)
 
     # noinspection PyAttributeOutsideInit
     def get_object(self, queryset=None):
         self.object = super().get_object(queryset=queryset)
         unit = self.object
-        grade = (
-            unit.grades.filter(user=self.request.user)
-            .order_by("-created")
-            .first()
-        )
-        if grade is None:
-            grade = models.Grade(user=self.request.user, unit=unit)
-        return unit, grade
+        grade = get_last_grade(unit, self.request.user)
+        best_grade = get_best_grade(unit, self.request.user)
+        return unit, grade, best_grade
 
     def post(self, request, *args, **kwargs):
-        unit, _ = self.get_object()
+        unit, _, _ = self.get_object()
         grade = models.Grade(user=self.request.user, unit=unit)
 
         if not unit.checksum:
             raise RuntimeError("Not checksum present for this unit")
+
+        # Grade sent on time?
+        due_date = datetime.combine(
+            unit.due_date, datetime.max.time(), tzinfo=timezone.utc
+        )
+        grade.on_time = datetime.now(timezone.utc) <= due_date
 
         # Clear grade
         grade.status = "sent"
@@ -122,7 +120,6 @@ class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):
     template_name = "academy/student/unit_detail.html"
 
 
-
 def csvdata(spc_list, unit_list, object_list):
     csvfile = StringIO()
     csvwriter = csv.writer(csvfile)
@@ -132,12 +129,21 @@ def csvdata(spc_list, unit_list, object_list):
     for spc in spc_list:
         specs.extend([spc.code for _ in range(spc.unit_count)])
 
-    first_row = headers + [spc + "-" + unit.code for spc, unit in zip(specs, unit_list)]
+    first_row = headers + [
+        spc + "-" + unit.code for spc, unit in zip(specs, unit_list)
+    ]
 
     rows = [first_row]
     for obj in object_list:
-        user = [obj["user"].username, obj["user"].slack_member_id, obj["submission_date"], obj["total_score"]]
-        user_row = user + [grade.score or grade.status for grade in obj["grades"] if grade]
+        user = [
+            obj["user"].username,
+            obj["user"].slack_member_id,
+            obj["submission_date"],
+            obj["total_score"],
+        ]
+        user_row = user + [
+            grade.score or grade.status for grade in obj["grades"] if grade
+        ]
         rows.append(user_row)
 
     for row in rows:
@@ -156,7 +162,9 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
         can_graduate = self.request.GET.get("can_graduate")
 
         if can_graduate is not None:
-            return self.queryset.filter(can_graduate=can_graduate).order_by("name")
+            return self.queryset.filter(can_graduate=can_graduate).order_by(
+                "name"
+            )
 
         if user_id:
             return self.queryset.filter(id=user_id).order_by("name")
@@ -218,7 +226,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
                     user_data["grades"].append(None)
 
                 else:
-                    grade = get_grade(unit, user)
+                    grade = get_best_grade(unit, user)
                     if grade_status and grade.status != grade_status:
                         user_data["grades"].append(None)
                         continue
@@ -235,8 +243,13 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
             object_list.append(user_data)
 
         if "download" in kwargs and kwargs["download"] == "csv":
-            response = HttpResponse(csvdata(spc_list, unit_list, object_list), content_type="text/csv")
-            response["Content-Disposition"] = "attachment; filename=student-grades.csv"
+            response = HttpResponse(
+                csvdata(spc_list, unit_list, object_list),
+                content_type="text/csv",
+            )
+            response[
+                "Content-Disposition"
+            ] = "attachment; filename=student-grades.csv"
             return response
         else:
             context = self.get_context_data(

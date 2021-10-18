@@ -34,6 +34,19 @@ def student():
 
 
 @pytest.fixture
+def student2():
+    user = User.objects.create(
+        username="test_student_2",
+        name="test_student_2",
+        github_username="TestUser2",
+        slack_member_id="U12J144442Z",
+        is_student=True,
+        is_instructor=False,
+    )
+    return user
+
+
+@pytest.fixture
 def instructor():
     user = User.objects.create(
         username="test_instructor",

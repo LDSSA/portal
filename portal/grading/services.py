@@ -14,6 +14,13 @@ logger = logging.getLogger(__name__)
 pattern = re.compile("[^a-zA-Z0-9-]+")
 
 
+class MockGrading:
+    def __init__(self, grade):
+        pass
+
+    def run_grading(self):
+        pass
+
 class Grading:
     def __init__(self, grade):
         self.grade = grade
