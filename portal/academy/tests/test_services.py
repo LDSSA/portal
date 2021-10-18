@@ -3,7 +3,11 @@ from datetime import datetime
 
 from portal.hackathons.models import Attendance
 from portal.academy.models import Grade
-from portal.academy.services import check_graduation_status, check_complete_specialization
+from portal.academy.services import (
+    check_graduation_status,
+    check_complete_specialization,
+    csvdata,
+)
 
 
 @pytest.fixture
@@ -76,7 +80,9 @@ def attendances_graduate_ok_one_missed(student, hackathon1, hackathon2, hackatho
 
 
 @pytest.fixture
-def attendances_graduation_fail_first_missed(student, hackathon1, hackathon2, hackathon3):
+def attendances_graduation_fail_first_missed(
+    student, hackathon1, hackathon2, hackathon3
+):
     """
     Set student attendances for case when first hackathon was missed
     """
@@ -102,7 +108,9 @@ def attendances_graduation_fail_first_missed(student, hackathon1, hackathon2, ha
 
 
 @pytest.fixture
-def attendances_graduation_fail_too_many_missed(student, hackathon1, hackathon2, hackathon3):
+def attendances_graduation_fail_too_many_missed(
+    student, hackathon1, hackathon2, hackathon3
+):
     """
     Set student attendances for case when too many hackathons were missed, even
     if the first one was attended
@@ -129,11 +137,7 @@ def attendances_graduation_fail_too_many_missed(student, hackathon1, hackathon2,
 
 
 @pytest.mark.django_db(transaction=True)
-def test_check_graduation_status_ok(
-    db,
-    student,
-    attendances_graduate_ok
-):
+def test_check_graduation_status_ok(db, student, attendances_graduate_ok):
     """
     Checks student can graduate when all conditions are met:
 
@@ -147,9 +151,7 @@ def test_check_graduation_status_ok(
 
 @pytest.mark.django_db(transaction=True)
 def test_check_graduation_status_ok_missed_one_not_first(
-    db,
-    student,
-    attendances_graduate_ok_one_missed
+    db, student, attendances_graduate_ok_one_missed
 ):
     """
     Checks student can graduate when all conditions are met:
@@ -164,9 +166,7 @@ def test_check_graduation_status_ok_missed_one_not_first(
 
 @pytest.mark.django_db(transaction=True)
 def test_check_graduation_status_fail_missed_first(
-    db,
-    student,
-    attendances_graduation_fail_first_missed
+    db, student, attendances_graduation_fail_first_missed
 ):
     """
     Checks student can not graduate when one of the following conditions are met:
@@ -182,9 +182,7 @@ def test_check_graduation_status_fail_missed_first(
 
 @pytest.mark.django_db(transaction=True)
 def test_check_graduation_status_fail_missed_too_many(
-    db,
-    student,
-    attendances_graduation_fail_too_many_missed
+    db, student, attendances_graduation_fail_too_many_missed
 ):
     """
     Checks student can not graduate when one of the following conditions are met:
@@ -275,12 +273,7 @@ def test_check_complete_specialization_missing_slu2(
 
 @pytest.mark.django_db(transaction=True)
 def test_check_complete_specialization_missing_slu1_but_two_attempts_slu2(
-    db,
-    student,
-    specialization,
-    slu1,
-    grade_slu2,
-    grade_slu2_failed
+    db, student, specialization, slu1, grade_slu2, grade_slu2_failed
 ):
     """
     Checks student did not completed specialization when one of the SLUs is missing.
@@ -324,3 +317,27 @@ def test_check_complete_specialization_missing_all(
     """
 
     assert check_complete_specialization(student, specialization) is False
+
+
+@pytest.mark.django_db(transaction=True)
+def test_csvdata(db, specialization, slu1, slu2, student, grade_slu1, grade_slu2):
+    """
+    Test creation of csv file from table of student/unit grades
+    """
+
+    specialization.unit_count = 2
+    spc_list = [specialization]
+    unit_list = [slu1, slu2]
+    object_list = [
+        {
+            "user": student,
+            "grades": [grade_slu1, grade_slu2],
+            "submission_date": datetime(year=2021, month=8, day=15),
+            "total_score": 38,
+        }
+    ]
+    text = csvdata(spc_list, unit_list, object_list)
+    assert (
+        text == "username,slack_id,submission_date,total_score,S01-SLU01,S01-SLU02\r\n"
+        "test_student,U12J14XV12Z,2021-08-15 00:00:00,38,18,20\r\n"
+    )

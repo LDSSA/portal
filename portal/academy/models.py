@@ -1,5 +1,3 @@
-import random
-import string
 from datetime import datetime
 
 from django.db import models
@@ -25,9 +23,7 @@ class Unit(models.Model):
     code = models.CharField(max_length=255, primary_key=True)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    instructor = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )
+    instructor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     due_date = models.DateField(default=timezone.now)
     open = models.BooleanField(default=False)
 
@@ -41,18 +37,13 @@ class Unit(models.Model):
 
 def notebook_path(instance, filename):
     now = datetime.now().isoformat(timespec="seconds")
-    return (
-        f"{instance.unit.code}/{instance.user.username}/"
-        f"notebook_{now}.ipynb"
-    )
+    return f"{instance.unit.code}/{instance.user.username}/notebook_{now}.ipynb"
 
 
 def feedback_path(instance, filename):
     now = datetime.now().isoformat(timespec="seconds")
-    return (
-        f"{instance.unit.code}/{instance.user.username}/"
-        f"feeback_{now}.ipynb"
-    )
+    # TODO: fix file name
+    return f"{instance.unit.code}/{instance.user.username}/feeback_{now}.ipynb"
 
 
 class Grade(models.Model):
@@ -61,9 +52,7 @@ class Grade(models.Model):
         on_delete=models.CASCADE,
         related_name="grades",
     )
-    unit = models.ForeignKey(
-        Unit, on_delete=models.CASCADE, related_name="grades"
-    )
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="grades")
     created = models.DateTimeField(auto_now_add=True)
     notebook = models.FileField(upload_to=notebook_path, null=True)
 
