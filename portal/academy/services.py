@@ -119,7 +119,7 @@ def check_complete_specialization(user: User, spec: Specialization):
 
 
 def get_last_grade(unit, user):
-    grade = unit.grades.filter(user=user).order_by("-created").first()
+    grade = unit.grades.filter(user=user, status="graded").order_by("-created").first()
     if grade is None:
         grade = Grade(user=user, unit=unit)
     return grade
@@ -127,7 +127,7 @@ def get_last_grade(unit, user):
 
 def get_best_grade(unit, user):
     grade = (
-        unit.grades.filter(user=user, on_time=True).order_by("-score").first()
+        unit.grades.filter(user=user, status="graded", on_time=True).order_by("-score").first()
     )
     if grade is None:
         grade = Grade(user=user, unit=unit)
