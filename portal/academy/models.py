@@ -71,3 +71,4 @@ class Grade(models.Model):
     score = models.FloatField(null=True)
     message = models.TextField(blank=True)
     feedback = models.FileField(upload_to=feedback_path, null=True)
+    on_time = models.BooleanField(default=True)

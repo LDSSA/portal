@@ -1,13 +1,14 @@
 import pytest
 from datetime import datetime
 
-from portal.hackathons.models import Attendance
 from portal.academy.models import Grade
 from portal.academy.services import (
     check_graduation_status,
     check_complete_specialization,
     csvdata,
 )
+from portal.academy.services import get_last_grade, get_best_grade
+from portal.hackathons.models import Attendance
 
 
 @pytest.fixture
@@ -341,3 +342,31 @@ def test_csvdata(db, specialization, slu1, slu2, student, grade_slu1, grade_slu2
         text == "username,slack_id,submission_date,total_score,S01-SLU01,S01-SLU02\r\n"
         "test_student,U12J14XV12Z,2021-08-15 00:00:00,38,18,20\r\n"
     )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_grade_retrieve(slu1, student, student2):
+    """
+    Ensure grades are correctly retrieved.
+    """
+    Grade.objects.create(
+        user=student,
+        unit=slu1,
+        status="graded",
+        score=16,
+    )
+    Grade.objects.create(
+        user=student,
+        unit=slu1,
+        status="graded",
+        score=14,
+    )
+    Grade.objects.create(
+        user=student, unit=slu1, status="graded", score=20, on_time=False
+    )
+
+    assert get_last_grade(slu1, student).score == 20
+    assert get_best_grade(slu1, student).score == 16
+
+    assert get_last_grade(slu1, student2).score == None
+    assert get_best_grade(slu1, student2).score == None

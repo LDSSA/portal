@@ -43,6 +43,7 @@ class GradeAdmin(admin.ModelAdmin):
         "status",
         "created",
         "score",
+        "on_time",
     )
     search_fields = [
         "unit__code",
@@ -54,6 +55,7 @@ class GradeAdmin(admin.ModelAdmin):
         "status",
         "unit",
         "user",
+        "on_time",
     )
     fields = (
         "unit",
@@ -61,6 +63,7 @@ class GradeAdmin(admin.ModelAdmin):
         "status",
         "created",
         "score",
+        "on_time",
         "notebook",
         "message",
     )

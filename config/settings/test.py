@@ -16,6 +16,8 @@ SECRET_KEY = env(
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#test-runner
 TEST_RUNNER = "django.test.runner.DiscoverRunner"
+ROOT_URLCONF = "config.urls"
+GRADING_CLASS = "portal.grading.services.MockGrading"
 
 # CACHES
 # ------------------------------------------------------------------------------

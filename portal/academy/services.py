@@ -3,7 +3,6 @@ import logging
 from io import StringIO
 
 from django.db.models import Max
-
 from portal.academy.models import Specialization, Grade, Unit
 from portal.hackathons.models import Hackathon, Attendance
 from portal.users.models import User
@@ -59,7 +58,9 @@ def check_graduation_status(user: User):
 
     # TODO: set hackathon 1 as mandatory and verify for mandatory hackathons
     num_presences = attendances.filter(present=True).count()
-    present_in_first = attendances.filter(hackathon=first_hackathon).first().present
+    present_in_first = (
+        attendances.filter(hackathon=first_hackathon).first().present
+    )
 
     logger.info(
         f"Student {user.username} has been in {num_presences} out of {num_hackathons} "
@@ -80,7 +81,9 @@ def check_complete_specialization(user: User, spec: Specialization):
     Check student completed a specialization by verifying
     they passed on all units
     """
-    logger.info(f"Checking {user.name} completion of specialization: {spec.name}")
+    logger.info(
+        f"Checking {user.name} completion of specialization: {spec.name}"
+    )
 
     spec_units = [unit for unit in Unit.objects.filter(specialization=spec)]
     spec_units_codes = [u.code for u in spec_units]
@@ -104,8 +107,28 @@ def check_complete_specialization(user: User, spec: Specialization):
     )
 
     if sorted(passed_unit_codes) == sorted(spec_units_codes):
-        logger.info(f"Student {user.username} completed specialization {spec.name}")
+        logger.info(
+            f"Student {user.username} completed specialization {spec.name}"
+        )
         return True
 
-    logger.info(f"Student {user.username} did not complete specialization {spec.name}")
+    logger.info(
+        f"Student {user.username} did not complete specialization {spec.name}"
+    )
     return False
+
+
+def get_last_grade(unit, user):
+    grade = unit.grades.filter(user=user).order_by("-created").first()
+    if grade is None:
+        grade = Grade(user=user, unit=unit)
+    return grade
+
+
+def get_best_grade(unit, user):
+    grade = (
+        unit.grades.filter(user=user, on_time=True).order_by("-score").first()
+    )
+    if grade is None:
+        grade = Grade(user=user, unit=unit)
+    return grade
