@@ -165,7 +165,10 @@ def submission(hackathon, user, file):
     y_true = glob["load"](y_true)
 
     # Load prediction data
-    y_pred = glob["load"](file)
+    try:
+        y_pred = glob["load"](file)
+    except Exception as exc:
+        raise ValidationError("Error reading data") from exc
 
     try:
         is_valid = glob["validate"](y_true, y_pred)
