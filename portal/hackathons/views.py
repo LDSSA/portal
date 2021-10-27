@@ -307,7 +307,7 @@ class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):
             score = services.submission(
                 self.object, request.user, request.FILES["data"]
             )
-        except services.ValidationError as exc:
+        except ValidationError as exc:
             messages.add_message(
                 request, messages.ERROR, str(exc.__cause__ or exc)
             )  # Use root exception if defined

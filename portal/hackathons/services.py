@@ -4,6 +4,7 @@ from itertools import zip_longest
 from io import StringIO
 
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 
 from . import models
 
@@ -129,10 +130,6 @@ def get_groups(items, size, max_diff=1):
     logger.debug(groups)
 
     return groups
-
-
-class ValidationError(Exception):
-    pass
 
 
 def submission(hackathon, user, file):
