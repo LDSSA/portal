@@ -82,7 +82,7 @@ To seed the entire db with pre-arranged data, run:
 docker-compose run --rm django ./scripts/db_seed.sh
 ```
 
-You can then login with any of the users created, for which the passwords are `<user>1234` or 
+You can then login with any of the users created, for which the passwords are `<user>1234` or
 with the admin (user `admin`, password `123`)
 
 ### Starting
@@ -111,7 +111,7 @@ source docker/production/django/entrypoint
 
 #### Temporarily deprecated - data initialization from fixtures
 
-Currently the data under `fixtures/initial.yaml` is out of date and as such the 
+Currently the data under `fixtures/initial.yaml` is out of date and as such the
 following command is deprecated
 
 ```bash
@@ -148,14 +148,39 @@ docker volume rm portal_local_postgres_data
 docker volume rm portal_local_postgres_data_backups
 ```
 
-## Build & push
+## Deploy
 
-```bash
-docker build -f docker/production/django/Dockerfile -t ldssa/django:<commit hash> .
-```
-
-```bash
-docker push ldssa/django:<commit hash>
-```
-
-
+1. Build the container
+    * Use the commit hash that is on master to tag the image
+        ```bash
+        docker build -f docker/production/django/Dockerfile -t ldssa/django:<commit hash> .
+        ```
+1. Push the container
+    ```bash
+    docker push ldssa/django:<commit hash>
+    ```
+1. Set the new commit hash in the [portal-deployment repo](https://github.com/LDSSA/portal-deployment)
+    * Set the commit hash in the following files
+        ```bash
+        portal-staging/django-staging-deployment.yaml
+        portal/django-deployment.yaml
+        portal/scheduler-deployment.yaml
+        portal/simulator-deployment.yaml
+        ```
+1. Tell kubernetes to run the new container
+    ```bash
+    cd portal-deployment
+    kubectl apply -f portal
+    ```
+    * You might get this warning, no need to worry
+        * `The Service "django" is invalid: spec.ports[0].nodePort: Forbidden: may not be used when `type` is 'ClusterIP'`
+    * Make sure the old containers are killed and the new containers are running
+        * `watch kubectl get pods`
+1. Running migrations
+    * If you’ve changed the django models, then you’ll need to run migrations
+    ```bash
+    kubectl exec -ti $(kubectl get pods -l app=django -o custom-columns=:metadata.name | tail -n +2 | head -1) -- bash
+    source docker/production/django/entrypoint
+    ./manage.py showmigrations
+    ./manage.py migrate
+    ```
