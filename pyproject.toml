@@ -1,2 +1,7 @@
 [tool.black]
 line-length = 79
+
+[tool.pytest.ini_options]
+norecursedirs = 'node_modules'
+addopts = '--ds=config.settings.test --ignore=portal/applications --ignore=portal/candidate --ignore=portal/selection --ignore=portal/staff'
+testpaths = ['portal']
