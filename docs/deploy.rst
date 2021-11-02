@@ -10,9 +10,9 @@ Deploy
 
     docker push ldssa/django:<commit hash>
     
-#. Set the new commit hash in the [portal-deployment repo](https://github.com/LDSSA/portal-deployment)
+#. Set the new commit hash in the `portal-deployment repo <https://github.com/LDSSA/portal-deployment>`_.
 
-    * Set the commit hash in the following files
+    * Set the commit hash in the following files::
     
         portal-staging/django-staging-deployment.yaml
         portal/django-deployment.yaml

@@ -83,10 +83,12 @@ Emails are sent to:
 http://localhost:8025
 
 Admin creds
+
 * username: admin
 * password: 123
 
-Entering the container:
+Entering the container::
+
     docker-compose exec django bash
     source docker/production/django/entrypoint
 
@@ -102,6 +104,7 @@ your repository.
 
 Starting over
 -------------------
+::
 
     docker-compose rm
     docker volume rm portal_local_postgres_data
