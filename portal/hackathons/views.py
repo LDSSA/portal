@@ -217,9 +217,16 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
         object_list = sorted(object_list, key=lambda x: x["hackathon_team_id"])
         return object_list
 
+    @staticmethod
+    def _filter_can_attend_next(object_list):
+        return [item for item in object_list if item["student"].can_attend_next]
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         object_list = self.get_object_list()
+        if request.GET.get("filter_eligible"):
+            object_list = self._filter_can_attend_next(object_list)
+
         context = self.get_context_data(
             object=self.object, object_list=object_list
         )
@@ -228,6 +235,9 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
         object_list = self.get_object_list()
+
+        if request.GET.get("filter_eligible"):
+            object_list = self._filter_can_attend_next(object_list)
 
         new_status = request.POST.get("status")
         cur_status = self.object.status

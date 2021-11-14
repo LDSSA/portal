@@ -53,6 +53,13 @@
     </div>
     <div class="col-md-auto">
       <div class="mb-4">
+        <a href="{% add_query_param 'filter_eligible' true %}" >
+          <button type="submit" class="btn">Filter eligible</button>
+        </a>
+      </div>
+    </div>
+    <div class="col-md-auto">
+      <div class="mb-4">
         <form method="post">
           {% csrf_token %}
           <input type="hidden" name="status" value="closed">
