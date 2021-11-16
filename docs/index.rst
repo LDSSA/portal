@@ -14,6 +14,7 @@ Contents:
    install
    tests
    deploy
+   logs
 
 
 
