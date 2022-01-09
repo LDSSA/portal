@@ -1,13 +1,15 @@
 import logging
 
+from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.views.generic import ListView, DetailView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from portal.users.views import StudentMixin, InstructorMixin
 from portal.capstone import models, forms
+from portal.users.models import User
+from portal.users.views import StudentMixin, InstructorMixin
 
 
 logger = logging.getLogger(__name__)
@@ -43,23 +45,46 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):
             capstone=self.object, user=self.request.user
         )
 
-        return self.object, api
+        report = None
+        current_report = self.object.get_current_due_report()
+        if current_report:
+            report, _ = models.Report.objects.get_or_create(
+                capstone=self.object,
+                user=self.request.user,
+                type=current_report)
+
+        return self.object, api, report
 
     def get(self, request, *args, **kwargs):
-        capstone, api = self.get_object()
+        capstone, api, report = self.get_object()
         context = self.get_context_data(
             capstone=capstone,
             api=api,
             api_form=forms.ApiForm(instance=api),
+            report=report,
+            report_form=forms.ReportForm(instance=report),
         )
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        capstone, api = self.get_object()
+        capstone, api, report = self.get_object()
 
-        api_form = forms.ApiForm(request.POST, instance=api)
-        if api_form.is_valid():
-            api_form.save()
+        if "submit_api" in request.POST:
+            form = forms.ApiForm(request.POST, instance=api)
+            if form.is_valid():
+                form.save()
+
+        elif "submit_report" in request.POST:
+            current_report = capstone.get_current_due_report
+            if current_report is None:
+                raise forms.ValidationError("Not accepting reports at the moment!")
+
+            form = forms.ReportForm(request.POST, request.FILES, instance=report)
+            if form.is_valid():
+                form.save()
+                messages.add_message(
+                    request, messages.SUCCESS, "Report submited successfully!"
+                )
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -82,9 +107,20 @@ class InstructorCapstoneDetailView(InstructorMixin, DetailView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
+        student_data = []
+        for student in User.objects.filter(is_student=True):
+            student_data.append({
+                'user': student,
+                'api': models.StudentApi.objects.filter(capstone=self.object, user=student).first(),
+                'report_1_provisory': models.Report.objects.filter(capstone=self.object, user=student, type=models.Report.Type.report_1_provisory).first(),
+                'report_1_final': models.Report.objects.filter(capstone=self.object, user=student, type=models.Report.Type.report_1_final).first(),
+                'report_2_provisory': models.Report.objects.filter(capstone=self.object, user=student, type=models.Report.Type.report_2_provisory).first(),
+                'report_2_final': models.Report.objects.filter(capstone=self.object, user=student, type=models.Report.Type.report_2_final).first(),
+            })
+
         context = self.get_context_data(
             object=self.object,
-            student_apis=self.object.studentapi_set.all(),
+            students=student_data,
         )
         return self.render_to_response(context)
 

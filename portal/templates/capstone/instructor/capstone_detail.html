@@ -16,14 +16,22 @@
       <th scope="col">Student</th>
       <th scope="col">URL</th>
       <th scope="col">Score</th>
+      <th scope="col">Report 1 Provisory</th>
+      <th scope="col">Report 1 Final</th>
+      <th scope="col">Report 2 Provisory</th>
+      <th scope="col">Report 2 Final</th>
     </tr>
     </thead>
     <tbody>
-    {% for obj in student_apis %}
+    {% for student in students %}
       <tr>
-        <th>{{ obj.student.username }}</th>
-        <td>{{ obj.url }}</td>
-        <td>{{ obj.score }}</td>
+        <th>{{ student.user.username }}</th>
+        <td>{{ student.api.url }}</td>
+        <td>{{ student.api.score }}</td>
+        <td>{% if student.report_1_provisory.file %}<a href="{{ student.report_1_provisory.file.url }}">DL</a>{% endif %}</td>
+        <td>{% if student.report_1_final.file %}<a href="{{ student.report_1_final.file.url }}">DL</a>{% endif %}</td>
+        <td>{% if student.report_2_provisory.file %}<a href="{{ student.report_2_provisory.file.url }}">DL</a>{% endif %}</td>
+        <td>{% if student.report_2_final.file %}<a href="{{ student.report_2_final.file.url }}">DL</a>{% endif %}</td>
       </tr>
     {% endfor %}
     </tbody>

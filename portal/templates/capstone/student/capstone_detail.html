@@ -14,14 +14,36 @@
   <div class="row">
     <div class="col-md-auto">
       <div class="mb-4">
-        <h3>Submit</h3>
+        <h3>API</h3>
         <form method="post">
           {% csrf_token %}
           {{ api_form|crispy }}
           <button type="submit"
                   class="btn btn-success"
-                  name="submit">Submit</button>
+                  name="submit_api">Submit</button>
         </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-auto">
+      <div class="mb-4">
+        {% if capstone.get_current_due_report %}
+        <h3>Accepting {{ report.get_type_display }}</h3>
+        {% if report.file %}
+          <p>Submited at: {{ report.submited_at }}</p>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ report_form|crispy }}
+          <button type="submit"
+                  class="btn btn-success"
+                  name="submit_report">Submit</button>
+        </form>
+        {% else %}
+        <h3>Not accepting reports</h3>
+        {% endif %}
       </div>
     </div>
   </div>
