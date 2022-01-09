@@ -15,6 +15,7 @@
     <thead>
       <tr>
         <th scope="col">Logo</th>
+        <th scope="col">Team</th>
         <th scope="col">Name</th>
         <th scope="col">Score</th>
       </tr>
@@ -25,6 +26,7 @@
          <th>
            <img src="{{ obj.logo }}" alt="{{ obj.name }}">
          </th>
+         <td>{{ obj.hackathon_team_id }}</td>
          <td>{{ obj.name }}</td>
          <td>{{ submission.score|floatformat:3 }}</td>
        </tr>
