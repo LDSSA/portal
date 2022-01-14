@@ -11,10 +11,10 @@ class CapstoneAdmin(admin.ModelAdmin):
     fields = (
         "name",
         "scoring",
-        "report_1_provisory_due_date",
-        "report_1_final_due_date",
-        "report_2_provisory_due_date",
-        "report_2_final_due_date",
+        "report_1_provisory_open",
+        "report_1_final_open",
+        "report_2_provisory_open",
+        "report_2_final_open",
     )
 
 

@@ -23,10 +23,10 @@ class Capstone(models.Model):
     name = models.CharField(max_length=1024)
 
     scoring = models.FileField(upload_to=random_path, null=True, blank=True)
-    report_1_provisory_due_date = models.DateTimeField()
-    report_1_final_due_date = models.DateTimeField()
-    report_2_provisory_due_date = models.DateTimeField()
-    report_2_final_due_date = models.DateTimeField()
+    report_1_provisory_open = models.BooleanField(default=False)
+    report_1_final_open = models.BooleanField(default=False)
+    report_2_provisory_open = models.BooleanField(default=False)
+    report_2_final_open = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -42,17 +42,6 @@ class Capstone(models.Model):
             score = glob["score"](self, api)
             api.score = score
             api.save()
-
-    def get_current_due_report(self):
-        now = datetime.now(timezone.utc)
-        if now <= self.report_1_provisory_due_date:
-            return Report.Type.report_1_provisory
-        elif self.report_1_provisory_due_date + timedelta(days=1) < now <= self.report_1_final_due_date:
-            return Report.Type.report_1_final
-        elif self.report_1_final_due_date + timedelta(days=1) < now <= self.report_2_provisory_due_date:
-            return Report.Type.report_2_provisory
-        elif self.report_2_provisory_due_date + timedelta(days=1) < now <= self.report_2_final_due_date:
-            return Report.Type.report_2_final
 
 
 class Report(models.Model):

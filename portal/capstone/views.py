@@ -45,46 +45,43 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):
             capstone=self.object, user=self.request.user
         )
 
-        report = None
-        current_report = self.object.get_current_due_report()
-        if current_report:
+        reports = {}
+        for type_ in models.Report.Type.values:
             report, _ = models.Report.objects.get_or_create(
                 capstone=self.object,
                 user=self.request.user,
-                type=current_report)
+                type=type_)
+            reports[type_] = report
 
-        return self.object, api, report
+        return self.object, api, reports
 
     def get(self, request, *args, **kwargs):
-        capstone, api, report = self.get_object()
+        capstone, api, reports = self.get_object()
         context = self.get_context_data(
             capstone=capstone,
             api=api,
             api_form=forms.ApiForm(instance=api),
-            report=report,
-            report_form=forms.ReportForm(instance=report),
+            report_forms={report_type: forms.ReportForm(instance=report) for report_type, report in reports.items()},
         )
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
-        capstone, api, report = self.get_object()
+        capstone, api, reports = self.get_object()
 
         if "submit_api" in request.POST:
             form = forms.ApiForm(request.POST, instance=api)
             if form.is_valid():
                 form.save()
 
-        elif "submit_report" in request.POST:
-            current_report = capstone.get_current_due_report
-            if current_report is None:
-                raise forms.ValidationError("Not accepting reports at the moment!")
-
-            form = forms.ReportForm(request.POST, request.FILES, instance=report)
-            if form.is_valid():
-                form.save()
-                messages.add_message(
-                    request, messages.SUCCESS, "Report submited successfully!"
-                )
+        else:
+            for report_type, report in reports.items():
+                if f"submit_{report_type}" in request.POST:
+                    form = forms.ReportForm(request.POST, request.FILES, instance=report)
+                    if form.is_valid():
+                        form.save()
+                        messages.add_message(
+                            request, messages.SUCCESS, "Report submited successfully!"
+                        )
 
         return HttpResponseRedirect(self.get_success_url())
 

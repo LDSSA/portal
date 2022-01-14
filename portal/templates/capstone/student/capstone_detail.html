@@ -26,10 +26,10 @@
     </div>
   </div>
 
+  {% for report_type, report_form in report_forms.items %}
   <div class="row">
     <div class="col-md-auto">
       <div class="mb-4">
-        {% if capstone.get_current_due_report %}
         <h3>Accepting {{ report.get_type_display }}</h3>
         {% if report.file %}
           <p>Submited at: {{ report.submited_at }}</p>
@@ -39,14 +39,12 @@
           {{ report_form|crispy }}
           <button type="submit"
                   class="btn btn-success"
-                  name="submit_report">Submit</button>
+                  name="submit_{{ report_type }}">Submit</button>
         </form>
-        {% else %}
-        <h3>Not accepting reports</h3>
-        {% endif %}
       </div>
     </div>
   </div>
+  {% endfor %}
 
 {% endblock content %}
 
