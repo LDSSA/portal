@@ -109,7 +109,7 @@ class Simulator(models.Model):
         logger.info(
             "Creating due datapoints for simulator %s student %s",
             self,
-            student_api.student,
+            student_api.user,
         )
         due = starts or datetime.now(timezone.utc)
         interval = (self.ends - starts) / datapoints.count()
@@ -126,7 +126,7 @@ class Simulator(models.Model):
                 DueDatapoint(
                     simulator=self,
                     datapoint=datapoint,
-                    user=student_api.student,
+                    user=student_api.user,
                     due=due,
                     url=url,
                 )
