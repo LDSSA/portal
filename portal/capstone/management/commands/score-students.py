@@ -10,5 +10,5 @@ class Command(BaseCommand):
         parser.add_argument("capstone")
 
     def handle(self, *args, **options):
-        capstone = models.Capstone(name=options["capstone"])
+        capstone = models.Capstone.objects.get(name=options["capstone"])
         capstone.score()
