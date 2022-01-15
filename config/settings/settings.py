@@ -25,8 +25,6 @@ if READ_DOT_ENV_FILE:
 TIMEOUT = 5
 SIMULATOR_INTERVAL = 5
 PRODUCER_INTERVAL = 1
-REQUEST_TIMEOUT = 10
-BLOCK_SIZE = 500
 
 # GRADING
 # ------------------------------------------------------------------------------

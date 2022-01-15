@@ -83,22 +83,6 @@ class Simulator(models.Model):
         ).exclude(url="")
 
         interval = (self.ends - starts) / datapoints.count()
-
-        # Assuming one producer we are queueing BLOCK_SIZE requests per cycle
-        # to queue enough requests we need to queue at least
-        # (PRODUCER_INTERVAL / interval) * number of students
-        required_requests_per_cycle = student_apis.count() * (
-            settings.PRODUCER_INTERVAL / interval.total_seconds()
-        )
-        logger.debug("Block size: %s", settings.BLOCK_SIZE)
-        logger.debug("Required requests: %s", required_requests_per_cycle)
-        if settings.BLOCK_SIZE < required_requests_per_cycle:
-            raise RuntimeError(
-                f"Number of queued requests per cycle is not enough, "
-                f"required {required_requests_per_cycle}",
-                f"consumed {settings.BLOCK_SIZE}",
-            )
-
         self.interval = interval
         self.save()
 
@@ -163,13 +147,12 @@ class DueDatapoint(models.Model):
 
     due = models.DateTimeField(null=True)
     STATE_CHOICES = (
-        ("due", "due"),
         ("queued", "queued"),
         ("success", "success"),
         ("fail", "fail"),
     )
     state = models.CharField(
-        choices=STATE_CHOICES, default="due", max_length=64
+        choices=STATE_CHOICES, default="queued", max_length=64
     )
 
     response_content = models.TextField(blank=True)
@@ -178,3 +161,8 @@ class DueDatapoint(models.Model):
     response_elapsed = models.FloatField(null=True)
     response_status = models.IntegerField(null=True)
     response_timeout = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['due', 'state']),
+        ]
