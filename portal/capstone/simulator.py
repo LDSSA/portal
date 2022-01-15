@@ -119,9 +119,7 @@ def consume(id_):
                 )
 
             except requests.exceptions.RequestException as exc:
-                logger.info("Request Exception %s", id_, exc_info=True)
-                logger.debug(exc.__class__.__name__)
-                logger.debug(traceback.format_tb(exc.__traceback__))
+                logger.info("Student API Request Exception %s", id_, exc_info=True)
 
                 due_datapoint.state = "fail"
                 due_datapoint.response_exception = exc.__class__.__name__
