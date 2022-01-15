@@ -28,7 +28,7 @@ class Capstone(models.Model):
 
         for api in self.studentapi_set.all():
             # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
-            score = glob["score"](self, api)
+            score = glob["score"](api)
             api.score = score
             api.save()
 
