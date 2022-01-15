@@ -8,7 +8,20 @@ from portal.capstone import models
 @admin.register(models.Capstone)
 class CapstoneAdmin(admin.ModelAdmin):
     list_display = ("name",)
-    fields = ("name", "scoring")
+    fields = (
+        "name",
+        "scoring",
+        "report_1_provisory_open",
+        "report_1_final_open",
+        "report_2_provisory_open",
+        "report_2_final_open",
+    )
+
+
+@admin.register(models.Report)
+class ReportAdmin(admin.ModelAdmin):
+    list_display = ("capstone", "user", "type")
+    fields = ("capstone", "user", "type", "file", "submited_at")
 
 
 @admin.register(models.StudentApi)

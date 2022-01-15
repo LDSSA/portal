@@ -1,5 +1,7 @@
 import logging
-from datetime import datetime, timezone
+import random
+import string
+from datetime import datetime, timezone, timedelta
 from urllib.parse import urljoin
 
 from django.db import models
@@ -12,10 +14,19 @@ from portal.users.models import User
 logger = logging.getLogger(__name__)
 
 
+def report_path(instance, filename):
+    randstr = "".join(random.choices(string.ascii_lowercase, k=12))
+    return f"{instance.user.username}/{instance.type}_{instance.user.username}_{randstr}.pdf"
+
+
 class Capstone(models.Model):
     name = models.CharField(max_length=1024)
 
     scoring = models.FileField(upload_to=random_path, null=True, blank=True)
+    report_1_provisory_open = models.BooleanField(default=False)
+    report_1_final_open = models.BooleanField(default=False)
+    report_2_provisory_open = models.BooleanField(default=False)
+    report_2_final_open = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -31,6 +42,20 @@ class Capstone(models.Model):
             score = glob["score"](api)
             api.score = score
             api.save()
+
+
+class Report(models.Model):
+    class Type(models.TextChoices):
+        report_1_provisory = ("report_1_provisory", "Report 1 Provisory")
+        report_1_final = ("report_1_final", "Report 1 Final")
+        report_2_provisory = ("report_2_provisory", "Report 2 Provisory")
+        report_2_final = ("report_2_final", "Report 2 Final")
+
+    capstone = models.ForeignKey(Capstone, models.CASCADE)
+    user = models.ForeignKey(User, models.CASCADE)
+    type = models.CharField(max_length=32, choices=Type.choices)
+    file = models.FileField(upload_to=report_path, null=True, blank=True)
+    submited_at = models.DateTimeField(auto_now=True)
 
 
 class StudentApi(models.Model):
