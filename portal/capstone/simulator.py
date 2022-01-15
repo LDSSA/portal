@@ -74,7 +74,7 @@ def run_producer(submissions):
                     .order_by('due')
                     .filter(state="queued")
                     .filter(simulator__status="started")
-                    .filter(due__lte=now).last()
+                    .filter(due__lte=now).first()
                 )
                 logger.debug("Locked %s", due_datapoint.id)
                 due_datapoint.state = "due"
@@ -88,7 +88,7 @@ def run_producer(submissions):
 def send_datapoint(due_datapoint):
     try:
         try:
-            logger.info("Posting %s", due_datapoint.id)
+            logger.info("Posting %s %s %s", due_datapoint.id, due_datapoint.user.username, due_datapoint.due)
             data = json.loads(due_datapoint.datapoint.data)
             response = requests.post(
                 due_datapoint.url, json=data, timeout=settings.TIMEOUT
