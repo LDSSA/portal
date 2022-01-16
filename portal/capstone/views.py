@@ -61,7 +61,7 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):
             capstone=capstone,
             api=api,
             api_form=forms.ApiForm(instance=api),
-            report_forms={report_type: forms.ReportForm(instance=report) for report_type, report in reports.items()},
+            reports=[[report_type, forms.ReportForm(instance=report), report] for report_type, report in reports.items() if getattr(capstone, f"{report_type}_open")],
         )
         return self.render_to_response(context)
 
