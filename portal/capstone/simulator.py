@@ -79,7 +79,7 @@ def run_producer():
                     )
                 except DatabaseError:
                     logger.debug("Unable to aquire lock")
-                    pass
+                    continue
                 if due_datapoint is None:
                     continue
                 logger.debug("Locked %s", due_datapoint.id)
