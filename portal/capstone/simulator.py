@@ -1,6 +1,5 @@
 import json
 import logging
-import queue
 import random
 import time
 import traceback
@@ -8,28 +7,29 @@ from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 from datetime import datetime, timezone
 
 import requests
-from django.db import transaction, close_old_connections
+from django.db import transaction, close_old_connections, DatabaseError
 from django.conf import settings
 
 from portal.capstone import models
 
 
 logger = logging.getLogger(__name__)
+WORKERS = 50
 
 
 def run():
     # Queue
-    submissions = queue.Queue()
 
     # Start consumer pool
-    with PoolExecutor(max_workers=50) as executor:
+    with PoolExecutor(max_workers=WORKERS) as executor:
         # Start simulator
         logger.info("Starting simulator..")
         executor.submit(run_simulator)
 
         # Start producer
-        logger.info("Starting producer...")
-        executor.submit(run_producer, submissions)
+        for idx in range(WORKERS-1):
+            logger.info("Starting producer %s...", idx)
+            executor.submit(run_producer)
 
 
 def run_simulator():
@@ -50,7 +50,7 @@ def run_simulator():
         time.sleep(settings.SIMULATOR_INTERVAL)
 
 
-def run_producer(submissions):
+def run_producer():
     # Prevent thundering herd
     time.sleep(2 * random.random())
 
@@ -69,13 +69,19 @@ def run_producer(submissions):
                 # Lock due datapoints
                 # prevent multiple producers from repeating datapoints
                 now = datetime.now(timezone.utc)
-                due_datapoint = (
-                    models.DueDatapoint.objects.select_for_update()
-                    .order_by('due')
-                    .filter(state="queued")
-                    .filter(simulator__status="started")
-                    .filter(due__lte=now).first()
-                )
+                try:
+                    due_datapoint = (
+                        models.DueDatapoint.objects.select_for_update(nowait=True)
+                        .order_by('due')
+                        .filter(state="queued")
+                        .filter(simulator__status="started")
+                        .filter(due__lte=now).first()
+                    )
+                except DatabaseError:
+                    logger.debug("Unable to aquire lock")
+                    pass
+                if due_datapoint is None:
+                    continue
                 logger.debug("Locked %s", due_datapoint.id)
                 due_datapoint.state = "due"
                 due_datapoint.save()
