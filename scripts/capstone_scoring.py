@@ -1,3 +1,9 @@
+##############################################################################
+# To run the scoring
+# get a shell in a container running the portal
+# source docker/production/django/entrypoint
+# ./manage.py score-students "Hackathon 6"
+##############################################################################
 import json
 
 from sklearn import metrics
