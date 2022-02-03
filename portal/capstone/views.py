@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -118,6 +119,7 @@ class InstructorCapstoneDetailView(InstructorMixin, DetailView):
         context = self.get_context_data(
             object=self.object,
             students=student_data,
+            workspace_url=settings.SLACK_WORKSPACE,
         )
         return self.render_to_response(context)
 

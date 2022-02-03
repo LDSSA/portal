@@ -27,7 +27,7 @@
     {% for student in students %}
       <tr>
         <th>{{ student.user.username }}</th>
-        <td><a href="{{ workspace_url }}{{ obj.user.slack_member_id }}" target="_blank" class="text-dark">{{ obj.user.slack_member_id }}</a></td>
+        <td><a href="{{ workspace_url }}{{ student.user.slack_member_id }}" target="_blank" class="text-dark">{{ student.user.slack_member_id }}</a></td>
         <td>{{ student.api.url }}</td>
         <td>{{ student.api.score }}</td>
         <td>{% if student.report_1_provisory.file %}<a href="{{ student.report_1_provisory.file.url }}">DL</a>{% endif %}</td>
