@@ -55,6 +55,7 @@ def run_producer():
     time.sleep(2 * random.random())
 
     while True:
+        time.sleep(settings.PRODUCER_INTERVAL)
         logger.debug("Producer cycle...")
         close_old_connections()
 
