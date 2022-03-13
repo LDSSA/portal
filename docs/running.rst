@@ -1,7 +1,10 @@
-Install
-=========
+Running Locally
+================
 
-The first time you run this you need to create the database and a super user.
+The first time you run this you need to create the database, a super user and a 
+network (used for local grading).
+
+	 docker network create portal
 
 Start by running the following command::
 
@@ -95,7 +98,6 @@ Entering the container::
 
 Test submissions
 -------------------
-
 To test submissions get the hash for the exercise notebook using ldsagrader add
 it to the unit.
 Then create a student user with your github username and add the deploy key to
@@ -109,3 +111,21 @@ Starting over
     docker-compose rm
     docker volume rm portal_local_postgres_data
     docker volume rm portal_local_postgres_data_backups
+
+
+Running Admissions
+-------------------
+The dynamic (changeable in the backoffice) variable `PORTAL_STATUS` determines
+the the current state of the portal:
+
+* `admissions`
+* `admissions:applications`
+* `admissions:selection`
+* `academy`
+
+The `scheduler` service is will change the portal from one state to the next
+according to the value setup in the following variables:
+
+* `ACADEMY_START`
+* `ADMISSIONS_APPLICATIONS_START`
+* `ADMISSIONS_SELECTION_START`
