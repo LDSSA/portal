@@ -115,13 +115,14 @@ Starting over
 
 Running Admissions
 -------------------
-The dynamic (changeable in the backoffice) variable `PORTAL_STATUS` determines
-the the current state of the portal:
+The setting `PORTAL_STATUS` determines the current portal state:
 
 * `admissions`
 * `admissions:applications`
 * `admissions:selection`
 * `academy`
+
+Changing the state is done in the backoffice (admin page) under `Constance > config`.
 
 The `scheduler` service is will change the portal from one state to the next
 according to the value setup in the following variables:

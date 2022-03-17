@@ -1,6 +1,8 @@
 Project Setup
 ===============
 
+.. image:: assets/learning_units.png
+
 Repositories & CI
 ------------------
 
@@ -13,7 +15,7 @@ The CI pipeline on the instructors repository will:
 * Create a docker image for the exercise
 * Remove exercise solutions and place it on the students repository
 
-This requries the following environment varibles to be setup in the CI:
+This requires the following environment variables to be setup in the CI:
 
 * `DOCKER_PASS`
 * `DOCKER_USER`
@@ -24,7 +26,7 @@ This requries the following environment varibles to be setup in the CI:
 
 Admissions requires it's own repositories setup.
 
-Portal Varibles
+Portal Variables
 ------------------
 
 Portal setup is done mostly through its kubernetes configmap.

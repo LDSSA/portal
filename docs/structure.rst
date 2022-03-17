@@ -4,16 +4,17 @@ Project Structure
 
 File Structure
 -------------------
+Here are a few of the more important project directories.
 
-* `.devcontainer` - Developing in *VS Code* development containers.
-* `.envs/.local` - Environment files to run the project locally.
-* `.vscode` - *VS Code* config.
-* `config` - Project root config.
-* `docker` - Dockerfiles.
-* `docs` - Portal documentation.
-* `portal` - Source code.
-* `requirements` - Local and production project requiremtnts.
-* `scripts` - Helper scripts.
+* `.devcontainer/` - Contains *VS Code* development containers config.
+* `.envs/.local/` - Environment files to run the project locally.
+* `.vscode/` - *VS Code* config.
+* `config/` - Project root config.
+* `docker/` - Dockerfiles.
+* `docs/` - Portal documentation.
+* `portal/` - Source code.
+* `requirements/` - Local and production project requiremtnts.
+* `scripts/` - Helper scripts.
 
 
 Services
