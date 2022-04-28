@@ -1,5 +1,7 @@
 import logging
-from datetime import datetime, timezone
+import random
+import string
+from datetime import datetime, timezone, timedelta
 from urllib.parse import urljoin
 
 from django.db import models
@@ -12,10 +14,19 @@ from portal.users.models import User
 logger = logging.getLogger(__name__)
 
 
+def report_path(instance, filename):
+    randstr = "".join(random.choices(string.ascii_lowercase, k=12))
+    return f"{instance.user.username}/{instance.type}_{instance.user.username}_{randstr}.pdf"
+
+
 class Capstone(models.Model):
     name = models.CharField(max_length=1024)
 
     scoring = models.FileField(upload_to=random_path, null=True, blank=True)
+    report_1_provisory_open = models.BooleanField(default=False)
+    report_1_final_open = models.BooleanField(default=False)
+    report_2_provisory_open = models.BooleanField(default=False)
+    report_2_final_open = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
@@ -28,9 +39,23 @@ class Capstone(models.Model):
 
         for api in self.studentapi_set.all():
             # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
-            score = glob["score"](self, api)
+            score = glob["score"](api)
             api.score = score
             api.save()
+
+
+class Report(models.Model):
+    class Type(models.TextChoices):
+        report_1_provisory = ("report_1_provisory", "Report 1 Provisory")
+        report_1_final = ("report_1_final", "Report 1 Final")
+        report_2_provisory = ("report_2_provisory", "Report 2 Provisory")
+        report_2_final = ("report_2_final", "Report 2 Final")
+
+    capstone = models.ForeignKey(Capstone, models.CASCADE)
+    user = models.ForeignKey(User, models.CASCADE)
+    type = models.CharField(max_length=32, choices=Type.choices)
+    file = models.FileField(upload_to=report_path, null=True, blank=True)
+    submited_at = models.DateTimeField(auto_now=True)
 
 
 class StudentApi(models.Model):
@@ -83,22 +108,6 @@ class Simulator(models.Model):
         ).exclude(url="")
 
         interval = (self.ends - starts) / datapoints.count()
-
-        # Assuming one producer we are queueing BLOCK_SIZE requests per cycle
-        # to queue enough requests we need to queue at least
-        # (PRODUCER_INTERVAL / interval) * number of students
-        required_requests_per_cycle = student_apis.count() * (
-            settings.PRODUCER_INTERVAL / interval.total_seconds()
-        )
-        logger.debug("Block size: %s", settings.BLOCK_SIZE)
-        logger.debug("Required requests: %s", required_requests_per_cycle)
-        if settings.BLOCK_SIZE < required_requests_per_cycle:
-            raise RuntimeError(
-                f"Number of queued requests per cycle is not enough, "
-                f"required {required_requests_per_cycle}",
-                f"consumed {settings.BLOCK_SIZE}",
-            )
-
         self.interval = interval
         self.save()
 
@@ -109,7 +118,7 @@ class Simulator(models.Model):
         logger.info(
             "Creating due datapoints for simulator %s student %s",
             self,
-            student_api.student,
+            student_api.user,
         )
         due = starts or datetime.now(timezone.utc)
         interval = (self.ends - starts) / datapoints.count()
@@ -126,7 +135,7 @@ class Simulator(models.Model):
                 DueDatapoint(
                     simulator=self,
                     datapoint=datapoint,
-                    user=student_api.student,
+                    user=student_api.user,
                     due=due,
                     url=url,
                 )
@@ -163,13 +172,12 @@ class DueDatapoint(models.Model):
 
     due = models.DateTimeField(null=True)
     STATE_CHOICES = (
-        ("due", "due"),
         ("queued", "queued"),
         ("success", "success"),
         ("fail", "fail"),
     )
     state = models.CharField(
-        choices=STATE_CHOICES, default="due", max_length=64
+        choices=STATE_CHOICES, default="queued", max_length=64
     )
 
     response_content = models.TextField(blank=True)
@@ -178,3 +186,8 @@ class DueDatapoint(models.Model):
     response_elapsed = models.FloatField(null=True)
     response_status = models.IntegerField(null=True)
     response_timeout = models.BooleanField(default=False)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['due', 'state']),
+        ]

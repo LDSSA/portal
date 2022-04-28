@@ -7,3 +7,9 @@ class ApiForm(forms.ModelForm):
     class Meta:
         model = models.StudentApi
         fields = ["url"]
+
+
+class ReportForm(forms.ModelForm):
+    class Meta:
+        model = models.Report
+        fields = ["file"]

@@ -11,10 +11,12 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   install
+   structure
+   running
    tests
    deploy
    logs
+   setup
 
 
 
