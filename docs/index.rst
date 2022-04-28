@@ -15,6 +15,7 @@ Contents:
    running
    tests
    deploy
+   logs
    setup
 
 
