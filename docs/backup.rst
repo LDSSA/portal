@@ -1,6 +1,13 @@
 Backup Portal Data
 ========
 
+Backup Process
+------------------
+
+
+
+
+
 The following process assumes we are doign a backup for batch 5, as an example.
 
 #. Create the db snapshot (we will then back up the snapshot to s3)
@@ -66,6 +73,12 @@ The following process assumes we are doign a backup for batch 5, as an example.
         --s3-bucket-name ldsa-portal-batch5-backup \
         --iam-role-arn arn:aws:iam::036806565123:role/rds-s3-export-role \
         --kms-key-id arn:aws:kms:eu-west-1:036806565123:key/754f1adc-3cc7-4578-b06c-61d41de40a4e
+
+Existing Backups
+------------------
+
+* https://s3.console.aws.amazon.com/s3/buckets/ldsa-portal-batch4-backup?region=eu-west-1
+* https://s3.console.aws.amazon.com/s3/buckets/ldsa-portal-batch5-backup?region=eu-west-1
 
 Resources
 ------------------
