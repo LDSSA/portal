@@ -21,7 +21,7 @@ RUN chmod +x kubectl && mv kubectl /bin/kubectl
 # Instal aws cli
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
     && unzip awscliv2.zip \
-    && ./aws/install \
+    && ./aws/install --update \
     && rm -r aws
 
 # aws-iam-authenticator
