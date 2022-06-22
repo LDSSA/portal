@@ -17,14 +17,21 @@ The CI pipeline on the instructors repository will:
 
 This requires the following environment variables to be setup in the CI:
 
-* `DOCKER_PASS`
-* `DOCKER_USER`
-* `PORTAL_CHECKSUM_URL_TEMPLATE`
-* `PORTAL_HACKATHON_URL_TEMPLATE`
-* `PORTAL_TOKEN`
-* `STUDENT_REPO`
+* `DOCKER_PASS` - Set as global environment variable
+* `DOCKER_USER` - Set as global environment variable
+* `PORTAL_CHECKSUM_URL_TEMPLATE` - Set to `https://portal.lisbondatascience.org/grading/academy/checksums/{unit_id}/`
+* `PORTAL_HACKATHON_URL_TEMPLATE` - Set to `https://portal.lisbondatascience.org/hackathons/api/setup/{unit_id}/`
+* `PORTAL_TOKEN` - Set to `portal-api` token in portal backoffice
+* `STUDENT_REPO` - Set to the student repo ssh URL
 
-Admissions requires it's own repositories setup.
+> Admissions requires it's own repositories setup.
+
+This requires the following environment variables to be setup in the CI:
+
+* `DOCKER_PASS` - Set as global environment variable
+* `DOCKER_USER` - Set as global environment variable
+* `PORTAL_CHECKSUM_URL_TEMPLATE` - Set to `https://portal.lisbondatascience.org/grading/admissions/checksums/{unit_id}/`
+* `STUDENT_REPO` - Set to the student repo ssh URL
 
 Portal Variables
 ------------------
