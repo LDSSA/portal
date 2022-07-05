@@ -70,7 +70,7 @@ class Grading:
         cmd = self.get_command(image, name, env)
         self.start_message()
         logger.info(cmd)
-        self.run_command(cmd)
+        AcademyKubernetesGrading.run_command(cmd)
 
 
 class KubernetesGrading(Grading):
