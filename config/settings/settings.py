@@ -478,7 +478,7 @@ CONSTANCE_CONFIG = {
     "ADMISSIONS_SELECTION_START": (datetime.now(timezone.utc), ""),
     "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
     # Batch config
-    "BATCH_NAME": ("", "Example: batch5"),
+    "BATCH_NAME": ("batch6", "Example: batch6"),
 }
 ADMISSIONS_APPLICATIONS_STARTED_STATUSES = ['admissions:applications', 'admissions:selection']
 
