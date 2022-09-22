@@ -123,7 +123,7 @@ class AcademyGradingMixin:
         return urljoin(settings.BASE_URL, url)
 
     def get_image(self):
-        return f"ldssa/batch5-{self.grade.unit.code.lower()}"
+        return f"ldssa/{settings.BASE_URL}-{self.grade.unit.code.lower()}"
 
     def get_name(self):
         id_ = "".join(random.choices(string.ascii_lowercase, k=8))
@@ -170,7 +170,7 @@ class AdmissionsGradingMixin(AcademyGradingMixin):
     notebook_view_name = "grading:admissions-notebook"
 
     def get_image(self):
-        return f"ldssa/batch5-admissions-{self.grade.unit.code.lower()}:latest"
+        return f"ldssa/{settings.BASE_URL}-admissions-{self.grade.unit.code.lower()}:latest"
 
     def get_env(self):
         env = super().get_env()
