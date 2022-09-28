@@ -8,6 +8,7 @@ from urllib.parse import urljoin, unquote
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework.reverse import reverse
+from constance import config
 
 
 logger = logging.getLogger(__name__)
@@ -123,7 +124,7 @@ class AcademyGradingMixin:
         return urljoin(settings.BASE_URL, url)
 
     def get_image(self):
-        return f"ldssa/{settings.BASE_URL}-{self.grade.unit.code.lower()}"
+        return f"ldssa/{config.BATCH_NAME}-{self.grade.unit.code.lower()}"
 
     def get_name(self):
         id_ = "".join(random.choices(string.ascii_lowercase, k=8))
