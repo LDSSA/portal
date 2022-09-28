@@ -50,7 +50,7 @@ class SimulatorAdmin(admin.ModelAdmin):
 
 @admin.register(models.Datapoint)
 class DatapointAdmin(admin.ModelAdmin):
-    list_display = ("id", "simulator", "data")
+    list_display = ("id", "simulator", "data", "outcome")
     fields = ("simulator", "data", "outcome")
     list_filter = ("simulator",)
 
