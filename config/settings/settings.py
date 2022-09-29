@@ -38,6 +38,7 @@ GRADING_ADMISSIONS_CLASS = env.str(
 )
 BASE_URL = env.str("BASE_URL")
 STUDENT_REPO_NAME = env.str("STUDENT_REPO_NAME")
+BATCH_NAME = env.str("BATCH_NAME")
 
 # ADMISSIONS
 # ------------------------------------------------------------------------------
@@ -477,8 +478,6 @@ CONSTANCE_CONFIG = {
     "ADMISSIONS_APPLICATIONS_START": (datetime.now(timezone.utc), ""),
     "ADMISSIONS_SELECTION_START": (datetime.now(timezone.utc), ""),
     "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
-    # Batch config
-    "BATCH_NAME": ("batch6", "Example: batch6"),
 }
 ADMISSIONS_APPLICATIONS_STARTED_STATUSES = ['admissions:applications', 'admissions:selection']
 
