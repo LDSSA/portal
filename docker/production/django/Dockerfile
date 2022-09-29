@@ -62,9 +62,6 @@ RUN chown -R django /app
 
 USER django
 
-# temporary fix https://gist.github.com/Zheaoli/335bba0ad0e49a214c61cbaaa1b20306?permalink_comment_id=4254554#gistcomment-4254554
-RUN sed -i -e "s,v1alpha1,v1beta1,g" /home/django/.kube/config
-
 WORKDIR /app
 
 ENTRYPOINT ["/entrypoint"]
