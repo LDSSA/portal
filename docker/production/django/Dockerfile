@@ -3,16 +3,16 @@ FROM python:3.7-slim-buster
 ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update && apt-get install -y \
-      build-essential \
-      gcc \
-      python3-dev \
-      libpq-dev \
-      postgresql-client \
-      docker \
-      curl \
-      unzip \
-      less \
-      groff
+    build-essential \
+    gcc \
+    python3-dev \
+    libpq-dev \
+    postgresql-client \
+    docker \
+    curl \
+    unzip \
+    less \
+    groff
 
 # Install kubectl
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl

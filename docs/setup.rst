@@ -6,7 +6,7 @@ Project Setup
 Repositories & CI
 ------------------
 
-The portal requires two repositories to be set up, the instructors repository 
+The portal requires two repositories to be set up, the instructors repository
 and the students repository.
 The CI pipeline on the instructors repository will:
 
@@ -40,6 +40,7 @@ Portal setup is done mostly through its kubernetes configmap.
 The variables that change according to the batch are:
 
 * `STUDENT_REPO_NAME`
+* `BATCH_NAME`
 * `DJANGO_AWS_STORAGE_BUCKET_NAME`
 * `SLACK_WORKSPACE`
 
