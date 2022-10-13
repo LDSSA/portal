@@ -46,6 +46,7 @@ class UserAdmin(auth_admin.UserAdmin):
         "is_instructor",
         "name",
         "is_superuser",
+        "can_graduate",
     ]
     search_fields = ["username", "name"]
     list_filter = (

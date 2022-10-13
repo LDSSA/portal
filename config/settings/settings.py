@@ -38,6 +38,7 @@ GRADING_ADMISSIONS_CLASS = env.str(
 )
 BASE_URL = env.str("BASE_URL")
 STUDENT_REPO_NAME = env.str("STUDENT_REPO_NAME")
+# Changing this to allow local spin-up
 BATCH_NAME = env.str("BATCH_NAME")
 
 # ADMISSIONS
