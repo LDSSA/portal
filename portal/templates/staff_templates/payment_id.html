@@ -114,7 +114,7 @@
                 Note: candidates are not allowed to switch to or from the Scholarship ticket type.
             </p>
 
-            <form action="{% url 'admissions:staff:payment-reset' candidate_id %}/reset" enctype="multipart/form-data" method="POST" class="m-0 mt-auto">
+            <form action="{% url 'admissions:staff:payment-reset' candidate_id %}" enctype="multipart/form-data" method="POST" class="m-0 mt-auto">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-info">Reset Payment</button>
             </form>
