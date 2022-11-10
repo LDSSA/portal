@@ -17,6 +17,7 @@ Contents:
    deploy
    logs
    setup
+   hackathon_02
 
 
 
