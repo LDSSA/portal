@@ -82,7 +82,7 @@ class Application(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     # coding test ##########################################################
-    coding_test_started_at = models.DateTimeField(null=True, default=None)
+    coding_test_started_at = models.DateTimeField(null=True, blank=True, default=None)
 
     # stores data about sent email
     # None -> email not sent
