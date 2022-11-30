@@ -784,7 +784,7 @@ class PaymentResetView(AdmissionsStaffViewMixin, View):
         except Exception:
             raise Http404
 
-        return redirect("admissions:staff:payments", args=(kwargs["pk"],))
+        return redirect("admissions:staff:payment-detail", pk=kwargs["pk"])
 
 
 class ExportView(AdmissionsStaffViewMixin, TemplateView):
