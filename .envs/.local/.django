@@ -9,6 +9,7 @@ GRADING_USERNAME=portal-api
 STUDENT_REPO_NAME=batch5-workspace
 # ADMISSIONS
 # ------------------------------------------------------------------------------
+BATCH_NAME=batch5
 # GENERAL
 # ------------------------------------------------------------------------------
 DJANGO_DEBUG=true
