@@ -18,9 +18,9 @@ class Selection(models.Model):
 
     draw_rank = models.IntegerField(null=True, default=None)
 
-    payment_value = models.FloatField(null=True, default=None)
-    ticket_type = models.CharField(null=True, default=None, max_length=40)
-    payment_due_date = models.DateTimeField(null=True, default=None)
+    payment_value = models.FloatField(null=True, blank=True, default=None)
+    ticket_type = models.CharField(null=True, blank=True, default=None, max_length=40)
+    payment_due_date = models.DateTimeField(null=True, blank=True, default=None)
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)

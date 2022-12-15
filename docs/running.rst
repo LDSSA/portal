@@ -2,9 +2,9 @@ Running Locally
 ================
 
 The first time you run this you need to create the database, a super user and a 
-network (used for local grading).
+network (used for local grading)::
 
-	 docker network create portal
+	docker network create portal
 
 Start by running the following command::
 
