@@ -56,4 +56,5 @@ class UserAdmin(auth_admin.UserAdmin):
         "is_superuser",
         "is_active",
         "groups",
+        "can_graduate",
     )
