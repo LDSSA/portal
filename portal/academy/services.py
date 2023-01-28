@@ -52,6 +52,9 @@ def check_graduation_status(user: User):
     """
     logger.info(f"Checking graduation status for {user.name}")
 
+    if user.failed_or_dropped:
+        return False
+
     attendances = Attendance.objects.filter(user=user)
     first_hackathon = Hackathon.objects.order_by("due_date").first()
     num_hackathons = Hackathon.objects.count()
