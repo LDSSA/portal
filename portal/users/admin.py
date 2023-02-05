@@ -35,6 +35,7 @@ class UserAdmin(auth_admin.UserAdmin):
                     "logo",
                     "github_username",
                     "slack_member_id",
+                    "failed_or_dropped",
                 )
             },
         ),
@@ -47,6 +48,7 @@ class UserAdmin(auth_admin.UserAdmin):
         "name",
         "is_superuser",
         "can_graduate",
+        "failed_or_dropped",
     ]
     search_fields = ["username", "name"]
     list_filter = (
@@ -57,4 +59,5 @@ class UserAdmin(auth_admin.UserAdmin):
         "is_active",
         "groups",
         "can_graduate",
+        "failed_or_dropped",
     )
