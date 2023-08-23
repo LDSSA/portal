@@ -71,6 +71,8 @@ class User(AbstractUser):
     can_graduate = models.BooleanField(default=True)
     can_attend_next = models.BooleanField(default=True)
 
+    failed_or_dropped = models.BooleanField(default=False)
+
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
 

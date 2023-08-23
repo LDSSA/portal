@@ -273,14 +273,14 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
             )
 
         elif new_status == "taking_attendance":
-            for user in get_user_model().objects.filter(is_student=True):
+            for user in get_user_model().objects.filter(is_student=True, failed_or_dropped=False):
                 attendance, _ = models.Attendance.objects.get_or_create(
                     user=user, hackathon=self.object
                 )
 
         # Update graduation eligibility status of user
         elif new_status == "complete" and cur_status == "submissions_closed":
-            for user in get_user_model().objects.filter(is_student=True):
+            for user in get_user_model().objects.filter(is_student=True, failed_or_dropped=False):
                 user.can_graduate = check_graduation_status(user)
                 user.save()
 

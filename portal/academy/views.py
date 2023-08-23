@@ -154,7 +154,7 @@ def csvdata(spc_list, unit_list, object_list):
 
 class InstructorUserListView(InstructorViewsMixin, ListView):
     model = get_user_model()
-    queryset = get_user_model().objects.filter(is_student=True)
+    queryset = get_user_model().objects.filter(is_student=True, failed_or_dropped=False)
     template_name = "academy/instructor/user_list.html"
 
     def get_queryset(self):
