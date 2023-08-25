@@ -101,5 +101,5 @@ services:
 
 networks:
   default:
-    external:
-      name: portal
+    external: true
+    name: portal
