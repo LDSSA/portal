@@ -45,26 +45,6 @@ jobs:
           root: /tmp/workspace
           paths:
             - image/django.tar
-
-  # test-prospector:
-  #   docker:
-  #     - image: circleci/python:3.8
-  #       auth:
-  #         username: $DOCKER_USER
-  #         password: $DOCKER_PASS
-  #   steps:
-  #     - setup_remote_docker
-  #     - *fast-checkout
-  #     - run:
-  #         name: Run prospector
-  #         command: |
-  #           set -ex
-  #           source /tmp/workspace/env
-  #           docker load -i /tmp/workspace/image/django.tar
-  #           docker run -d --rm --entrypoint='' --name=django ldssa/django:$IMAGE_TAG tail -f /dev/null
-  #           docker exec -u root django pip install prospector[with_everything]
-  #           docker exec -u root django prospector --die-on-tool-error --with-tool pyroma --with-tool vulture --with-tool mypy --with-tool bandit --show-profile
-
   push:
     docker:
       - image: circleci/python:3.9
@@ -83,32 +63,6 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker push ldssa/django:$IMAGE_TAG
 
-  deploy:
-    docker:
-      - image: circleci/python:3.9
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
-    steps:
-      - run:
-          name: Deploy
-          command: |
-            true
-
-  sentry-release:
-    docker:
-      - image: circleci/python:3.9
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
-    steps:
-      - run:
-          name: Deploy
-          command: |
-            # sentry-cli releases new --finalize -p django django:$CI_COMMIT_SHORT_SHA
-            # sentry-cli releases set-commits --auto django:$CI_COMMIT_SHORT_SHA
-            true
-
 workflows:
   version: 2
 
@@ -122,11 +76,6 @@ workflows:
             - Common Env
           requires:
             - persist-checkout
-      # - test-prospector:
-      #     context: 
-      #       - Common Env
-      #     requires:
-      #       - build
       - approval:
           type: approval
           context: 
@@ -138,13 +87,3 @@ workflows:
             - Common Env
           requires:
             - approval
-      - sentry-release:
-          context: 
-            - Common Env
-          requires:
-            - push
-      - deploy:
-          context: 
-            - Common Env
-          requires:
-            - sentry-release
