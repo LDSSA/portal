@@ -138,6 +138,7 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "rest_framework",
     "rest_framework.authtoken",
+    "crispy_bootstrap4",
 ]
 LOCAL_APPS = [
     "portal.users.apps.UsersAppConfig",
