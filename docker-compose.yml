@@ -2,97 +2,45 @@ version: '3'
 
 volumes:
   local_postgres_data: {}
-  local_postgres_data_backups: {}
 
 services:
   django:
     build:
       context: .
-      dockerfile: ./docker/local/django/Dockerfile
     depends_on:
       - postgres
       - mailhog
-    volumes:
-      - .:/app
-      - /var/run/docker.sock:/var/run/docker.sock
     env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
+      - ./.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 8000:8000
-      - 5678:5678
-    command: python -m debugpy --listen 0.0.0.0:5678 manage.py runserver_plus 0.0.0.0:8000
-
-  # simulator:
-  #   build:
-  #     context: .
-  #     dockerfile: ./docker/local/django/Dockerfile
-  #   depends_on:
-  #     - postgres
-  #     - mailhog
-  #   volumes:
-  #     - .:/app
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   env_file:
-  #     - ./.envs/.local/.django
-  #     - ./.envs/.local/.postgres
-  #   command: ./manage.py run-simulator
-
-  # second-simulator:
-  #   build:
-  #     context: .
-  #     dockerfile: ./docker/local/django/Dockerfile
-  #   depends_on:
-  #     - postgres
-  #     - mailhog
-  #   volumes:
-  #     - .:/app
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   env_file:
-  #     - ./.envs/.local/.django
-  #     - ./.envs/.local/.postgres
-  #   command: ./manage.py run-simulator
-
-  # third-simulator:
-  #   build:
-  #     context: .
-  #     dockerfile: ./docker/local/django/Dockerfile
-  #   depends_on:
-  #     - postgres
-  #     - mailhog
-  #   volumes:
-  #     - .:/app
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   env_file:
-  #     - ./.envs/.local/.django
-  #     - ./.envs/.local/.postgres
-  #   command: ./manage.py run-simulator
+    command: /app/bin/start_dev.sh
 
   scheduler:
     build:
       context: .
-      dockerfile: ./docker/local/django/Dockerfile
     depends_on:
       - postgres
       - mailhog
     volumes:
       - .:/app
-    env_file:
-      - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
-    command: ./manage.py run-scheduler
+    command: ./bin/start_scheduler.sh
 
   postgres:
-    build:
-      context: .
-      dockerfile: ./docker/production/postgres/Dockerfile
+    image: postgres:14.5
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
-      - local_postgres_data_backups:/backups
-    env_file:
-      - ./.envs/.local/.postgres
+    environment:
+      - POSTGRES_DB=portal
+      - POSTGRES_USER=portal
+      - POSTGRES_PASSWORD=portal
     ports:
-      - "5432:5432"
+      - '5432:5432'
+    expose:
+      - 5432
+    container_name: postgres
 
   mailhog:
     image: mailhog/mailhog:v1.0.0
