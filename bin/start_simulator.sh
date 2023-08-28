@@ -4,4 +4,4 @@ set -o errexit
 set -o nounset
 
 
-python manage.py run-scheduler
+poetry run python manage.py run-simulator

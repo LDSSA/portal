@@ -7,28 +7,26 @@ services:
   django:
     build:
       context: .
-      dockerfile: ./docker/local/django/Dockerfile
     depends_on:
       - postgres
       - mailhog
+    env_file:
+      - ./.env
     volumes:
-      - .:/app
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 8000:8000
-      - 5678:5678
-    command: python -m debugpy --listen 0.0.0.0:5678 manage.py runserver_plus 0.0.0.0:8000
+    command: /app/bin/start_dev.sh
 
   scheduler:
     build:
       context: .
-      dockerfile: ./docker/local/django/Dockerfile
     depends_on:
       - postgres
       - mailhog
     volumes:
       - .:/app
-    command: ./manage.py run-scheduler
+    command: ./bin/start_scheduler.sh
 
   postgres:
     image: postgres:14.5

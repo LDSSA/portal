@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster
+FROM python:3.10.11-bullseye
 
 ENV PYTHONUNBUFFERED 1
 
@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y \
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 RUN chmod +x kubectl && mv kubectl /bin/kubectl
 
-# Instal aws cli
+# Install aws cli
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
     && unzip awscliv2.zip \
     && ./aws/install --update \
@@ -31,37 +31,36 @@ RUN curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/
 
 RUN adduser --system django
 
-# Requirements are installed here to ensure they will be cached.
-COPY ./requirements /requirements
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r /requirements/production.txt \
-    && rm -rf /requirements
+ENV POETRY_HOME="/usr/local"
+ENV POETRY_CACHE_DIR="./.cache/poetry"
+ENV PATH="/usr/local/bin:$PATH"
+ENV PYTHONPATH="$PYTHONPATH:."
 
-COPY ./docker/production/django/entrypoint /entrypoint
-RUN sed -i 's/\r//' /entrypoint
-RUN chmod +x /entrypoint
-RUN chown django /entrypoint
+EXPOSE 8000
 
-COPY ./docker/production/django/start /start
-RUN sed -i 's/\r//' /start
-RUN chmod +x /start
-RUN chown django /start
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-COPY ./docker/production/django/start_simulator /start_simulator
-RUN sed -i 's/\r//' /start_simulator
-RUN chmod +x /start_simulator
-RUN chown django /start_simulator
+RUN mkdir /app
+WORKDIR /app
 
-COPY ./docker/production/django/start_scheduler /start_scheduler
-RUN sed -i 's/\r//' /start_scheduler
-RUN chmod +x /start_scheduler
+# Copy poetry.lock* in case it doesn't exist in the repo
+COPY ./poetry.lock ./pyproject.toml /app/
 
+# Install only the package dependencies here
+RUN poetry install --no-root
+
+# Copy the rest of the application
 COPY . /app
+
+# Now, run poetry install again to install the application
+RUN poetry install
+
+# Copy entry scripts and give execution permissions
+RUN sed -i 's/\r//' /app/bin/*.sh
+RUN chmod +x /app/bin/*.sh
 
 RUN chown -R django /app
 
 USER django
 
-WORKDIR /app
-
-ENTRYPOINT ["/entrypoint"]
+ENTRYPOINT ["/app/bin/entrypoint.sh"]
