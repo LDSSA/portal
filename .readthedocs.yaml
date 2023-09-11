@@ -10,6 +10,8 @@ build:
       - poetry config virtualenvs.create false
     post_install:
       - poetry install --only docs
+    pre-build:
+      - python -m sphinx -b linkcheck -D linkcheck_timeout=1 docs/ $READTHEDOCS_OUTPUT/linkcheck
 
 sphinx:
   configuration: docs/source/conf.py
