@@ -1,14 +1,17 @@
 Deploy
-========
+======
 
 #. Build the container
-    * Use the commit hash that is on master to tag the image::
+
+    * Use the commit hash which is on the main branch to tag the image::
 
         docker build -f docker/production/django/Dockerfile -t ldssa/django:<commit hash> .
 
-#. Push the container::
+#. Push the container
 
-    docker push ldssa/django:<commit hash>
+    * Again use the same commit hash::
+
+        docker push ldssa/django:<commit hash>
     
 #. Set the new commit hash in the `portal-deployment repo <https://github.com/LDSSA/portal-deployment>`_.
 
@@ -20,6 +23,7 @@ Deploy
         portal/simulator-deployment.yaml
 
 #. Tell kubernetes to run the new container.
+
     * Run::
 
         cd portal-deployment
@@ -33,14 +37,13 @@ Deploy
 
         watch kubectl get pods
 
-    * If for some reason the containers don's start or the deployment goes wrong, just apply the configuration with the old commit hash
+    * If for some reason the containers don't start or the deployment fails, just apply the configuration with the old commit hash
     
 #. Running migrations
 
-    * If you’ve changed the django models, then you’ll need to run migrations::
+    * If you have changed the django models, then you'll need to run migrations::
 
         kubectl exec -ti $(kubectl get pods -l app=django -o custom-columns=:metadata.name | tail -n +2 | head -1) -- bash
         source docker/production/django/entrypoint
         ./manage.py showmigrations | grep '\[ \]'
         ./manage.py migrate
-
