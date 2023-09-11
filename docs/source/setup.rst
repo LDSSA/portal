@@ -1,7 +1,7 @@
 Project Setup
 ===============
 
-.. image:: assets/learning_units.png
+.. image:: ../assets/learning_units.png
 
 Repositories & CI
 ------------------
