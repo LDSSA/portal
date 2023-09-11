@@ -1,8 +1,8 @@
 Administration
-========
+==============
 
 Creating Learning Units in the portal
--------------------
+-------------------------------------
 
 #. Go to learning unit issue
     * example: https://github.com/LDSSA/batch5-instructors/issues/414

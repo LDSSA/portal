@@ -1,5 +1,5 @@
 Hackathon 02 Checklist
-==================
+======================
 
 For hackathon 02, the original data is split between a train and test dataset. The training data is split between multiple data sources:
 
@@ -10,7 +10,7 @@ You can split the features and or observations (ids + features) into different s
 
 
 What is needed from instructors for Hackathon 02
--------------------
+------------------------------------------------
 
 An example of this https://github.com/LDSSA/batch5-instructors/pull/338/files
 

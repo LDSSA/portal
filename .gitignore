@@ -54,7 +54,11 @@ coverage.xml
 staticfiles/
 
 # Sphinx documentation
-docs/_build/
+/docs/_build/
+/docs/build/
+
+# auto-generated Sphinx api docs
+/docs/generated
 
 # PyBuilder
 target/

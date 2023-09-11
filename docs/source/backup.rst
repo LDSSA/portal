@@ -1,14 +1,10 @@
 Backup Portal Data
-========
+==================
 
 Backup Process
-------------------
+--------------
 
-
-
-
-
-The following process assumes we are doign a backup for batch 5, as an example.
+The following process assumes we are doing a backup for batch 5, as an example.
 
 #. Create the db snapshot (we will then back up the snapshot to s3)
 
@@ -16,9 +12,10 @@ The following process assumes we are doign a backup for batch 5, as an example.
         --db-instance-identifier portal-batch5 \
         --db-snapshot-identifier ldsa-portal-batch5-backup
 
-#. Create s3 bucket in same region as the db instance
+#. Create a s3 bucket in the same region as the db instance
 
-#. Create the policy to allow the export task to write to s3 bucket
+#. Create the policy to allow the export task to write to the s3 bucket
+
     aws iam create-policy  --policy-name ExportPolicy --policy-document '{
         "Version": "2012-10-17",
         "Statement": [
@@ -32,7 +29,8 @@ The following process assumes we are doign a backup for batch 5, as an example.
                     "s3:DeleteObject*",
                     "s3:GetBucketLocation"
                 ],
-                "Resource": [
+                "Resource": 
+                [
                     "arn:aws:s3:::ldsa-portal-batch5-backup",
                     "arn:aws:s3:::ldsa-portal-batch5-backup/*"
                 ]
