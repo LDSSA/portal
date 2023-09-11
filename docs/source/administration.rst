@@ -1,18 +1,20 @@
 Administration
 ==============
 
-Creating Learning Units in the portal
+Creating Learning Units in the Portal
 -------------------------------------
 
-#. Go to learning unit issue
-    * example: https://github.com/LDSSA/batch5-instructors/issues/414
+#. Go to the learning unit issue
+    * `Example: <https://github.com/LDSSA/batch5-instructors/issues/414>`_`
 
-#. Go to portal admin (ask team for url)
+#. Go to the portal admin (ask the team for the url)
 
 #. Add unit
-    * .. image :: assets/administration/1.png
+    .. image :: assets/administration/1.png
 
-#. Fill the information from the issue
-    * In this case, i also needed to add a specialization
-        * .. image :: assets/administration/2.png
-    * .. image :: assets/administration/3.png
+#. Fill in the information from the issue
+    * In this case, it is also needed to add a specialization
+        
+    * .. image :: assets/administration/2.png
+
+    *  .. image :: assets/administration/3.png
