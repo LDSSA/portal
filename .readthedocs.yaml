@@ -11,7 +11,7 @@ build:
     post_install:
       - poetry install --only docs
     pre_build:
-      - python -m sphinx -b linkcheck -D linkcheck_timeout=1 docs/ $READTHEDOCS_OUTPUT/linkcheck
+      - python -m sphinx -b linkcheck -D linkcheck_timeout=1 docs/source $READTHEDOCS_OUTPUT/linkcheck
 
 sphinx:
   configuration: docs/source/conf.py
