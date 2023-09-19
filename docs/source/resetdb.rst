@@ -1,8 +1,8 @@
 Resetting the Database
-========
+======================
 
 Accessing the Database
-------------------
+----------------------
 
 
 In order to access the database, you need to use `kubectl`. 
@@ -24,7 +24,7 @@ In order to access the database, you need to use `kubectl`.
     ./manage.py shell
 
 Models to Delete
-------------------
+----------------
 
 * `portal.users.models.User`
 * `portal.academy.models.Specialization`
