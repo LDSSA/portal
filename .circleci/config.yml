@@ -43,12 +43,10 @@ jobs:
           name: List added, copied, modified, and renamed *py files
           command: |
             git diff --name-only --diff-filter=ACMR origin/main | grep -E "(.py$)" > diff.txt || true
-            cat diff.txt
       - run:
           name: Black code formatting
           command: |
             poetry run black --check --diff --color --config=pyproject.toml . &> lint_checks.txt || true
-            cat lint_checks.txt
       - run:
           name: Diff-based black
           command: |
