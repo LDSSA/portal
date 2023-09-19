@@ -66,9 +66,7 @@ class StudentApi(models.Model):
 
 
 class Simulator(models.Model):
-    capstone = models.ForeignKey(
-        Capstone, models.CASCADE, related_name="simulators"
-    )
+    capstone = models.ForeignKey(Capstone, models.CASCADE, related_name="simulators")
 
     name = models.CharField(max_length=1024)
     started = models.DateTimeField(null=True)
@@ -85,9 +83,7 @@ class Simulator(models.Model):
         ("reset", "reset"),
         ("ended", "ended"),
     )
-    status = models.CharField(
-        choices=STATUS_CHOICES, default="queued", max_length=64
-    )
+    status = models.CharField(choices=STATUS_CHOICES, default="queued", max_length=64)
 
     def start(self):
         if self.status == "start":  # Started manually through the admin
@@ -103,9 +99,7 @@ class Simulator(models.Model):
         logger.info("Creating due datapoints for %s", self)
         self.due_datapoints.all().delete()
         datapoints = self.datapoints.order_by("id").all()
-        student_apis = StudentApi.objects.filter(
-            capstone=self.capstone
-        ).exclude(url="")
+        student_apis = StudentApi.objects.filter(capstone=self.capstone).exclude(url="")
 
         interval = (self.ends - starts) / datapoints.count()
         self.interval = interval
@@ -155,17 +149,13 @@ class Simulator(models.Model):
 
 
 class Datapoint(models.Model):
-    simulator = models.ForeignKey(
-        Simulator, models.CASCADE, related_name="datapoints"
-    )
+    simulator = models.ForeignKey(Simulator, models.CASCADE, related_name="datapoints")
     data = models.TextField(blank=True)
     outcome = models.TextField(blank=True)
 
 
 class DueDatapoint(models.Model):
-    simulator = models.ForeignKey(
-        Simulator, models.CASCADE, related_name="due_datapoints"
-    )
+    simulator = models.ForeignKey(Simulator, models.CASCADE, related_name="due_datapoints")
     url = models.TextField()
     datapoint = models.ForeignKey(Datapoint, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE)
@@ -176,9 +166,7 @@ class DueDatapoint(models.Model):
         ("success", "success"),
         ("fail", "fail"),
     )
-    state = models.CharField(
-        choices=STATE_CHOICES, default="queued", max_length=64
-    )
+    state = models.CharField(choices=STATE_CHOICES, default="queued", max_length=64)
 
     response_content = models.TextField(blank=True)
     response_exception = models.TextField(blank=True)
@@ -189,5 +177,5 @@ class DueDatapoint(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['due', 'state']),
+            models.Index(fields=["due", "state"]),
         ]

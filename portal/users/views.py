@@ -36,9 +36,7 @@ class UserRequiredFieldsMixin:
             elif config.PORTAL_STATUS.startswith("academy"):
                 required_fields = self.required_academy_fields
             missing_fields = [
-                field
-                for field in required_fields
-                if getattr(request.user, field) == ""
+                field for field in required_fields if getattr(request.user, field) == ""
             ]
             if missing_fields:
                 logger.info("Missing fields %s", missing_fields)
@@ -58,11 +56,7 @@ class InstructorMixin:
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return self.handle_no_permission()
-        if (
-            request.user.is_instructor
-            or request.user.is_superuser
-            or request.user.is_staff
-        ):
+        if request.user.is_instructor or request.user.is_superuser or request.user.is_staff:
             return super().dispatch(request, *args, **kwargs)
         else:
             return self.handle_no_permission()
@@ -138,9 +132,7 @@ class CandidateAcceptedCoCMixin:
         return super().dispatch(request, *args, **kwargs)
 
 
-class CandidateScholarshipDecidedMixin(
-    AdmissionsCandidateMixin, UserPassesTestMixin
-):
+class CandidateScholarshipDecidedMixin(AdmissionsCandidateMixin, UserPassesTestMixin):
     """Verify that the current user is an instructor."""
 
     def test_func(self):
@@ -150,7 +142,6 @@ class CandidateScholarshipDecidedMixin(
 
 
 class UserDetailView(LoginRequiredMixin, DetailView):
-
     model = User
     slug_field = "username"
     slug_url_kwarg = "username"
@@ -160,7 +151,6 @@ user_detail_view = UserDetailView.as_view()
 
 
 class UserListView(LoginRequiredMixin, ListView):
-
     model = User
     slug_field = "username"
     slug_url_kwarg = "username"
@@ -170,7 +160,6 @@ user_list_view = UserListView.as_view()
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
-
     model = User
     form_class = forms.UserChangeForm
 
@@ -185,7 +174,6 @@ user_update_view = UserUpdateView.as_view()
 
 
 class UserRedirectView(LoginRequiredMixin, RedirectView):
-
     permanent = False
 
     def get_redirect_url(self):

@@ -2,7 +2,6 @@ from django.apps import AppConfig
 
 
 class UsersAppConfig(AppConfig):
-
     name = "portal.users"
     verbose_name = "Users"
 

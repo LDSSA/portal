@@ -8,13 +8,9 @@ from .status import SelectionStatus
 
 
 class Selection(models.Model):
-    user = models.OneToOneField(
-        "users.User", on_delete=models.CASCADE, editable=False
-    )
+    user = models.OneToOneField("users.User", on_delete=models.CASCADE, editable=False)
 
-    status = models.CharField(
-        default=SelectionStatus.PASSED_TEST, null=False, max_length=40
-    )
+    status = models.CharField(default=SelectionStatus.PASSED_TEST, null=False, max_length=40)
 
     draw_rank = models.IntegerField(null=True, default=None)
 
@@ -45,9 +41,7 @@ class SelectionDocument(models.Model):
         related_name="documents",
     )
     doc = models.FileField(upload_to=get_path, null=True, blank=True)
-    doc_type = models.CharField(
-        blank=False, null=False, max_length=20, choices=doc_type_choices
-    )
+    doc_type = models.CharField(blank=False, null=False, max_length=20, choices=doc_type_choices)
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)

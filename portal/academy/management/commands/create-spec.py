@@ -3,12 +3,12 @@ from portal.academy.models import Specialization
 
 
 class Command(BaseCommand):
-    help = 'Creates a specialization in portal'
+    help = "Creates a specialization in portal"
 
     def add_arguments(self, parser):
-        parser.add_argument('-c', '--code', type=str, required=True)
-        parser.add_argument('-n', '--name', type=str, required=True)
-        parser.add_argument('-d', '--description', type=str, default="")
+        parser.add_argument("-c", "--code", type=str, required=True)
+        parser.add_argument("-n", "--name", type=str, required=True)
+        parser.add_argument("-d", "--description", type=str, default="")
 
     def handle(self, *args, **options):
         # TODO: revisit uniqueness of primary key
@@ -19,9 +19,9 @@ class Command(BaseCommand):
 
         try:
             spec = Specialization(
-                code=options.get('code'),
-                name=options.get('name'),
-                description=options.get('description'),
+                code=options.get("code"),
+                name=options.get("name"),
+                description=options.get("description"),
             )
             spec.save()
         except Exception as e:

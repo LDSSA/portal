@@ -44,33 +44,19 @@ class Domain:
 
         state["accepted_coc"] = candidate.code_of_conduct_accepted
 
-        state["decided_scholarship"] = (
-            candidate.applying_for_scholarship is not None
-        )
+        state["decided_scholarship"] = candidate.applying_for_scholarship is not None
         state["applying_for_scholarship"] = candidate.applying_for_scholarship
 
         application, _ = Application.objects.get_or_create(user=candidate)
-        status = ApplicationsDomain.get_application_detailed_status(
-            application
-        )
+        status = ApplicationsDomain.get_application_detailed_status(application)
         state["application_status"] = status["application"]
-        state["coding_test_status"] = status[
-            Challenge.objects.get(code="coding_test").code
-        ]
-        state["slu01_status"] = status[
-            Challenge.objects.get(code="slu01").code
-        ]
-        state["slu02_status"] = status[
-            Challenge.objects.get(code="slu02").code
-        ]
-        state["slu03_status"] = status[
-            Challenge.objects.get(code="slu03").code
-        ]
+        state["coding_test_status"] = status[Challenge.objects.get(code="coding_test").code]
+        state["slu01_status"] = status[Challenge.objects.get(code="slu01").code]
+        state["slu02_status"] = status[Challenge.objects.get(code="slu02").code]
+        state["slu03_status"] = status[Challenge.objects.get(code="slu03").code]
 
         try:
-            state["selection_status"] = SelectionDomain.get_status(
-                candidate.selection
-            )
+            state["selection_status"] = SelectionDomain.get_status(candidate.selection)
 
         except Selection.DoesNotExist:
             state["selection_status"] = None

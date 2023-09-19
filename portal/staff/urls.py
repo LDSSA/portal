@@ -7,9 +7,7 @@ app_name = "staff"
 urlpatterns = [
     path("", views.HomeView.as_view(), name="home"),
     path("events", views.EventsView.as_view(), name="events"),
-    path(
-        "candidates", views.CandidateListView.as_view(), name="candidate-list"
-    ),
+    path("candidates", views.CandidateListView.as_view(), name="candidate-list"),
     path(
         "candidates/<slug:pk>/",
         views.CandidateDetailView.as_view(),
@@ -20,9 +18,7 @@ urlpatterns = [
         views.ApplicationView.as_view(),
         name="application-list",
     ),
-    path(
-        "submissions", views.SubmissionView.as_view(), name="submission-list"
-    ),
+    path("submissions", views.SubmissionView.as_view(), name="submission-list"),
     path(
         "submissions/download/<int:pk>",
         views.SubmissionDownloadView.as_view(),
@@ -33,9 +29,7 @@ urlpatterns = [
         views.SubmissionFeedbackDownloadView.as_view(),
         name="submission-feedback-download",
     ),
-    path(
-        "selections/", views.SelectionListView.as_view(), name="selection-list"
-    ),
+    path("selections/", views.SelectionListView.as_view(), name="selection-list"),
     path(
         "selections/draw",
         views.SelectionDrawView.as_view(),
@@ -51,9 +45,7 @@ urlpatterns = [
         views.SelectionSelectView.as_view(),
         name="selection-select",
     ),
-    path(
-        "interviews", views.InterviewListView.as_view(), name="interview-list"
-    ),
+    path("interviews", views.InterviewListView.as_view(), name="interview-list"),
     path(
         "interviews/<int:pk>",
         views.InterviewDetailView.as_view(),

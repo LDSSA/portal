@@ -15,7 +15,6 @@ class UserWhitelistAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(auth_admin.UserAdmin):
-
     add_form = UserCreationForm
     fieldsets = (
         ("User", {"fields": ("name",)}),

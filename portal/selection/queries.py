@@ -20,9 +20,7 @@ class SelectionQueries:
         return Selection.objects.filter(status__in=status_list)
 
     @staticmethod
-    def draw_filter(
-        forbidden_genders: List[Gender], forbidden_ticket_types: List[TicketType]
-    ):
+    def draw_filter(forbidden_genders: List[Gender], forbidden_ticket_types: List[TicketType]):
         return (
             Selection.objects.filter(status=SelectionStatus.PASSED_TEST)
             .exclude(user__gender__in=forbidden_genders)

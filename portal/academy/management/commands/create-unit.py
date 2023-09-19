@@ -6,20 +6,21 @@ from portal.users.models import User
 
 
 class Command(BaseCommand):
-    help = 'Creates a unit in portal'
+    help = "Creates a unit in portal"
 
     def add_arguments(self, parser):
-        parser.add_argument('-s', '--specialization', type=str, required=True)
-        parser.add_argument('-c', '--code', type=str, required=True)
-        parser.add_argument('-n', '--name', type=str, required=True)
-        parser.add_argument('-d', '--description', type=str, default="")
-        parser.add_argument('-i', '--instructor', type=str, default=None)
-        parser.add_argument('-due', '--duedate', type=str, help="Due date (eg. '2020-04-10')")
-        parser.add_argument('-cs', '--checksum', type=str, default=None, help="Checksum (will be random if empty)")
-        parser.add_argument('--open', action="store_true")
+        parser.add_argument("-s", "--specialization", type=str, required=True)
+        parser.add_argument("-c", "--code", type=str, required=True)
+        parser.add_argument("-n", "--name", type=str, required=True)
+        parser.add_argument("-d", "--description", type=str, default="")
+        parser.add_argument("-i", "--instructor", type=str, default=None)
+        parser.add_argument("-due", "--duedate", type=str, help="Due date (eg. '2020-04-10')")
+        parser.add_argument(
+            "-cs", "--checksum", type=str, default=None, help="Checksum (will be random if empty)"
+        )
+        parser.add_argument("--open", action="store_true")
 
     def handle(self, *args, **options):
-
         # TODO: revisit uniqueness of primary key
         unit = Unit.objects.filter(code=options["code"]).first()
         if unit:
@@ -46,7 +47,7 @@ class Command(BaseCommand):
                 name=options["name"],
                 description=options["description"],
                 instructor=instructor,
-                due_date=dateutil.parser.parse(options['duedate']),
+                due_date=dateutil.parser.parse(options["duedate"]),
                 open=options["open"],
                 checksum=checksum,
             )

@@ -1,5 +1,6 @@
 import logging
 from typing import Type
+
 # from allauth.account.forms import SignupForm
 
 import django.forms as forms
@@ -53,7 +54,7 @@ class UserChangeForm(forms.ModelForm):
             "company",
             "ticket_type",
         )
-        widgets = { 
+        widgets = {
             "logo": forms.TextInput(),
             "github_username": forms.TextInput(),
             "slack_member_id": forms.TextInput(),
@@ -61,7 +62,6 @@ class UserChangeForm(forms.ModelForm):
 
 
 class UserCreationForm(auth.forms.UserCreationForm):
-
     error_message = auth.forms.UserCreationForm.error_messages.update(
         {"duplicate_username": _("This username has already been taken.")}
     )
@@ -87,15 +87,9 @@ class PortalSignupForm(forms.Form):
         super().__init__(*args, **kwargs)
         # del self.fields["username"].widget.attrs["autofocus"]
         self.fields["gender"] = forms.ChoiceField(choices=Gender.choices)
-        self.fields["ticket_type"] = forms.ChoiceField(
-            choices=TicketTypeSelectable.choices
-        )
-        self.fields["profession"] = forms.CharField(
-            max_length=50, required=False
-        )
-        self.fields["company"] = forms.CharField(
-            max_length=100, required=False
-        )
+        self.fields["ticket_type"] = forms.ChoiceField(choices=TicketTypeSelectable.choices)
+        self.fields["profession"] = forms.CharField(max_length=50, required=False)
+        self.fields["company"] = forms.CharField(max_length=100, required=False)
 
     def signup(self, request, user):
         user.name = self.cleaned_data["name"]

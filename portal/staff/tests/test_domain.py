@@ -111,9 +111,7 @@ class TestEvents(TestCase):
             self.acd - timedelta(minutes=60)
         )
 
-        selection = SelectionDomain.create(
-            user=User.objects.create(email="u1@test.com")
-        )
+        selection = SelectionDomain.create(user=User.objects.create(email="u1@test.com"))
         SelectionDomain.update_status(selection, SelectionStatus.DRAWN)
 
         # because the is a drawn selection
@@ -132,9 +130,7 @@ class TestEvents(TestCase):
         with self.assertRaises(EventsException):
             Events.trigger_admissions_are_over()
 
-        SelectionDomain.update_status(
-            selection, SelectionStatus.TO_BE_ACCEPTED
-        )
+        SelectionDomain.update_status(selection, SelectionStatus.TO_BE_ACCEPTED)
 
         # because the is a to_be_accepted selection
         with self.assertRaises(EventsException):
@@ -150,70 +146,48 @@ class TestEvents(TestCase):
 
         u1 = User.objects.create(email="u1@test.com")
         Profile.objects.create(user=u1)
-        SelectionDomain.update_status(
-            SelectionDomain.create(user=u1), SelectionStatus.PASSED_TEST
-        )
+        SelectionDomain.update_status(SelectionDomain.create(user=u1), SelectionStatus.PASSED_TEST)
 
         u2 = User.objects.create(email="u2@test.com")
         Profile.objects.create(user=u2)
-        SelectionDomain.update_status(
-            SelectionDomain.create(user=u2), SelectionStatus.ACCEPTED
-        )
+        SelectionDomain.update_status(SelectionDomain.create(user=u2), SelectionStatus.ACCEPTED)
 
         u3 = User.objects.create(email="u3@test.com")
         Profile.objects.create(user=u3)
-        SelectionDomain.update_status(
-            SelectionDomain.create(user=u3), SelectionStatus.REJECTED
-        )
+        SelectionDomain.update_status(SelectionDomain.create(user=u3), SelectionStatus.REJECTED)
 
         self.assertEqual(
-            SelectionQueries.filter_by_status_in(
-                [SelectionStatus.PASSED_TEST]
-            ).count(),
+            SelectionQueries.filter_by_status_in([SelectionStatus.PASSED_TEST]).count(),
             1,
         )
         self.assertEqual(
-            SelectionQueries.filter_by_status_in(
-                [SelectionStatus.ACCEPTED]
-            ).count(),
+            SelectionQueries.filter_by_status_in([SelectionStatus.ACCEPTED]).count(),
             1,
         )
         self.assertEqual(
-            SelectionQueries.filter_by_status_in(
-                [SelectionStatus.REJECTED]
-            ).count(),
+            SelectionQueries.filter_by_status_in([SelectionStatus.REJECTED]).count(),
             1,
         )
         self.assertEqual(
-            SelectionQueries.filter_by_status_in(
-                [SelectionStatus.NOT_SELECTED]
-            ).count(),
+            SelectionQueries.filter_by_status_in([SelectionStatus.NOT_SELECTED]).count(),
             0,
         )
 
         Events.trigger_admissions_are_over()
 
         self.assertEqual(
-            SelectionQueries.filter_by_status_in(
-                [SelectionStatus.PASSED_TEST]
-            ).count(),
+            SelectionQueries.filter_by_status_in([SelectionStatus.PASSED_TEST]).count(),
             0,
         )
         self.assertEqual(
-            SelectionQueries.filter_by_status_in(
-                [SelectionStatus.ACCEPTED]
-            ).count(),
+            SelectionQueries.filter_by_status_in([SelectionStatus.ACCEPTED]).count(),
             1,
         )
         self.assertEqual(
-            SelectionQueries.filter_by_status_in(
-                [SelectionStatus.REJECTED]
-            ).count(),
+            SelectionQueries.filter_by_status_in([SelectionStatus.REJECTED]).count(),
             1,
         )
         self.assertEqual(
-            SelectionQueries.filter_by_status_in(
-                [SelectionStatus.NOT_SELECTED]
-            ).count(),
+            SelectionQueries.filter_by_status_in([SelectionStatus.NOT_SELECTED]).count(),
             1,
         )

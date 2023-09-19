@@ -47,13 +47,12 @@ class CaseInsensitiveGetObjectMixin:
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
 
         assert lookup_url_kwarg in self.kwargs, (
-            'Expected view %s to be called with a URL keyword argument '
+            "Expected view %s to be called with a URL keyword argument "
             'named "%s". Fix your URL conf, or set the `.lookup_field` '
-            'attribute on the view correctly.' %
-            (self.__class__.__name__, lookup_url_kwarg)
+            "attribute on the view correctly." % (self.__class__.__name__, lookup_url_kwarg)
         )
 
-        filter_kwargs = {f'{self.lookup_field}__iexact': self.kwargs[lookup_url_kwarg]}
+        filter_kwargs = {f"{self.lookup_field}__iexact": self.kwargs[lookup_url_kwarg]}
         obj = generics.get_object_or_404(queryset, **filter_kwargs)
 
         # May raise a permission denied
@@ -90,10 +89,6 @@ class AdmissionsNotebookDownload(CaseInsensitiveGetObjectMixin, generics.Retriev
 
     def get(self, request, *args, **kwargs):
         obj = self.get_object()
-        response = HttpResponse(
-            obj.notebook.read(), content_type="application/vnd.jupyter"
-        )
-        response[
-            "Content-Disposition"
-        ] = "attachment; filename=Exercise notebook.ipynb"
+        response = HttpResponse(obj.notebook.read(), content_type="application/vnd.jupyter")
+        response["Content-Disposition"] = "attachment; filename=Exercise notebook.ipynb"
         return response

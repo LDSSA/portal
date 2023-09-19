@@ -57,9 +57,7 @@ class Events:
 
     @staticmethod
     def admissions_are_over_sent_emails() -> int:
-        return SelectionQueries.filter_by_status_in(
-            SelectionStatus.FINAL_STATUS
-        ).count()
+        return SelectionQueries.filter_by_status_in(SelectionStatus.FINAL_STATUS).count()
 
     @staticmethod
     def admissions_are_over_total_emails() -> int:
@@ -71,9 +69,7 @@ class Events:
             logger.error(
                 "trying to trigger `admissions over` event but applications are still open"
             )
-            raise EventsException(
-                "Can't trigger `admissions over` event (applications open)"
-            )
+            raise EventsException("Can't trigger `admissions over` event (applications open)")
 
         if SelectionQueries.filter_by_status_in(
             [
@@ -83,9 +79,7 @@ class Events:
                 SelectionStatus.TO_BE_ACCEPTED,
             ]
         ).exists():
-            logger.error(
-                "trying to trigger `admissions over` event but open selections exist"
-            )
+            logger.error("trying to trigger `admissions over` event but open selections exist")
             raise EventsException(
                 "Can't trigger `admissions over` event (DRAWN, INTERVIEW, SELECTED, TO_BE_ACCEPTED exists)"
             )
@@ -99,9 +93,7 @@ class Events:
 
             if selection_status == SelectionStatus.PASSED_TEST:
                 # this user was never selected
-                SelectionDomain.update_status(
-                    selection, SelectionStatus.NOT_SELECTED
-                )
+                SelectionDomain.update_status(selection, SelectionStatus.NOT_SELECTED)
                 emails.send_admissions_are_over_not_selected(
                     to_email=selection.user.email,
                     to_name=selection.user.name,

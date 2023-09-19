@@ -21,66 +21,42 @@ class TestDomain(TestCase):
         interface.feature_flag_client.set_applications_closing_date(self.acd)
 
     def test_get_start_date(self) -> None:
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
-        self.assertEqual(
-            Domain.get_start_date(a, SubmissionTypes.coding_test), None
-        )
-        self.assertEqual(
-            Domain.get_start_date(a, SubmissionTypes.slu01), self.aod
-        )
-        self.assertEqual(
-            Domain.get_start_date(a, SubmissionTypes.slu02), self.aod
-        )
-        self.assertEqual(
-            Domain.get_start_date(a, SubmissionTypes.slu03), self.aod
-        )
+        self.assertEqual(Domain.get_start_date(a, SubmissionTypes.coding_test), None)
+        self.assertEqual(Domain.get_start_date(a, SubmissionTypes.slu01), self.aod)
+        self.assertEqual(Domain.get_start_date(a, SubmissionTypes.slu02), self.aod)
+        self.assertEqual(Domain.get_start_date(a, SubmissionTypes.slu03), self.aod)
 
         dt_now = datetime.now()
         a.coding_test_started_at = dt_now
         a.save()
-        self.assertEqual(
-            Domain.get_start_date(a, SubmissionTypes.coding_test), dt_now
-        )
+        self.assertEqual(Domain.get_start_date(a, SubmissionTypes.coding_test), dt_now)
 
     def test_get_close_date(self) -> None:
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         expected_domain_buffer_delta = timedelta(minutes=2)
 
+        self.assertEqual(Domain.get_end_date(a, SubmissionTypes.coding_test), self.acd)
         self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.coding_test), self.acd
-        )
-        self.assertEqual(
-            Domain.get_end_date(
-                a, SubmissionTypes.coding_test, apply_buffer=True
-            ),
+            Domain.get_end_date(a, SubmissionTypes.coding_test, apply_buffer=True),
             self.acd + expected_domain_buffer_delta,
         )
 
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.slu01), self.acd
-        )
+        self.assertEqual(Domain.get_end_date(a, SubmissionTypes.slu01), self.acd)
         self.assertEqual(
             Domain.get_end_date(a, SubmissionTypes.slu01, apply_buffer=True),
             self.acd + expected_domain_buffer_delta,
         )
 
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.slu02), self.acd
-        )
+        self.assertEqual(Domain.get_end_date(a, SubmissionTypes.slu02), self.acd)
         self.assertEqual(
             Domain.get_end_date(a, SubmissionTypes.slu02, apply_buffer=True),
             self.acd + expected_domain_buffer_delta,
         )
 
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.slu03), self.acd
-        )
+        self.assertEqual(Domain.get_end_date(a, SubmissionTypes.slu03), self.acd)
         self.assertEqual(
             Domain.get_end_date(a, SubmissionTypes.slu03, apply_buffer=True),
             self.acd + expected_domain_buffer_delta,
@@ -97,19 +73,13 @@ class TestDomain(TestCase):
             dt_now + coding_test_delta,
         )
         self.assertEqual(
-            Domain.get_end_date(
-                a, SubmissionTypes.coding_test, apply_buffer=True
-            ),
+            Domain.get_end_date(a, SubmissionTypes.coding_test, apply_buffer=True),
             dt_now + coding_test_delta + expected_domain_buffer_delta,
         )
 
     def test_get_best_score(self) -> None:
-        target_app = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
-        other_app = Application.objects.create(
-            user=User.objects.create(email="other@test.com")
-        )
+        target_app = Application.objects.create(user=User.objects.create(email="target@test.com"))
+        other_app = Application.objects.create(user=User.objects.create(email="other@test.com"))
         Submission.objects.create(
             application=target_app,
             score=10,
@@ -143,39 +113,19 @@ class TestDomain(TestCase):
             submission_type=SubmissionTypes.slu03.uname,
         )
 
-        self.assertEqual(
-            Domain.get_best_score(target_app, SubmissionTypes.coding_test), 89
-        )
-        self.assertEqual(
-            Domain.get_best_score(target_app, SubmissionTypes.slu01), 73
-        )
-        self.assertEqual(
-            Domain.get_best_score(target_app, SubmissionTypes.slu02), None
-        )
-        self.assertEqual(
-            Domain.get_best_score(target_app, SubmissionTypes.slu03), 92
-        )
+        self.assertEqual(Domain.get_best_score(target_app, SubmissionTypes.coding_test), 89)
+        self.assertEqual(Domain.get_best_score(target_app, SubmissionTypes.slu01), 73)
+        self.assertEqual(Domain.get_best_score(target_app, SubmissionTypes.slu02), None)
+        self.assertEqual(Domain.get_best_score(target_app, SubmissionTypes.slu03), 92)
 
-        self.assertEqual(
-            Domain.get_best_score(other_app, SubmissionTypes.coding_test), None
-        )
-        self.assertEqual(
-            Domain.get_best_score(other_app, SubmissionTypes.slu01), None
-        )
-        self.assertEqual(
-            Domain.get_best_score(other_app, SubmissionTypes.slu02), None
-        )
-        self.assertEqual(
-            Domain.get_best_score(other_app, SubmissionTypes.slu03), None
-        )
+        self.assertEqual(Domain.get_best_score(other_app, SubmissionTypes.coding_test), None)
+        self.assertEqual(Domain.get_best_score(other_app, SubmissionTypes.slu01), None)
+        self.assertEqual(Domain.get_best_score(other_app, SubmissionTypes.slu02), None)
+        self.assertEqual(Domain.get_best_score(other_app, SubmissionTypes.slu03), None)
 
     def test_has_positive_score(self) -> None:
-        target_app = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
-        other_app = Application.objects.create(
-            user=User.objects.create(email="other@test.com")
-        )
+        target_app = Application.objects.create(user=User.objects.create(email="target@test.com"))
+        other_app = Application.objects.create(user=User.objects.create(email="other@test.com"))
         Submission.objects.create(
             application=target_app,
             score=10,
@@ -213,29 +163,17 @@ class TestDomain(TestCase):
             Domain.has_positive_score(target_app, SubmissionTypes.coding_test),
             True,
         )
-        self.assertEqual(
-            Domain.has_positive_score(target_app, SubmissionTypes.slu01), False
-        )
-        self.assertEqual(
-            Domain.has_positive_score(target_app, SubmissionTypes.slu02), False
-        )
-        self.assertEqual(
-            Domain.has_positive_score(target_app, SubmissionTypes.slu03), True
-        )
+        self.assertEqual(Domain.has_positive_score(target_app, SubmissionTypes.slu01), False)
+        self.assertEqual(Domain.has_positive_score(target_app, SubmissionTypes.slu02), False)
+        self.assertEqual(Domain.has_positive_score(target_app, SubmissionTypes.slu03), True)
 
         self.assertEqual(
             Domain.has_positive_score(other_app, SubmissionTypes.coding_test),
             False,
         )
-        self.assertEqual(
-            Domain.has_positive_score(other_app, SubmissionTypes.slu01), False
-        )
-        self.assertEqual(
-            Domain.has_positive_score(other_app, SubmissionTypes.slu02), False
-        )
-        self.assertEqual(
-            Domain.has_positive_score(other_app, SubmissionTypes.slu03), False
-        )
+        self.assertEqual(Domain.has_positive_score(other_app, SubmissionTypes.slu01), False)
+        self.assertEqual(Domain.has_positive_score(other_app, SubmissionTypes.slu02), False)
+        self.assertEqual(Domain.has_positive_score(other_app, SubmissionTypes.slu03), False)
 
     def test_add_submission_error_close_applications(self) -> None:
         interface.feature_flag_client.set_applications_opening_date(
@@ -244,9 +182,7 @@ class TestDomain(TestCase):
         interface.feature_flag_client.set_applications_closing_date(
             datetime.now() - timedelta(hours=2)
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         with self.assertRaises(DomainException):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
@@ -260,9 +196,7 @@ class TestDomain(TestCase):
         interface.feature_flag_client.set_applications_closing_date(
             datetime.now() + timedelta(minutes=30)
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         a.coding_test_started_at = None
         a.save()
@@ -277,9 +211,7 @@ class TestDomain(TestCase):
         interface.feature_flag_client.set_applications_closing_date(
             datetime.now() + timedelta(minutes=60)
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         with self.assertRaises(DomainException):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
@@ -299,9 +231,7 @@ class TestDomain(TestCase):
         interface.feature_flag_client.set_applications_closing_date(
             datetime.now() + timedelta(minutes=30)
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         a.coding_test_started_at = datetime.now() - timedelta(hours=3)
         a.save()
@@ -317,9 +247,7 @@ class TestDomain(TestCase):
         interface.feature_flag_client.set_applications_closing_date(
             datetime.now() - timedelta(minutes=30)
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         with self.assertRaises(DomainException):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
@@ -339,24 +267,16 @@ class TestDomain(TestCase):
         interface.feature_flag_client.set_applications_closing_date(
             datetime.now() + timedelta(minutes=30)
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         for _ in range(0, 251):
             Submission.objects.create(
                 application=a,
                 submission_type=SubmissionTypes.coding_test.uname,
             )
-            Submission.objects.create(
-                application=a, submission_type=SubmissionTypes.slu01.uname
-            )
-            Submission.objects.create(
-                application=a, submission_type=SubmissionTypes.slu02.uname
-            )
-            Submission.objects.create(
-                application=a, submission_type=SubmissionTypes.slu03.uname
-            )
+            Submission.objects.create(application=a, submission_type=SubmissionTypes.slu01.uname)
+            Submission.objects.create(application=a, submission_type=SubmissionTypes.slu02.uname)
+            Submission.objects.create(application=a, submission_type=SubmissionTypes.slu03.uname)
 
         a.coding_test_started_at = datetime.now()
         a.save()
@@ -379,9 +299,7 @@ class TestDomain(TestCase):
         interface.feature_flag_client.set_applications_closing_date(
             datetime.now() + timedelta(minutes=30)
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         a.coding_test_started_at = datetime.now()
         a.save()
@@ -400,9 +318,7 @@ class TestDomain(TestCase):
         self.assertEqual(a.submissions.count(), 5)
 
     def test_get_status(self) -> None:
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() + timedelta(minutes=5)
@@ -423,9 +339,7 @@ class TestDomain(TestCase):
             Domain.get_sub_type_status(a, SubmissionTypes.slu03),
             SubmissionStatus.not_started,
         )
-        self.assertEqual(
-            Domain.get_application_status(a), ApplicationStatus.not_started
-        )
+        self.assertEqual(Domain.get_application_status(a), ApplicationStatus.not_started)
 
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() - timedelta(minutes=5)
@@ -449,9 +363,7 @@ class TestDomain(TestCase):
             Domain.get_sub_type_status(a, SubmissionTypes.slu03),
             SubmissionStatus.ongoing,
         )
-        self.assertEqual(
-            Domain.get_application_status(a), ApplicationStatus.ongoing
-        )
+        self.assertEqual(Domain.get_application_status(a), ApplicationStatus.ongoing)
 
         Submission.objects.create(
             application=a,
@@ -462,9 +374,7 @@ class TestDomain(TestCase):
             Domain.get_sub_type_status(a, SubmissionTypes.slu01),
             SubmissionStatus.passed,
         )
-        self.assertEqual(
-            Domain.get_application_status(a), ApplicationStatus.ongoing
-        )
+        self.assertEqual(Domain.get_application_status(a), ApplicationStatus.ongoing)
 
         Submission.objects.create(
             application=a,
@@ -503,9 +413,7 @@ class TestDomain(TestCase):
             Domain.get_sub_type_status(a, SubmissionTypes.slu02),
             SubmissionStatus.passed,
         )
-        self.assertEqual(
-            Domain.get_application_status(a), ApplicationStatus.passed
-        )
+        self.assertEqual(Domain.get_application_status(a), ApplicationStatus.passed)
 
         slu02_sub.delete()
         interface.feature_flag_client.set_applications_closing_date(
@@ -516,6 +424,4 @@ class TestDomain(TestCase):
             Domain.get_sub_type_status(a, SubmissionTypes.slu02),
             SubmissionStatus.failed,
         )
-        self.assertEqual(
-            Domain.get_application_status(a), ApplicationStatus.failed
-        )
+        self.assertEqual(Domain.get_application_status(a), ApplicationStatus.failed)

@@ -28,7 +28,7 @@ class AccountAdapter(DefaultAccountAdapter):
     default_token_generator = EmailAwarePasswordResetTokenGenerator()
 
     def is_open_for_signup(self, request: HttpRequest):
-        if request.path == reverse('instructors_signup'):
+        if request.path == reverse("instructors_signup"):
             return True
         return getattr(config, "ACCOUNT_ALLOW_REGISTRATION", True)
 
@@ -38,9 +38,7 @@ class AccountAdapter(DefaultAccountAdapter):
         e-mail that is to be sent, e.g. "account/email/email_confirmation"
         """
         to = [email] if isinstance(email, str) else email
-        subject = render_to_string(
-            "{0}_subject.txt".format(template_prefix), context
-        )
+        subject = render_to_string("{0}_subject.txt".format(template_prefix), context)
         # remove superfluous line breaks
         subject = " ".join(subject.splitlines()).strip()
         subject = self.format_email_subject(subject)
@@ -72,9 +70,7 @@ class AccountAdapter(DefaultAccountAdapter):
                 "account_reset_password_from_key",
                 kwargs=dict(uidb36=user_pk_to_url_str(user), key=temp_key),
             )
-            url = build_absolute_uri(
-                request=getattr(self, "request", None), location=path
-            )
+            url = build_absolute_uri(request=getattr(self, "request", None), location=path)
             send_reset_password_email(to_email=email, reset_password_url=url)
         else:
             super.send_mail(template_prefix, email, context)
@@ -83,9 +79,7 @@ class AccountAdapter(DefaultAccountAdapter):
         # We assume signup is always True
         send_signup_email(
             to_email=emailconfirmation.email_address.email,
-            email_confirmation_url=self.get_email_confirmation_url(
-                request, emailconfirmation
-            ),
+            email_confirmation_url=self.get_email_confirmation_url(request, emailconfirmation),
         )
 
 

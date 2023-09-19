@@ -15,9 +15,7 @@ def requires_interview(selection):
 
 
 def select() -> None:
-    for selection in SelectionQueries.filter_by_status_in(
-        [SelectionStatus.DRAWN]
-    ):
+    for selection in SelectionQueries.filter_by_status_in([SelectionStatus.DRAWN]):
         if requires_interview(selection):
             to_interview(selection)
         else:

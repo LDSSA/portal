@@ -19,9 +19,7 @@ def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
         max_team_size,
         max_teams,
     )
-    present = models.Attendance.objects.filter(
-        hackathon=hackathon, present=True
-    )
+    present = models.Attendance.objects.filter(hackathon=hackathon, present=True)
     present = [p.user for p in present]
     logger.debug("Present %s", present)
 
@@ -42,30 +40,22 @@ def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
 def create_teams(hackathon, present_teams):
     hackathon_team_id = 1
     for students in present_teams:
-        team = models.Team.objects.create(
-            hackathon=hackathon, hackathon_team_id=hackathon_team_id
-        )
+        team = models.Team.objects.create(hackathon=hackathon, hackathon_team_id=hackathon_team_id)
         team.users.set(students)
         logger.info("Team %s students %s", hackathon_team_id, students)
         hackathon_team_id += 1
 
 
-def generate_teams_with_remote(
-    hackathon, team_size=3, max_team_size=6, max_teams=13
-):
+def generate_teams_with_remote(hackathon, team_size=3, max_team_size=6, max_teams=13):
     logger.info(
         "Generating Teams Size: %s Max: %s Max teams: %s",
         team_size,
         max_team_size,
         max_teams,
     )
-    present = models.Attendance.objects.filter(
-        hackathon=hackathon, present=True, remote=False
-    )
+    present = models.Attendance.objects.filter(hackathon=hackathon, present=True, remote=False)
     present = [p.user for p in present]
-    remote = models.Attendance.objects.filter(
-        hackathon=hackathon, present=True, remote=True
-    )
+    remote = models.Attendance.objects.filter(hackathon=hackathon, present=True, remote=True)
     remote = [p.user for p in remote]
     logger.debug("Present %s", present)
     logger.debug("Remote %s", remote)
@@ -88,9 +78,7 @@ def generate_teams_with_remote(
 def create_teams_with_remote(hackathon, present_teams, remote_teams):
     hackathon_team_id = 1
     for students in present_teams:
-        team = models.Team.objects.create(
-            hackathon=hackathon, hackathon_team_id=hackathon_team_id
-        )
+        team = models.Team.objects.create(hackathon=hackathon, hackathon_team_id=hackathon_team_id)
         team.users.set(students)
         logger.info("Team %s students %s", hackathon_team_id, students)
         hackathon_team_id += 1
@@ -102,9 +90,7 @@ def create_teams_with_remote(hackathon, present_teams, remote_teams):
             remote=True,
         )
         team.users.set(students)
-        logger.info(
-            "(remote) Team %s students %s", hackathon_team_id, students
-        )
+        logger.info("(remote) Team %s students %s", hackathon_team_id, students)
         hackathon_team_id += 1
 
 
@@ -115,10 +101,7 @@ def get_groups(items, size, max_diff=1):
     logger.debug("Creating groups...")
     random.shuffle(items)
     iterators = [iter(items)] * size
-    groups = list(
-        [item for item in group if item is not None]
-        for group in zip_longest(*iterators)
-    )
+    groups = list([item for item in group if item is not None] for group in zip_longest(*iterators))
     logger.debug(groups)
 
     logger.debug("Reshaping groups...")
@@ -139,9 +122,7 @@ def submission(hackathon, user, file):
 
         # Replace students with team
         if hackathon.status == "submissions_open":
-            team = models.Team.objects.filter(
-                users=user, hackathon=hackathon
-            ).first()
+            team = models.Team.objects.filter(users=user, hackathon=hackathon).first()
             if team:
                 user = team
 

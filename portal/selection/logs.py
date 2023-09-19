@@ -30,9 +30,7 @@ def log_selection_event(
 ) -> None:
     data_s = "\n".join([f"{k}: {v}" for k, v in data.items()])
     msg = f"{event.value}\n{data_s}\n---\ntriggered by {user.email if user is not None else 'unknown'}"
-    SelectionLogs.objects.create(
-        selection=selection, event=event.name, message=msg
-    )
+    SelectionLogs.objects.create(selection=selection, event=event.name, message=msg)
 
 
 def get_selection_logs(selection: Selection) -> List[Dict[str, Any]]:

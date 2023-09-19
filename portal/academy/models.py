@@ -65,9 +65,7 @@ class Grade(models.Model):
         ("checksum-failed", "Checksum verification failed"),
         ("graded", "Graded"),
     )
-    status = models.CharField(
-        max_length=1024, choices=STATUSES, default="never-submitted"
-    )
+    status = models.CharField(max_length=1024, choices=STATUSES, default="never-submitted")
     score = models.FloatField(null=True)
     message = models.TextField(blank=True)
     feedback = models.FileField(upload_to=feedback_path, null=True)

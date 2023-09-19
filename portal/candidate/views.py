@@ -67,10 +67,7 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
 
-        elif (
-            state.application_status != Status.passed
-            or state.selection_status is None
-        ):
+        elif state.application_status != Status.passed or state.selection_status is None:
             action_point = "admission_test"
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
@@ -78,8 +75,7 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):
 
         elif (
             state.selection_status is not None
-            and state.selection_status
-            not in SelectionStatus.SELECTION_POSITIVE_STATUS
+            and state.selection_status not in SelectionStatus.SELECTION_POSITIVE_STATUS
         ):
             action_point = "selection_results"
             accordion_enabled_status["accepted_coc"] = True
@@ -110,12 +106,8 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):
             "applications_close_datetime": config.ADMISSIONS_SELECTION_START.strftime(
                 "%Y-%m-%d %H:%M"
             ),
-            "applications_close_date": config.ADMISSIONS_SELECTION_START.strftime(
-                "%Y-%m-%d"
-            ),
-            "coding_test_duration": str(
-                config.ADMISSIONS_CODING_TEST_DURATION
-            ),
+            "applications_close_date": config.ADMISSIONS_SELECTION_START.strftime("%Y-%m-%d"),
+            "coding_test_duration": str(config.ADMISSIONS_CODING_TEST_DURATION),
             "accordion_enabled_status": accordion_enabled_status,
         }
         return super().get_context_data(**ctx)
@@ -128,9 +120,7 @@ class ContactView(AdmissionsCandidateViewMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        user_url = reverse(
-            "admissions:staff:candidate-detail", args=(user.pk,)
-        )
+        user_url = reverse("admissions:staff:candidate-detail", args=(user.pk,))
         message = request.POST["message"]
         user_name = user.name
 
@@ -142,9 +132,7 @@ class ContactView(AdmissionsCandidateViewMixin, TemplateView):
         )
         user.save()
 
-        template = loader.get_template(
-            "./candidate_templates/contactus-success.html"
-        )
+        template = loader.get_template("./candidate_templates/contactus-success.html")
         return HttpResponse(template.render({}, request))
 
 
@@ -160,9 +148,7 @@ class CodeOfConductView(AdmissionsCandidateViewMixin, TemplateView):
         return redirect("admissions:candidate:home")
 
 
-class ScholarshipView(
-    AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView
-):
+class ScholarshipView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView):
     """Read scholarship conditions and chose to apply"""
 
     template_name = "candidate_templates/scholarship.html"
@@ -176,9 +162,7 @@ class ScholarshipView(
         return redirect("admissions:candidate:home")
 
 
-class CandidateBeforeCodingTestView(
-    AdmissionsCandidateViewMixin, TemplateView
-):
+class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
     template_name = "candidate_templates/before_coding_test.html"
 
     def get_context_data(self, **kwargs):
@@ -196,27 +180,23 @@ class CandidateBeforeCodingTestView(
             application.coding_test_started_at = datetime.now(timezone.utc)
             application.save()
 
-        return HttpResponseRedirect(
-            reverse("admissions:candidate:coding-test")
-        )
+        return HttpResponseRedirect(reverse("admissions:candidate:coding-test"))
 
 
 def submission_view_ctx(application, challenge) -> Dict[str, Any]:
     return {
         "challenge": challenge,
         "status": Domain.get_sub_type_status(application, challenge).name,
-        "submissions_closes_at": Domain.get_end_date(
-            application, challenge
-        ).strftime("%Y-%m-%d %H:%M"),
+        "submissions_closes_at": Domain.get_end_date(application, challenge).strftime(
+            "%Y-%m-%d %H:%M"
+        ),
         "best_score": Domain.get_best_score(application, challenge),
         "download_enabled": Domain.can_add_submission(application, challenge),
         "upload_enabled": Domain.can_add_submission(application, challenge),
-        "submissions": Submission.objects.filter(
-            application=application, unit=challenge
-        ).order_by("-updated_at"),
-        "coding_test_started_at_ms": int(
-            application.coding_test_started_at.timestamp() * 1000
-        )
+        "submissions": Submission.objects.filter(application=application, unit=challenge).order_by(
+            "-updated_at"
+        ),
+        "coding_test_started_at_ms": int(application.coding_test_started_at.timestamp() * 1000)
         if application.coding_test_started_at is not None
         else None,
     }
@@ -229,9 +209,7 @@ class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
 
         application, _ = Application.objects.get_or_create(user=request.user)
         if application.coding_test_started_at is None:
-            return HttpResponseRedirect(
-                reverse("admissions:candidate:before-coding-test")
-            )
+            return HttpResponseRedirect(reverse("admissions:candidate:before-coding-test"))
 
         submission_type_ = Challenge.objects.get(code="coding_test")
         ctx = {
@@ -240,9 +218,7 @@ class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
                 config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600
             ),
         }
-        template = loader.get_template(
-            "./candidate_templates/coding_test.html"
-        )
+        template = loader.get_template("./candidate_templates/coding_test.html")
         return HttpResponse(template.render(ctx, request))
 
 
@@ -250,10 +226,7 @@ class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         assignment_id = kwargs.get("pk")
         application = Application.objects.get(user=request.user)
-        if (
-            assignment_id == "coding_test"
-            and application.coding_test_started_at is None
-        ):
+        if assignment_id == "coding_test" and application.coding_test_started_at is None:
             raise Http404
 
         obj = Challenge.objects.get(code=assignment_id)
@@ -299,12 +272,8 @@ class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
         Grading(grade=sub).run_grading()
 
         if pk == "coding_test":
-            return HttpResponseRedirect(
-                reverse("admissions:candidate:coding-test")
-            )
-        return HttpResponseRedirect(
-            reverse("admissions:candidate:slu", args=(pk,))
-        )
+            return HttpResponseRedirect(reverse("admissions:candidate:coding-test"))
+        return HttpResponseRedirect(reverse("admissions:candidate:slu", args=(pk,)))
 
 
 class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):
@@ -344,12 +313,8 @@ class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):
         except Selection.DoesNotExist:
             raise Http404
 
-        payment_proofs = SelectionDocumentQueries.get_payment_proof_documents(
-            selection
-        )
-        student_ids = SelectionDocumentQueries.get_student_id_documents(
-            selection
-        )
+        payment_proofs = SelectionDocumentQueries.get_payment_proof_documents(selection)
+        student_ids = SelectionDocumentQueries.get_student_id_documents(selection)
 
         template = loader.get_template("./candidate_templates/payment.html")
 

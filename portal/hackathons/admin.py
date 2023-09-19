@@ -25,9 +25,7 @@ class HackathonAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         for student in get_user_model().objects.filter(is_student=True):
-            models.Attendance.objects.get_or_create(
-                hackathon=obj, user=student
-            )
+            models.Attendance.objects.get_or_create(hackathon=obj, user=student)
 
 
 @admin.register(models.Team)
@@ -68,7 +66,7 @@ class SubmissionAdmin(admin.ModelAdmin):
         "get_name",
         "score",
         "created",
-        )
+    )
     fields = (
         "hackathon",
         "content_object",

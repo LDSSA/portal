@@ -9,9 +9,7 @@ from datetime import datetime, timedelta, timezone
 from django.utils.module_loading import import_string
 
 
-ROOT_DIR = (
-    environ.Path(__file__) - 3
-)  # (portal/config/settings/base.py - 3 = portal/)
+ROOT_DIR = environ.Path(__file__) - 3  # (portal/config/settings/base.py - 3 = portal/)
 APPS_DIR = ROOT_DIR.path("portal")
 
 env = environ.Env()
@@ -30,9 +28,7 @@ PRODUCER_INTERVAL = 1
 # GRADING
 # ------------------------------------------------------------------------------
 GRADING_USERNAME = env.str("GRADING_USERNAME")
-GRADING_CLASS = env.str(
-    "GRADING_CLASS", default="portal.grading.services.AcademyKubernetesGrading"
-)
+GRADING_CLASS = env.str("GRADING_CLASS", default="portal.grading.services.AcademyKubernetesGrading")
 GRADING_ADMISSIONS_CLASS = env.str(
     "GRADING_ADMISSIONS_CLASS",
     default="portal.grading.services.AdmissionsKubernetesGrading",
@@ -78,12 +74,12 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("POSTGRES_DB"),
-            "USER": os.environ.get("POSTGRES_USER"),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-            "HOST": os.environ.get("POSTGRES_HOST"),
-            "PORT": os.environ.get("POSTGRES_PORT"),
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "HOST": os.environ.get("POSTGRES_HOST"),
+        "PORT": os.environ.get("POSTGRES_PORT"),
     }
 }
 
@@ -276,10 +272,7 @@ if STATICFILES_STORAGE == "config.settings.settings.StaticRootS3Boto3Storage":
     DEFAULT_FILE_STORAGE = "config.settings.settings.MediaRootS3Boto3Storage"
     MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/"
 
-elif (
-    STATICFILES_STORAGE
-    == "django.contrib.staticfiles.storage.StaticFilesStorage"
-):
+elif STATICFILES_STORAGE == "django.contrib.staticfiles.storage.StaticFilesStorage":
     # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
     STATIC_URL = "/static/"
     # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
@@ -383,15 +376,11 @@ if SECURITY_EXTRAS:
     # TODO: set this to 60 seconds first and then to 518400 once you prove the former works
     SECURE_HSTS_SECONDS = 60
     # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
-        "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True
-    )
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True)
     # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-preload
     SECURE_HSTS_PRELOAD = env.bool("DJANGO_SECURE_HSTS_PRELOAD", default=True)
     # https://docs.djangoproject.com/en/dev/ref/middleware/#x-content-type-options-nosniff
-    SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
-        "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True
-    )
+    SECURE_CONTENT_TYPE_NOSNIFF = env.bool("DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True)
 
 # EMAIL
 # ------------------------------------------------------------------------------
@@ -402,18 +391,12 @@ EMAIL_BACKEND = env(
 )
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = env(
-    "DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org"
-)
-ADMISSIONS_FROM_EMAIL = env(
-    "ADMISSIONS_FROM_EMAIL", default="admissions@lisbondatascience.org"
-)
+DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org")
+ADMISSIONS_FROM_EMAIL = env("ADMISSIONS_FROM_EMAIL", default="admissions@lisbondatascience.org")
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
-EMAIL_SUBJECT_PREFIX = env(
-    "DJANGO_EMAIL_SUBJECT_PREFIX", default="[LDSSA Portal]"
-)
+EMAIL_SUBJECT_PREFIX = env("DJANGO_EMAIL_SUBJECT_PREFIX", default="[LDSSA Portal]")
 
 if EMAIL_BACKEND in (
     "django.core.mail.backends.smtp.EmailBackend",
@@ -432,10 +415,7 @@ if EMAIL_BACKEND in (
         EMAIL_PORT = env("DJANGO_EMAIL_PORT")
         EMAIL_USE_TLS = env.bool("DJANGO_EMAIL_PORT")
 
-elif (
-    EMAIL_BACKEND
-    == "portal.anymail_elasticmail.elasticmail.ElasticmailBackend"
-):
+elif EMAIL_BACKEND == "portal.anymail_elasticmail.elasticmail.ElasticmailBackend":
     ANYMAIL = {
         "ELASTICMAIL_API_KEY": env("ELASTICMAIL_API_KEY"),
     }
@@ -486,7 +466,7 @@ CONSTANCE_CONFIG = {
     "ADMISSIONS_SELECTION_START": (datetime.now(timezone.utc), ""),
     "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
 }
-ADMISSIONS_APPLICATIONS_STARTED_STATUSES = ['admissions:applications', 'admissions:selection']
+ADMISSIONS_APPLICATIONS_STARTED_STATUSES = ["admissions:applications", "admissions:selection"]
 
 
 # django-allauth
@@ -514,9 +494,7 @@ if COMPRESS_ENABLED:
         STATICFILES_FINDERS = ["compressor.finders.CompressorFinder"]
 
     # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_STORAGE
-    COMPRESS_STORAGE = env(
-        "COMPRESS_STORAGE", default="compressor.storage.CompressorFileStorage"
-    )
+    COMPRESS_STORAGE = env("COMPRESS_STORAGE", default="compressor.storage.CompressorFileStorage")
     # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_URL
     COMPRESS_URL = STATIC_URL
 
@@ -524,9 +502,7 @@ if COMPRESS_ENABLED:
 # django-rest-framework
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.TokenAuthentication",),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAdminUser",),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
 }
@@ -537,9 +513,7 @@ if DEBUG:
     # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
     INSTALLED_APPS += ["debug_toolbar"]  # noqa F405
     # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#middleware
-    MIDDLEWARE += [
-        "debug_toolbar.middleware.DebugToolbarMiddleware"
-    ]  # noqa F405
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]  # noqa F405
     # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-config
     DEBUG_TOOLBAR_CONFIG = {
         "DISABLE_PANELS": [

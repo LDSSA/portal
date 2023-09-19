@@ -15,10 +15,7 @@ def random_path(instance, filename):
     if hasattr(instance, "code"):
         return f"{instance.code}_{filename}" f"_{date}_{randstr}"
     else:
-        return (
-            f"{instance.__class__.__name__}{instance.id}_{filename}"
-            f"_{date}_{randstr}"
-        )
+        return f"{instance.__class__.__name__}{instance.id}_{filename}" f"_{date}_{randstr}"
 
 
 class Hackathon(models.Model):
@@ -52,26 +49,20 @@ class Hackathon(models.Model):
     can_submit = ("submissions_open", "complete")
     can_submit_instructor = ("closed", "submissions_open", "complete")
 
-    status = models.CharField(
-        max_length=255, choices=status_choices, default="closed"
-    )
+    status = models.CharField(max_length=255, choices=status_choices, default="closed")
 
     max_submissions = models.IntegerField(default=5)
     team_size = models.IntegerField(default=3)
     max_team_size = models.IntegerField(default=6)
     max_teams = models.IntegerField(default=13)
 
-    script_file = models.FileField(
-        upload_to=random_path, null=True, blank=True
-    )
+    script_file = models.FileField(upload_to=random_path, null=True, blank=True)
     data_file = models.FileField(upload_to=random_path, null=True, blank=True)
     descending = models.BooleanField(blank=True)
 
 
 class Attendance(models.Model):
-    hackathon = models.ForeignKey(
-        Hackathon, on_delete=models.CASCADE, related_name="attendance"
-    )
+    hackathon = models.ForeignKey(Hackathon, on_delete=models.CASCADE, related_name="attendance")
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -82,22 +73,16 @@ class Attendance(models.Model):
 
 
 class Team(models.Model):
-    hackathon = models.ForeignKey(
-        Hackathon, on_delete=models.CASCADE, related_name="teams"
-    )
+    hackathon = models.ForeignKey(Hackathon, on_delete=models.CASCADE, related_name="teams")
     hackathon_team_id = models.IntegerField(default=0)
     # remote = models.BooleanField(default=False)
-    users = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="hackathon_teams"
-    )
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="hackathon_teams")
     name = models.TextField(blank=True)
     logo = models.TextField(blank=True)
 
 
 class Submission(models.Model):
-    hackathon = models.ForeignKey(
-        Hackathon, on_delete=models.CASCADE, related_name="submissions"
-    )
+    hackathon = models.ForeignKey(Hackathon, on_delete=models.CASCADE, related_name="submissions")
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")

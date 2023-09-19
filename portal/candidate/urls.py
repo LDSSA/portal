@@ -53,9 +53,7 @@ urlpatterns = [
     ),
     path(
         "payment/upload-payment-proof",
-        views.SelectionDocumentUploadView.as_view(
-            document_type="payment_proof"
-        ),
+        views.SelectionDocumentUploadView.as_view(document_type="payment_proof"),
         name="payment-proof-upload",
     ),
     path(

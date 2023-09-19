@@ -42,7 +42,7 @@ def send_grader_request_helper(
     score: float,
     status: str = "graded",
     message: str = "",
-    send_file: bool = True
+    send_file: bool = True,
 ) -> Response:
     """
     Helper method to setup an empty grade before sending a request to the grading
@@ -53,17 +53,15 @@ def send_grader_request_helper(
     if send_file:
         example_file = Path(os.path.dirname(__file__)) / "example_notebook.ipynb"
         file_update_dict = {
-                "notebook": SimpleUploadedFile(
-                    "example_notebook.ipynb",
-                    example_file.read_bytes(),
-                    "application/x-ipynb+json"
-                )
-            }
+            "notebook": SimpleUploadedFile(
+                "example_notebook.ipynb", example_file.read_bytes(), "application/x-ipynb+json"
+            )
+        }
     else:
         file_update_dict = {}
         grade_update_dict.update({"notebook": None, "status": "failed"})
 
-    path_url = reverse('grading:academy-grade', kwargs={'pk': grade.pk}).lstrip('/')
+    path_url = reverse("grading:academy-grade", kwargs={"pk": grade.pk}).lstrip("/")
     url = f"{base_url.rstrip('/')}/{path_url}"
 
     response = requests.put(

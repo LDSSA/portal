@@ -39,7 +39,6 @@ class TicketType(DjangoChoices):
 
 # TODO TODO custom user manager to filter out users with unverified email addresses
 class User(AbstractUser):
-
     # First Name and Last Name do not cover name patterns
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
@@ -57,12 +56,8 @@ class User(AbstractUser):
     code_of_conduct_accepted = models.BooleanField(default=False)
     applying_for_scholarship = models.BooleanField(default=None, null=True)
     profession = models.CharField(blank=True, max_length=50)
-    gender = models.CharField(
-        null=False, max_length=25, choices=Gender.choices
-    )
-    ticket_type = models.CharField(
-        null=False, max_length=25, choices=TicketType.choices
-    )
+    gender = models.CharField(null=False, max_length=25, choices=Gender.choices)
+    ticket_type = models.CharField(null=False, max_length=25, choices=TicketType.choices)
     company = models.CharField(blank=True, max_length=100)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
