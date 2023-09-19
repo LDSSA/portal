@@ -123,7 +123,7 @@ workflows:
   ci:
     jobs:
       - requirements:
-        name: Validate requirements
+          name: Validate requirements
           filters: &ci-filter
             branches:
               ignore: main
