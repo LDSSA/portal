@@ -701,9 +701,7 @@ class TestDraw(TestCase):
             ticket_type=ProfileTicketTypes.company,
             gender=ProfileGenders.female,
         )
-        selection = Selection.objects.create(
-            user=u, status=SelectionStatus.SELECTED
-        )
+        selection = Selection.objects.create(            user=u, status=SelectionStatus.SELECTED        )
 
         with self.assertRaises(DrawException):
             reject_draw(selection)
