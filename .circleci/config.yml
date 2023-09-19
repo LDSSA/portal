@@ -39,7 +39,7 @@ jobs:
       - python/install-packages:
           args: "--no-interaction --no-root --only dev"
           pkg-manager: poetry
-      - run: git-diff-py-files
+      - run:
           name: List added, copied, modified, and renamed *py files
           command: |
             git diff --name-only --diff-filter=ACMR origin/main | grep -E "(.py$)" > diff.txt || true
