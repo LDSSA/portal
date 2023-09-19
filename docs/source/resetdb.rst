@@ -23,10 +23,12 @@ In order to access the database, you need to use `kubectl`.
 
     ./manage.py shell
 
-#. Delete the following models:
-    * `portal.users.models.User`
-    * `portal.academy.models.Specialization`
-    * `portal.users.models.UserWhitelist`
-    * `portal.capstone.models.Capstone`
-    * `portal.challenge.models.Challenge`
-    * `portal.hackathons.models.Hackathon`
+Models to Delete
+------------------
+
+* `portal.users.models.User`
+* `portal.academy.models.Specialization`
+* `portal.users.models.UserWhitelist`
+* `portal.capstone.models.Capstone`
+* `portal.challenge.models.Challenge`
+* `portal.hackathons.models.Hackathon`
