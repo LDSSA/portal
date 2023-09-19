@@ -21,6 +21,7 @@ class MockGrading:
     def run_grading(self):
         pass
 
+
 class Grading:
     def __init__(self, grade):
         self.grade = grade
@@ -45,9 +46,7 @@ class Grading:
         )
 
     def success_message(self):
-        logger.info(
-            "Graded %s %s", self.grade.user.username, self.grade.unit.pk
-        )
+        logger.info("Graded %s %s", self.grade.user.username, self.grade.unit.pk)
 
     def run_command(self, cmd):
         process = subprocess.run(cmd)
@@ -132,9 +131,7 @@ class AcademyGradingMixin:
         return pattern.sub("", name)
 
     def get_env(self):
-        grader = get_user_model().objects.get(
-            username=settings.GRADING_USERNAME
-        )
+        grader = get_user_model().objects.get(username=settings.GRADING_USERNAME)
 
         grading_url = self.get_grading_url()
         checksum_url = self.get_checksum_url()

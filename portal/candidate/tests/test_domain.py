@@ -89,8 +89,6 @@ class TestDomain(TestCase):
         }
 
         readable = Domain.candidate_state_readable(
-            Domain.get_candidate_state(
-                User.objects.create(email="anon@adm.com")
-            )
+            Domain.get_candidate_state(User.objects.create(email="anon@adm.com"))
         )
         self.assertEqual(readable, expected)

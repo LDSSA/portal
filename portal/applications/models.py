@@ -17,18 +17,12 @@ class Challenge(models.Model):
 
 def notebook_path(instance, filename):
     now = datetime.now().isoformat(timespec="seconds")
-    return (
-        f"{instance.unit.code}/{instance.user.username}/"
-        f"notebook_{now}.ipynb"
-    )
+    return f"{instance.unit.code}/{instance.user.username}/" f"notebook_{now}.ipynb"
 
 
 def feedback_path(instance, filename):
     now = datetime.now().isoformat(timespec="seconds")
-    return (
-        f"{instance.unit.code}/{instance.user.username}/"
-        f"feeback_{now}.ipynb"
-    )
+    return f"{instance.unit.code}/{instance.user.username}/" f"feeback_{now}.ipynb"
 
 
 class Submission(models.Model):
@@ -37,9 +31,7 @@ class Submission(models.Model):
         on_delete=models.CASCADE,
         related_name="submissions",
     )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     unit = models.ForeignKey(Challenge, on_delete=models.CASCADE)
     notebook = models.FileField(upload_to=notebook_path, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -55,9 +47,7 @@ class Submission(models.Model):
         ("checksum-failed", "Checksum verification failed"),
         ("graded", "Graded"),
     )
-    status = models.CharField(
-        max_length=1024, choices=STATUSES, default="never-submitted"
-    )
+    status = models.CharField(max_length=1024, choices=STATUSES, default="never-submitted")
     score = models.FloatField(default=0, null=False)
     message = models.TextField(blank=True)
     feedback = models.FileField(upload_to=feedback_path, null=True, blank=True)

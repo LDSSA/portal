@@ -25,9 +25,7 @@ class StudentCapstoneListView(StudentMixin, ListView):
         self.object_list = self.get_queryset()
         data = []
         for capstone in self.object_list:
-            api, _ = models.StudentApi.objects.get_or_create(
-                capstone=capstone, user=request.user
-            )
+            api, _ = models.StudentApi.objects.get_or_create(capstone=capstone, user=request.user)
             data.append((capstone, api))
 
         context = self.get_context_data(object_list=data)
@@ -49,9 +47,8 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):
         reports = {}
         for type_ in models.Report.Type.values:
             report, _ = models.Report.objects.get_or_create(
-                capstone=self.object,
-                user=self.request.user,
-                type=type_)
+                capstone=self.object, user=self.request.user, type=type_
+            )
             reports[type_] = report
 
         return self.object, api, reports
@@ -62,7 +59,11 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):
             capstone=capstone,
             api=api,
             api_form=forms.ApiForm(instance=api),
-            reports=[[report_type, forms.ReportForm(instance=report), report] for report_type, report in reports.items() if getattr(capstone, f"{report_type}_open")],
+            reports=[
+                [report_type, forms.ReportForm(instance=report), report]
+                for report_type, report in reports.items()
+                if getattr(capstone, f"{report_type}_open")
+            ],
         )
         return self.render_to_response(context)
 
@@ -87,9 +88,7 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse(
-            "capstone:student-capstone-detail", args=(self.object.pk,)
-        )
+        return reverse("capstone:student-capstone-detail", args=(self.object.pk,))
 
 
 class InstructorCapstoneListView(InstructorMixin, ListView):
@@ -107,14 +106,30 @@ class InstructorCapstoneDetailView(InstructorMixin, DetailView):
         self.object = self.get_object()
         student_data = []
         for student in User.objects.filter(is_student=True):
-            student_data.append({
-                'user': student,
-                'api': models.StudentApi.objects.filter(capstone=self.object, user=student).first(),
-                'report_1_provisory': models.Report.objects.filter(capstone=self.object, user=student, type=models.Report.Type.report_1_provisory).first(),
-                'report_1_final': models.Report.objects.filter(capstone=self.object, user=student, type=models.Report.Type.report_1_final).first(),
-                'report_2_provisory': models.Report.objects.filter(capstone=self.object, user=student, type=models.Report.Type.report_2_provisory).first(),
-                'report_2_final': models.Report.objects.filter(capstone=self.object, user=student, type=models.Report.Type.report_2_final).first(),
-            })
+            student_data.append(
+                {
+                    "user": student,
+                    "api": models.StudentApi.objects.filter(
+                        capstone=self.object, user=student
+                    ).first(),
+                    "report_1_provisory": models.Report.objects.filter(
+                        capstone=self.object,
+                        user=student,
+                        type=models.Report.Type.report_1_provisory,
+                    ).first(),
+                    "report_1_final": models.Report.objects.filter(
+                        capstone=self.object, user=student, type=models.Report.Type.report_1_final
+                    ).first(),
+                    "report_2_provisory": models.Report.objects.filter(
+                        capstone=self.object,
+                        user=student,
+                        type=models.Report.Type.report_2_provisory,
+                    ).first(),
+                    "report_2_final": models.Report.objects.filter(
+                        capstone=self.object, user=student, type=models.Report.Type.report_2_final
+                    ).first(),
+                }
+            )
 
         context = self.get_context_data(
             object=self.object,

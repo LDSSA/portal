@@ -32,9 +32,7 @@ def load_payment_data(selection, staff=None):
 
     selection.ticket_type = ticket_type
     selection.payment_value = value
-    selection.payment_due_date = datetime.now(timezone.utc) + timedelta(
-        hours=48
-    )
+    selection.payment_due_date = datetime.now(timezone.utc) + timedelta(hours=48)
     selection.save()
 
     log_selection_event(
@@ -50,9 +48,7 @@ def load_payment_data(selection, staff=None):
     )
 
 
-def add_document(
-    selection: Selection, document: SelectionDocument, document_type
-) -> None:
+def add_document(selection: Selection, document: SelectionDocument, document_type) -> None:
     logger.info(f"selection={selection.id}: new document uploaded")
     document = SelectionDocument.objects.create(
         selection=selection,
@@ -72,13 +68,8 @@ def add_document(
 
 
 def add_note(selection, note, user=None):
-    log_selection_event(
-        selection, SelectionEvent.note_added, data={"note": note}, user=user
-    )
+    log_selection_event(selection, SelectionEvent.note_added, data={"note": note}, user=user)
 
 
 def can_be_updated(selection: Selection) -> bool:
-    return (
-        SelectionDomain.get_status(selection)
-        not in SelectionStatus.FINAL_STATUS
-    )
+    return SelectionDomain.get_status(selection) not in SelectionStatus.FINAL_STATUS

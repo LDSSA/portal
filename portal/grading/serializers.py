@@ -32,9 +32,7 @@ class ChecksumSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
 
         if old_checksum != instance.checksum:
-            for grade in models.Grade.objects.filter(
-                unit=instance, status="graded"
-            ):
+            for grade in models.Grade.objects.filter(unit=instance, status="graded"):
                 grade.status = "out-of-date"
                 grade.save()
 

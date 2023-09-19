@@ -18,9 +18,7 @@ class TestSelect(TestCase):
                 ticket_type=ProfileTicketTypes.regular,
                 gender=ProfileGenders.female,
             )
-            Selection.objects.create(
-                user=u, status=SelectionStatus.PASSED_TEST
-            )
+            Selection.objects.create(user=u, status=SelectionStatus.PASSED_TEST)
 
         for i in range(9):
             u = User.objects.create(email=f"drawn_female_user_{i}@amd.com")
@@ -34,14 +32,10 @@ class TestSelect(TestCase):
         select()
 
         self.assertEqual(
-            SelectionQueries.filter_by_status_in(
-                [SelectionStatus.SELECTED]
-            ).count(),
+            SelectionQueries.filter_by_status_in([SelectionStatus.SELECTED]).count(),
             9,
         )
-        for selection in SelectionQueries.filter_by_status_in(
-            [SelectionStatus.SELECTED]
-        ):
+        for selection in SelectionQueries.filter_by_status_in([SelectionStatus.SELECTED]):
             self.assertEqual(selection.ticket_type, ProfileTicketTypes.regular)
             self.assertEqual(selection.payment_value, 250)
 

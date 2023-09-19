@@ -31,15 +31,13 @@ class LeaderboardView(LoginRequiredMixin, generic.DetailView):
         submissions = {}
         # If scores are to be descending (higher is top score)
         ordering = "-" if self.object.descending else ""
-        for submission in models.Submission.objects.filter(
-            hackathon=self.object
-        ).order_by(ordering + "score", "created"):
+        for submission in models.Submission.objects.filter(hackathon=self.object).order_by(
+            ordering + "score", "created"
+        ):
             if submission.content_object not in submissions:
                 submissions[submission.content_object] = submission
 
-        context = self.get_context_data(
-            object=self.object, submissions=submissions
-        )
+        context = self.get_context_data(object=self.object, submissions=submissions)
 
         return self.render_to_response(context)
 
@@ -132,9 +130,7 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
         hackathon, attendance, team = self.get_object()
 
         if "attendance" in request.POST:
-            attendance_form = forms.StudentAttendanceForm(
-                request.POST, instance=attendance
-            )
+            attendance_form = forms.StudentAttendanceForm(request.POST, instance=attendance)
             if attendance_form.is_valid():
                 attendance_form.save()
 
@@ -145,30 +141,22 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
 
         elif "submit" in request.POST:
             try:
-                score = services.submission(
-                    hackathon, request.user, request.FILES["data"]
-                )
+                score = services.submission(hackathon, request.user, request.FILES["data"])
             except Exception as exc:
                 messages.add_message(
-                    request,
-                    messages.ERROR,
-                    request, messages.ERROR, str(exc.__cause__ or exc)
+                    request, messages.ERROR, request, messages.ERROR, str(exc.__cause__ or exc)
                 )  # Use root exception if defined
 
                 if not isinstance(exc, ValidationError):
                     logger.exception("Unhandled Exception during scoring")
 
             else:
-                messages.add_message(
-                    request, messages.SUCCESS, "Score: %s" % score
-                )
+                messages.add_message(request, messages.SUCCESS, "Score: %s" % score)
 
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse(
-            "hackathons:student-hackathon-detail", args=(self.object.pk,)
-        )
+        return reverse("hackathons:student-hackathon-detail", args=(self.object.pk,))
 
 
 class InstructorHackathonListView(InstructorViewsMixin, generic.ListView):
@@ -184,9 +172,7 @@ class InstructorHackathonSettingsView(InstructorViewsMixin, generic.UpdateView):
     form_class = forms.InstructorHackathonForm
 
     def get_success_url(self):
-        return reverse(
-            "hackathons:instructor-hackathon-settings", args=(self.object.pk,)
-        )
+        return reverse("hackathons:instructor-hackathon-settings", args=(self.object.pk,))
 
 
 # noinspection PyAttributeOutsideInit,PyUnusedLocal
@@ -206,9 +192,7 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
 
             object_list.append(
                 {
-                    "hackathon_team_id": team.hackathon_team_id
-                    if team is not None
-                    else 0,
+                    "hackathon_team_id": team.hackathon_team_id if team is not None else 0,
                     "student": att.user,
                     "team": team,
                     "attendance": att,
@@ -227,9 +211,7 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
         if request.GET.get("filter_eligible"):
             object_list = self._filter_can_attend_next(object_list)
 
-        context = self.get_context_data(
-            object=self.object, object_list=object_list
-        )
+        context = self.get_context_data(object=self.object, object_list=object_list)
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
@@ -246,10 +228,7 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
         self.object.status = new_status
         self.object.save()
 
-        if (
-            cur_status == "marking_presences"
-            and new_status == "generating_teams"
-        ):
+        if cur_status == "marking_presences" and new_status == "generating_teams":
             for item in object_list:
                 logger.info(request.POST)
                 logger.info(item["student"].username)
@@ -260,10 +239,7 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
                     item["attendance"].present = False
                 item["attendance"].save()
 
-        elif (
-            new_status == "generating_teams"
-            and cur_status == "generating_teams"
-        ):
+        elif new_status == "generating_teams" and cur_status == "generating_teams":
             self.object.teams.all().delete()
             services.generate_teams(
                 self.object,
@@ -291,9 +267,7 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse(
-            "hackathons:instructor-hackathon-admin", args=(self.object.pk,)
-        )
+        return reverse("hackathons:instructor-hackathon-admin", args=(self.object.pk,))
 
 
 # noinspection PyUnusedLocal
@@ -314,9 +288,7 @@ class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):
         self.object = self.get_object()
 
         try:
-            score = services.submission(
-                self.object, request.user, request.FILES["data"]
-            )
+            score = services.submission(self.object, request.user, request.FILES["data"])
         except ValidationError as exc:
             messages.add_message(
                 request, messages.ERROR, str(exc.__cause__ or exc)
@@ -330,16 +302,12 @@ class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):
             logger.exception("Unhandled Exception during scoring")
 
         else:
-            messages.add_message(
-                request, messages.SUCCESS, "Score: %s" % score
-            )
+            messages.add_message(request, messages.SUCCESS, "Score: %s" % score)
 
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse(
-            "hackathons:instructor-hackathon-detail", args=(self.object.pk,)
-        )
+        return reverse("hackathons:instructor-hackathon-detail", args=(self.object.pk,))
 
 
 class HackathonSetupView(generics.UpdateAPIView):

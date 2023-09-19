@@ -81,9 +81,7 @@ def attendances_graduate_ok_one_missed(student, hackathon1, hackathon2, hackatho
 
 
 @pytest.fixture
-def attendances_graduation_fail_first_missed(
-    student, hackathon1, hackathon2, hackathon3
-):
+def attendances_graduation_fail_first_missed(student, hackathon1, hackathon2, hackathon3):
     """
     Set student attendances for case when first hackathon was missed
     """
@@ -109,9 +107,7 @@ def attendances_graduation_fail_first_missed(
 
 
 @pytest.fixture
-def attendances_graduation_fail_too_many_missed(
-    student, hackathon1, hackathon2, hackathon3
-):
+def attendances_graduation_fail_too_many_missed(student, hackathon1, hackathon2, hackathon3):
     """
     Set student attendances for case when too many hackathons were missed, even
     if the first one was attended
@@ -361,9 +357,7 @@ def test_grade_retrieve(slu1, student, student2):
         status="graded",
         score=14,
     )
-    Grade.objects.create(
-        user=student, unit=slu1, status="graded", score=20, on_time=False
-    )
+    Grade.objects.create(user=student, unit=slu1, status="graded", score=20, on_time=False)
 
     assert get_last_grade(slu1, student).score == 20
     assert get_best_grade(slu1, student).score == 16

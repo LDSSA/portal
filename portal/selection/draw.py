@@ -23,7 +23,10 @@ class DrawParams(NamedTuple):
 
 
 default_draw_params = DrawParams(
-    number_of_seats=65, min_scholarships_quota=10/65, min_female_quota=0.35, max_company_quota=10/65
+    number_of_seats=65,
+    min_scholarships_quota=10 / 65,
+    min_female_quota=0.35,
+    max_company_quota=10 / 65,
 )
 
 
@@ -50,23 +53,17 @@ class DrawCounters:
 
 
 def must_pick_scholarship(params: DrawParams, counters: DrawCounters) -> bool:
-    fraction_if_not_drawn = counters.scholarships / (
-        counters.total + 1
-    )
+    fraction_if_not_drawn = counters.scholarships / (counters.total + 1)
     return fraction_if_not_drawn < params.min_scholarships_quota
 
 
 def must_pick_female(params: DrawParams, counters: DrawCounters) -> bool:
-    fraction_if_not_drawn = counters.female / (
-        counters.total + 1
-    )
+    fraction_if_not_drawn = counters.female / (counters.total + 1)
     return fraction_if_not_drawn < params.min_female_quota
 
 
 def must_not_pick_company(params: DrawParams, counters: DrawCounters) -> bool:
-    fraction_if_drawn = (counters.company + 1) / (
-        counters.total + 1
-    )
+    fraction_if_drawn = (counters.company + 1) / (counters.total + 1)
     return fraction_if_drawn >= params.max_company_quota
 
 
@@ -80,8 +77,8 @@ def get_draw_counters(candidates: Iterable[Selection]) -> DrawCounters:
 
 
 def iter_draw_constraints(
-        params: DrawParams,
-        counters: DrawCounters,
+    params: DrawParams,
+    counters: DrawCounters,
 ) -> Iterator[Tuple[Set[Gender], Set[TicketType]]]:
     # this function controls how we compute and loosen the draw constraints
     # loosening the constraints is required when we still need to draw
@@ -119,7 +116,11 @@ def iter_draw_constraints(
         (forget_scholarship_ratio,),
         (forget_scholarship_ratio, forget_female_ratio),
         (forget_scholarship_ratio, forget_company_ratio),
-        (forget_scholarship_ratio, forget_female_ratio, forget_company_ratio,),
+        (
+            forget_scholarship_ratio,
+            forget_female_ratio,
+            forget_company_ratio,
+        ),
     ]:
         forbidden_genders_cp = forbidden_genders.copy()
         forbidden_ticket_types_cp = forbidden_ticket_types.copy()
@@ -129,8 +130,8 @@ def iter_draw_constraints(
 
 
 def draw_next(
-        params: DrawParams,
-        counters: DrawCounters,
+    params: DrawParams,
+    counters: DrawCounters,
 ) -> Optional[Selection]:
     for fg, ftt in iter_draw_constraints(params, counters):
         q = SelectionQueries.draw_filter(list(fg), list(ftt))
@@ -161,9 +162,7 @@ def draw(params: DrawParams) -> None:
             # no more suitable candidates
             break
 
-        SelectionDomain.update_status(
-            selection, SelectionStatus.DRAWN, draw_rank=draw_rank
-        )
+        SelectionDomain.update_status(selection, SelectionStatus.DRAWN, draw_rank=draw_rank)
         counters.update(selection)
         draw_rank += 1
 
@@ -171,8 +170,6 @@ def draw(params: DrawParams) -> None:
 def reject_draw(selection: Selection) -> None:
     current_status = SelectionDomain.get_status(selection)
     if current_status != SelectionStatus.DRAWN:
-        raise DrawException(
-            f"Can't reject draw for candidate in status {current_status}."
-        )
+        raise DrawException(f"Can't reject draw for candidate in status {current_status}.")
 
     SelectionDomain.update_status(selection, SelectionStatus.PASSED_TEST)

@@ -10,20 +10,12 @@ from ..status import SelectionStatus
 
 class TestDomain(TestCase):
     def setUp(self) -> None:
-        self.staff_user = User.objects.create_staff_user(
-            email="staff@adm.com", password="secret"
-        )
+        self.staff_user = User.objects.create_staff_user(email="staff@adm.com", password="secret")
 
     def test_load_payment_data(self) -> None:
-        user = User.objects.create_user(
-            email="user@adm.com", password="strong"
-        )
-        Profile.objects.create(
-            user=user, full_name="name", ticket_type=ProfileTicketTypes.regular
-        )
-        selection = Selection.objects.create(
-            user=user, status=SelectionStatus.SELECTED
-        )
+        user = User.objects.create_user(email="user@adm.com", password="strong")
+        Profile.objects.create(user=user, full_name="name", ticket_type=ProfileTicketTypes.regular)
+        selection = Selection.objects.create(user=user, status=SelectionStatus.SELECTED)
         load_payment_data(selection)
 
         self.assertEqual(selection.ticket_type, ProfileTicketTypes.regular)
@@ -31,15 +23,9 @@ class TestDomain(TestCase):
         self.assertEqual(selection.status, SelectionStatus.SELECTED)
 
     def test_create_payment_student(self) -> None:
-        user = User.objects.create_user(
-            email="student@adm.com", password="strong"
-        )
-        Profile.objects.create(
-            user=user, full_name="name", ticket_type=ProfileTicketTypes.student
-        )
-        selection = Selection.objects.create(
-            user=user, status=SelectionStatus.SELECTED
-        )
+        user = User.objects.create_user(email="student@adm.com", password="strong")
+        Profile.objects.create(user=user, full_name="name", ticket_type=ProfileTicketTypes.student)
+        selection = Selection.objects.create(user=user, status=SelectionStatus.SELECTED)
         load_payment_data(selection)
 
         self.assertEqual(selection.ticket_type, ProfileTicketTypes.student)
@@ -47,15 +33,9 @@ class TestDomain(TestCase):
         self.assertEqual(selection.status, SelectionStatus.SELECTED)
 
     def test_create_payment_company(self) -> None:
-        user = User.objects.create_user(
-            email="company@adm.com", password="strong"
-        )
-        Profile.objects.create(
-            user=user, full_name="name", ticket_type=ProfileTicketTypes.company
-        )
-        selection = Selection.objects.create(
-            user=user, status=SelectionStatus.SELECTED
-        )
+        user = User.objects.create_user(email="company@adm.com", password="strong")
+        Profile.objects.create(user=user, full_name="name", ticket_type=ProfileTicketTypes.company)
+        selection = Selection.objects.create(user=user, status=SelectionStatus.SELECTED)
         load_payment_data(selection)
 
         self.assertEqual(selection.ticket_type, ProfileTicketTypes.company)

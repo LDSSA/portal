@@ -45,6 +45,4 @@ def get_all_candidates() -> ExportData:
         .annotate(**{k: F(v) for k, v in headers.items()})
     )
 
-    return ExportData(
-        headers=["id", *[k for k, _ in headers.items()]], rows=rows
-    )
+    return ExportData(headers=["id", *[k for k, _ in headers.items()]], rows=rows)

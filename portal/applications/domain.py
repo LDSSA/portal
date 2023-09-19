@@ -37,38 +37,23 @@ class Domain:
     submission_timedelta_buffer = timedelta(minutes=2)
 
     @classmethod
-    def get_application_status(
-        cls, application: Application
-    ) -> ApplicationStatus:
+    def get_application_status(cls, application: Application) -> ApplicationStatus:
         return cls.get_application_detailed_status(application)["application"]
 
     @classmethod
     def get_application_detailed_status(cls, application) -> Dict[str, Status]:
         chall_status = {}
         for chall in Challenge.objects.all():
-            chall_status[chall.code] = cls.get_sub_type_status(
-                application, chall
-            )
+            chall_status[chall.code] = cls.get_sub_type_status(application, chall)
 
         application_status = None
-        if any(
-            (s == SubmissionStatus.failed for _, s in chall_status.items())
-        ):
+        if any((s == SubmissionStatus.failed for _, s in chall_status.items())):
             application_status = ApplicationStatus.failed
-        elif any(
-            (s == SubmissionStatus.ongoing for _, s in chall_status.items())
-        ):
+        elif any((s == SubmissionStatus.ongoing for _, s in chall_status.items())):
             application_status = ApplicationStatus.ongoing
-        elif all(
-            (s == SubmissionStatus.passed for _, s in chall_status.items())
-        ):
+        elif all((s == SubmissionStatus.passed for _, s in chall_status.items())):
             application_status = ApplicationStatus.passed
-        elif all(
-            (
-                s == SubmissionStatus.not_started
-                for _, s in chall_status.items()
-            )
-        ):
+        elif all((s == SubmissionStatus.not_started for _, s in chall_status.items())):
             application_status = ApplicationStatus.not_started
         else:
             # some tests passed, some not started
@@ -96,9 +81,7 @@ class Domain:
     @staticmethod
     def get_start_date(application, challenge):
         if challenge.code == "coding_test":
-            start_date = getattr(
-                application, f"{challenge.code}_started_at", None
-            )
+            start_date = getattr(application, f"{challenge.code}_started_at", None)
         else:
             start_date = config.ADMISSIONS_APPLICATIONS_START
 
@@ -110,9 +93,7 @@ class Domain:
 
         if challenge.code == "coding_test":
             if start_date is not None:
-                close_date = (
-                    start_date + config.ADMISSIONS_CODING_TEST_DURATION
-                )
+                close_date = start_date + config.ADMISSIONS_CODING_TEST_DURATION
             else:
                 close_date = config.ADMISSIONS_SELECTION_START
         else:
@@ -126,9 +107,9 @@ class Domain:
 
     @staticmethod
     def get_best_score(application, challenge):
-        return Submission.objects.filter(
-            application=application, unit=challenge
-        ).aggregate(models.Max("score"))["score__max"]
+        return Submission.objects.filter(application=application, unit=challenge).aggregate(
+            models.Max("score")
+        )["score__max"]
 
     @classmethod
     def has_positive_score(cls, application, challenge):
@@ -153,14 +134,10 @@ class Domain:
             return False
 
         if (
-            Submission.objects.filter(
-                application=application, unit=challenge
-            ).count()
+            Submission.objects.filter(application=application, unit=challenge).count()
             >= cls.max_submissions
         ):
-            logger.warning(
-                f"user `{application.user.email}` reached max submissions."
-            )
+            logger.warning(f"user `{application.user.email}` reached max submissions.")
             return False
 
         return True
@@ -183,16 +160,12 @@ class Domain:
 
         status = Domain.get_application_status(application)
         if status == ApplicationStatus.passed:
-            emails.send_application_is_over_passed(
-                to_email=application.user.email, to_name=to_name
-            )
+            emails.send_application_is_over_passed(to_email=application.user.email, to_name=to_name)
             application.application_over_email_sent = "passed"
             application.save()
 
         else:
-            emails.send_application_is_over_failed(
-                to_email=application.user.email, to_name=to_name
-            )
+            emails.send_application_is_over_failed(to_email=application.user.email, to_name=to_name)
             application.application_over_email_sent = "failed"
             application.save()
 
@@ -212,6 +185,4 @@ class DomainQueries:
 
     @staticmethod
     def applications_with_sent_emails_count() -> int:
-        return Application.objects.filter(
-            application_over_email_sent__isnull=False
-        ).count()
+        return Application.objects.filter(application_over_email_sent__isnull=False).count()

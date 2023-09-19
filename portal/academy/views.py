@@ -59,9 +59,7 @@ class BaseUnitListView(ListView):
             grade = get_best_grade(unit, request.user)
             data.append((unit, grade))
 
-        context = self.get_context_data(
-            object_list=data, detail_view_name=self.detail_view_name
-        )
+        context = self.get_context_data(object_list=data, detail_view_name=self.detail_view_name)
         return self.render_to_response(context)
 
 
@@ -71,9 +69,7 @@ class BaseUnitDetailView(DetailView):
 
     def get(self, request, *args, **kwargs):
         unit, grade, best_grade = self.get_object()
-        context = self.get_context_data(
-            unit=unit, grade=grade, best_grade=best_grade
-        )
+        context = self.get_context_data(unit=unit, grade=grade, best_grade=best_grade)
         return self.render_to_response(context)
 
     # noinspection PyAttributeOutsideInit
@@ -92,9 +88,7 @@ class BaseUnitDetailView(DetailView):
             raise RuntimeError("Not checksum present for this unit")
 
         # Grade sent on time?
-        due_date = datetime.combine(
-            unit.due_date, datetime.max.time(), tzinfo=timezone.utc
-        )
+        due_date = datetime.combine(unit.due_date, datetime.max.time(), tzinfo=timezone.utc)
         grade.on_time = datetime.now(timezone.utc) <= due_date
 
         # Clear grade
@@ -129,9 +123,7 @@ def csvdata(spc_list, unit_list, object_list):
     for spc in spc_list:
         specs.extend([spc.code for _ in range(spc.unit_count)])
 
-    first_row = headers + [
-        spc + "-" + unit.code for spc, unit in zip(specs, unit_list)
-    ]
+    first_row = headers + [spc + "-" + unit.code for spc, unit in zip(specs, unit_list)]
 
     rows = [first_row]
     for obj in object_list:
@@ -141,9 +133,7 @@ def csvdata(spc_list, unit_list, object_list):
             obj["submission_date"],
             obj["total_score"],
         ]
-        user_row = user + [
-            grade.score or grade.status for grade in obj["grades"] if grade
-        ]
+        user_row = user + [grade.score or grade.status for grade in obj["grades"] if grade]
         rows.append(user_row)
 
     for row in rows:
@@ -162,9 +152,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
         can_graduate = self.request.GET.get("can_graduate")
 
         if can_graduate is not None:
-            return self.queryset.filter(can_graduate=can_graduate).order_by(
-                "name"
-            )
+            return self.queryset.filter(can_graduate=can_graduate).order_by("name")
 
         if user_id:
             return self.queryset.filter(id=user_id).order_by("name")
@@ -174,16 +162,9 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
     # noinspection PyAttributeOutsideInit
     def get(self, request, *args, **kwargs):
         # Validate query params
-        validator = serializers.InstructorsViewFiltersSerializer(
-            data=self.request.GET
-        )
+        validator = serializers.InstructorsViewFiltersSerializer(data=self.request.GET)
         if not validator.is_valid():
-            msg = " ".join(
-                [
-                    f"Filter '{k}': {v[0].lower()}"
-                    for k, v in validator.errors.items()
-                ]
-            )
+            msg = " ".join([f"Filter '{k}': {v[0].lower()}" for k, v in validator.errors.items()])
             messages.error(request, _(msg))
             return redirect("academy:instructor-user-list")
         query_params = validator.validated_data
@@ -247,9 +228,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
                 csvdata(spc_list, unit_list, object_list),
                 content_type="text/csv",
             )
-            response[
-                "Content-Disposition"
-            ] = "attachment; filename=student-grades.csv"
+            response["Content-Disposition"] = "attachment; filename=student-grades.csv"
             return response
         else:
             context = self.get_context_data(

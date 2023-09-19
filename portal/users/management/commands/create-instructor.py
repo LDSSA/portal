@@ -3,7 +3,7 @@ from portal.users.management.commands._create_user import create_user, add_user_
 
 
 class Command(BaseCommand):
-    help = 'Creates an instructor user in portal'
+    help = "Creates an instructor user in portal"
 
     def add_arguments(self, parser):
         add_user_options(parser)

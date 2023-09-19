@@ -49,9 +49,7 @@ class ElasticmailBackend(AnymailRequestsBackend):
 
     def parse_recipient_status(self, response, payload, message):
         try:
-            parsed_response = self.deserialize_json_response(
-                response, payload, message
-            )
+            parsed_response = self.deserialize_json_response(response, payload, message)
         except json.JSONDecodeError as exc:
             raise AnymailRequestsAPIError(
                 "Invalid Elasticmail API response format",
@@ -152,9 +150,7 @@ class ElasticmailV4Payload(RequestsPayload):
         if mimetype == "text/plain":
             self.set_txt_body(content)
         else:
-            self.unsupported_feature(
-                "alternative part with type '%s'" % mimetype
-            )
+            self.unsupported_feature("alternative part with type '%s'" % mimetype)
 
     def add_attachment(self, attachment):
         pass
@@ -166,9 +162,7 @@ class ElasticmailV4Payload(RequestsPayload):
         self.data["Content"]["Merge"].update(metadata)
 
     def set_track_clicks(self, track_clicks):
-        self.data["Options"]["TrackClicks"] = (
-            "true" if track_clicks else "false"
-        )
+        self.data["Options"]["TrackClicks"] = "true" if track_clicks else "false"
 
     def set_track_opens(self, track_opens):
         self.data["Options"]["TrackOpens"] = "true" if track_opens else "false"
@@ -233,9 +227,7 @@ class ElasticmailV2Payload(RequestsPayload):
         if mimetype == "text/plain":
             self.set_txt_body(content)
         else:
-            self.unsupported_feature(
-                "alternative part with type '%s'" % mimetype
-            )
+            self.unsupported_feature("alternative part with type '%s'" % mimetype)
 
     def add_attachment(self, attachment):
         pass
