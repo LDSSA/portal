@@ -53,16 +53,12 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
             "datetime_flags": [
                 {
                     "key": "applications_opening_date",
-                    "value": config.ADMISSIONS_APPLICATIONS_START.strftime(
-                        DATETIME_FMT
-                    ),
+                    "value": config.ADMISSIONS_APPLICATIONS_START.strftime(DATETIME_FMT),
                     "label": "Challenge Submissions Opening Date",
                 },
                 {
                     "key": "applications_closing_date",
-                    "value": config.ADMISSIONS_SELECTION_START.strftime(
-                        DATETIME_FMT
-                    ),
+                    "value": config.ADMISSIONS_SELECTION_START.strftime(DATETIME_FMT),
                     "label": "Challenge Submissions Closing Date",
                 },
             ],
@@ -99,9 +95,7 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
         if key == "applications_opening_date":
             date_s = request.POST["date_s"]
             opening_date = datetime.strptime(date_s, DATETIME_FMT)
-            opening_date = opening_date.replace(
-                tzinfo=tz.gettz("Europe/Lisbon")
-            )
+            opening_date = opening_date.replace(tzinfo=tz.gettz("Europe/Lisbon"))
             if opening_date > config.ADMISSIONS_SELECTION_START:
                 return HttpResponseServerError(
                     b"error setting opening date. opening date must be before closing date"
@@ -112,9 +106,7 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
         elif key == "applications_closing_date":
             date_s = request.POST["date_s"]
             closing_date = datetime.strptime(date_s, DATETIME_FMT)
-            closing_date = closing_date.replace(
-                tzinfo=tz.gettz("Europe/Lisbon")
-            )
+            closing_date = closing_date.replace(tzinfo=tz.gettz("Europe/Lisbon"))
             if closing_date < config.ADMISSIONS_APPLICATIONS_START:
                 return HttpResponseServerError(
                     b"error setting closing date. closing date must be after opening date"
@@ -222,9 +214,7 @@ class CandidateDetailView(AdmissionsStaffViewMixin, TemplateView):
 
         try:
             application = user.application
-            total_submissions = Submission.objects.filter(
-                application=application
-            ).count()
+            total_submissions = Submission.objects.filter(application=application).count()
             application_best_scores = {
                 "coding_test": ApplicationDomain.get_best_score(
                     application, Challenge.objects.get(code="coding_test")
@@ -259,9 +249,7 @@ class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         query = Application.objects.all().order_by("user__email")
 
-        filter_by_application_status = self.request.GET.get(
-            "application_status"
-        )
+        filter_by_application_status = self.request.GET.get("application_status")
 
         applications = []
         count_by_type: Dict[Any, Any] = {
@@ -312,16 +300,13 @@ class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
             },
         }
         for a in query:
-            application_det_status = (
-                ApplicationDomain.get_application_detailed_status(a)
-            )
+            application_det_status = ApplicationDomain.get_application_detailed_status(a)
             for sub_type, sub_status in application_det_status.items():
                 count_by_type[sub_type][sub_status.name] += 1
 
             if (
                 filter_by_application_status is not None
-                and application_det_status["application"].name
-                != filter_by_application_status
+                and application_det_status["application"].name != filter_by_application_status
             ):
                 continue
 
@@ -331,9 +316,7 @@ class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
                     "status_list": [
                         application_det_status["application"],
                         *[
-                            ApplicationDomain.get_sub_type_status(
-                                a, Challenge.objects.get(pk=code)
-                            )
+                            ApplicationDomain.get_sub_type_status(a, Challenge.objects.get(pk=code))
                             for code in [
                                 "coding_test",
                                 "slu01",
@@ -417,12 +400,8 @@ class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/selections.html"
 
     def get_context_data(self, **kwargs):
-        all_passed_test = SelectionQueries.filter_by_status_in(
-            [SelectionStatus.PASSED_TEST]
-        )
-        all_drawn = SelectionQueries.filter_by_status_in(
-            [SelectionStatus.DRAWN]
-        )
+        all_passed_test = SelectionQueries.filter_by_status_in([SelectionStatus.PASSED_TEST])
+        all_drawn = SelectionQueries.filter_by_status_in([SelectionStatus.DRAWN])
         all_after_draw = SelectionQueries.filter_by_status_in(
             [
                 SelectionStatus.INTERVIEW,
@@ -433,74 +412,50 @@ class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
         )
 
         # no scholarships
-        passed_test_no_scholarships = SelectionQueries.no_scholarships(
-            all_passed_test
-        )
+        passed_test_no_scholarships = SelectionQueries.no_scholarships(all_passed_test)
         drawn_no_scholarships = SelectionQueries.no_scholarships(all_drawn)
-        after_draw_no_scholarships = SelectionQueries.no_scholarships(
-            all_after_draw
-        )
+        after_draw_no_scholarships = SelectionQueries.no_scholarships(all_after_draw)
 
         drawn_candidates_no_scholarships = drawn_no_scholarships.count()
-        drawn_female_no_scholarships = drawn_no_scholarships.filter(
-            user__gender="female"
-        ).count()
+        drawn_female_no_scholarships = drawn_no_scholarships.filter(user__gender="female").count()
         drawn_company_no_scholarships = drawn_no_scholarships.filter(
             user__ticket_type=TicketType.company
         ).count()
 
-        selected_accepted_candidates_no_scholarships = (
-            after_draw_no_scholarships.count()
-        )
-        selected_accepted_female_no_scholarships = (
-            after_draw_no_scholarships.filter(
-                user__gender=Gender.female
-            ).count()
-        )
-        selected_accepted_company_no_scholarships = (
-            after_draw_no_scholarships.filter(
-                user__ticket_type=TicketType.company
-            ).count()
-        )
+        selected_accepted_candidates_no_scholarships = after_draw_no_scholarships.count()
+        selected_accepted_female_no_scholarships = after_draw_no_scholarships.filter(
+            user__gender=Gender.female
+        ).count()
+        selected_accepted_company_no_scholarships = after_draw_no_scholarships.filter(
+            user__ticket_type=TicketType.company
+        ).count()
 
-        left_out_candidates_no_scholarships = (
-            passed_test_no_scholarships.count()
-        )
+        left_out_candidates_no_scholarships = passed_test_no_scholarships.count()
         left_out_females_no_scholarships = passed_test_no_scholarships.filter(
             user__gender=Gender.female
         ).count()
-        left_out_non_company_no_scholarships = (
-            passed_test_no_scholarships.filter(
-                user__ticket_type=TicketType.company
-            ).count()
-        )
+        left_out_non_company_no_scholarships = passed_test_no_scholarships.filter(
+            user__ticket_type=TicketType.company
+        ).count()
 
         # scholarships
-        passed_test_scholarships = SelectionQueries.scholarships(
-            all_passed_test
-        )
+        passed_test_scholarships = SelectionQueries.scholarships(all_passed_test)
         drawn_scholarships = SelectionQueries.scholarships(all_drawn)
         after_draw_scholarships = SelectionQueries.scholarships(all_after_draw)
 
         drawn_candidates_scholarships = drawn_scholarships.count()
-        drawn_female_scholarships = drawn_scholarships.filter(
-            user__gender=Gender.female
-        ).count()
+        drawn_female_scholarships = drawn_scholarships.filter(user__gender=Gender.female).count()
         drawn_company_scholarships = drawn_scholarships.filter(
             user__ticket_type=TicketType.company
         ).count()
 
-        selected_accepted_candidates_scholarships = (
-            after_draw_scholarships.count()
-        )
+        selected_accepted_candidates_scholarships = after_draw_scholarships.count()
         selected_accepted_female_scholarships = after_draw_scholarships.filter(
             user__gender=Gender.female
         ).count()
-        selected_accepted_company_scholarships = (
-            after_draw_scholarships.filter(
-                user__ticket_type=TicketType.company
-            ).count()
-        )
+        selected_accepted_company_scholarships = after_draw_scholarships.filter(
+            user__ticket_type=TicketType.company
+        ).count()
 
         left_out_candidates_scholarships = passed_test_scholarships.count()
         left_out_females_scholarships = passed_test_scholarships.filter(
@@ -534,14 +489,12 @@ class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
                     / default_draw_params.number_of_seats
                     * 100,
                     "pct_female": (
-                        drawn_female_no_scholarships
-                        + selected_accepted_female_no_scholarships
+                        drawn_female_no_scholarships + selected_accepted_female_no_scholarships
                     )
                     / default_draw_params.number_of_seats
                     * 100,
                     "pct_company": (
-                        drawn_company_no_scholarships
-                        + selected_accepted_company_no_scholarships
+                        drawn_company_no_scholarships + selected_accepted_company_no_scholarships
                     )
                     / default_draw_params.number_of_seats
                     * 100,
@@ -563,20 +516,17 @@ class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
                     "total_company": drawn_company_scholarships
                     + selected_accepted_company_scholarships,
                     "pct_candidates": (
-                        drawn_candidates_scholarships
-                        + selected_accepted_candidates_scholarships
+                        drawn_candidates_scholarships + selected_accepted_candidates_scholarships
                     )
                     / default_draw_params.number_of_seats
                     * 100,
                     "pct_female": (
-                        drawn_female_scholarships
-                        + selected_accepted_female_scholarships
+                        drawn_female_scholarships + selected_accepted_female_scholarships
                     )
                     / default_draw_params.number_of_seats
                     * 100,
                     "pct_company": (
-                        drawn_company_scholarships
-                        + selected_accepted_company_scholarships
+                        drawn_company_scholarships + selected_accepted_company_scholarships
                     )
                     / default_draw_params.number_of_seats
                     * 100,
@@ -613,9 +563,7 @@ class InterviewListView(AdmissionsStaffViewMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = {
-            "selections": SelectionQueries.filter_by_status_in(
-                [SelectionStatus.INTERVIEW]
-            ),
+            "selections": SelectionQueries.filter_by_status_in([SelectionStatus.INTERVIEW]),
             "selection_status": SelectionStatus,
         }
         return super().get_context_data(**ctx)
@@ -778,9 +726,7 @@ class PaymentResetView(AdmissionsStaffViewMixin, View):
         _, selection = _get_user_selection(kwargs["pk"])
         try:
             load_payment_data(selection, request.user)
-            SelectionDomain.update_status(
-                selection, SelectionStatus.SELECTED, user=request.user
-            )
+            SelectionDomain.update_status(selection, SelectionStatus.SELECTED, user=request.user)
         except Exception:
             raise Http404
 
@@ -799,9 +745,7 @@ class ExportCandidatesView(AdmissionsStaffViewMixin, View):
         filename = f"candidates@{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H:%M')}.csv"
 
         response = HttpResponse(status=200, content_type="text/csv")
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="{filename}.csv"'
+        response["Content-Disposition"] = f'attachment; filename="{filename}.csv"'
 
         w = csv.DictWriter(response, export_data.headers, lineterminator="\n")
         w.writeheader()
