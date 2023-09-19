@@ -1,0 +1,30 @@
+.. LDSA Portal documentation master file, created by
+   sphinx-quickstart.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Welcome to LDSA Portal's documentation!
+====================================================================
+
+Contents:
+
+.. toctree::
+   :maxdepth: 2
+
+   structure
+   running
+   tests
+   deploy
+   logs
+   setup
+   hackathon_02
+   resetdb
+
+
+
+.. Indices and tables
+   ==================
+
+   * :ref:`genindex`
+   * :ref:`modindex`
+   * :ref:`search`
