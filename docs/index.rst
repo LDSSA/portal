@@ -18,7 +18,6 @@ Contents:
    logs
    setup
    hackathon_02
-   resetdb
 
 
 
