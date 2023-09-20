@@ -68,6 +68,7 @@ django-extensions = "^3.2.3"
 django-coverage-plugin = "^3.1.0"
 pytest-django = "^4.5.2"
 pre-commit = "^3.4.0"
+ruff = "^0.0.290"
 
 [tool.poetry.group.docs.dependencies]
 sphinx = "^7.2.3"
@@ -111,6 +112,37 @@ extend-exclude = '''
     | static/CACHE/
 )
 '''
+
+[tool.ruff]
+cache-dir = "~/.cache/ruff"
+# fix = true
+target-version = "py310"
+# show-fixes = true
+# show-source = true
+select = [
+#   "A",   # flake8-builtins
+#   "B",   # flake8-bugbear
+#   "C",   # flake8-comprehensions
+  "E",   # pycodestyle errors
+#   "DJ",  # flake8-django
+  "F",   # pyflakes
+#   "I",   # isort
+#   "N",   # pep8-naming
+#   "PT",  # flake8-pytest-style
+#   "PL",  # pylint
+#   "Q",   # flake8-quotes
+#   "RUF", # ruff
+  "UP",  # pyupgrade
+#   "W",   # pycodestyle warnings
+]
+ignore = [
+  "E501",  # line too long, handled by black
+]
+extend-exclude = [
+  "**/migrations/*",
+  "**/static/CACHE/*",
+  "docs",
+]
 
 [tool.pytest.ini_options]
 norecursedirs = "node_modules"
