@@ -362,5 +362,5 @@ def test_grade_retrieve(slu1, student, student2):
     assert get_last_grade(slu1, student).score == 20
     assert get_best_grade(slu1, student).score == 16
 
-    assert get_last_grade(slu1, student2).score == None
-    assert get_best_grade(slu1, student2).score == None
+    assert get_last_grade(slu1, student2).score is None
+    assert get_best_grade(slu1, student2).score is None

@@ -60,10 +60,10 @@ def test_grade_on_time(client, student, slu1):
 
     client.force_login(student)
     client.post(reverse("academy:student-unit-detail", args=(slu1.pk,)))
-    assert get_last_grade(slu1, student).on_time == True
+    assert get_last_grade(slu1, student).on_time is True
 
     slu1.due_date = datetime.now(timezone.utc) - timedelta(days=5)
     slu1.save()
 
     client.post(reverse("academy:student-unit-detail", args=(slu1.pk,)))
-    assert get_last_grade(slu1, student).on_time == False
+    assert get_last_grade(slu1, student).on_time is False
