@@ -20,6 +20,7 @@ Contents
    hackathon_02
    administration
    backup
+   resetdb
 
 .. Indices and tables
    ==================
