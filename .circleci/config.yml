@@ -65,22 +65,13 @@ jobs:
           args: "--no-interaction --no-root --only dev"
           pkg-manager: poetry
       - run: *git-diff-py-files
-          name: List added, copied, modified, and renamed *py files
-          command: |
-            git diff --name-only --diff-filter=ACMR origin/main | grep -E "(.py$)" > diff.txt || true
       - run:
           name: Black code formatting
           command: |
             poetry run black --check --diff --color --config=pyproject.toml . &> lint_checks.txt || true
       - run:
           name: Diff-based black
-          command: *display-lint-errors |
-            grep -Ff diff.txt lint_checks.txt > lint_errors.txt || true
-            if [ -s lint_errors.txt ]; then
-              cat lint_errors.txt
-              printf 'Run the following command to fix your branch:\n make fixes'
-              exit 1
-            fi
+          command: *display-lint-errors
 
   persist-checkout:
     executor: app-executor
@@ -150,24 +141,24 @@ workflows:
           requires:
             - Validate requirements
 
-  workflow:
-    jobs:
-      - persist-checkout:
-          context: 
-            - Common Env
-      - build:
-          context: 
-            - Common Env
-          requires:
-            - persist-checkout
-      - approval:
-          type: approval
-          context: 
-            - Common Env
-          requires:
-            - build
-      - push:
-          context: 
-            - Common Env
-          requires:
-            - approval
+  # workflow:
+  #   jobs:
+  #     - persist-checkout:
+  #         context: 
+  #           - Common Env
+  #     - build:
+  #         context: 
+  #           - Common Env
+  #         requires:
+  #           - persist-checkout
+  #     - approval:
+  #         type: approval
+  #         context: 
+  #           - Common Env
+  #         requires:
+  #           - build
+  #     - push:
+  #         context: 
+  #           - Common Env
+  #         requires:
+  #           - approval

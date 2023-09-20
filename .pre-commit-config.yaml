@@ -6,6 +6,11 @@ ci:
   autofix_prs: false
   
 repos:
+  - repo: https://github.com/zahorniak/pre-commit-circleci.git
+    rev: v0.6
+    hooks:
+    - id: circleci_validate
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.0.290
     hooks:
