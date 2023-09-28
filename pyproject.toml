@@ -56,11 +56,9 @@ django-anymail = {extras = ["amazon-ses"], version = "^10.1"}
 werkzeug = "^2.3.7"
 ipdb = "^0.13.13"
 psycopg2-binary = "^2.9.7"
-black = "^23.7.0"
 mypy = "^1.5.1"
 pytest = "^7.4.0"
 pytest-sugar = "^0.9.7"
-flake8 = "^6.1.0"
 coverage = "^7.3.0"
 factory-boy = "^3.3.0"
 django-debug-toolbar = "^4.2.0"
@@ -68,6 +66,7 @@ django-extensions = "^3.2.3"
 django-coverage-plugin = "^3.1.0"
 pytest-django = "^4.5.2"
 pre-commit = "^3.4.0"
+black = "^23.7.0"
 ruff = "^0.0.290"
 
 [tool.poetry.group.docs.dependencies]
@@ -78,14 +77,6 @@ sphinx-notfound-page = "^1.0.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.flake8]
-max-line-length = 100
-exclude = [".tox", ".git", "*/migrations/*", "*/static/CACHE/*", "docs", "node_modules"]
-
-[tool.pycodestyle]
-max-line-length = 100
-exclude = [".tox", ".git", "*/migrations/*", "*/static/CACHE/*", "docs", "node_modules"]
 
 [tool.mypy]
 python_version = "3.10"
