@@ -1,6 +1,5 @@
 import random
 import string
-import uuid
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey

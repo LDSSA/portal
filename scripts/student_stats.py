@@ -10,9 +10,9 @@ qs = (
     .values_list("username", "total")
 )
 for item in qs:
-    print(item)
+    print(item)  # noqa: T201
 
 
 for u in models.Unit.objects.order_by("-code"):
     num = u.grades.filter(status="graded").count()
-    print(u.code, num)
+    print(u.code, num)  # noqa: T201

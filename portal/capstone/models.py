@@ -1,10 +1,9 @@
 import logging
 import random
 import string
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from urllib.parse import urljoin
 
-from django.conf import settings
 from django.db import models
 
 from portal.hackathons.models import random_path

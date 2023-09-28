@@ -4,7 +4,6 @@ from logging import getLogger
 from typing import Any
 
 from constance import config
-from django.conf import settings
 from django.db import models
 
 from portal.admissions import emails

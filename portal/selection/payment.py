@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta, timezone
 from logging import getLogger
-from typing import Optional
 
 from .domain import SelectionDomain
 from .logs import SelectionEvent, log_selection_event

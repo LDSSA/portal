@@ -6,10 +6,8 @@ from anymail.backends.base_requests import (
     RequestsPayload,
 )
 from anymail.exceptions import AnymailRequestsAPIError
-from anymail.message import ANYMAIL_STATUSES, AnymailRecipientStatus
+from anymail.message import AnymailRecipientStatus
 from anymail.utils import get_anymail_setting
-
-from config.settings.settings import ANYMAIL
 
 logger = logging.getLogger(__name__)
 

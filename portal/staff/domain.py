@@ -1,7 +1,6 @@
 from logging import getLogger
 
 from constance import config
-from django.conf import settings
 
 from portal.admissions import emails
 from portal.applications.domain import Domain as ApplicationDomain

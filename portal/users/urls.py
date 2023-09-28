@@ -1,9 +1,6 @@
 from django.urls import path
 
 from portal.users.views import (
-    user_detail_view,
-    user_list_view,
-    user_redirect_view,
     user_update_view,
 )
 
