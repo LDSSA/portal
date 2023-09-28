@@ -1,5 +1,3 @@
-from typing import List
-
 from django.db.models import Max
 
 from portal.users.models import Gender, TicketType
@@ -15,12 +13,12 @@ class SelectionQueries:
 
     @staticmethod
     def filter_by_status_in(
-        status_list: List[SelectionStatusType],
+        status_list: list[SelectionStatusType],
     ):
         return Selection.objects.filter(status__in=status_list)
 
     @staticmethod
-    def draw_filter(forbidden_genders: List[Gender], forbidden_ticket_types: List[TicketType]):
+    def draw_filter(forbidden_genders: list[Gender], forbidden_ticket_types: list[TicketType]):
         return (
             Selection.objects.filter(status=SelectionStatus.PASSED_TEST)
             .exclude(user__gender__in=forbidden_genders)

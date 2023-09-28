@@ -26,7 +26,7 @@ class Command(BaseCommand):
         # TODO: revisit uniqueness of primary key
         unit = Unit.objects.filter(code=options["code"]).first()
         if unit:
-            self.stdout.write(self.style.SUCCESS("Unit already existed: {}".format(unit)))
+            self.stdout.write(self.style.SUCCESS(f"Unit already existed: {unit}"))
             return
 
         instructor_opt = options.get("instructor")
@@ -37,7 +37,7 @@ class Command(BaseCommand):
             else:
                 instructor = User.objects.first()
         except Exception as e:
-            raise CommandError("Could not create unit: dependency not met ({})".format(e))
+            raise CommandError(f"Could not create unit: dependency not met ({e})")
 
         checksum = options.get("checksum")
         if not checksum:
@@ -56,6 +56,6 @@ class Command(BaseCommand):
             unit.save()
 
         except Exception as e:
-            raise CommandError("Could not create unit: {}".format(e))
+            raise CommandError(f"Could not create unit: {e}")
 
-        self.stdout.write(self.style.SUCCESS("Successfully created unit {}".format(unit)))
+        self.stdout.write(self.style.SUCCESS(f"Successfully created unit {unit}"))

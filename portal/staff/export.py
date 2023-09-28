@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, NamedTuple
+from typing import Any, NamedTuple
 
 from django.db.models import F
 
@@ -6,8 +6,8 @@ from portal.users.models import User
 
 
 class ExportData(NamedTuple):
-    headers: List[str]
-    rows: List[Dict[str, Any]]
+    headers: list[str]
+    rows: list[dict[str, Any]]
 
 
 def get_all_candidates() -> ExportData:

@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from enum import Enum
 from logging import getLogger
-from typing import Any, Dict, Optional
+from typing import Any
 
 from constance import config
 from django.conf import settings
@@ -40,7 +40,7 @@ class Domain:
         return cls.get_application_detailed_status(application)["application"]
 
     @classmethod
-    def get_application_detailed_status(cls, application) -> Dict[str, Status]:
+    def get_application_detailed_status(cls, application) -> dict[str, Status]:
         chall_status = {}
         for chall in Challenge.objects.all():
             chall_status[chall.code] = cls.get_sub_type_status(application, chall)

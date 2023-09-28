@@ -26,6 +26,6 @@ class Command(BaseCommand):
             )
             spec.save()
         except Exception as e:
-            raise CommandError("Could not create specialization: {}".format(e))
+            raise CommandError(f"Could not create specialization: {e}")
 
         self.stdout.write(self.style.SUCCESS("Successfully created specialization {}".format(spec)))

@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any
 from urllib.parse import urljoin
 
 from constance import config
@@ -183,7 +183,7 @@ class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         return HttpResponseRedirect(reverse("admissions:candidate:coding-test"))
 
 
-def submission_view_ctx(application, challenge) -> Dict[str, Any]:
+def submission_view_ctx(application, challenge) -> dict[str, Any]:
     return {
         "challenge": challenge,
         "status": Domain.get_sub_type_status(application, challenge).name,

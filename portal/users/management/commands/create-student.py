@@ -13,6 +13,6 @@ class Command(BaseCommand):
         try:
             user = create_user(user_type="student", **options)
         except Exception as e:
-            raise CommandError("Could not create student: {}".format(e))
+            raise CommandError(f"Could not create student: {e}")
 
-        self.stdout.write(self.style.SUCCESS("Successfully created student {}".format(user)))
+        self.stdout.write(self.style.SUCCESS(f"Successfully created student {user}"))

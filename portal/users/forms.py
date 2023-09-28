@@ -1,5 +1,4 @@
 import logging
-from typing import Type
 
 # from allauth.account.forms import SignupForm
 import django.forms as forms

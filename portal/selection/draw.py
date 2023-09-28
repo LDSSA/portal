@@ -1,5 +1,6 @@
+from collections.abc import Iterable, Iterator
 from logging import getLogger
-from typing import Iterable, Iterator, NamedTuple, Optional, Set, Tuple
+from typing import NamedTuple
 
 from portal.users.models import Gender, TicketType
 
@@ -80,13 +81,13 @@ def get_draw_counters(candidates: Iterable[Selection]) -> DrawCounters:
 def iter_draw_constraints(
     params: DrawParams,
     counters: DrawCounters,
-) -> Iterator[Tuple[Set[Gender], Set[TicketType]]]:
+) -> Iterator[tuple[set[Gender], set[TicketType]]]:
     # this function controls how we compute and loosen the draw constraints
     # loosening the constraints is required when we still need to draw
     # candidates and none matches the current criteria
 
-    forbidden_genders: Set[Gender] = set()
-    forbidden_ticket_types: Set[TicketType] = set()
+    forbidden_genders: set[Gender] = set()
+    forbidden_ticket_types: set[TicketType] = set()
 
     if must_pick_female(params, counters):
         forbidden_genders.update([Gender.male, Gender.other])
@@ -97,16 +98,16 @@ def iter_draw_constraints(
     if must_not_pick_company(params, counters):
         forbidden_ticket_types.add(TicketType.company)
 
-    def forget_none(fg: Set[Gender], ftt: Set[TicketType]) -> None:
+    def forget_none(fg: set[Gender], ftt: set[TicketType]) -> None:
         pass
 
-    def forget_female_ratio(fg: Set[Gender], ftt: Set[TicketType]) -> None:
+    def forget_female_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
         fg.difference_update([Gender.male, Gender.other])
 
-    def forget_company_ratio(fg: Set[Gender], ftt: Set[TicketType]) -> None:
+    def forget_company_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
         ftt.discard(TicketType.company)
 
-    def forget_scholarship_ratio(fg: Set[Gender], ftt: Set[TicketType]) -> None:
+    def forget_scholarship_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
         ftt.difference_update([TicketType.regular, TicketType.student, TicketType.company])
 
     for loosen_funcs in [
@@ -133,7 +134,7 @@ def iter_draw_constraints(
 def draw_next(
     params: DrawParams,
     counters: DrawCounters,
-) -> Optional[Selection]:
+) -> Selection | None:
     for fg, ftt in iter_draw_constraints(params, counters):
         q = SelectionQueries.draw_filter(list(fg), list(ftt))
         sel = SelectionQueries.random(q)

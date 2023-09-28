@@ -1,5 +1,3 @@
-from typing import List
-
 from django.test import TestCase
 from profiles.models import Profile, ProfileGenders, ProfileTicketTypes
 from users.models import User
@@ -217,7 +215,7 @@ class TestDraw(TestCase):
             )
             Selection.objects.create(user=u, status=SelectionStatus.PASSED_TEST)
 
-        to_draw_selections: List[Selection] = []
+        to_draw_selections: list[Selection] = []
         for i in range(10):
             u = User.objects.create(email=f"female_user_{i}@amd.com")
             Profile.objects.create(
@@ -248,7 +246,7 @@ class TestDraw(TestCase):
     def test_draw_dont_pick_scholarships(self) -> None:
         params = DrawParams(number_of_seats=5, min_female_quota=0, max_company_quota=0)
 
-        to_draw_selections: List[Selection] = []
+        to_draw_selections: list[Selection] = []
         for i in range(3):
             u = User.objects.create(email=f"female_user_{i}@amd.com")
             Profile.objects.create(
@@ -282,7 +280,7 @@ class TestDraw(TestCase):
     def test_draw_pick_scholarships(self) -> None:
         params = DrawParams(number_of_seats=5, min_female_quota=0, max_company_quota=0)
 
-        to_draw_selections: List[Selection] = []
+        to_draw_selections: list[Selection] = []
         for i in range(3):
             u = User.objects.create(email=f"female_user_{i}@amd.com")
             Profile.objects.create(
@@ -319,7 +317,7 @@ class TestDraw(TestCase):
     def test_draw_pick_scholarships_not_enough_females(self) -> None:
         params = DrawParams(number_of_seats=5, min_female_quota=0.5, max_company_quota=0)
 
-        to_draw_selections: List[Selection] = []
+        to_draw_selections: list[Selection] = []
         for i in range(2):
             u = User.objects.create(email=f"scholarship_female_user_{i}@amd.com")
             Profile.objects.create(
@@ -372,7 +370,7 @@ class TestDraw(TestCase):
     def test_draw_pick_scholarships_not_enough(self) -> None:
         params = DrawParams(number_of_seats=4, min_female_quota=0, max_company_quota=0)
 
-        to_draw_selections: List[Selection] = []
+        to_draw_selections: list[Selection] = []
         for i in range(2):
             u = User.objects.create(email=f"female_user_{i}@amd.com")
             Profile.objects.create(

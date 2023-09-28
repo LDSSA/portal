@@ -1,4 +1,4 @@
-from typing import Dict, NamedTuple, Optional
+from typing import NamedTuple
 
 import nbconvert
 import nbformat
@@ -23,13 +23,13 @@ def notebook_to_html(nb):
 class CandidateState(NamedTuple):
     accepted_coc: bool
     decided_scholarship: bool
-    applying_for_scholarship: Optional[bool]
-    application_status: Optional[ApplicationStatus]
-    coding_test_status: Optional[SubmissionStatus]
-    slu01_status: Optional[SubmissionStatus]
-    slu02_status: Optional[SubmissionStatus]
-    slu03_status: Optional[SubmissionStatus]
-    selection_status: Optional[SelectionStatusType]
+    applying_for_scholarship: bool | None
+    application_status: ApplicationStatus | None
+    coding_test_status: SubmissionStatus | None
+    slu01_status: SubmissionStatus | None
+    slu02_status: SubmissionStatus | None
+    slu03_status: SubmissionStatus | None
+    selection_status: SelectionStatusType | None
 
 
 class DomainException(Exception):
@@ -65,7 +65,7 @@ class Domain:
     @staticmethod
     def candidate_state_readable(
         candidate_state: CandidateState,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         return {
             k: k.replace("_", " ").title().replace("Slu", "SLU ")
             for k, _ in candidate_state._asdict().items()

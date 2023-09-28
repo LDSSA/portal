@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime, timedelta, timezone
 from logging import getLogger
-from typing import Any, Dict
+from typing import Any
 
 from constance import config
 from dateutil import tz
@@ -253,7 +253,7 @@ class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
         filter_by_application_status = self.request.GET.get("application_status")
 
         applications = []
-        count_by_type: Dict[Any, Any] = {
+        count_by_type: dict[Any, Any] = {
             "application": {
                 s: 0
                 for s in [
