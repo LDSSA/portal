@@ -3,12 +3,11 @@ import random
 import re
 import string
 import subprocess
-from urllib.parse import urljoin, unquote
+from urllib.parse import unquote, urljoin
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from rest_framework.reverse import reverse
-
 
 logger = logging.getLogger(__name__)
 pattern = re.compile("[^a-zA-Z0-9-]+")

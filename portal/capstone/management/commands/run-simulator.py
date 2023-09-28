@@ -1,6 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
 
-
 from portal.capstone.simulator import run
 
 

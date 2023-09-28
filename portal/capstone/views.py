@@ -4,14 +4,13 @@ from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import ListView, DetailView
+from django.views.generic import DetailView, ListView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from portal.capstone import models, forms
+from portal.capstone import forms, models
 from portal.users.models import User
-from portal.users.views import StudentMixin, InstructorMixin
-
+from portal.users.views import InstructorMixin, StudentMixin
 
 logger = logging.getLogger(__name__)
 

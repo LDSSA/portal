@@ -1,13 +1,15 @@
-import pytest
 from datetime import datetime
+
+import pytest
 
 from portal.academy.models import Grade
 from portal.academy.services import (
-    check_graduation_status,
     check_complete_specialization,
+    check_graduation_status,
     csvdata,
+    get_best_grade,
+    get_last_grade,
 )
-from portal.academy.services import get_last_grade, get_best_grade
 from portal.hackathons.models import Attendance
 
 

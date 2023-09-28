@@ -1,7 +1,9 @@
 import uuid
+
 import dateutil.parser
 from django.core.management.base import BaseCommand, CommandError
-from portal.academy.models import Unit, Specialization
+
+from portal.academy.models import Specialization, Unit
 from portal.users.models import User
 
 

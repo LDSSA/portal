@@ -1,12 +1,11 @@
 import logging
 from time import sleep
 
-from django.core.management.base import BaseCommand
+from constance import config
 from django.conf import settings
+from django.core.management.base import BaseCommand
 from django.db import connection
 from django.utils import timezone
-from constance import config
-
 
 # from portal.capstone.simulator import run
 logger = logging.getLogger(__name__)

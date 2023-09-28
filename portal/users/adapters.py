@@ -2,24 +2,23 @@ import logging
 from typing import Any
 
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.account.forms import EmailAwarePasswordResetTokenGenerator
+from allauth.account.utils import filter_users_by_email, user_pk_to_url_str
 from allauth.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.utils import build_absolute_uri
-from allauth.account.utils import filter_users_by_email, user_pk_to_url_str
-from allauth.account.forms import EmailAwarePasswordResetTokenGenerator
 from constance import config
+from django.core.mail import EmailMessage
 from django.http import HttpRequest
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
 from django.urls import reverse
 
-from portal.users.models import UserWhitelist
 from portal.admissions.emails import (
-    send_signup_email,
     send_reset_password_email,
+    send_signup_email,
 )
-
+from portal.users.models import UserWhitelist
 
 logger = logging.getLogger(__name__)
 

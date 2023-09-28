@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from portal.users.management.commands._create_user import create_user, add_user_options
+
+from portal.users.management.commands._create_user import add_user_options, create_user
 
 
 class Command(BaseCommand):

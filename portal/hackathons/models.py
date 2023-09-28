@@ -2,10 +2,10 @@ import random
 import string
 import uuid
 
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.conf import settings
 from django.utils import timezone
 
 

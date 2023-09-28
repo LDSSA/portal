@@ -1,11 +1,12 @@
-import pytest
 from datetime import datetime
+
+import pytest
 from django.conf import settings
 from django.test import RequestFactory
-from portal.users.models import User
-from portal.academy.models import Specialization, Unit, Grade
-from portal.hackathons.models import Hackathon, Attendance
 
+from portal.academy.models import Grade, Specialization, Unit
+from portal.hackathons.models import Attendance, Hackathon
+from portal.users.models import User
 from portal.users.tests.factories import UserFactory
 
 

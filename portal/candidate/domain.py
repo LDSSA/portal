@@ -1,11 +1,10 @@
 from typing import Dict, NamedTuple, Optional
 
-import nbformat
 import nbconvert
+import nbformat
 
-from portal.applications.domain import ApplicationStatus
+from portal.applications.domain import ApplicationStatus, SubmissionStatus
 from portal.applications.domain import Domain as ApplicationsDomain
-from portal.applications.domain import SubmissionStatus
 from portal.applications.models import Application, Challenge
 from portal.selection.domain import SelectionDomain
 from portal.selection.models import Selection

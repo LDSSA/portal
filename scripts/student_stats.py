@@ -3,7 +3,6 @@ from django.db.models import Sum
 from portal.academy import models
 from portal.users.models import User
 
-
 qs = (
     User.objects.filter(student=True)
     .annotate(total=Sum("grades__score"))

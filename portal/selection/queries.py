@@ -2,8 +2,8 @@ from typing import List
 
 from django.db.models import Max
 
-
 from portal.users.models import Gender, TicketType
+
 from .models import Selection, SelectionDocument
 from .status import SelectionStatus, SelectionStatusType
 

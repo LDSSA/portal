@@ -1,15 +1,14 @@
 import logging
 import random
 import string
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urljoin
 
-from django.db import models
 from django.conf import settings
+from django.db import models
 
 from portal.hackathons.models import random_path
 from portal.users.models import User
-
 
 logger = logging.getLogger(__name__)
 

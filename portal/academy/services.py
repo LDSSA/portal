@@ -3,10 +3,10 @@ import logging
 from io import StringIO
 
 from django.db.models import Max
-from portal.academy.models import Specialization, Grade, Unit
-from portal.hackathons.models import Hackathon, Attendance
-from portal.users.models import User
 
+from portal.academy.models import Grade, Specialization, Unit
+from portal.hackathons.models import Attendance, Hackathon
+from portal.users.models import User
 
 logger = logging.getLogger(__name__)
 

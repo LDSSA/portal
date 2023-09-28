@@ -4,12 +4,11 @@ from logging import getLogger
 from typing import Any, Dict, Optional
 
 from constance import config
-from django.db import models
 from django.conf import settings
+from django.db import models
 
-
-from portal.applications.models import Application, Submission, Challenge
 from portal.admissions import emails
+from portal.applications.models import Application, Challenge, Submission
 
 logger = getLogger(__name__)
 

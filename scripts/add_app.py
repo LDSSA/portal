@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
-from portal.capstone import models
 
+from portal.capstone import models
 
 student_api = models.StudentApi.objects.get(id=107)
 simulator = models.Simulator.objects.get(name="extension_observations")

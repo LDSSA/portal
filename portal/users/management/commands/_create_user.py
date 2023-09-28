@@ -1,6 +1,8 @@
 import uuid
-from portal.users.models import User
+
 from allauth.account.models import EmailAddress
+
+from portal.users.models import User
 
 
 def add_user_options(parser):

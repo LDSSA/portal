@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from portal.academy import models
-from portal.applications.models import Submission, Challenge
+from portal.applications.models import Challenge, Submission
 
 
 class GradeSerializer(serializers.ModelSerializer):

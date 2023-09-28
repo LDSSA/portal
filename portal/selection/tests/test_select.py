@@ -1,5 +1,4 @@
 from django.test import TestCase
-
 from profiles.models import Profile, ProfileGenders, ProfileTicketTypes
 from users.models import User
 

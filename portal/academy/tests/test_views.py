@@ -3,8 +3,8 @@ from datetime import datetime, timedelta, timezone
 import pytest
 from django.urls import reverse
 
-from portal.academy.views import csvdata
 from portal.academy.services import get_last_grade
+from portal.academy.views import csvdata
 
 
 @pytest.mark.django_db(transaction=True)

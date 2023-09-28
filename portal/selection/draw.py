@@ -1,6 +1,7 @@
 from logging import getLogger
-from portal.users.models import TicketType, Gender
 from typing import Iterable, Iterator, NamedTuple, Optional, Set, Tuple
+
+from portal.users.models import Gender, TicketType
 
 from .domain import SelectionDomain
 from .models import Selection

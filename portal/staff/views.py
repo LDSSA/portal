@@ -1,39 +1,40 @@
 import csv
 from datetime import datetime, timedelta, timezone
 from logging import getLogger
-from portal.candidate.domain import notebook_to_html
 from typing import Any, Dict
 
-from dateutil import tz
 from constance import config
+from dateutil import tz
 from django.http import (
-    HttpResponseServerError,
     Http404,
+    HttpResponseServerError,
 )
 from django.http.response import FileResponse, HttpResponse
 from django.shortcuts import redirect
-from django.views.generic import TemplateView, View
 from django.urls import reverse
+from django.views.generic import TemplateView, View
 
 from portal.admissions import emails
-from portal.applications.domain import Domain as ApplicationDomain, Status
-from portal.applications.models import Submission, Application, Challenge
+from portal.applications.domain import Domain as ApplicationDomain
+from portal.applications.domain import Status
+from portal.applications.models import Application, Challenge, Submission
+from portal.candidate.domain import notebook_to_html
 from portal.selection.domain import SelectionDomain
 from portal.selection.draw import default_draw_params, draw, reject_draw
 from portal.selection.logs import get_selection_logs
 from portal.selection.models import Selection
-from portal.selection.queries import SelectionQueries
 from portal.selection.payment import (
     add_note,
-    load_payment_data,
     can_be_updated,
+    load_payment_data,
 )
+from portal.selection.queries import SelectionQueries
 from portal.selection.select import select
 from portal.selection.status import SelectionStatus
 from portal.staff.domain import Events, EventsException
-from portal.users.models import User, Gender, TicketType
-from portal.users.views import AdmissionsStaffViewMixin
 from portal.staff.export import get_all_candidates
+from portal.users.models import Gender, TicketType, User
+from portal.users.views import AdmissionsStaffViewMixin
 
 logger = getLogger(__name__)
 

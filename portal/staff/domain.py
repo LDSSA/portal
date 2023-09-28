@@ -3,6 +3,7 @@ from logging import getLogger
 from constance import config
 from django.conf import settings
 
+from portal.admissions import emails
 from portal.applications.domain import Domain as ApplicationDomain
 from portal.applications.domain import (
     DomainException as ApplicationDomainException,
@@ -10,11 +11,9 @@ from portal.applications.domain import (
 from portal.applications.domain import (
     DomainQueries as ApplicationDomainQueries,
 )
-from portal.admissions import emails
 from portal.selection.domain import SelectionDomain
 from portal.selection.queries import SelectionQueries
 from portal.selection.status import SelectionStatus
-
 
 logger = getLogger(__name__)
 

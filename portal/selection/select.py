@@ -1,7 +1,8 @@
 from logging import getLogger
 
-from portal.users.models import TicketType
 from portal.admissions import emails
+from portal.users.models import TicketType
+
 from .domain import SelectionDomain
 from .payment import load_payment_data
 from .queries import SelectionQueries

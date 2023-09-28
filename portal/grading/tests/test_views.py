@@ -1,11 +1,12 @@
 import os
+from pathlib import Path
+
 import pytest
 import requests
-from pathlib import Path
-from requests import Response
-from django.urls import reverse
-from rest_framework.authtoken.models import Token
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.urls import reverse
+from requests import Response
+from rest_framework.authtoken.models import Token
 
 from portal.academy import models
 from portal.users.models import User

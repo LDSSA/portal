@@ -2,12 +2,11 @@
 Base settings to build other settings files upon.
 """
 
-import environ
 import os
 from datetime import datetime, timedelta, timezone
 
+import environ
 from django.utils.module_loading import import_string
-
 
 ROOT_DIR = environ.Path(__file__) - 3  # (portal/config/settings/base.py - 3 = portal/)
 APPS_DIR = ROOT_DIR.path("portal")

@@ -1,23 +1,22 @@
 import csv
 import logging
-from io import StringIO
 from datetime import datetime, timezone
+from io import StringIO
 
 from constance import config
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework.settings import import_string
 
 from portal.academy import models, serializers
-from portal.academy.services import csvdata, get_last_grade, get_best_grade
-from portal.users.views import StudentViewsMixin, InstructorViewsMixin
-
+from portal.academy.services import csvdata, get_best_grade, get_last_grade
+from portal.users.views import InstructorViewsMixin, StudentViewsMixin
 
 logger = logging.getLogger(__name__)
 

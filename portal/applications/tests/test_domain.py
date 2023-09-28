@@ -1,7 +1,5 @@
 from datetime import datetime, timedelta
 
-from django.test import TestCase
-
 from applications.domain import (
     ApplicationStatus,
     Domain,
@@ -9,6 +7,7 @@ from applications.domain import (
     SubmissionStatus,
 )
 from applications.models import Application, Submission, SubmissionTypes
+from django.test import TestCase
 from interface import interface
 from users.models import User
 

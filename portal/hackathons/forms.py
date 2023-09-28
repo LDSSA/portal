@@ -5,7 +5,6 @@ from django import forms
 
 from . import models
 
-
 logger = logging.getLogger(__name__)
 
 

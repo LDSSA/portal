@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta
 
-from django.test import TestCase
-
 from applications.models import Application, Submission, SubmissionTypes
+from django.test import TestCase
 from interface import interface
 from profiles.models import Profile
 from selection.domain import SelectionDomain

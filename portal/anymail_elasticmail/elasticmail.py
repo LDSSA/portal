@@ -1,15 +1,15 @@
-from anymail.exceptions import AnymailRequestsAPIError
-from anymail.message import ANYMAIL_STATUSES, AnymailRecipientStatus
-from config.settings.settings import ANYMAIL
-import logging
 import json
+import logging
 
 from anymail.backends.base_requests import (
-    RequestsPayload,
     AnymailRequestsBackend,
+    RequestsPayload,
 )
+from anymail.exceptions import AnymailRequestsAPIError
+from anymail.message import ANYMAIL_STATUSES, AnymailRecipientStatus
 from anymail.utils import get_anymail_setting
 
+from config.settings.settings import ANYMAIL
 
 logger = logging.getLogger(__name__)
 

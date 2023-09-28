@@ -2,7 +2,6 @@ from django.urls import path
 
 from portal.candidate import views
 
-
 app_name = "candidate"
 
 urlpatterns = [

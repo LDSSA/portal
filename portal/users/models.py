@@ -1,10 +1,10 @@
+from cryptography.hazmat.backends import (
+    default_backend as crypto_default_backend,
+)
 from cryptography.hazmat.primitives import (
     serialization as crypto_serialization,
 )
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import (
-    default_backend as crypto_default_backend,
-)
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse

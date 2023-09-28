@@ -7,11 +7,10 @@ from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 from datetime import datetime, timezone
 
 import requests
-from django.db import transaction, close_old_connections, DatabaseError
 from django.conf import settings
+from django.db import DatabaseError, close_old_connections, transaction
 
 from portal.capstone import models
-
 
 logger = logging.getLogger(__name__)
 WORKERS = 50

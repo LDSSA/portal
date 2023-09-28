@@ -2,14 +2,13 @@ import logging
 from typing import Type
 
 # from allauth.account.forms import SignupForm
-
 import django.forms as forms
 
 # from allauth.account.forms import SignupForm
 from constance import config
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.contrib import auth
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 

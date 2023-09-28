@@ -3,11 +3,11 @@ import logging
 from django.http import HttpResponse
 from rest_framework import generics
 
-from . import serializers
 from portal.academy import models
+from portal.academy.services import check_complete_specialization
 from portal.applications.models import Challenge, Submission
 
-from portal.academy.services import check_complete_specialization
+from . import serializers
 
 logger = logging.getLogger(__name__)
 

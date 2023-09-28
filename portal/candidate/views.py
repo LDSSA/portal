@@ -18,26 +18,26 @@ from django.views import generic
 from django.views.generic import TemplateView
 from rest_framework.settings import import_string
 
+from portal.admissions import emails
 from portal.applications.domain import Domain, Status
-from portal.users.models import TicketType
 from portal.applications.models import (
     Application,
     Challenge,
     Submission,
 )
-from portal.candidate.domain import Domain as CandidateDomain, notebook_to_html
-from portal.admissions import emails
+from portal.candidate.domain import Domain as CandidateDomain
+from portal.candidate.domain import notebook_to_html
 from portal.selection.domain import SelectionDomain
 from portal.selection.models import Selection, SelectionDocument
 from portal.selection.payment import add_document, can_be_updated
 from portal.selection.queries import SelectionDocumentQueries
 from portal.selection.status import SelectionStatus
+from portal.users.models import TicketType
 from portal.users.views import (
     AdmissionsCandidateViewMixin,
-    CandidateAcceptedCoCMixin,
     AdmissionsViewMixin,
+    CandidateAcceptedCoCMixin,
 )
-
 
 logger = logging.getLogger(__name__)
 

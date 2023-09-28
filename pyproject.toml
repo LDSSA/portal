@@ -117,7 +117,7 @@ select = [
   "E",   # pycodestyle errors
 #   "DJ",  # flake8-django
 #   "F",   # pyflakes
-#   "I",   # isort
+  "I",   # isort
 #   "N",   # pep8-naming
 #   "PT",  # flake8-pytest-style
 #   "PL",  # pylint
@@ -127,12 +127,21 @@ select = [
 #   "W",   # pycodestyle warnings
 ]
 ignore = [
-  "E501",  # line too long, handled by black
+  "E501",  # line too long, handled by Black
 ]
 extend-exclude = [
   "**/migrations/*",
   "**/static/CACHE/*",
   "docs",
+]
+
+[tool.ruff.flake8-quotes]
+inline-quotes = 'single'
+
+[tool.ruff.pep8-naming]
+ignore-names = [
+    'foo',
+    'bar',
 ]
 
 [tool.pytest.ini_options]

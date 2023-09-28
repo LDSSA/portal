@@ -10,11 +10,10 @@ from django.urls import reverse
 from django.views import generic
 from rest_framework import generics
 
-from portal.users.views import StudentViewsMixin, InstructorViewsMixin
-from portal.hackathons import models, serializers, forms, services
-from portal.capstone.models import StudentApi, Capstone
 from portal.academy.services import check_graduation_status
-
+from portal.capstone.models import Capstone, StudentApi
+from portal.hackathons import forms, models, serializers, services
+from portal.users.views import InstructorViewsMixin, StudentViewsMixin
 
 logger = logging.getLogger(__name__)
 
