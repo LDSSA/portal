@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta  # noqa: D100
 
 from django.test import TestCase
 
@@ -12,8 +12,8 @@ from portal.selection.status import SelectionStatus
 from portal.users.models import User
 
 
-class TestDomain(TestCase):
-    def test_get_candidate_state_default(self) -> None:
+class TestDomain(TestCase):  # noqa: D101
+    def test_get_candidate_state_default(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() + timedelta(minutes=30)
         )
@@ -39,7 +39,7 @@ class TestDomain(TestCase):
             ),
         )
 
-    def test_get_candidate_state(self) -> None:
+    def test_get_candidate_state(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() - timedelta(minutes=30)
         )
@@ -73,7 +73,7 @@ class TestDomain(TestCase):
             ),
         )
 
-    def test_candidate_state_readable(self) -> None:
+    def test_candidate_state_readable(self) -> None:  # noqa: D102
         expected = {
             "confirmed_email": "Confirmed Email",
             "accepted_coc": "Accepted Coc",

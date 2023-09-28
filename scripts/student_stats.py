@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import Sum  # noqa: D100
 
 from portal.academy import models
 from portal.users.models import User

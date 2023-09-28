@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime  # noqa: D100
 
 import pytest
 from django.conf import settings
@@ -12,7 +12,7 @@ from portal.users.tests.factories import UserFactory
 
 @pytest.mark.django_db
 @pytest.fixture(autouse=True)
-def cleanup_db():
+def cleanup_db():  # noqa: D103
     User.objects.all().delete()
     Specialization.objects.all().delete()
     Unit.objects.all().delete()
@@ -22,8 +22,8 @@ def cleanup_db():
 
 
 @pytest.fixture
-def grader():
-    user = User.objects.create(
+def grader():  # noqa: D103
+    return User.objects.create(
         username="grader",
         name="Grader User",
         github_username="GraderUser",
@@ -32,12 +32,11 @@ def grader():
         is_instructor=True,
         is_staff=True,
     )
-    return user
 
 
 @pytest.fixture
-def student():
-    user = User.objects.create(
+def student():  # noqa: D103
+    return User.objects.create(
         username="test_student",
         name="test_student",
         github_username="TestUser",
@@ -45,12 +44,11 @@ def student():
         is_student=True,
         is_instructor=False,
     )
-    return user
 
 
 @pytest.fixture
-def student2():
-    user = User.objects.create(
+def student2():  # noqa: D103
+    return User.objects.create(
         username="test_student_2",
         name="test_student_2",
         github_username="TestUser2",
@@ -58,12 +56,11 @@ def student2():
         is_student=True,
         is_instructor=False,
     )
-    return user
 
 
 @pytest.fixture
-def instructor():
-    user = User.objects.create(
+def instructor():  # noqa: D103
+    return User.objects.create(
         username="test_instructor",
         name="test_instructor",
         github_username="TestInstructor",
@@ -71,23 +68,21 @@ def instructor():
         is_student=False,
         is_instructor=True,
     )
-    return user
 
 
 @pytest.fixture
-def specialization():
-    spec = Specialization.objects.create(
+def specialization():  # noqa: D103
+    return Specialization.objects.create(
         code="S01",
         name="bootcamp",
         description="This is a test bootcamp",
         created=datetime(year=2021, month=8, day=10),
     )
-    return spec
 
 
 @pytest.fixture
-def slu1(specialization, instructor):
-    unit = Unit.objects.create(
+def slu1(specialization, instructor):  # noqa: D103
+    return Unit.objects.create(
         specialization=specialization,
         code="SLU01",
         name="unit 1",
@@ -98,12 +93,11 @@ def slu1(specialization, instructor):
         checksum="a424e2aa-adb2-473c-b782-65b9f879a628",
         created=datetime(year=2021, month=8, day=11),
     )
-    return unit
 
 
 @pytest.fixture
-def slu2(specialization, instructor):
-    unit = Unit.objects.create(
+def slu2(specialization, instructor):  # noqa: D103
+    return Unit.objects.create(
         specialization=specialization,
         code="SLU02",
         name="unit 2",
@@ -114,45 +108,41 @@ def slu2(specialization, instructor):
         checksum="a424e2aa-adb2-473c-b782-65b9f879a628",
         created=datetime(year=2021, month=8, day=11),
     )
-    return unit
 
 
 @pytest.fixture
-def hackathon1(specialization, instructor):
-    hack = Hackathon.objects.create(
+def hackathon1(specialization, instructor):  # noqa: D103
+    return Hackathon.objects.create(
         code="HCKT01",
         name="Hackathon 1 - Binary classification",
         due_date=datetime(year=2021, month=8, day=30),
         descending=False,
     )
-    return hack
 
 
 @pytest.fixture
-def hackathon2(specialization, instructor):
-    hack = Hackathon.objects.create(
+def hackathon2(specialization, instructor):  # noqa: D103
+    return Hackathon.objects.create(
         code="HCKT02",
         name="Hackathon 2 - Data wrangling",
         due_date=datetime(year=2021, month=9, day=30),
         descending=False,
     )
-    return hack
 
 
 @pytest.fixture
-def hackathon3(specialization, instructor):
-    hack = Hackathon.objects.create(
+def hackathon3(specialization, instructor):  # noqa: D103
+    return Hackathon.objects.create(
         code="HCKT03",
         name="Hackathon 3 - Time series",
         due_date=datetime(year=2021, month=10, day=30),
         descending=True,
     )
-    return hack
 
 
 @pytest.fixture
-def grade_slu1(student, slu1):
-    grade = Grade.objects.create(
+def grade_slu1(student, slu1):  # noqa: D103
+    return Grade.objects.create(
         user=student,
         unit=slu1,
         created=datetime(year=2021, month=8, day=15),
@@ -160,12 +150,11 @@ def grade_slu1(student, slu1):
         score=18,
         message="",
     )
-    return grade
 
 
 @pytest.fixture
-def grade_slu2(student, slu2):
-    grade = Grade.objects.create(
+def grade_slu2(student, slu2):  # noqa: D103
+    return Grade.objects.create(
         user=student,
         unit=slu2,
         created=datetime(year=2021, month=8, day=15),
@@ -173,19 +162,18 @@ def grade_slu2(student, slu2):
         score=20,
         message="",
     )
-    return grade
 
 
 @pytest.fixture(autouse=True)
-def media_storage(settings, tmpdir):
+def media_storage(settings, tmpdir):  # noqa: D103
     settings.MEDIA_ROOT = tmpdir.strpath
 
 
 @pytest.fixture
-def user() -> settings.AUTH_USER_MODEL:
+def user() -> settings.AUTH_USER_MODEL:  # noqa: D103
     return UserFactory()
 
 
 @pytest.fixture
-def request_factory() -> RequestFactory:
+def request_factory() -> RequestFactory:  # noqa: D103
     return RequestFactory()

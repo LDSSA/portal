@@ -1,4 +1,4 @@
-import os
+import os  # noqa: D100
 from pathlib import Path
 
 import pytest
@@ -13,7 +13,7 @@ from portal.users.models import User
 
 
 @pytest.fixture
-def auth_token(grader):
+def auth_token(grader):  # noqa: D103
     token = Token.objects.create(user=grader)
     token.save()
     grader.save()
@@ -21,10 +21,7 @@ def auth_token(grader):
 
 
 def setup_base_empty_grade_helper(user: User, unit: models.Unit) -> models.Grade:
-    """
-    Helper method to setup an empty grade before sending a request to the grading
-    view.
-    """
+    """Set up an empty grade before sending a request to the grading view."""
     grade = models.Grade(user=user, unit=unit)
 
     grade.status = "sent"
@@ -45,10 +42,7 @@ def send_grader_request_helper(
     message: str = "",
     send_file: bool = True,
 ) -> Response:
-    """
-    Helper method to setup an empty grade before sending a request to the grading
-    view.
-    """
+    """Set up an empty grade before sending a request to the grading view."""
     grade_update_dict = {"score": score, "status": status, "message": message, "notebook": None}
 
     if send_file:
@@ -65,17 +59,16 @@ def send_grader_request_helper(
     path_url = reverse("grading:academy-grade", kwargs={"pk": grade.pk}).lstrip("/")
     url = f"{base_url.rstrip('/')}/{path_url}"
 
-    response = requests.put(
+    return requests.put(
         url,
         headers={"Authorization": f"Token {token}"},
         data=grade_update_dict,
         files=file_update_dict,
     )
-    return response
 
 
 @pytest.mark.django_db(transaction=True)
-def test_academy_grading_view_set_slu1_grade_and_passed_specialization(
+def test_academy_grading_view_set_slu1_grade_and_passed_specialization(  # noqa: D103
     live_server,
     auth_token,
     db,
@@ -98,7 +91,7 @@ def test_academy_grading_view_set_slu1_grade_and_passed_specialization(
 
 
 @pytest.mark.django_db(transaction=True)
-def test_academy_grading_view_set_slu1_grade_and_dont_pass_specialization(
+def test_academy_grading_view_set_slu1_grade_and_dont_pass_specialization(  # noqa: D103
     live_server,
     auth_token,
     db,
@@ -122,7 +115,7 @@ def test_academy_grading_view_set_slu1_grade_and_dont_pass_specialization(
 
 
 @pytest.mark.django_db(transaction=True)
-def test_academy_grading_view_set_slu1_and_slu2_grade_and_pass_specialization(
+def test_academy_grading_view_set_slu1_and_slu2_grade_and_pass_specialization(  # noqa: D103
     live_server,
     auth_token,
     db,

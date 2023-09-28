@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path  # noqa: D100
 
 from portal.users.views import (
     user_update_view,

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta  # noqa: D100
 
 from applications.models import Application, Submission, SubmissionTypes
 from django.test import TestCase
@@ -11,19 +11,19 @@ from staff.domain import Events, EventsException
 from users.models import User
 
 
-class TestEvents(TestCase):
-    def setUp(self) -> None:
+class TestEvents(TestCase):  # noqa: D101
+    def setUp(self) -> None:  # noqa: D102
         self.aod = datetime.now() - timedelta(minutes=30)
         self.acd = datetime.now() + timedelta(minutes=30)
         interface.feature_flag_client.set_applications_opening_date(self.aod)
         interface.feature_flag_client.set_applications_closing_date(self.acd)
 
-    def test_trigger_applications_are_over_exception(self) -> None:
+    def test_trigger_applications_are_over_exception(self) -> None:  # noqa: D102
         # because applications are not closed
         with self.assertRaises(EventsException):
             Events.trigger_applications_are_over()
 
-    def test_trigger_applications_are_over(self) -> None:
+    def test_trigger_applications_are_over(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             self.aod - timedelta(minutes=60)
         )
@@ -98,7 +98,7 @@ class TestEvents(TestCase):
         a5.refresh_from_db()
         self.assertEqual(a5.application_over_email_sent, "passed")
 
-    def test_trigger_admissions_are_over_exception(self) -> None:
+    def test_trigger_admissions_are_over_exception(self) -> None:  # noqa: D102
         # because applications are not closed
         with self.assertRaises(EventsException):
             Events.trigger_admissions_are_over()
@@ -135,7 +135,7 @@ class TestEvents(TestCase):
         with self.assertRaises(EventsException):
             Events.trigger_admissions_are_over()
 
-    def test_trigger_admissions_are_over(self) -> None:
+    def test_trigger_admissions_are_over(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             self.aod - timedelta(minutes=60)
         )

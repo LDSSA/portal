@@ -1,4 +1,4 @@
-import random
+import random  # noqa: D100
 import string
 
 from django.conf import settings
@@ -8,16 +8,16 @@ from django.db import models
 from django.utils import timezone
 
 
-def random_path(instance, filename):
+def random_path(instance, filename):  # noqa: D103
     date = str(timezone.now()).split(" ")[0]
     randstr = "".join(random.choices(string.ascii_lowercase, k=12))
     if hasattr(instance, "code"):
         return f"{instance.code}_{filename}" f"_{date}_{randstr}"
-    else:
-        return f"{instance.__class__.__name__}{instance.id}_{filename}" f"_{date}_{randstr}"
+
+    return f"{instance.__class__.__name__}{instance.id}_{filename}" f"_{date}_{randstr}"
 
 
-class Hackathon(models.Model):
+class Hackathon(models.Model):  # noqa: D101
     code = models.CharField(max_length=255, primary_key=True)
     name = models.CharField(max_length=255, blank=True)
     due_date = models.DateField(default=timezone.now)
@@ -60,7 +60,7 @@ class Hackathon(models.Model):
     descending = models.BooleanField(blank=True)
 
 
-class Attendance(models.Model):
+class Attendance(models.Model):  # noqa: D101
     hackathon = models.ForeignKey(Hackathon, on_delete=models.CASCADE, related_name="attendance")
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -71,7 +71,7 @@ class Attendance(models.Model):
     # remote = models.BooleanField(default=False)
 
 
-class Team(models.Model):
+class Team(models.Model):  # noqa: D101
     hackathon = models.ForeignKey(Hackathon, on_delete=models.CASCADE, related_name="teams")
     hackathon_team_id = models.IntegerField(default=0)
     # remote = models.BooleanField(default=False)
@@ -80,7 +80,7 @@ class Team(models.Model):
     logo = models.TextField(blank=True)
 
 
-class Submission(models.Model):
+class Submission(models.Model):  # noqa: D101
     hackathon = models.ForeignKey(Hackathon, on_delete=models.CASCADE, related_name="submissions")
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()

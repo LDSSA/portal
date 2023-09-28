@@ -1,4 +1,4 @@
-import os
+import os  # noqa: D100
 import uuid
 
 from django.db import models
@@ -6,7 +6,7 @@ from django.db import models
 from .status import SelectionStatus
 
 
-class Selection(models.Model):
+class Selection(models.Model):  # noqa: D101
     user = models.OneToOneField("users.User", on_delete=models.CASCADE, editable=False)
 
     status = models.CharField(default=SelectionStatus.PASSED_TEST, null=False, max_length=40)
@@ -27,13 +27,13 @@ doc_type_choices = [
 ]
 
 
-def get_path(instance, filename):
+def get_path(instance, filename):  # noqa: D103
     key_basename, key_ext = os.path.splitext(filename)
     filename = f"{key_basename}_{uuid.uuid4().hex}{key_ext}"
     return f"payments/{instance.doc_type}/{instance.selection.user.username}/{filename}"
 
 
-class SelectionDocument(models.Model):
+class SelectionDocument(models.Model):  # noqa: D101
     selection = models.ForeignKey(
         "selection.Selection",
         on_delete=models.CASCADE,
@@ -46,7 +46,7 @@ class SelectionDocument(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class SelectionLogs(models.Model):
+class SelectionLogs(models.Model):  # noqa: D101
     selection = models.ForeignKey(
         "selection.Selection",
         on_delete=models.CASCADE,

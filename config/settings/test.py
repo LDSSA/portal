@@ -1,6 +1,4 @@
-"""
-With these settings, tests run faster.
-"""
+"""With these settings, tests run faster."""
 
 from .settings import *  # noqa
 from .settings import env

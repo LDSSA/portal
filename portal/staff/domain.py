@@ -1,4 +1,4 @@
-from logging import getLogger
+from logging import getLogger  # noqa: D100
 
 from constance import config
 
@@ -17,21 +17,21 @@ from portal.selection.status import SelectionStatus
 logger = getLogger(__name__)
 
 
-class EventsException(Exception):
+class EventsException(Exception):  # noqa: D101
     pass
 
 
-class Events:
+class Events:  # noqa: D101
     @staticmethod
-    def applications_are_over_sent_emails() -> int:
+    def applications_are_over_sent_emails() -> int:  # noqa: D102
         return ApplicationDomainQueries.applications_with_sent_emails_count()
 
     @staticmethod
-    def applications_are_over_total_emails() -> int:
+    def applications_are_over_total_emails() -> int:  # noqa: D102
         return ApplicationDomainQueries.applications_count()
 
     @staticmethod
-    def trigger_applications_are_over() -> None:
+    def trigger_applications_are_over() -> None:  # noqa: D102
         if config.PORTAL_STATUS == "admissions:applications":
             logger.error(
                 "trying to trigger `applications over` event but applications are still open"
@@ -54,15 +54,15 @@ class Events:
         logger.info(f"sent {sent_count} `application_over` emails")
 
     @staticmethod
-    def admissions_are_over_sent_emails() -> int:
+    def admissions_are_over_sent_emails() -> int:  # noqa: D102
         return SelectionQueries.filter_by_status_in(SelectionStatus.FINAL_STATUS).count()
 
     @staticmethod
-    def admissions_are_over_total_emails() -> int:
+    def admissions_are_over_total_emails() -> int:  # noqa: D102
         return SelectionQueries.get_all().count()
 
     @staticmethod
-    def trigger_admissions_are_over() -> None:
+    def trigger_admissions_are_over() -> None:  # noqa: D102
         if config.PORTAL_STATUS == "admissions:applications":
             logger.error(
                 "trying to trigger `admissions over` event but applications are still open"

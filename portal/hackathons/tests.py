@@ -1,1 +1,1 @@
-# Create your tests here.
+# Create your tests here.  # noqa: D100

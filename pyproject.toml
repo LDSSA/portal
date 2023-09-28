@@ -114,6 +114,7 @@ select = [
 #   "A",   # flake8-builtins
 #   "B",   # flake8-bugbear
 #   "C",   # flake8-comprehensions
+  "D",   # pydocstyle
   "E",   # pycodestyle errors
 #   "DJ",  # flake8-django
   "F",   # pyflakes
@@ -122,12 +123,15 @@ select = [
 #   "PT",  # flake8-pytest-style
 #   "PL",  # pylint
 #   "Q",   # flake8-quotes
+  "RET", # flake8-return
 #   "RUF", # ruff
   "UP",  # pyupgrade
 #   "W",   # pycodestyle warnings
 ]
 ignore = [
-  "E501",  # line too long, handled by Black
+  "E501",   # line too long, handled by Black
+  "D211",   # No blank lines allowed before class docstring
+  "D213"    # Multi-line docstring summary should start at the second line
 ]
 extend-exclude = [
   "**/migrations/*",

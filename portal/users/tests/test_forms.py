@@ -1,4 +1,4 @@
-import pytest
+import pytest  # noqa: D100
 
 from portal.users.forms import UserCreationForm
 from portal.users.tests.factories import UserFactory
@@ -6,8 +6,8 @@ from portal.users.tests.factories import UserFactory
 pytestmark = pytest.mark.django_db
 
 
-class TestUserCreationForm:
-    def test_clean_username(self):
+class TestUserCreationForm:  # noqa: D101
+    def test_clean_username(self):  # noqa: D102
         # A user with proto_user params does not exist yet.
         proto_user = UserFactory.build()
 

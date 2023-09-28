@@ -1,4 +1,4 @@
-import pytest
+import pytest  # noqa: D100
 
 pytestmark = pytest.mark.django_db
 

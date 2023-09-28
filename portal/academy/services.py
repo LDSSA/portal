@@ -1,4 +1,4 @@
-import csv
+import csv  # noqa: D100
 import logging
 from io import StringIO
 
@@ -11,7 +11,7 @@ from portal.users.models import User
 logger = logging.getLogger(__name__)
 
 
-def csvdata(spc_list, unit_list, object_list):
+def csvdata(spc_list, unit_list, object_list):  # noqa: D103
     csvfile = StringIO()
     csvwriter = csv.writer(csvfile)
 
@@ -40,8 +40,7 @@ def csvdata(spc_list, unit_list, object_list):
 
 
 def check_graduation_status(user: User):
-    """
-    Check graduation eligibility of student given their attendance in hackathons:
+    """Check graduation eligibility of student given their attendance in hackathons.
 
     - if student missed the first hackathon, they can not not graduate
     - if student has missed more than one hackathon, they can not not graduate
@@ -76,9 +75,9 @@ def check_graduation_status(user: User):
 
 
 def check_complete_specialization(user: User, spec: Specialization):
-    """
-    Check student completed a specialization by verifying
-    they passed on all units
+    """Check student completed a specialization.
+
+    Verifies if the student passed on all units
     """
     logger.info(f"Checking {user.name} completion of specialization: {spec.name}")
 
@@ -106,14 +105,14 @@ def check_complete_specialization(user: User, spec: Specialization):
     return False
 
 
-def get_last_grade(unit, user):
+def get_last_grade(unit, user):  # noqa: D103
     grade = unit.grades.filter(user=user).order_by("-created").first()
     if grade is None:
         grade = Grade(user=user, unit=unit)
     return grade
 
 
-def get_best_grade(unit, user):
+def get_best_grade(unit, user):  # noqa: D103
     grade = unit.grades.filter(user=user, status="graded", on_time=True).order_by("-score").first()
     if grade is None:
         grade = Grade(user=user, unit=unit)

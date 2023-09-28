@@ -1,17 +1,17 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError  # noqa: D100
 
 from portal.academy.models import Specialization
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # noqa: D101
     help = "Creates a specialization in portal"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser):  # noqa: D102
         parser.add_argument("-c", "--code", type=str, required=True)
         parser.add_argument("-n", "--name", type=str, required=True)
         parser.add_argument("-d", "--description", type=str, default="")
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: D102
         # TODO: revisit uniqueness of primary key
         spec = Specialization.objects.filter(code=options["code"]).first()
         if spec:

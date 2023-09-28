@@ -1,15 +1,15 @@
-from django.contrib import admin
+from django.contrib import admin  # noqa: D100
 
 from portal.academy import models
 
 
 @admin.register(models.Specialization)
-class SpecializationAdmin(admin.ModelAdmin):
+class SpecializationAdmin(admin.ModelAdmin):  # noqa: D101
     list_display = ("code", "name")
 
 
 @admin.register(models.Unit)
-class UnitAdmin(admin.ModelAdmin):
+class UnitAdmin(admin.ModelAdmin):  # noqa: D101
     list_display = (
         "get_code",
         "name",
@@ -30,14 +30,14 @@ class UnitAdmin(admin.ModelAdmin):
     search_fields = ["instructor__username", "name", "unit__code"]
     list_filter = ("specialization", "open", "instructor")
 
-    def get_code(self, obj):
+    def get_code(self, obj):  # noqa: D102
         return str(obj)
 
     get_code.short_description = "Code"
 
 
 @admin.register(models.Grade)
-class GradeAdmin(admin.ModelAdmin):
+class GradeAdmin(admin.ModelAdmin):  # noqa: D101
     list_display = (
         "unit",
         "user",

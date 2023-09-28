@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: D100
 from time import sleep
 
 from constance import config
@@ -10,10 +10,10 @@ from django.utils import timezone
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # noqa: D101
     help = "Run scheduler"
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: D102
         scheduled_fcns = (update_portal_status,)
 
         while True:
@@ -35,7 +35,7 @@ class Command(BaseCommand):
             sleep(10)
 
 
-def update_portal_status():
+def update_portal_status():  # noqa: D103
     dt = timezone.now()
 
     # Initial portal state

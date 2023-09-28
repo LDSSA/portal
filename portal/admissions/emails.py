@@ -1,8 +1,8 @@
-from django.conf import settings
+from django.conf import settings  # noqa: D100
 from django.core.mail import EmailMessage
 
 
-def send_signup_email(to_email, email_confirmation_url):
+def send_signup_email(to_email, email_confirmation_url):  # noqa: D103
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -13,7 +13,7 @@ def send_signup_email(to_email, email_confirmation_url):
     email.send()
 
 
-def send_reset_password_email(to_email, reset_password_url):
+def send_reset_password_email(to_email, reset_password_url):  # noqa: D103
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -24,7 +24,7 @@ def send_reset_password_email(to_email, reset_password_url):
     email.send()
 
 
-def send_application_is_over_passed(to_email, to_name):
+def send_application_is_over_passed(to_email, to_name):  # noqa: D103
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -36,7 +36,7 @@ def send_application_is_over_passed(to_email, to_name):
     email.send()
 
 
-def send_application_is_over_failed(to_email, to_name):
+def send_application_is_over_failed(to_email, to_name):  # noqa: D103
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -48,7 +48,7 @@ def send_application_is_over_failed(to_email, to_name):
     email.send()
 
 
-def send_admissions_are_over_not_selected(to_email, to_name):
+def send_admissions_are_over_not_selected(to_email, to_name):  # noqa: D103
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -60,7 +60,7 @@ def send_admissions_are_over_not_selected(to_email, to_name):
     email.send()
 
 
-def send_selected_and_payment_details(
+def send_selected_and_payment_details(  # noqa: D103
     to_email, to_name, *, payment_value: int, payment_due_date: str
 ):
     email = EmailMessage(
@@ -78,7 +78,7 @@ def send_selected_and_payment_details(
     email.send()
 
 
-def send_payment_accepted_proof_email(to_email, to_name, *, message):
+def send_payment_accepted_proof_email(to_email, to_name, *, message):  # noqa: D103
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -90,7 +90,7 @@ def send_payment_accepted_proof_email(to_email, to_name, *, message):
     email.send()
 
 
-def send_payment_need_additional_proof_email(to_email, to_name: str, *, message):
+def send_payment_need_additional_proof_email(to_email, to_name: str, *, message):  # noqa: D103
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -102,7 +102,7 @@ def send_payment_need_additional_proof_email(to_email, to_name: str, *, message)
     email.send()
 
 
-def send_payment_refused_proof_email(to_email, to_name, *, message):
+def send_payment_refused_proof_email(to_email, to_name, *, message):  # noqa: D103
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -114,7 +114,9 @@ def send_payment_refused_proof_email(to_email, to_name, *, message):
     email.send()
 
 
-def send_interview_passed_email(to_email, to_name, *, payment_value: int, payment_due_date: str):
+def send_interview_passed_email(  # noqa: D103
+    to_email, to_name, *, payment_value: int, payment_due_date: str
+):
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -130,7 +132,7 @@ def send_interview_passed_email(to_email, to_name, *, payment_value: int, paymen
     email.send()
 
 
-def send_interview_failed_email(to_email: str, to_name: str, *, message: str):
+def send_interview_failed_email(to_email: str, to_name: str, *, message: str):  # noqa: D103
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -142,7 +144,7 @@ def send_interview_failed_email(to_email: str, to_name: str, *, message: str):
     email.send()
 
 
-def send_selected_interview_details(to_email, to_name):
+def send_selected_interview_details(to_email, to_name):  # noqa: D103
     email = EmailMessage(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
@@ -154,7 +156,7 @@ def send_selected_interview_details(to_email, to_name):
     email.send()
 
 
-def send_contact_us_email(from_email, user_name, user_url, message):
+def send_contact_us_email(from_email, user_name, user_url, message):  # noqa: D103
     email = EmailMessage(
         to=["admissions@lisbondatascience.org"],
         reply_to=[from_email],

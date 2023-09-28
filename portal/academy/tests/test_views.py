@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone  # noqa: D100
 
 import pytest
 from django.urls import reverse
@@ -8,7 +8,7 @@ from portal.academy.views import csvdata
 
 
 @pytest.mark.django_db(transaction=True)
-def test_student_unit_detail_view(client, db, student, slu1):
+def test_student_unit_detail_view(client, db, student, slu1):  # noqa: D103
     client.login(username=student.username, password=student.password)
     url = reverse("academy:student-unit-detail", kwargs={"pk": slu1.pk})
     response = client.post(url, follow=True)
@@ -19,7 +19,7 @@ def test_student_unit_detail_view(client, db, student, slu1):
 
 
 @pytest.mark.django_db(transaction=True)
-def test_instructor_unit_detail_view(client, db, instructor, slu1):
+def test_instructor_unit_detail_view(client, db, instructor, slu1):  # noqa: D103
     client.login(username=instructor.username, password=instructor.password)
     url = reverse("academy:instructor-unit-detail", kwargs={"pk": slu1.pk})
     response = client.post(url, follow=True)
@@ -31,10 +31,7 @@ def test_instructor_unit_detail_view(client, db, instructor, slu1):
 
 @pytest.mark.django_db(transaction=True)
 def test_csvdata(db, specialization, slu1, slu2, student, grade_slu1, grade_slu2):
-    """
-    Test creation of csv file from table of student/unit grades
-    """
-
+    """Test creation of csv file from table of student/unit grades."""
     specialization.unit_count = 2
     spc_list = [specialization]
     unit_list = [slu1, slu2]
@@ -54,7 +51,7 @@ def test_csvdata(db, specialization, slu1, slu2, student, grade_slu1, grade_slu2
 
 
 @pytest.mark.django_db(transaction=True)
-def test_grade_on_time(client, student, slu1):
+def test_grade_on_time(client, student, slu1):  # noqa: D103
     slu1.due_date = datetime.now(timezone.utc) + timedelta(days=5)
     slu1.save()
 

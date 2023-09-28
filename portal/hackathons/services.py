@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: D100
 import random
 from io import StringIO
 from itertools import zip_longest
@@ -11,7 +11,7 @@ from . import models
 logger = logging.getLogger(__name__)
 
 
-def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
+def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):  # noqa: D103
     logger.info(
         "Generating Teams Size: %s Max: %s Max teams: %s",
         team_size,
@@ -28,15 +28,14 @@ def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
         if len(present_teams) > max_teams:
             team_size += 1
             continue
-        else:
-            break
+
     else:
         raise RuntimeError("Cannot fit with these parameters")
 
     create_teams(hackathon, present_teams)
 
 
-def create_teams(hackathon, present_teams):
+def create_teams(hackathon, present_teams):  # noqa: D103
     hackathon_team_id = 1
     for students in present_teams:
         team = models.Team.objects.create(hackathon=hackathon, hackathon_team_id=hackathon_team_id)
@@ -45,7 +44,7 @@ def create_teams(hackathon, present_teams):
         hackathon_team_id += 1
 
 
-def generate_teams_with_remote(hackathon, team_size=3, max_team_size=6, max_teams=13):
+def generate_teams_with_remote(hackathon, team_size=3, max_team_size=6, max_teams=13):  # noqa: D103
     logger.info(
         "Generating Teams Size: %s Max: %s Max teams: %s",
         team_size,
@@ -66,15 +65,13 @@ def generate_teams_with_remote(hackathon, team_size=3, max_team_size=6, max_team
         if len(present_teams) + len(remote_teams) > max_teams:
             team_size += 1
             continue
-        else:
-            break
     else:
         raise RuntimeError("Cannot fit with these parameters")
 
     create_teams(hackathon, present_teams, remote_teams)
 
 
-def create_teams_with_remote(hackathon, present_teams, remote_teams):
+def create_teams_with_remote(hackathon, present_teams, remote_teams):  # noqa: D103
     hackathon_team_id = 1
     for students in present_teams:
         team = models.Team.objects.create(hackathon=hackathon, hackathon_team_id=hackathon_team_id)
@@ -93,7 +90,7 @@ def create_teams_with_remote(hackathon, present_teams, remote_teams):
         hackathon_team_id += 1
 
 
-def get_groups(items, size, max_diff=1):
+def get_groups(items, size, max_diff=1):  # noqa: D103
     if not len(items):
         return []
 
@@ -114,7 +111,7 @@ def get_groups(items, size, max_diff=1):
     return groups
 
 
-def submission(hackathon, user, file):
+def submission(hackathon, user, file):  # noqa: D103
     if user.is_student:
         if hackathon.status not in ("submissions_open", "complete"):
             raise ValidationError("Hackathon closed")

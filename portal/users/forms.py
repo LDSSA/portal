@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: D100
 
 # from allauth.account.forms import SignupForm
 import django.forms as forms
@@ -16,10 +16,10 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-class UserChangeForm(forms.ModelForm):
+class UserChangeForm(forms.ModelForm):  # noqa: D101
     name = forms.CharField()
 
-    def __init__(self, *args, **kwawgs):
+    def __init__(self, *args, **kwawgs):  # noqa: D107
         super().__init__(*args, **kwawgs)
         if config.PORTAL_STATUS == "academy":
             del self.fields["gender"]
@@ -39,7 +39,7 @@ class UserChangeForm(forms.ModelForm):
                     choices=TicketType.choices, disabled=True
                 )
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = User
         fields = (
             "name",
@@ -58,15 +58,15 @@ class UserChangeForm(forms.ModelForm):
         }
 
 
-class UserCreationForm(auth.forms.UserCreationForm):
+class UserCreationForm(auth.forms.UserCreationForm):  # noqa: D101
     error_message = auth.forms.UserCreationForm.error_messages.update(
         {"duplicate_username": _("This username has already been taken.")}
     )
 
-    class Meta(auth.forms.UserCreationForm.Meta):
+    class Meta(auth.forms.UserCreationForm.Meta):  # noqa: D106
         model = User
 
-    def clean_username(self):
+    def clean_username(self):  # noqa: D102
         username = self.cleaned_data["username"]
 
         try:
@@ -77,10 +77,10 @@ class UserCreationForm(auth.forms.UserCreationForm):
         raise ValidationError(self.error_messages["duplicate_username"])
 
 
-class PortalSignupForm(forms.Form):
+class PortalSignupForm(forms.Form):  # noqa: D101
     name = forms.CharField(max_length=255)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa: D107
         super().__init__(*args, **kwargs)
         # del self.fields["username"].widget.attrs["autofocus"]
         self.fields["gender"] = forms.ChoiceField(choices=Gender.choices)
@@ -88,7 +88,7 @@ class PortalSignupForm(forms.Form):
         self.fields["profession"] = forms.CharField(max_length=50, required=False)
         self.fields["company"] = forms.CharField(max_length=100, required=False)
 
-    def signup(self, request, user):
+    def signup(self, request, user):  # noqa: D102
         user.name = self.cleaned_data["name"]
         user.gender = self.cleaned_data["gender"]
         user.ticket_type = self.cleaned_data["ticket_type"]

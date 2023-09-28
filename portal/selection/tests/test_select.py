@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase  # noqa: D100
 from profiles.models import Profile, ProfileGenders, ProfileTicketTypes
 from users.models import User
 
@@ -8,8 +8,8 @@ from ..select import select
 from ..status import SelectionStatus
 
 
-class TestSelect(TestCase):
-    def test_select_to_selected(self) -> None:
+class TestSelect(TestCase):  # noqa: D101
+    def test_select_to_selected(self) -> None:  # noqa: D102
         for i in range(5):
             u = User.objects.create(email=f"female_user_{i}@amd.com")
             Profile.objects.create(

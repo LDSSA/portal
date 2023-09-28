@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime  # noqa: D100
 from logging import getLogger
 
 from django.conf import settings
@@ -7,7 +7,7 @@ from django.db import models
 logger = getLogger(__name__)
 
 
-class Challenge(models.Model):
+class Challenge(models.Model):  # noqa: D101
     code = models.CharField(max_length=50, primary_key=True)
     file = models.FileField(blank=True)
     checksum = models.TextField(blank=True)
@@ -15,17 +15,17 @@ class Challenge(models.Model):
     pass_score = models.FloatField(default=16)
 
 
-def notebook_path(instance, filename):
+def notebook_path(instance, filename):  # noqa: D103
     now = datetime.now().isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/" f"notebook_{now}.ipynb"
 
 
-def feedback_path(instance, filename):
+def feedback_path(instance, filename):  # noqa: D103
     now = datetime.now().isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/" f"feeback_{now}.ipynb"
 
 
-class Submission(models.Model):
+class Submission(models.Model):  # noqa: D101
     application = models.ForeignKey(
         to="applications.Application",
         on_delete=models.CASCADE,
@@ -53,19 +53,19 @@ class Submission(models.Model):
     feedback = models.FileField(upload_to=feedback_path, null=True, blank=True)
 
 
-class SubmissionsException(Exception):
+class SubmissionsException(Exception):  # noqa: D101
     detail = "submission error"
 
 
-class SubmissionsClosedException(SubmissionsException):
+class SubmissionsClosedException(SubmissionsException):  # noqa: D101
     detail = "submission error (closed)"
 
 
-class SubmissionsNotOpenException(SubmissionsException):
+class SubmissionsNotOpenException(SubmissionsException):  # noqa: D101
     detail = "submission error (not open yet)"
 
 
-class Application(models.Model):
+class Application(models.Model):  # noqa: D101
     user = models.OneToOneField("users.User", on_delete=models.CASCADE)
 
     updated_at = models.DateTimeField(auto_now=True)

@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: D100
 from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urljoin
@@ -42,10 +42,10 @@ from portal.users.views import (
 logger = logging.getLogger(__name__)
 
 
-class HomeView(AdmissionsCandidateViewMixin, TemplateView):
+class HomeView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
     template_name = "candidate_templates/home.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         state = CandidateDomain.get_candidate_state(self.request.user)
 
         # the action_point is the first open section in the steps accordion
@@ -114,11 +114,12 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):
 
 
 class ContactView(AdmissionsCandidateViewMixin, TemplateView):
-    """Send email to site admins"""
+
+    """Send email to site admins."""  # noqa: D211
 
     template_name = "candidate_templates/contactus.html"
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         user = request.user
         user_url = reverse("admissions:staff:candidate-detail", args=(user.pk,))
         message = request.POST["message"]
@@ -137,11 +138,12 @@ class ContactView(AdmissionsCandidateViewMixin, TemplateView):
 
 
 class CodeOfConductView(AdmissionsCandidateViewMixin, TemplateView):
-    """View and accept code of conduct"""
+
+    """View and accept code of conduct."""  # noqa: D211
 
     template_name = "candidate_templates/code_of_conduct.html"
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         user = request.user
         user.code_of_conduct_accepted = True
         user.save()
@@ -149,11 +151,12 @@ class CodeOfConductView(AdmissionsCandidateViewMixin, TemplateView):
 
 
 class ScholarshipView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView):
-    """Read scholarship conditions and chose to apply"""
+
+    """Read scholarship conditions and chose to apply."""  # noqa: D211
 
     template_name = "candidate_templates/scholarship.html"
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         user = request.user
         user.applying_for_scholarship = request.POST["decision"] == "yes"
         if user.applying_for_scholarship:
@@ -162,10 +165,10 @@ class ScholarshipView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, T
         return redirect("admissions:candidate:home")
 
 
-class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
+class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
     template_name = "candidate_templates/before_coding_test.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         ctx = {
             "coding_test_duration_hours": str(
                 config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600
@@ -174,7 +177,7 @@ class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         application = Application.objects.get(user=request.user)
         if application.coding_test_started_at is None:
             application.coding_test_started_at = datetime.now(timezone.utc)
@@ -183,7 +186,7 @@ class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         return HttpResponseRedirect(reverse("admissions:candidate:coding-test"))
 
 
-def submission_view_ctx(application, challenge) -> dict[str, Any]:
+def submission_view_ctx(application, challenge) -> dict[str, Any]:  # noqa: D103
     return {
         "challenge": challenge,
         "status": Domain.get_sub_type_status(application, challenge).name,
@@ -202,8 +205,8 @@ def submission_view_ctx(application, challenge) -> dict[str, Any]:
     }
 
 
-class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
-    def get(self, request, *args, **kwargs):
+class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
+    def get(self, request, *args, **kwargs):  # noqa: D102
         if config.PORTAL_STATUS not in settings.ADMISSIONS_APPLICATIONS_STARTED_STATUSES:
             return HttpResponseRedirect(reverse("home"))
 
@@ -222,8 +225,8 @@ class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         return HttpResponse(template.render(ctx, request))
 
 
-class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
-    def get(self, request, *args, **kwargs):
+class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):  # noqa: D101
+    def get(self, request, *args, **kwargs):  # noqa: D102
         assignment_id = kwargs.get("pk")
         application = Application.objects.get(user=request.user)
         if assignment_id == "coding_test" and application.coding_test_started_at is None:
@@ -236,8 +239,8 @@ class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
             raise Http404
 
 
-class SluView(AdmissionsCandidateViewMixin, TemplateView):
-    def get(self, request, *args, **kwargs):
+class SluView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
+    def get(self, request, *args, **kwargs):  # noqa: D102
         if kwargs["pk"] == "coding_test":
             raise Http404
 
@@ -252,9 +255,10 @@ class SluView(AdmissionsCandidateViewMixin, TemplateView):
 
 
 class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
-    """Submit challenges"""
 
-    def post(self, request, *args, **kwargs):
+    """Submit challenges."""  # noqa: D211
+
+    def post(self, request, *args, **kwargs):  # noqa: D102
         # Send to grading
         pk = kwargs.get("pk")
         challenge = Challenge.objects.get(code=pk)
@@ -276,15 +280,15 @@ class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
         return HttpResponseRedirect(reverse("admissions:candidate:slu", args=(pk,)))
 
 
-class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):
+class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):  # noqa: D101
     queryset = Submission.objects.all()
 
-    def get_queryset(self):
+    def get_queryset(self):  # noqa: D102
         if self.request.user.is_staff:
             return super().get_queryset()
         return super().get_queryset().filter(user=self.request.user)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         obj = self.get_object()
         try:
             return FileResponse(obj.notebook)
@@ -292,13 +296,13 @@ class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):
             raise Http404
 
 
-class SubmissionFeedbackDownloadView(AdmissionsViewMixin, generic.DetailView):
+class SubmissionFeedbackDownloadView(AdmissionsViewMixin, generic.DetailView):  # noqa: D101
     queryset = Submission.objects.all()
 
-    def get_queryset(self):
+    def get_queryset(self):  # noqa: D102
         return super().get_queryset().filter(user=self.request.user)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         obj = self.get_object()
         try:
             return HttpResponse(notebook_to_html(obj.feedback.read()))
@@ -306,8 +310,8 @@ class SubmissionFeedbackDownloadView(AdmissionsViewMixin, generic.DetailView):
             raise Http404
 
 
-class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):
-    def get(self, request, *args, **kwargs):
+class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):  # noqa: D101
+    def get(self, request, *args, **kwargs):  # noqa: D102
         try:
             selection = request.user.selection
         except Selection.DoesNotExist:
@@ -328,7 +332,7 @@ class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):
         }
         return HttpResponse(template.render(context, request))
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         try:
             selection = request.user.selection
         except Selection.DoesNotExist:
@@ -339,16 +343,16 @@ class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):
         return HttpResponseRedirect(reverse("admissions:candidate:payment"))
 
 
-class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):
+class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):  # noqa: D101
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")
 
-    def get_queryset(self):
+    def get_queryset(self):  # noqa: D102
         if self.request.user.is_staff:
             return super().get_queryset()
         return super().get_queryset().filter(selection=self.request.user.selection)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         obj = self.get_object()
         try:
             return FileResponse(obj.doc)
@@ -356,12 +360,12 @@ class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):
             raise Http404
 
 
-class SelectionDocumentUploadView(AdmissionsViewMixin, generic.DetailView):
+class SelectionDocumentUploadView(AdmissionsViewMixin, generic.DetailView):  # noqa: D101
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")
     document_type = None
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         add_document(
             request.user.selection,
             document=request.FILES["file"],

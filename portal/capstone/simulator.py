@@ -1,4 +1,4 @@
-import json
+import json  # noqa: D100
 import logging
 import random
 import time
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 WORKERS = 50
 
 
-def run():
+def run():  # noqa: D103
     # Queue
 
     # Start consumer pool
@@ -31,7 +31,7 @@ def run():
             executor.submit(run_producer)
 
 
-def run_simulator():
+def run_simulator():  # noqa: D103
     while True:
         logger.debug("Simulator cycle...")
         close_old_connections()
@@ -49,7 +49,7 @@ def run_simulator():
         time.sleep(settings.SIMULATOR_INTERVAL)
 
 
-def run_producer():
+def run_producer():  # noqa: D103
     # Prevent thundering herd
     time.sleep(2 * random.random())
 
@@ -92,7 +92,7 @@ def run_producer():
             logger.exception("Exception in producer")
 
 
-def send_datapoint(due_datapoint):
+def send_datapoint(due_datapoint):  # noqa: D103
     try:
         try:
             logger.info(

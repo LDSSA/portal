@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: D100
 
 from django.http import HttpResponse
 from rest_framework import generics
@@ -13,12 +13,13 @@ logger = logging.getLogger(__name__)
 
 
 class AcademyGradingView(generics.RetrieveUpdateAPIView):
-    """Receive notebook grade"""
+
+    """Receive notebook grade."""  # noqa: D211
 
     queryset = models.Grade.objects.all()
     serializer_class = serializers.GradeSerializer
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):  # noqa: D102
         update_result = super().update(request, *args, **kwargs)
 
         grade = self.get_object()
@@ -32,10 +33,9 @@ class AcademyGradingView(generics.RetrieveUpdateAPIView):
         return update_result
 
 
-class CaseInsensitiveGetObjectMixin:
+class CaseInsensitiveGetObjectMixin:  # noqa: D101
     def get_object(self):
-        """
-        Returns the object the view is displaying.
+        """Return the object the view is displaying.
 
         You may want to override this if you need to provide non-standard
         queryset lookups.  Eg if objects are referenced using multiple
@@ -62,32 +62,36 @@ class CaseInsensitiveGetObjectMixin:
 
 
 class AcademyChecksumView(CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView):
-    """Receive and retrieve notebook checksum"""
+
+    """Receive and retrieve notebook checksum."""  # noqa: D211
 
     queryset = models.Unit.objects.all()
     serializer_class = serializers.ChecksumSerializer
 
 
 class AdmissionsGradingView(CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView):
-    """Receive notebook grade"""
+
+    """Receive notebook grade."""  # noqa: D211
 
     queryset = Submission.objects.all()
     serializer_class = serializers.AdmissionsGradeSerializer
 
 
 class AdmissionsChecksumView(CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView):
-    """Receive and retrieve notebook checksum"""
+
+    """Receive and retrieve notebook checksum."""  # noqa: D211
 
     queryset = Challenge.objects.all()
     serializer_class = serializers.AdmissionsChecksumSerializer
 
 
 class AdmissionsNotebookDownload(CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView):
-    """Receive and retrieve notebook checksum"""
+
+    """Receive and retrieve notebook checksum."""  # noqa: D211
 
     queryset = Submission.objects.all()
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         obj = self.get_object()
         response = HttpResponse(obj.notebook.read(), content_type="application/vnd.jupyter")
         response["Content-Disposition"] = "attachment; filename=Exercise notebook.ipynb"

@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase  # noqa: D100
 from profiles.models import Profile, ProfileTicketTypes
 from users.models import User
 
@@ -7,11 +7,11 @@ from ..payment import load_payment_data
 from ..status import SelectionStatus
 
 
-class TestDomain(TestCase):
-    def setUp(self) -> None:
+class TestDomain(TestCase):  # noqa: D101
+    def setUp(self) -> None:  # noqa: D102
         self.staff_user = User.objects.create_staff_user(email="staff@adm.com", password="secret")
 
-    def test_load_payment_data(self) -> None:
+    def test_load_payment_data(self) -> None:  # noqa: D102
         user = User.objects.create_user(email="user@adm.com", password="strong")
         Profile.objects.create(user=user, full_name="name", ticket_type=ProfileTicketTypes.regular)
         selection = Selection.objects.create(user=user, status=SelectionStatus.SELECTED)
@@ -21,7 +21,7 @@ class TestDomain(TestCase):
         self.assertEqual(selection.payment_value, 250)
         self.assertEqual(selection.status, SelectionStatus.SELECTED)
 
-    def test_create_payment_student(self) -> None:
+    def test_create_payment_student(self) -> None:  # noqa: D102
         user = User.objects.create_user(email="student@adm.com", password="strong")
         Profile.objects.create(user=user, full_name="name", ticket_type=ProfileTicketTypes.student)
         selection = Selection.objects.create(user=user, status=SelectionStatus.SELECTED)
@@ -31,7 +31,7 @@ class TestDomain(TestCase):
         self.assertEqual(selection.payment_value, 100)
         self.assertEqual(selection.status, SelectionStatus.SELECTED)
 
-    def test_create_payment_company(self) -> None:
+    def test_create_payment_company(self) -> None:  # noqa: D102
         user = User.objects.create_user(email="company@adm.com", password="strong")
         Profile.objects.create(user=user, full_name="name", ticket_type=ProfileTicketTypes.company)
         selection = Selection.objects.create(user=user, status=SelectionStatus.SELECTED)

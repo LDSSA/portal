@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: D100
 from datetime import datetime, timezone
 
 from constance import config
@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 # noinspection PyUnresolvedReferences
-class HomeRedirectView(LoginRequiredMixin, RedirectView):
-    def get_redirect_url(self, *args, **kwargs):
+class HomeRedirectView(LoginRequiredMixin, RedirectView):  # noqa: D101
+    def get_redirect_url(self, *args, **kwargs):  # noqa: D102
         if config.PORTAL_STATUS == "academy":
             if self.request.user.is_student:
                 self.pattern_name = "academy:student-unit-list"
@@ -42,14 +42,14 @@ class HomeRedirectView(LoginRequiredMixin, RedirectView):
         return super().get_redirect_url(*args, **kwargs)
 
 
-class BaseUnitListView(ListView):
+class BaseUnitListView(ListView):  # noqa: D101
     model = models.Unit
     queryset = models.Unit.objects.order_by("specialization", "code")
     template_name = None
     detail_view_name = None
 
     # noinspection PyAttributeOutsideInit
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         self.object_list = self.get_queryset()
         data = []
         for unit in self.object_list:
@@ -60,24 +60,24 @@ class BaseUnitListView(ListView):
         return self.render_to_response(context)
 
 
-class BaseUnitDetailView(DetailView):
+class BaseUnitDetailView(DetailView):  # noqa: D101
     model = models.Unit
     template_name = None
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         unit, grade, best_grade = self.get_object()
         context = self.get_context_data(unit=unit, grade=grade, best_grade=best_grade)
         return self.render_to_response(context)
 
     # noinspection PyAttributeOutsideInit
-    def get_object(self, queryset=None):
+    def get_object(self, queryset=None):  # noqa: D102
         self.object = super().get_object(queryset=queryset)
         unit = self.object
         grade = get_last_grade(unit, self.request.user)
         best_grade = get_best_grade(unit, self.request.user)
         return unit, grade, best_grade
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         unit, _, _ = self.get_object()
         grade = models.Grade(user=self.request.user, unit=unit)
 
@@ -102,21 +102,21 @@ class BaseUnitDetailView(DetailView):
         return HttpResponseRedirect(request.path_info)
 
 
-class StudentUnitListView(StudentViewsMixin, BaseUnitListView):
+class StudentUnitListView(StudentViewsMixin, BaseUnitListView):  # noqa: D101
     template_name = "academy/student/unit_list.html"
     detail_view_name = "academy:student-unit-detail"
 
 
-class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):
+class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):  # noqa: D101
     template_name = "academy/student/unit_detail.html"
 
 
-class InstructorUserListView(InstructorViewsMixin, ListView):
+class InstructorUserListView(InstructorViewsMixin, ListView):  # noqa: D101
     model = get_user_model()
     queryset = get_user_model().objects.filter(is_student=True, failed_or_dropped=False)
     template_name = "academy/instructor/user_list.html"
 
-    def get_queryset(self):
+    def get_queryset(self):  # noqa: D102
         user_id = self.request.GET.get("user_id")
         can_graduate = self.request.GET.get("can_graduate")
 
@@ -129,7 +129,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
         return self.queryset.all()
 
     # noinspection PyAttributeOutsideInit
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         # Validate query params
         validator = serializers.InstructorsViewFiltersSerializer(data=self.request.GET)
         if not validator.is_valid():
@@ -199,21 +199,21 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
             )
             response["Content-Disposition"] = "attachment; filename=student-grades.csv"
             return response
-        else:
-            context = self.get_context_data(
-                object_list=object_list,
-                spc_list=spc_list,
-                unit_list=unit_list,
-                max_score=max_score,
-                workspace_url=settings.SLACK_WORKSPACE,
-            )
-            return self.render_to_response(context)
+
+        context = self.get_context_data(
+            object_list=object_list,
+            spc_list=spc_list,
+            unit_list=unit_list,
+            max_score=max_score,
+            workspace_url=settings.SLACK_WORKSPACE,
+        )
+        return self.render_to_response(context)
 
 
-class InstructorUnitListView(InstructorViewsMixin, BaseUnitListView):
+class InstructorUnitListView(InstructorViewsMixin, BaseUnitListView):  # noqa: D101
     template_name = "academy/instructor/unit_list.html"
     detail_view_name = "academy:instructor-unit-detail"
 
 
-class InstructorUnitDetailView(InstructorViewsMixin, BaseUnitDetailView):
+class InstructorUnitDetailView(InstructorViewsMixin, BaseUnitDetailView):  # noqa: D101
     template_name = "academy/instructor/unit_detail.html"

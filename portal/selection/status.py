@@ -1,9 +1,9 @@
-from typing import NewType
+from typing import NewType  # noqa: D100
 
 SelectionStatusType = NewType("SelectionStatusType", str)
 
 
-class SelectionStatus:
+class SelectionStatus:  # noqa: D101
     PASSED_TEST = SelectionStatusType("Passed Test (Awaiting)")
     DRAWN = SelectionStatusType("Drawn")
     INTERVIEW = SelectionStatusType("Awaiting Interview")

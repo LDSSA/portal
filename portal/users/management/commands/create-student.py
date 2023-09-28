@@ -1,15 +1,15 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError  # noqa: D100
 
 from portal.users.management.commands._create_user import add_user_options, create_user
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # noqa: D101
     help = "Creates a student user in portal"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser):  # noqa: D102
         add_user_options(parser)
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: D102
         try:
             user = create_user(user_type="student", **options)
         except Exception as e:

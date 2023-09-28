@@ -1,11 +1,11 @@
-from django.apps import AppConfig
+from django.apps import AppConfig  # noqa: D100
 
 
-class UsersAppConfig(AppConfig):
+class UsersAppConfig(AppConfig):  # noqa: D101
     name = "portal.users"
     verbose_name = "Users"
 
-    def ready(self):
+    def ready(self):  # noqa: D102
         try:
             import users.signals  # noqa F401
         except ImportError:

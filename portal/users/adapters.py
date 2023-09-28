@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: D100
 from typing import Any
 
 from allauth.account.adapter import DefaultAccountAdapter
@@ -23,18 +23,19 @@ from portal.users.models import UserWhitelist
 logger = logging.getLogger(__name__)
 
 
-class AccountAdapter(DefaultAccountAdapter):
+class AccountAdapter(DefaultAccountAdapter):  # noqa: D101
     default_token_generator = EmailAwarePasswordResetTokenGenerator()
 
-    def is_open_for_signup(self, request: HttpRequest):
+    def is_open_for_signup(self, request: HttpRequest):  # noqa: D102
         if request.path == reverse("instructors_signup"):
             return True
         return getattr(config, "ACCOUNT_ALLOW_REGISTRATION", True)
 
     def render_mail(self, template_prefix, email, context):
-        """
-        Renders an e-mail to `email`.  `template_prefix` identifies the
-        e-mail that is to be sent, e.g. "account/email/email_confirmation"
+        """Render an e-mail to `email`.
+
+        `template_prefix` identifies the e-mail that is to be sent,
+        e.g. "account/email/email_confirmation"
         """
         to = [email] if isinstance(email, str) else email
         subject = render_to_string(f"{template_prefix}_subject.txt", context)
@@ -57,11 +58,10 @@ class AccountAdapter(DefaultAccountAdapter):
         # else:
         #     msg = EmailMessage(subject, bodies["html"], from_email, to)
         #     msg.content_subtype = "html"  # Main content is now text/html
-        msg = EmailMessage(subject, body, from_email, to)
+        return EmailMessage(subject, body, from_email, to)
         # msg.content_subtype = "html"  # Main content is now text/html
-        return msg
 
-    def send_mail(self, template_prefix, email, context):
+    def send_mail(self, template_prefix, email, context):  # noqa: D102
         if template_prefix == "account/email/password_reset_key":
             user = filter_users_by_email(email, is_active=True)[0]
             temp_key = self.default_token_generator.make_token(user)
@@ -74,7 +74,7 @@ class AccountAdapter(DefaultAccountAdapter):
         else:
             super.send_mail(template_prefix, email, context)
 
-    def send_confirmation_mail(self, request, emailconfirmation, signup):
+    def send_confirmation_mail(self, request, emailconfirmation, signup):  # noqa: D102
         # We assume signup is always True
         send_signup_email(
             to_email=emailconfirmation.email_address.email,
@@ -82,22 +82,22 @@ class AccountAdapter(DefaultAccountAdapter):
         )
 
 
-class SocialAccountAdapter(DefaultSocialAccountAdapter):
-    def is_open_for_signup(self, request: HttpRequest, sociallogin: Any):
+class SocialAccountAdapter(DefaultSocialAccountAdapter):  # noqa: D101
+    def is_open_for_signup(self, request: HttpRequest, sociallogin: Any):  # noqa: D102
         return getattr(config, "ACCOUNT_ALLOW_REGISTRATION", True)
 
 
-class SocialAccountWhitelistAdapter(DefaultSocialAccountAdapter):
-    def is_open_for_signup(self, request: HttpRequest, sociallogin: Any):
+class SocialAccountWhitelistAdapter(DefaultSocialAccountAdapter):  # noqa: D101
+    def is_open_for_signup(self, request: HttpRequest, sociallogin: Any):  # noqa: D102
         return getattr(config, "ACCOUNT_ALLOW_REGISTRATION", True)
 
-    def pre_social_login(self, request, sociallogin):
+    def pre_social_login(self, request, sociallogin):  # noqa: D102
         try:
             UserWhitelist.objects.get(username=sociallogin.user)
         except UserWhitelist.DoesNotExist:
             raise ImmediateHttpResponse(render(request, "whitelist.html"))
 
-    def populate_user(self, request, sociallogin, data):
+    def populate_user(self, request, sociallogin, data):  # noqa: D102
         user = super().populate_user(request, sociallogin, data)
         try:
             obj = UserWhitelist.objects.get(username=sociallogin.user)

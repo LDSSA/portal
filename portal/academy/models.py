@@ -1,21 +1,21 @@
-from datetime import datetime
+from datetime import datetime  # noqa: D100
 
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
 
-class Specialization(models.Model):
+class Specialization(models.Model):  # noqa: D101
     code = models.CharField(max_length=255, primary_key=True)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self):  # noqa: D105
         return self.code
 
 
-class Unit(models.Model):
+class Unit(models.Model):  # noqa: D101
     specialization = models.ForeignKey(
         Specialization, on_delete=models.CASCADE, related_name="units"
     )
@@ -31,22 +31,22 @@ class Unit(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self):  # noqa: D105
         return f"{self.specialization.code}/{self.code}"
 
 
-def notebook_path(instance, filename):
+def notebook_path(instance, filename):  # noqa: D103
     now = datetime.now().isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/notebook_{now}.ipynb"
 
 
-def feedback_path(instance, filename):
+def feedback_path(instance, filename):  # noqa: D103
     now = datetime.now().isoformat(timespec="seconds")
     # TODO: fix file name
     return f"{instance.unit.code}/{instance.user.username}/feeback_{now}.ipynb"
 
 
-class Grade(models.Model):
+class Grade(models.Model):  # noqa: D101
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

@@ -1,4 +1,4 @@
-import csv
+import csv  # noqa: D100
 from datetime import datetime, timedelta, timezone
 from logging import getLogger
 from typing import Any
@@ -43,10 +43,10 @@ DATETIME_FMT = "%d/%m/%Y %H:%M:%S"
 TIME_FMT = "%H:%M:%S"
 
 
-class HomeView(AdmissionsStaffViewMixin, TemplateView):
+class HomeView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "staff_templates/home.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         ctx = {
             "user": self.request.user,
             "datetime_fmt": DATETIME_FMT,
@@ -85,7 +85,7 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         if not request.user.is_superuser:
             return HttpResponseServerError(
                 b"error updating admin variables. Only admins can update these variables"
@@ -101,8 +101,8 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
                 return HttpResponseServerError(
                     b"error setting opening date. opening date must be before closing date"
                 )
-            else:
-                config.ADMISSIONS_APPLICATIONS_START = opening_date
+
+            config.ADMISSIONS_APPLICATIONS_START = opening_date
 
         elif key == "applications_closing_date":
             date_s = request.POST["date_s"]
@@ -112,8 +112,8 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
                 return HttpResponseServerError(
                     b"error setting closing date. closing date must be after opening date"
                 )
-            else:
-                config.ADMISSIONS_SELECTION_START = closing_date
+
+            config.ADMISSIONS_SELECTION_START = closing_date
 
         elif key == "coding_test_duration":
             duration = datetime.strptime(request.POST["date_s"], TIME_FMT)
@@ -141,11 +141,12 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
 
 
 class EventsView(AdmissionsStaffViewMixin, TemplateView):
-    """Trigger application and admissions ending events"""
+
+    """Trigger application and admissions ending events."""  # noqa: D211
 
     template_name = "staff_templates/events.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         ctx = {
             "user": self.request.user,
             "emails": [
@@ -165,7 +166,7 @@ class EventsView(AdmissionsStaffViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         if not request.user.is_superuser:
             return HttpResponseServerError(
                 b"error triggering event. Only admins can trigger events"
@@ -193,21 +194,23 @@ class EventsView(AdmissionsStaffViewMixin, TemplateView):
 
 
 class CandidateListView(AdmissionsStaffViewMixin, TemplateView):
-    """Candidate list."""
+
+    """Candidate list."""  # noqa: D211
 
     template_name = "staff_templates/candidates.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         ctx = {"users": User.objects.filter(is_staff=False).order_by("email")}
         return super().get_context_data(**ctx)
 
 
 class CandidateDetailView(AdmissionsStaffViewMixin, TemplateView):
-    """Candidate details."""
+
+    """Candidate details."""  # noqa: D211
 
     template_name = "staff_templates/candidate.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         try:
             user = User.objects.filter(is_staff=False).get(id=kwargs["pk"])
         except User.DoesNotExist:
@@ -243,11 +246,12 @@ class CandidateDetailView(AdmissionsStaffViewMixin, TemplateView):
 
 
 class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
-    """Candidate application details."""
+
+    """Candidate application details."""  # noqa: D211
 
     template_name = "staff_templates/applications.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         query = Application.objects.all().order_by("user__email")
 
         filter_by_application_status = self.request.GET.get("application_status")
@@ -346,11 +350,12 @@ class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
 
 
 class SubmissionView(AdmissionsStaffViewMixin, TemplateView):
-    """Candidate submissions list??"""
+
+    """Candidate submissions list??."""  # noqa: D211
 
     template_name = "staff_templates/submissions.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         query = Submission.objects.all().order_by("-created_at")
 
         user_email = self.request.GET.get("user_email", None)
@@ -371,8 +376,8 @@ class SubmissionView(AdmissionsStaffViewMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class SubmissionDownloadView(AdmissionsStaffViewMixin, View):
-    def get(self, request, *args, **kwargs):
+class SubmissionDownloadView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def get(self, request, *args, **kwargs):  # noqa: D102
         try:
             submission: Submission = Submission.objects.get(id=kwargs["pk"])
         except Submission.DoesNotExist:
@@ -384,8 +389,8 @@ class SubmissionDownloadView(AdmissionsStaffViewMixin, View):
             raise Http404
 
 
-class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):
-    def get(self, request, *args, **kwargs):
+class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def get(self, request, *args, **kwargs):  # noqa: D102
         try:
             submission: Submission = Submission.objects.get(id=kwargs["pk"])
         except Submission.DoesNotExist:
@@ -397,10 +402,10 @@ class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):
             raise Http404
 
 
-class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
+class SelectionListView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "staff_templates/selections.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         all_passed_test = SelectionQueries.filter_by_status_in([SelectionStatus.PASSED_TEST])
         all_drawn = SelectionQueries.filter_by_status_in([SelectionStatus.DRAWN])
         all_after_draw = SelectionQueries.filter_by_status_in(
@@ -540,29 +545,29 @@ class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class SelectionDrawView(AdmissionsStaffViewMixin, View):
-    def post(self, request, *args, **kwargs):
+class SelectionDrawView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def post(self, request, *args, **kwargs):  # noqa: D102
         draw(default_draw_params)
         return redirect("admissions:staff:selection-list")
 
 
-class SelectionRejectView(AdmissionsStaffViewMixin, View):
-    def post(self, request, *args, **kwargs):
+class SelectionRejectView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def post(self, request, *args, **kwargs):  # noqa: D102
         selection = Selection.objects.get(id=kwargs["candidate_id"])
         reject_draw(selection)
         return redirect("admissions:staff:selection-list")
 
 
-class SelectionSelectView(AdmissionsStaffViewMixin, View):
-    def post(self, request, *args, **kwargs):
+class SelectionSelectView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def post(self, request, *args, **kwargs):  # noqa: D102
         select()
         return redirect("admissions:staff:selection-list")
 
 
-class InterviewListView(AdmissionsStaffViewMixin, TemplateView):
+class InterviewListView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "./staff_templates/interviews.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         ctx = {
             "selections": SelectionQueries.filter_by_status_in([SelectionStatus.INTERVIEW]),
             "selection_status": SelectionStatus,
@@ -584,10 +589,10 @@ def _get_user_selection(user_id):
     return candidate, selection
 
 
-class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
+class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "./staff_templates/interview_id.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         _, selection = _get_user_selection(kwargs["pk"])
 
         if SelectionDomain.get_status(selection) != SelectionStatus.INTERVIEW:
@@ -600,13 +605,13 @@ class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         _, selection = _get_user_selection(kwargs["pk"])
         if SelectionDomain.get_status(selection) != SelectionStatus.INTERVIEW:
             return redirect("admissions:staff:interview-list")
         return super().get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         _, selection = _get_user_selection(kwargs["pk"])
         staff_user = request.user
         action = request.POST["action"]
@@ -640,10 +645,10 @@ class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
         return redirect(request.path_info)
 
 
-class PaymentListView(AdmissionsStaffViewMixin, TemplateView):
+class PaymentListView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "staff_templates/payments.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         ctx = {
             "selections": SelectionQueries.filter_by_status_in(
                 [
@@ -658,10 +663,10 @@ class PaymentListView(AdmissionsStaffViewMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
+class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "staff_templates/payment_id.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: D102
         _, selection = _get_user_selection(kwargs["pk"])
         ctx = {
             "s": selection,
@@ -683,7 +688,7 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         _, selection = _get_user_selection(kwargs["pk"])
         staff_user = request.user
         action = request.POST["action"]
@@ -722,8 +727,8 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
         return redirect(request.path_info)
 
 
-class PaymentResetView(AdmissionsStaffViewMixin, View):
-    def post(self, request, *args, **kwargs):
+class PaymentResetView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def post(self, request, *args, **kwargs):  # noqa: D102
         _, selection = _get_user_selection(kwargs["pk"])
         try:
             load_payment_data(selection, request.user)
@@ -734,14 +739,14 @@ class PaymentResetView(AdmissionsStaffViewMixin, View):
         return redirect("admissions:staff:payment-detail", pk=kwargs["pk"])
 
 
-class ExportView(AdmissionsStaffViewMixin, TemplateView):
+class ExportView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "staff_templates/exports.html"
 
 
-class ExportCandidatesView(AdmissionsStaffViewMixin, View):
+class ExportCandidatesView(AdmissionsStaffViewMixin, View):  # noqa: D101
     template_name = "staff_templates/exports.html"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         export_data = get_all_candidates()
         filename = f"candidates@{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H:%M')}.csv"
 

@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin  # noqa: D100
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
 
@@ -9,12 +9,12 @@ User = get_user_model()
 
 
 @admin.register(UserWhitelist)
-class UserWhitelistAdmin(admin.ModelAdmin):
+class UserWhitelistAdmin(admin.ModelAdmin):  # noqa: D101
     list_display = ["username", "is_student", "is_instructor"]
 
 
 @admin.register(User)
-class UserAdmin(auth_admin.UserAdmin):
+class UserAdmin(auth_admin.UserAdmin):  # noqa: D101
     add_form = UserCreationForm
     fieldsets = (
         ("User", {"fields": ("name",)}),

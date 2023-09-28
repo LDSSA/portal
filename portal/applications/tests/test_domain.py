@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta  # noqa: D100
 
 from applications.domain import (
     ApplicationStatus,
@@ -12,14 +12,14 @@ from interface import interface
 from users.models import User
 
 
-class TestDomain(TestCase):
-    def setUp(self) -> None:
+class TestDomain(TestCase):  # noqa: D101
+    def setUp(self) -> None:  # noqa: D102
         self.aod = datetime.now() - timedelta(minutes=30)
         self.acd = datetime.now() + timedelta(minutes=30)
         interface.feature_flag_client.set_applications_opening_date(self.aod)
         interface.feature_flag_client.set_applications_closing_date(self.acd)
 
-    def test_get_start_date(self) -> None:
+    def test_get_start_date(self) -> None:  # noqa: D102
         a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         self.assertEqual(Domain.get_start_date(a, SubmissionTypes.coding_test), None)
@@ -32,7 +32,7 @@ class TestDomain(TestCase):
         a.save()
         self.assertEqual(Domain.get_start_date(a, SubmissionTypes.coding_test), dt_now)
 
-    def test_get_close_date(self) -> None:
+    def test_get_close_date(self) -> None:  # noqa: D102
         a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         expected_domain_buffer_delta = timedelta(minutes=2)
@@ -76,7 +76,7 @@ class TestDomain(TestCase):
             dt_now + coding_test_delta + expected_domain_buffer_delta,
         )
 
-    def test_get_best_score(self) -> None:
+    def test_get_best_score(self) -> None:  # noqa: D102
         target_app = Application.objects.create(user=User.objects.create(email="target@test.com"))
         other_app = Application.objects.create(user=User.objects.create(email="other@test.com"))
         Submission.objects.create(
@@ -122,7 +122,7 @@ class TestDomain(TestCase):
         self.assertEqual(Domain.get_best_score(other_app, SubmissionTypes.slu02), None)
         self.assertEqual(Domain.get_best_score(other_app, SubmissionTypes.slu03), None)
 
-    def test_has_positive_score(self) -> None:
+    def test_has_positive_score(self) -> None:  # noqa: D102
         target_app = Application.objects.create(user=User.objects.create(email="target@test.com"))
         other_app = Application.objects.create(user=User.objects.create(email="other@test.com"))
         Submission.objects.create(
@@ -174,7 +174,7 @@ class TestDomain(TestCase):
         self.assertEqual(Domain.has_positive_score(other_app, SubmissionTypes.slu02), False)
         self.assertEqual(Domain.has_positive_score(other_app, SubmissionTypes.slu03), False)
 
-    def test_add_submission_error_close_applications(self) -> None:
+    def test_add_submission_error_close_applications(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() - timedelta(hours=5)
         )
@@ -188,7 +188,7 @@ class TestDomain(TestCase):
         with self.assertRaises(DomainException):
             Domain.add_submission(a, SubmissionTypes.slu01, Submission())
 
-    def test_add_submission_error_not_started_coding_test(self) -> None:
+    def test_add_submission_error_not_started_coding_test(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() - timedelta(minutes=30)
         )
@@ -203,7 +203,7 @@ class TestDomain(TestCase):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
         self.assertEqual(a.submissions.count(), 0)
 
-    def test_add_submission_error_not_started(self) -> None:
+    def test_add_submission_error_not_started(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() + timedelta(minutes=30)
         )
@@ -223,7 +223,7 @@ class TestDomain(TestCase):
 
         self.assertEqual(a.submissions.count(), 0)
 
-    def test_add_submission_error_already_ended_coding_test(self) -> None:
+    def test_add_submission_error_already_ended_coding_test(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() - timedelta(minutes=30)
         )
@@ -239,7 +239,7 @@ class TestDomain(TestCase):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
         self.assertEqual(a.submissions.count(), 0)
 
-    def test_add_submission_error_already_ended(self) -> None:
+    def test_add_submission_error_already_ended(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() - timedelta(minutes=60)
         )
@@ -259,7 +259,7 @@ class TestDomain(TestCase):
 
         self.assertEqual(a.submissions.count(), 0)
 
-    def test_add_submission_error_max_submissions(self) -> None:
+    def test_add_submission_error_max_submissions(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() - timedelta(minutes=30)
         )
@@ -291,7 +291,7 @@ class TestDomain(TestCase):
 
         self.assertEqual(a.submissions.count(), 251 * 4)
 
-    def test_add_submission(self) -> None:
+    def test_add_submission(self) -> None:  # noqa: D102
         interface.feature_flag_client.set_applications_opening_date(
             datetime.now() - timedelta(minutes=30)
         )
@@ -316,7 +316,7 @@ class TestDomain(TestCase):
         Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
         self.assertEqual(a.submissions.count(), 5)
 
-    def test_get_status(self) -> None:
+    def test_get_status(self) -> None:  # noqa: D102
         a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         interface.feature_flag_client.set_applications_opening_date(

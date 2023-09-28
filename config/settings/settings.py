@@ -1,6 +1,4 @@
-"""
-Base settings to build other settings files upon.
-"""
+"""Base settings to build other settings files upon."""
 
 import os
 from datetime import datetime, timedelta, timezone
@@ -259,10 +257,10 @@ if STATICFILES_STORAGE == "config.settings.settings.StaticRootS3Boto3Storage":
     # Full-fledge class: https://stackoverflow.com/a/18046120/104731
     from storages.backends.s3boto3 import S3Boto3Storage  # noqa E402
 
-    class StaticRootS3Boto3Storage(S3Boto3Storage):
+    class StaticRootS3Boto3Storage(S3Boto3Storage):  # noqa: D101
         location = "static"
 
-    class MediaRootS3Boto3Storage(S3Boto3Storage):
+    class MediaRootS3Boto3Storage(S3Boto3Storage):  # noqa: D101
         location = "media"
         file_overwrite = False
 

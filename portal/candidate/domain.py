@@ -1,4 +1,4 @@
-from typing import NamedTuple
+from typing import NamedTuple  # noqa: D100
 
 import nbconvert
 import nbformat
@@ -12,7 +12,7 @@ from portal.selection.status import SelectionStatusType
 from portal.users.models import User
 
 
-def notebook_to_html(nb):
+def notebook_to_html(nb):  # noqa: D103
     nb = nbformat.reads(nb, as_version=4)
     html_exporter = nbconvert.HTMLExporter()
     html_exporter.template_name = "classic"
@@ -20,7 +20,7 @@ def notebook_to_html(nb):
     return body
 
 
-class CandidateState(NamedTuple):
+class CandidateState(NamedTuple):  # noqa: D101
     accepted_coc: bool
     decided_scholarship: bool
     applying_for_scholarship: bool | None
@@ -32,13 +32,13 @@ class CandidateState(NamedTuple):
     selection_status: SelectionStatusType | None
 
 
-class DomainException(Exception):
+class DomainException(Exception):  # noqa: D101
     pass
 
 
-class Domain:
+class Domain:  # noqa: D101
     @staticmethod
-    def get_candidate_state(candidate: User) -> CandidateState:
+    def get_candidate_state(candidate: User) -> CandidateState:  # noqa: D102
         state = {}
 
         state["accepted_coc"] = candidate.code_of_conduct_accepted
@@ -63,7 +63,7 @@ class Domain:
         return CandidateState(**state)
 
     @staticmethod
-    def candidate_state_readable(
+    def candidate_state_readable(  # noqa: D102
         candidate_state: CandidateState,
     ) -> dict[str, str]:
         return {

@@ -1,4 +1,4 @@
-import uuid
+import uuid  # noqa: D100
 
 import dateutil.parser
 from django.core.management.base import BaseCommand, CommandError
@@ -7,10 +7,10 @@ from portal.academy.models import Specialization, Unit
 from portal.users.models import User
 
 
-class Command(BaseCommand):
+class Command(BaseCommand):  # noqa: D101
     help = "Creates a unit in portal"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser):  # noqa: D102
         parser.add_argument("-s", "--specialization", type=str, required=True)
         parser.add_argument("-c", "--code", type=str, required=True)
         parser.add_argument("-n", "--name", type=str, required=True)
@@ -22,7 +22,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--open", action="store_true")
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options):  # noqa: D102
         # TODO: revisit uniqueness of primary key
         unit = Unit.objects.filter(code=options["code"]).first()
         if unit:

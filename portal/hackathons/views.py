@@ -1,4 +1,4 @@
-import logging
+import logging  # noqa: D100
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -19,12 +19,12 @@ logger = logging.getLogger(__name__)
 
 
 # noinspection PyAttributeOutsideInit
-class LeaderboardView(LoginRequiredMixin, generic.DetailView):
+class LeaderboardView(LoginRequiredMixin, generic.DetailView):  # noqa: D101
     model = models.Hackathon
     queryset = models.Hackathon.objects.all()
     template_name = "hackathons/leaderboard.html"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         self.object = self.get_object()
 
         submissions = {}
@@ -41,15 +41,15 @@ class LeaderboardView(LoginRequiredMixin, generic.DetailView):
         return self.render_to_response(context)
 
 
-class MockSubmission:
-    def __init__(self, score):
+class MockSubmission:  # noqa: D101
+    def __init__(self, score):  # noqa: D107
         self.score = score
 
 
-class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
+class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):  # noqa: D101
     template_name = "hackathons/leaderboard.html"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         submissions = {}
         # Get the teams for this hackathon
         hckt06 = models.Hackathon.objects.filter(code="HCKT06")[0]
@@ -85,20 +85,20 @@ class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
         return self.render_to_response(context)
 
 
-class StudentHackathonListView(StudentViewsMixin, generic.ListView):
+class StudentHackathonListView(StudentViewsMixin, generic.ListView):  # noqa: D101
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/student/hackathon_list.html"
 
 
 # noinspection PyUnusedLocal
-class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
+class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):  # noqa: D101
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/student/hackathon_detail.html"
 
     # noinspection PyAttributeOutsideInit
-    def get_object(self, queryset=None):
+    def get_object(self, queryset=None):  # noqa: D102
         self.object = super().get_object(queryset=queryset)
         hackathon = self.object
 
@@ -113,7 +113,7 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
 
         return hackathon, attendance, team
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         hackathon, attendance, team = self.get_object()
         context = self.get_context_data(
             hackathon=hackathon,
@@ -125,7 +125,7 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
         )
         return self.render_to_response(context)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         hackathon, attendance, team = self.get_object()
 
         if "attendance" in request.POST:
@@ -154,33 +154,33 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
 
         return HttpResponseRedirect(self.get_success_url())
 
-    def get_success_url(self):
+    def get_success_url(self):  # noqa: D102
         return reverse("hackathons:student-hackathon-detail", args=(self.object.pk,))
 
 
-class InstructorHackathonListView(InstructorViewsMixin, generic.ListView):
+class InstructorHackathonListView(InstructorViewsMixin, generic.ListView):  # noqa: D101
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_list.html"
 
 
-class InstructorHackathonSettingsView(InstructorViewsMixin, generic.UpdateView):
+class InstructorHackathonSettingsView(InstructorViewsMixin, generic.UpdateView):  # noqa: D101
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_settings.html"
     form_class = forms.InstructorHackathonForm
 
-    def get_success_url(self):
+    def get_success_url(self):  # noqa: D102
         return reverse("hackathons:instructor-hackathon-settings", args=(self.object.pk,))
 
 
 # noinspection PyAttributeOutsideInit,PyUnusedLocal
-class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
+class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):  # noqa: D101
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_admin.html"
 
-    def get_object_list(self):
+    def get_object_list(self):  # noqa: D102
         object_list = []
         attendance = models.Attendance.objects.filter(hackathon=self.object)
         for att in attendance:
@@ -197,14 +197,13 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
                     "attendance": att,
                 }
             )
-        object_list = sorted(object_list, key=lambda x: x["hackathon_team_id"])
-        return object_list
+        return sorted(object_list, key=lambda x: x["hackathon_team_id"])
 
     @staticmethod
     def _filter_can_attend_next(object_list):
         return [item for item in object_list if item["student"].can_attend_next]
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         self.object = self.get_object()
         object_list = self.get_object_list()
         if request.GET.get("filter_eligible"):
@@ -213,7 +212,7 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
         context = self.get_context_data(object=self.object, object_list=object_list)
         return self.render_to_response(context)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         self.object = self.get_object()
         object_list = self.get_object_list()
 
@@ -265,17 +264,17 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
 
         return HttpResponseRedirect(self.get_success_url())
 
-    def get_success_url(self):
+    def get_success_url(self):  # noqa: D102
         return reverse("hackathons:instructor-hackathon-admin", args=(self.object.pk,))
 
 
 # noinspection PyUnusedLocal
-class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):
+class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):  # noqa: D101
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_detail.html"
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: D102
         self.object = self.get_object()
         context = self.get_context_data(
             hackathon=self.object,
@@ -283,7 +282,7 @@ class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):
         )
         return self.render_to_response(context)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):  # noqa: D102
         self.object = self.get_object()
 
         try:
@@ -305,17 +304,17 @@ class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):
 
         return HttpResponseRedirect(self.get_success_url())
 
-    def get_success_url(self):
+    def get_success_url(self):  # noqa: D102
         return reverse("hackathons:instructor-hackathon-detail", args=(self.object.pk,))
 
 
-class HackathonSetupView(generics.UpdateAPIView):
+class HackathonSetupView(generics.UpdateAPIView):  # noqa: D101
     queryset = models.Hackathon.objects.all()
     serializer_class = serializers.HackathonSerializer
     lookup_url_kwarg = "pk"
     lookup_field = "pk__iexact"
 
-    def get_object(self):
+    def get_object(self):  # noqa: D102
         queryset = self.filter_queryset(self.get_queryset())
 
         filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_url_kwarg]}

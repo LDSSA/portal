@@ -1,4 +1,4 @@
-from portal.academy import models as amodels
+from portal.academy import models as amodels  # noqa: D100
 from portal.hackathons import models as hmodels
 
 for h in hmodels.Hackathon.objects.order_by("code").exclude(code__in=("HCKT0", "HCKT00")):
@@ -8,8 +8,6 @@ for h in hmodels.Hackathon.objects.order_by("code").exclude(code__in=("HCKT0", "
     hack_students = {a.student for a in h.attendance.all() if a.present}
     teamed_students.extend([s for t in h.teams.all() for s in t.users.all()])
     teamed_students = set(teamed_students)
-    # print(teamed_students)
-    # print(hack_students)
     if teamed_students != hack_students:
         print("\n## Inconsistencies")  # noqa: T201
         in_team_but_not_present = teamed_students - hack_students
@@ -31,9 +29,9 @@ for h in hmodels.Hackathon.objects.order_by("code").exclude(code__in=("HCKT0", "
     print("\n## Submissions")  # noqa: T201
     for sub in h.submissions.order_by("-created"):
         if sub.content_type.model == "team":
-            print(
+            print(  # noqa: T201
                 f"    * Team {sub.content_object.hackathon_team_id} - {sub.created}"
-            )  # noqa: T201
+            )
         else:
             print(f"    * {sub.content_object.username} - {sub.created}")  # noqa: T201
 

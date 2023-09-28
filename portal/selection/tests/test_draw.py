@@ -1,4 +1,4 @@
-from django.test import TestCase
+from django.test import TestCase  # noqa: D100
 from profiles.models import Profile, ProfileGenders, ProfileTicketTypes
 from users.models import User
 
@@ -17,8 +17,8 @@ from ..queries import SelectionQueries
 from ..status import SelectionStatus
 
 
-class TestDraw(TestCase):
-    def test_must_pick_female(self) -> None:
+class TestDraw(TestCase):  # noqa: D101
+    def test_must_pick_female(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=50, min_female_quota=0.35, max_company_quota=0.2)
 
         tt = [
@@ -34,7 +34,7 @@ class TestDraw(TestCase):
 
             self.assertEqual(must_pick_female(params, counters), t["expected"])
 
-    def test_must_not_pick_company(self) -> None:
+    def test_must_not_pick_company(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=50, min_female_quota=0.35, max_company_quota=0.2)
 
         tt = [
@@ -49,7 +49,7 @@ class TestDraw(TestCase):
 
             self.assertEqual(must_not_pick_company(params, counters), t["expected"])
 
-    def test_draw_all_females(self) -> None:
+    def test_draw_all_females(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=10, min_female_quota=1, max_company_quota=0)
 
         for i in range(15):
@@ -78,7 +78,7 @@ class TestDraw(TestCase):
             5,
         )
 
-    def test_draw_all_females_not_enough(self) -> None:
+    def test_draw_all_females_not_enough(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=10, min_female_quota=1, max_company_quota=0)
 
         for i in range(9):
@@ -121,7 +121,7 @@ class TestDraw(TestCase):
             8,
         )
 
-    def test_draw_1pc_females(self) -> None:
+    def test_draw_1pc_females(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=6, min_female_quota=0.01, max_company_quota=0)
 
         for i in range(9):
@@ -154,7 +154,7 @@ class TestDraw(TestCase):
             > 0
         )
 
-    def test_draw_0_companies(self) -> None:
+    def test_draw_0_companies(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=8, min_female_quota=0, max_company_quota=0)
 
         for i in range(9):
@@ -195,7 +195,7 @@ class TestDraw(TestCase):
             0,
         )
 
-    def test_draw_rejects_dont_count(self) -> None:
+    def test_draw_rejects_dont_count(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=10, min_female_quota=1, max_company_quota=0)
 
         for i in range(100):
@@ -243,7 +243,7 @@ class TestDraw(TestCase):
             selection.refresh_from_db()
             self.assertEqual(SelectionDomain.get_status(selection), SelectionStatus.DRAWN)
 
-    def test_draw_dont_pick_scholarships(self) -> None:
+    def test_draw_dont_pick_scholarships(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=5, min_female_quota=0, max_company_quota=0)
 
         to_draw_selections: list[Selection] = []
@@ -277,7 +277,7 @@ class TestDraw(TestCase):
             selection.refresh_from_db()
             self.assertEqual(SelectionDomain.get_status(selection), SelectionStatus.DRAWN)
 
-    def test_draw_pick_scholarships(self) -> None:
+    def test_draw_pick_scholarships(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=5, min_female_quota=0, max_company_quota=0)
 
         to_draw_selections: list[Selection] = []
@@ -314,7 +314,7 @@ class TestDraw(TestCase):
             5,
         )
 
-    def test_draw_pick_scholarships_not_enough_females(self) -> None:
+    def test_draw_pick_scholarships_not_enough_females(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=5, min_female_quota=0.5, max_company_quota=0)
 
         to_draw_selections: list[Selection] = []
@@ -367,7 +367,7 @@ class TestDraw(TestCase):
             3,
         )
 
-    def test_draw_pick_scholarships_not_enough(self) -> None:
+    def test_draw_pick_scholarships_not_enough(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=4, min_female_quota=0, max_company_quota=0)
 
         to_draw_selections: list[Selection] = []
@@ -410,7 +410,7 @@ class TestDraw(TestCase):
             2,
         )
 
-    def test_draw_none(self) -> None:
+    def test_draw_none(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=8, min_female_quota=0, max_company_quota=0)
 
         for i in range(2):
@@ -469,7 +469,7 @@ class TestDraw(TestCase):
             0,
         )
 
-    def test_draw_real(self) -> None:
+    def test_draw_real(self) -> None:  # noqa: D102
         params = DrawParams(number_of_seats=50, min_female_quota=0.35, max_company_quota=0.1)
 
         for i in range(100):
@@ -545,7 +545,7 @@ class TestDraw(TestCase):
             < params.number_of_seats * params.max_company_quota
         )
 
-    def test_reject_draw(self) -> None:
+    def test_reject_draw(self) -> None:  # noqa: D102
         u = User.objects.create(email="drawn_female_user@amd.com")
         Profile.objects.create(
             user=u,
@@ -565,7 +565,7 @@ class TestDraw(TestCase):
             1,
         )
 
-    def test_reject_draw_expection(self) -> None:
+    def test_reject_draw_expection(self) -> None:  # noqa: D102
         u = User.objects.create(email="selected_female_user@amd.com")
         Profile.objects.create(
             user=u,
