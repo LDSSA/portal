@@ -141,24 +141,24 @@ workflows:
           requires:
             - Validate requirements
 
-  # workflow:
-  #   jobs:
-  #     - persist-checkout:
-  #         context: 
-  #           - Common Env
-  #     - build:
-  #         context: 
-  #           - Common Env
-  #         requires:
-  #           - persist-checkout
-  #     - approval:
-  #         type: approval
-  #         context: 
-  #           - Common Env
-  #         requires:
-  #           - build
-  #     - push:
-  #         context: 
-  #           - Common Env
-  #         requires:
-  #           - approval
+  workflow:
+    jobs:
+      - persist-checkout:
+          context: 
+            - Common Env
+      - build:
+          context: 
+            - Common Env
+          requires:
+            - persist-checkout
+      - approval:
+          type: approval
+          context: 
+            - Common Env
+          requires:
+            - build
+      - push:
+          context: 
+            - Common Env
+          requires:
+            - approval
