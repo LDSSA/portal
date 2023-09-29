@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 WORKERS = 50
 
 
-def run():  # noqa: D103
+def run():  # noqa: ANN201, D103
     # Queue
 
     # Start consumer pool
@@ -31,7 +31,7 @@ def run():  # noqa: D103
             executor.submit(run_producer)
 
 
-def run_simulator():  # noqa: D103
+def run_simulator():  # noqa: ANN201, D103
     while True:
         logger.debug("Simulator cycle...")
         close_old_connections()
@@ -49,9 +49,9 @@ def run_simulator():  # noqa: D103
         time.sleep(settings.SIMULATOR_INTERVAL)
 
 
-def run_producer():  # noqa: D103
+def run_producer():  # noqa: ANN201, D103
     # Prevent thundering herd
-    time.sleep(2 * random.random())
+    time.sleep(2 * random.random())  # noqa: S311
 
     while True:
         time.sleep(settings.PRODUCER_INTERVAL)
@@ -92,11 +92,14 @@ def run_producer():  # noqa: D103
             logger.exception("Exception in producer")
 
 
-def send_datapoint(due_datapoint):  # noqa: D103
+def send_datapoint(due_datapoint):  # noqa: ANN001, ANN201, D103
     try:
         try:
             logger.info(
-                "Posting %s %s %s", due_datapoint.id, due_datapoint.user.username, due_datapoint.due
+                "Posting %s %s %s",
+                due_datapoint.id,
+                due_datapoint.user.username,
+                due_datapoint.due,
             )
             data = json.loads(due_datapoint.datapoint.data)
             response = requests.post(due_datapoint.url, json=data, timeout=settings.TIMEOUT)

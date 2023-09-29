@@ -61,10 +61,10 @@ class OldFilter(admin.SimpleListFilter):  # noqa: D101
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "old"
 
-    def lookups(self, request, model_admin):  # noqa: D102
+    def lookups(self, request, model_admin):  # noqa: ANN001, ANN101, ANN201, ARG002, D102
         return (("now", "now"),)
 
-    def queryset(self, request, queryset):  # noqa: D102
+    def queryset(self, request, queryset):  # noqa: ANN001, ANN101, ANN201, ARG002, D102
         if self.value() == "now":
             return queryset.filter(due__lte=datetime.now(timezone.utc))
         return None

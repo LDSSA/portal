@@ -12,7 +12,7 @@ from .status import SelectionStatus
 logger = getLogger(__name__)
 
 
-class DrawException(Exception):  # noqa: D101
+class DrawExceptionError(Exception):  # noqa: D101
     pass
 
 
@@ -33,13 +33,13 @@ default_draw_params = DrawParams(
 
 
 class DrawCounters:  # noqa: D101
-    def __init__(self) -> None:  # noqa: D107
+    def __init__(self) -> None:  # noqa: ANN101, D107
         self.total = 0
         self.female = 0
         self.scholarships = 0
         self.company = 0
 
-    def update(self, selection: Selection) -> None:  # noqa: D102
+    def update(self, selection: Selection) -> None:  # noqa: ANN101, D102
         user = selection.user
 
         self.total += 1
@@ -98,16 +98,16 @@ def iter_draw_constraints(  # noqa: D103
     if must_not_pick_company(params, counters):
         forbidden_ticket_types.add(TicketType.company)
 
-    def forget_none(fg: set[Gender], ftt: set[TicketType]) -> None:
+    def forget_none(fg: set[Gender], ftt: set[TicketType]) -> None:  # noqa: ARG001
         pass
 
-    def forget_female_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
+    def forget_female_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:  # noqa: ARG001
         fg.difference_update([Gender.male, Gender.other])
 
-    def forget_company_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
+    def forget_company_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:  # noqa: ARG001
         ftt.discard(TicketType.company)
 
-    def forget_scholarship_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:
+    def forget_scholarship_ratio(fg: set[Gender], ftt: set[TicketType]) -> None:  # noqa: ARG001
         ftt.difference_update([TicketType.regular, TicketType.student, TicketType.company])
 
     for loosen_funcs in [
@@ -152,7 +152,7 @@ def draw(params: DrawParams) -> None:  # noqa: D103
             SelectionStatus.SELECTED,
             SelectionStatus.TO_BE_ACCEPTED,
             SelectionStatus.ACCEPTED,
-        ]
+        ],
     )
 
     counters = get_draw_counters(current_candidates)
@@ -172,6 +172,7 @@ def draw(params: DrawParams) -> None:  # noqa: D103
 def reject_draw(selection: Selection) -> None:  # noqa: D103
     current_status = SelectionDomain.get_status(selection)
     if current_status != SelectionStatus.DRAWN:
-        raise DrawException(f"Can't reject draw for candidate in status {current_status}.")
+        msg = f"Can't reject draw for candidate in status {current_status}."
+        raise DrawExceptionError(msg)
 
     SelectionDomain.update_status(selection, SelectionStatus.PASSED_TEST)

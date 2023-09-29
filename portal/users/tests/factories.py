@@ -18,4 +18,4 @@ class UserFactory(DjangoModelFactory):  # noqa: D101
 
     class Meta:  # noqa: D106
         model = get_user_model()
-        django_get_or_create = ["username"]
+        django_get_or_create = ["username"]  # noqa: RUF012

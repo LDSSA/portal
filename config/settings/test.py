@@ -1,6 +1,6 @@
 """With these settings, tests run faster."""
 
-from .settings import *  # noqa
+from .settings import *  # noqa: F403
 from .settings import env
 
 # GENERAL
@@ -24,7 +24,7 @@ CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "",
-    }
+    },
 }
 
 # PASSWORDS
@@ -35,15 +35,15 @@ PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 # TEMPLATES
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#templates
-TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG  # noqa F405
-TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa F405
+TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG  # noqa: F405
+TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa: F405
     (
         "django.template.loaders.cached.Loader",
         [
             "django.template.loaders.filesystem.Loader",
             "django.template.loaders.app_directories.Loader",
         ],
-    )
+    ),
 ]
 
 # EMAIL

@@ -11,7 +11,7 @@ from .status import SelectionStatus
 logger = getLogger(__name__)
 
 
-def requires_interview(selection):  # noqa: D103
+def requires_interview(selection):  # noqa: ANN001, ANN201, D103
     return selection.user.ticket_type == TicketType.scholarship
 
 
@@ -23,7 +23,7 @@ def select() -> None:  # noqa: D103
             to_selected(selection)
 
 
-def to_selected(selection):  # noqa: D103
+def to_selected(selection):  # noqa: ANN001, ANN201, D103
     SelectionDomain.update_status(selection, SelectionStatus.SELECTED)
     load_payment_data(selection)
 
@@ -36,8 +36,9 @@ def to_selected(selection):  # noqa: D103
     )
 
 
-def to_interview(selection):  # noqa: D103
+def to_interview(selection):  # noqa: ANN001, ANN201, D103
     SelectionDomain.update_status(selection, SelectionStatus.INTERVIEW)
     emails.send_selected_interview_details(
-        to_email=selection.user.email, to_name=selection.user.name
+        to_email=selection.user.email,
+        to_name=selection.user.name,
     )

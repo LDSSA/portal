@@ -12,7 +12,7 @@ from portal.selection.status import SelectionStatusType
 from portal.users.models import User
 
 
-def notebook_to_html(nb):  # noqa: D103
+def notebook_to_html(nb):  # noqa: ANN001, ANN201, D103
     nb = nbformat.reads(nb, as_version=4)
     html_exporter = nbconvert.HTMLExporter()
     html_exporter.template_name = "classic"
@@ -32,7 +32,7 @@ class CandidateState(NamedTuple):  # noqa: D101
     selection_status: SelectionStatusType | None
 
 
-class DomainException(Exception):  # noqa: D101
+class DomainExceptionError(Exception):  # noqa: D101
     pass
 
 

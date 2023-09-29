@@ -17,6 +17,9 @@ class UserWhitelist(models.Model):  # noqa: D101
     is_student = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
 
+    def __str__(self) -> str:  # noqa: ANN101, D105
+        return f"{self.username}"
+
 
 class Gender(DjangoChoices):  # noqa: D101
     female = ChoiceItem("female", "Female")
@@ -37,7 +40,7 @@ class TicketType(DjangoChoices):  # noqa: D101
     scholarship = ChoiceItem("scholarship", "Scholarship")
 
 
-# TODO TODO custom user manager to filter out users with unverified email addresses
+# TODO: custom user manager to filter out users with unverified email addresses  # noqa: FIX002, TD002, TD003
 class User(AbstractUser):  # noqa: D101
     # First Name and Last Name do not cover name patterns
     # around the globe.
@@ -68,10 +71,10 @@ class User(AbstractUser):  # noqa: D101
 
     failed_or_dropped = models.BooleanField(default=False)
 
-    def get_absolute_url(self):  # noqa: D102
+    def get_absolute_url(self):  # noqa: ANN101, ANN201, D102
         return reverse("users:detail", kwargs={"username": self.username})
 
-    def save(self, *args, **kwargs):  # noqa: D102
+    def save(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN101, ANN201, D102
         if not self.deploy_private_key and not self.deploy_public_key:
             key = rsa.generate_private_key(
                 backend=crypto_default_backend(),

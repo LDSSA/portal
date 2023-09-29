@@ -23,7 +23,7 @@ ApplicationStatus = Status
 SubmissionStatus = Status
 
 
-class DomainException(Exception):  # noqa: D101
+class DomainExceptionError(Exception):  # noqa: D101
     pass
 
 
@@ -35,11 +35,15 @@ class Domain:  # noqa: D101
     submission_timedelta_buffer = timedelta(minutes=2)
 
     @classmethod
-    def get_application_status(cls, application: Application) -> ApplicationStatus:  # noqa: D102
+    def get_application_status(  # noqa: D102
+        cls, application: Application  # noqa: ANN102
+    ) -> ApplicationStatus:  # noqa: ANN102, D102
         return cls.get_application_detailed_status(application)["application"]
 
     @classmethod
-    def get_application_detailed_status(cls, application) -> dict[str, Status]:  # noqa: D102
+    def get_application_detailed_status(  # noqa: D102
+        cls, application: Application  # noqa: ANN102
+    ) -> dict[str, Status]:  # noqa: D102
         chall_status = {}
         for chall in Challenge.objects.all():
             chall_status[chall.code] = cls.get_sub_type_status(application, chall)
@@ -60,7 +64,9 @@ class Domain:  # noqa: D101
         return {"application": application_status, **chall_status}
 
     @classmethod
-    def get_sub_type_status(cls, application, challenge):  # noqa: D102
+    def get_sub_type_status(  # noqa: ANN206, D102
+        cls, application: Application, challenge  # noqa: ANN001, ANN102
+    ):  # noqa: ANN001, ANN102, ANN206, D102
         if cls.has_positive_score(application, challenge):
             return SubmissionStatus.passed
 
@@ -77,7 +83,7 @@ class Domain:  # noqa: D101
         return SubmissionStatus.ongoing
 
     @staticmethod
-    def get_start_date(application, challenge):  # noqa: D102
+    def get_start_date(application: Application, challenge):  # noqa: ANN001, ANN205, D102
         if challenge.code == "coding_test":
             start_date = getattr(application, f"{challenge.code}_started_at", None)
         else:
@@ -86,7 +92,9 @@ class Domain:  # noqa: D101
         return start_date
 
     @classmethod
-    def get_end_date(cls, application, challenge, *, apply_buffer=False):  # noqa: D102
+    def get_end_date(  # noqa: ANN206, D102
+        cls, application: Application, challenge, *, apply_buffer=False  # noqa: ANN001, ANN102
+    ):  # noqa: ANN001, ANN102, ANN206, D102
         start_date = cls.get_start_date(application, challenge)
 
         if challenge.code == "coding_test":
@@ -98,24 +106,29 @@ class Domain:  # noqa: D101
             close_date = config.ADMISSIONS_SELECTION_START
 
         if apply_buffer:
-            # buffer is applied to account for possible latency (lambda grader func may take a while)
+            # buffer is applied to account for possible latency
+            # (lambda grader func may take a while)
             return close_date + cls.submission_timedelta_buffer
 
         return close_date
 
     @staticmethod
-    def get_best_score(application, challenge):  # noqa: D102
+    def get_best_score(application: Application, challenge):  # noqa: ANN001, ANN205, D102
         return Submission.objects.filter(application=application, unit=challenge).aggregate(
-            models.Max("score")
+            models.Max("score"),
         )["score__max"]
 
     @classmethod
-    def has_positive_score(cls, application, challenge):  # noqa: D102
+    def has_positive_score(  # noqa: ANN206, D102
+        cls, application: Application, challenge  # noqa: ANN001, ANN102
+    ):  # noqa: ANN001, ANN102, ANN206, D102
         score = cls.get_best_score(application, challenge)
         return score is not None and score >= challenge.pass_score
 
     @classmethod
-    def can_add_submission(cls, application, challenge):  # noqa: D102
+    def can_add_submission(  # noqa: ANN206, D102
+        cls, application: Application, challenge  # noqa: ANN001, ANN102
+    ):  # noqa: ANN001, ANN102, ANN206, D102
         if config.PORTAL_STATUS != "admissions:applications":
             return False
 
@@ -135,15 +148,18 @@ class Domain:  # noqa: D101
             Submission.objects.filter(application=application, unit=challenge).count()
             >= cls.max_submissions
         ):
-            logger.warning(f"user `{application.user.email}` reached max submissions.")
+            logger.warning("user `%s` reached max submissions.", application.user.email)
             return False
 
         return True
 
     @classmethod
-    def add_submission(cls, application, challenge, sub):  # noqa: D102
+    def add_submission(  # noqa: D102
+        cls, application: Application, challenge, sub  # noqa: ANN001, ANN102
+    ) -> None:  # noqa: ANN001, ANN102, D102
         if not cls.can_add_submission(application, challenge):
-            raise DomainException("Can't add submission")
+            msg = "Can't add submission"
+            raise DomainExceptionError(msg)
 
         sub.application = application
         sub.challenge = challenge
@@ -152,7 +168,8 @@ class Domain:  # noqa: D101
     @staticmethod
     def application_over(application: Application) -> None:  # noqa: D102
         if application.application_over_email_sent is not None:
-            raise DomainException("email was already sent")
+            msg = "email was already sent"
+            raise DomainExceptionError(msg)
 
         to_name = application.user.name
 
@@ -174,7 +191,7 @@ class Domain:  # noqa: D101
 
 class DomainQueries:  # noqa: D101
     @staticmethod
-    def all() -> Any:  # noqa: D102
+    def all() -> Any:  # noqa: A003, ANN401, D102
         return Application.objects.all()
 
     @staticmethod

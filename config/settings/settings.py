@@ -76,7 +76,7 @@ DATABASES = {
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
         "HOST": os.environ.get("POSTGRES_HOST"),
         "PORT": os.environ.get("POSTGRES_PORT"),
-    }
+    },
 }
 
 # CACHES
@@ -92,7 +92,7 @@ if CACHE_BACKEND == "django.core.cache.backends.locmem.LocMemCache":
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
             "LOCATION": "",
-        }
+        },
     }
 elif CACHE_BACKEND == "django_redis.cache.RedisCache":
     CACHES = {
@@ -105,7 +105,7 @@ elif CACHE_BACKEND == "django_redis.cache.RedisCache":
                 # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
                 "IGNORE_EXCEPTIONS": True,
             },
-        }
+        },
     }
 
 # URLS
@@ -233,7 +233,7 @@ STATICFILES_FINDERS = [
 if STATICFILES_STORAGE == "config.settings.settings.StaticRootS3Boto3Storage":
     AWS_DEFAULT_ACL = None
     # https://django-storages.readthedocs.io/en/latest/#installation
-    INSTALLED_APPS += ["storages"]  # noqa F405
+    INSTALLED_APPS += ["storages"]  # noqa: F405
     # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
     AWS_ACCESS_KEY_ID = env("DJANGO_AWS_ACCESS_KEY_ID")
     # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
@@ -255,7 +255,7 @@ if STATICFILES_STORAGE == "config.settings.settings.StaticRootS3Boto3Storage":
 
     # region http://stackoverflow.com/questions/10390244/
     # Full-fledge class: https://stackoverflow.com/a/18046120/104731
-    from storages.backends.s3boto3 import S3Boto3Storage  # noqa E402
+    from storages.backends.s3boto3 import S3Boto3Storage  # noqa: E402
 
     class StaticRootS3Boto3Storage(S3Boto3Storage):  # noqa: D101
         location = "static"
@@ -323,12 +323,12 @@ TEMPLATES = [
     },
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#templates
-TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG  # noqa F405
+TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG  # noqa: F405
 
 CACHE_TEMPLATES = env.bool("DJANGO_CACHE_TEMPLATES", default=True)
 if CACHE_TEMPLATES:
     # https://docs.djangoproject.com/en/dev/ref/settings/#templates
-    TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa F405
+    TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa: F405
         (
             "django.template.loaders.cached.Loader",
             [
@@ -369,7 +369,7 @@ if SECURITY_EXTRAS:
     CSRF_COOKIE_SECURE = True
     # https://docs.djangoproject.com/en/dev/topics/security/#ssl-https
     # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-seconds
-    # TODO: set this to 60 seconds first and then to 518400 once you prove the former works
+    # TODO: set this to 60 seconds first and then to 518400 once you prove the former works  # noqa: FIX002, TD002, TD003
     SECURE_HSTS_SECONDS = 60
     # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
     SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True)
@@ -436,7 +436,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 # django-constance
 # ------------------------------------------------------------------------------
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
-# CONSTANCE_DATABASE_CACHE_BACKEND ='default'
+# CONSTANCE_DATABASE_CACHE_BACKEND ='default'  # noqa: ERA001
 #
 # * Admissions                    -> admissions
 #   - Sign up
@@ -473,7 +473,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_ADAPTER = "portal.users.adapters.AccountAdapter"
-# SOCIALACCOUNT_ADAPTER = "portal.users.adapters.SocialAccountAdapter"
+# SOCIALACCOUNT_ADAPTER = "portal.users.adapters.SocialAccountAdapter"  # noqa: ERA001
 ACCOUNT_SIGNUP_FORM_CLASS = "portal.users.forms.PortalSignupForm"
 
 
@@ -507,9 +507,9 @@ REST_FRAMEWORK = {
 # ------------------------------------------------------------------------------
 if DEBUG:
     # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
-    INSTALLED_APPS += ["debug_toolbar"]  # noqa F405
+    INSTALLED_APPS += ["debug_toolbar"]  # noqa: F405
     # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#middleware
-    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]  # noqa F405
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]  # noqa: F405
     # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-config
     DEBUG_TOOLBAR_CONFIG = {
         "DISABLE_PANELS": [
@@ -529,20 +529,20 @@ if DEBUG:
 # ------------------------------------------------------------------------------
 # https://django-extensions.readthedocs.io/en/latest/installation_instructions.html#configuration
 if DEBUG:
-    INSTALLED_APPS += ["django_extensions"]  # noqa F405
+    INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 
 # Gunicorn
 # ------------------------------------------------------------------------------
 GUNICORN_ENABLED = env.bool("GUNICORN_ENABLED", default=True)
 if GUNICORN_ENABLED:
-    INSTALLED_APPS += ["gunicorn"]  # noqa F405
+    INSTALLED_APPS += ["gunicorn"]  # noqa: F405
 
 
 # Collectfast
 # ------------------------------------------------------------------------------
 # https://github.com/antonagestam/collectfast#installation
 if STATICFILES_STORAGE == "storages.backends.s3boto.S3BotoStorage":
-    INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
+    INSTALLED_APPS = ["collectfast", *INSTALLED_APPS]  # noqa: F405
     AWS_PRELOAD_METADATA = True
 
 # Sentry
@@ -569,7 +569,7 @@ LOGGING = {
     "formatters": {
         "verbose": {
             "format": "%(levelname)s %(asctime)s %(module)s "
-            "%(name)s.%(funcName)s/%(lineno)d %(message)s"
+            "%(name)s.%(funcName)s/%(lineno)d %(message)s",
         },
     },
     "handlers": {
@@ -577,7 +577,7 @@ LOGGING = {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
-        }
+        },
     },
     "loggers": {
         "": {

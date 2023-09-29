@@ -110,28 +110,14 @@ fix = false
 target-version = "py310"
 show-fixes = true
 show-source = true
-select = [
-#   "A",   # flake8-builtins
-#   "B",   # flake8-bugbear
-#   "C",   # flake8-comprehensions
-  "D",   # pydocstyle
-  "E",   # pycodestyle errors
-#   "DJ",  # flake8-django
-  "F",   # pyflakes
-  "I",   # isort
-#   "N",   # pep8-naming
-#   "PT",  # flake8-pytest-style
-#   "PL",  # pylint
-#   "Q",   # flake8-quotes
-  "RET", # flake8-return
-#   "RUF", # ruff
-  "UP",  # pyupgrade
-#   "W",   # pycodestyle warnings
-]
+select = ["ALL"]
 ignore = [
-  "E501",   # line too long, handled by Black
+  "ANN",    # Type hints related, handled by MyPy
+  "COM812", # Trailing comma missing, handled by Black
   "D211",   # No blank lines allowed before class docstring
-  "D213"    # Multi-line docstring summary should start at the second line
+  "D213",   # Multi-line docstring summary should start at the second line
+  "E501",   # line too long, handled by Black
+  "RUF100", # Unused noqa directive
 ]
 extend-exclude = [
   "**/migrations/*",

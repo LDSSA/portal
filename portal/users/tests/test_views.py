@@ -17,8 +17,10 @@ class TestUserUpdateView:
     https://github.com/pytest-dev/pytest-django/pull/258
     """  # noqa: D211
 
-    def test_get_success_url(  # noqa: D102
-        self, user: settings.AUTH_USER_MODEL, request_factory: RequestFactory
+    def test_get_success_url(  # noqa: ANN201, D102
+        self,  # noqa: ANN101
+        user: settings.AUTH_USER_MODEL,
+        request_factory: RequestFactory,
     ):  # noqa: D102
         view = UserUpdateView()
         request = request_factory.get("/fake-url/")
@@ -26,10 +28,12 @@ class TestUserUpdateView:
 
         view.request = request
 
-        assert view.get_success_url() == "/users/profile/"
+        assert view.get_success_url() == "/users/profile/"  # noqa: S101
 
-    def test_get_object(  # noqa: D102
-        self, user: settings.AUTH_USER_MODEL, request_factory: RequestFactory
+    def test_get_object(  # noqa: ANN201, D102
+        self,  # noqa: ANN101
+        user: settings.AUTH_USER_MODEL,
+        request_factory: RequestFactory,
     ):  # noqa: D102
         view = UserUpdateView()
         request = request_factory.get("/fake-url/")
@@ -37,12 +41,14 @@ class TestUserUpdateView:
 
         view.request = request
 
-        assert view.get_object() == user
+        assert view.get_object() == user  # noqa: S101
 
 
 class TestUserRedirectView:  # noqa: D101
-    def test_get_redirect_url(  # noqa: D102
-        self, user: settings.AUTH_USER_MODEL, request_factory: RequestFactory
+    def test_get_redirect_url(  # noqa: ANN201, D102
+        self,  # noqa: ANN101
+        user: settings.AUTH_USER_MODEL,
+        request_factory: RequestFactory,
     ):
         view = UserRedirectView()
         request = request_factory.get("/fake-url")
@@ -50,4 +56,4 @@ class TestUserRedirectView:  # noqa: D101
 
         view.request = request
 
-        assert view.get_redirect_url() == "/users/profile/"
+        assert view.get_redirect_url() == "/users/profile/"  # noqa: S101

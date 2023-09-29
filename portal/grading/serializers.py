@@ -27,7 +27,7 @@ class ChecksumSerializer(serializers.ModelSerializer):  # noqa: D101
             "checksum",
         )
 
-    def update(self, instance, validated_data):  # noqa: D102
+    def update(self, instance, validated_data):  # noqa: ANN001, ANN101, ANN201, D102
         old_checksum = instance.checksum
         instance = super().update(instance, validated_data)
 

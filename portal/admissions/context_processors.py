@@ -12,7 +12,7 @@ def user_has_payment(user: User) -> bool:  # noqa: D103
         return False
 
 
-def admissions_context_processor(request):  # noqa: D103
+def admissions_context_processor(request):  # noqa: ANN001, ANN201, D103
     my_dict = {
         "PORTAL_STATUS": config.PORTAL_STATUS,
         "ACADEMY_START": config.ACADEMY_START,
@@ -21,7 +21,7 @@ def admissions_context_processor(request):  # noqa: D103
         "ADMISSIONS_SELECTION_START": config.ADMISSIONS_SELECTION_START,
         "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": config.ADMISSIONS_ACCEPTING_PAYMENT_PROFS,
         "ADMISSIONS_CODING_TEST_DURATION_HOURS": str(
-            config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600
+            config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600,
         ),
         "ADMISSIONS_APPLICATIONS_STARTED_STATUSES": settings.ADMISSIONS_APPLICATIONS_STARTED_STATUSES,
     }
@@ -32,7 +32,7 @@ def admissions_context_processor(request):  # noqa: D103
                 "scholarship_decided": request.user.applying_for_scholarship is not None,
                 "applying_for_scholarship": request.user.applying_for_scholarship,
                 "user_has_payment": user_has_payment(request.user),
-            }
+            },
         )
 
     return my_dict

@@ -1,8 +1,11 @@
 from datetime import datetime  # noqa: D100
 
+from dateutil import gettz
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+
+LISBON_TZ = gettz("Europe/Lisbon")
 
 
 class Specialization(models.Model):  # noqa: D101
@@ -11,13 +14,15 @@ class Specialization(models.Model):  # noqa: D101
     description = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self) -> str:  # noqa: ANN101, D105
         return self.code
 
 
 class Unit(models.Model):  # noqa: D101
     specialization = models.ForeignKey(
-        Specialization, on_delete=models.CASCADE, related_name="units"
+        Specialization,
+        on_delete=models.CASCADE,
+        related_name="units",
     )
 
     code = models.CharField(max_length=255, primary_key=True)
@@ -25,28 +30,27 @@ class Unit(models.Model):  # noqa: D101
     description = models.TextField(blank=True)
     instructor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     due_date = models.DateField(default=timezone.now)
-    open = models.BooleanField(default=False)
+    open = models.BooleanField(default=False)  # noqa: A003
 
     checksum = models.TextField(blank=True)
 
     created = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):  # noqa: D105
+    def __str__(self) -> str:  # noqa: ANN101, D105
         return f"{self.specialization.code}/{self.code}"
 
 
-def notebook_path(instance, filename):  # noqa: D103
-    now = datetime.now().isoformat(timespec="seconds")
+def notebook_path(instance, filename):  # noqa: ANN001, ANN201, ARG001, D103
+    now = datetime.now(LISBON_TZ).isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/notebook_{now}.ipynb"
 
 
-def feedback_path(instance, filename):  # noqa: D103
-    now = datetime.now().isoformat(timespec="seconds")
-    # TODO: fix file name
-    return f"{instance.unit.code}/{instance.user.username}/feeback_{now}.ipynb"
+def feedback_path(instance, filename):  # noqa: ANN001, ANN201, ARG001, D103
+    now = datetime.now(LISBON_TZ).isoformat(timespec="seconds")
+    return f"{instance.unit.code}/{instance.user.username}/feedback_{now}.ipynb"
 
 
-class Grade(models.Model):  # noqa: D101
+class Grade(models.Model):  # noqa: D101, DJ008
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

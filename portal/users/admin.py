@@ -10,7 +10,7 @@ User = get_user_model()
 
 @admin.register(UserWhitelist)
 class UserWhitelistAdmin(admin.ModelAdmin):  # noqa: D101
-    list_display = ["username", "is_student", "is_instructor"]
+    list_display = ["username", "is_student", "is_instructor"]  # noqa: RUF012
 
 
 @admin.register(User)
@@ -35,12 +35,13 @@ class UserAdmin(auth_admin.UserAdmin):  # noqa: D101
                     "github_username",
                     "slack_member_id",
                     "failed_or_dropped",
-                )
+                ),
             },
         ),
         ("Keys", {"fields": ("deploy_private_key", "deploy_public_key")}),
-    ) + auth_admin.UserAdmin.fieldsets
-    list_display = [
+        *auth_admin.UserAdmin.fieldsets,
+    )
+    list_display = [  # noqa: RUF012
         "username",
         "is_student",
         "is_instructor",
@@ -49,7 +50,7 @@ class UserAdmin(auth_admin.UserAdmin):  # noqa: D101
         "can_graduate",
         "failed_or_dropped",
     ]
-    search_fields = ["username", "name"]
+    search_fields = ["username", "name"]  # noqa: RUF012
     list_filter = (
         "is_student",
         "is_instructor",

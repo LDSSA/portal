@@ -5,7 +5,7 @@ from allauth.account.models import EmailAddress
 from portal.users.models import User
 
 
-def add_user_options(parser):
+def add_user_options(parser) -> None:  # noqa: ANN001
     parser.add_argument("-u", "--username", type=str, required=True)
     parser.add_argument("-p", "--password", type=str, required=True)
     parser.add_argument("-e", "--email", type=str, required=True)
@@ -22,9 +22,18 @@ def add_user_options(parser):
     )
 
 
-def create_user(
-    username, password, email, name, github, slack, gender, ticket, user_type="student", **kwargs
-):
+def create_user(  # noqa: PLR0913
+    username,  # noqa: ANN001
+    password,  # noqa: ANN001
+    email,  # noqa: ANN001
+    name,  # noqa: ANN001
+    github,  # noqa: ANN001
+    slack,  # noqa: ANN001
+    gender,  # noqa: ANN001
+    ticket,  # noqa: ANN001
+    user_type="student",  # noqa: ANN001
+    **kwargs,  # noqa: ANN003, ARG001
+) -> User:
     if user_type == "student":
         is_student = True
         is_instructor = False
@@ -54,6 +63,9 @@ def create_user(
     user.save()
 
     EmailAddress.objects.get_or_create(
-        user=user, email__iexact=email, verified=True, defaults={"email": email}
+        user=user,
+        email__iexact=email,
+        verified=True,
+        defaults={"email": email},
     )
     return user

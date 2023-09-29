@@ -26,7 +26,9 @@ class UserRequiredFieldsMixin:  # noqa: D101
         "ticket_type",
     )
 
-    def dispatch(self, request, *args, **kwargs):  # noqa: D102
+    def dispatch(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, D102
         if request.user.is_authenticated:
             if config.PORTAL_STATUS.startswith("admissions"):
                 if request.user.is_staff:
@@ -46,14 +48,18 @@ class UserRequiredFieldsMixin:  # noqa: D101
 
 
 class AdmissionsOngoingMixin:  # noqa: D101
-    def dispatch(self, request, *args, **kwargs):  # noqa: D102
+    def dispatch(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, D102
         if config.PORTAL_STATUS.startswith("admissions"):
             return super().dispatch(request, *args, **kwargs)
         return self.handle_no_permission()
 
 
 class InstructorMixin:  # noqa: D101
-    def dispatch(self, request, *args, **kwargs):  # noqa: D102
+    def dispatch(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, D102
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         if request.user.is_instructor or request.user.is_superuser or request.user.is_staff:
@@ -71,7 +77,9 @@ class InstructorViewsMixin(  # noqa: D101
 
 
 class StudentMixin:  # noqa: D101
-    def dispatch(self, request, *args, **kwargs):  # noqa: D102
+    def dispatch(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, D102
         if not request.user.is_authenticated:
             return self.handle_no_permission()
         if not request.user.is_student:
@@ -88,7 +96,9 @@ class StudentViewsMixin(  # noqa: D101
 
 
 class AdmissionsStaffMixin:  # noqa: D101
-    def dispatch(self, request, *args, **kwargs):  # noqa: D102
+    def dispatch(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, D102
         if not request.user.is_staff:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
@@ -104,7 +114,9 @@ class AdmissionsStaffViewMixin(  # noqa: D101
 
 
 class AdmissionsCandidateMixin:  # noqa: D101
-    def dispatch(self, request, *args, **kwargs):  # noqa: D102
+    def dispatch(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, D102
         if request.user.is_staff:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
@@ -126,7 +138,9 @@ class AdmissionsCandidateViewMixin(  # noqa: D101
 
 
 class CandidateAcceptedCoCMixin:  # noqa: D101
-    def dispatch(self, request, *args, **kwargs):  # noqa: D102
+    def dispatch(  # noqa: ANN101, ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101
+    ):
         if not request.user.code_of_conduct_accepted:
             return self.handle_no_permission()
         return super().dispatch(request, *args, **kwargs)
@@ -136,7 +150,7 @@ class CandidateScholarshipDecidedMixin(AdmissionsCandidateMixin, UserPassesTestM
 
     """Verify that the current user is an instructor."""  # noqa: D211
 
-    def test_func(self):  # noqa: D102
+    def test_func(self):  # noqa: ANN101, ANN201, D102
         if not self.request.user.is_staff:
             return False
         return True
@@ -164,10 +178,10 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):  # noqa: D101
     model = User
     form_class = forms.UserChangeForm
 
-    def get_success_url(self):  # noqa: D102
+    def get_success_url(self) -> str:  # noqa: ANN101, D102
         return reverse("users:profile")
 
-    def get_object(self):  # noqa: D102
+    def get_object(self):  # noqa: ANN101, ANN201, D102
         return User.objects.get(username=self.request.user.username)
 
 
@@ -177,8 +191,8 @@ user_update_view = UserUpdateView.as_view()
 class UserRedirectView(LoginRequiredMixin, RedirectView):  # noqa: D101
     permanent = False
 
-    def get_redirect_url(self):  # noqa: D102
-        # return reverse("users:detail", kwargs={"username": self.request.user.username})
+    def get_redirect_url(self):  # noqa: ANN101, ANN201, D102
+        # return reverse("users:detail", kwargs={"username": self.request.user.username})  # noqa: ERA001
         return reverse("users:profile")
 
 

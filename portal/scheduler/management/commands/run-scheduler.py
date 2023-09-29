@@ -1,4 +1,4 @@
-import logging  # noqa: D100
+import logging  # noqa: D100, N999
 from time import sleep
 
 from constance import config
@@ -6,24 +6,24 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 from django.utils import timezone
 
-# from portal.capstone.simulator import run
+# from portal.capstone.simulator import run  # noqa: ERA001
 logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):  # noqa: D101
-    help = "Run scheduler"
+    help = "Run scheduler"  # noqa: A003
 
-    def handle(self, *args, **options):  # noqa: D102
+    def handle(self, *args, **options):  # noqa: ANN002, ANN003, ANN101, ANN201, ARG002, D102
         scheduled_fcns = (update_portal_status,)
 
         while True:
             logger.info("Running scheduler...")
 
-            for fcn in scheduled_fcns:
-                try:
+            try:
+                for fcn in scheduled_fcns:
                     fcn()
-                except Exception:
-                    logger.exception(f"Exception in {fcn.__name__}")
+            except Exception:
+                logger.exception("Exception in %s", fcn.__name__)
 
             # Close connection after each run
             # https://code.djangoproject.com/ticket/21596#comment:29
@@ -35,7 +35,7 @@ class Command(BaseCommand):  # noqa: D101
             sleep(10)
 
 
-def update_portal_status():  # noqa: D103
+def update_portal_status():  # noqa: ANN201, D103
     dt = timezone.now()
 
     # Initial portal state
@@ -56,6 +56,5 @@ def update_portal_status():  # noqa: D103
             # Disable sign ups
             config.ACCOUNT_ALLOW_REGISTRATION = False
 
-    elif config.PORTAL_STATUS == "admissions:selection":
-        if dt >= config.ACADEMY_START:
-            config.PORTAL_STATUS = "academy"
+    elif config.PORTAL_STATUS == "admissions:selection" and dt >= config.ACADEMY_START:
+        config.PORTAL_STATUS = "academy"

@@ -14,13 +14,14 @@ framework.
 """
 import os
 import sys
+from pathlib import Path
 
 from django.core.wsgi import get_wsgi_application
 
 # This allows easy placement of apps within the interior
 # portal directory.
-app_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir))
-sys.path.append(os.path.join(app_path, "portal"))
+app_path = Path(Path(Path(Path(__file__).resolve()).parent) / os.pardir).resolve()
+sys.path.append(Path(app_path) / "portal")
 
 # We defer to a DJANGO_SETTINGS_MODULE already in the environment. This breaks
 # if running multiple sites in the same mod_wsgi process. To fix this, use
@@ -33,5 +34,5 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.settings")
 application = get_wsgi_application()
 
 # Apply WSGI middleware here.
-# from helloworld.wsgi import HelloWorldApplication
-# application = HelloWorldApplication(application)
+# from helloworld.wsgi import HelloWorldApplication  # noqa: ERA001
+# application = HelloWorldApplication(application)  # noqa: ERA001

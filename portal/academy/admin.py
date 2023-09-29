@@ -27,10 +27,10 @@ class UnitAdmin(admin.ModelAdmin):  # noqa: D101
         "instructor",
         "checksum",
     )
-    search_fields = ["instructor__username", "name", "unit__code"]
+    search_fields = ["instructor__username", "name", "unit__code"]  # noqa: RUF012
     list_filter = ("specialization", "open", "instructor")
 
-    def get_code(self, obj):  # noqa: D102
+    def get_code(self, obj):  # noqa: ANN001, ANN101, ANN201, D102
         return str(obj)
 
     get_code.short_description = "Code"
@@ -46,7 +46,7 @@ class GradeAdmin(admin.ModelAdmin):  # noqa: D101
         "score",
         "on_time",
     )
-    search_fields = [
+    search_fields = [  # noqa: RUF012
         "unit__code",
         "user__username",
         "user__name",

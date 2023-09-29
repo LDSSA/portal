@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 # noinspection PyUnresolvedReferences
 class HomeRedirectView(LoginRequiredMixin, RedirectView):  # noqa: D101
-    def get_redirect_url(self, *args, **kwargs):  # noqa: D102
+    def get_redirect_url(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN101, ANN201, D102
         if config.PORTAL_STATUS == "academy":
             if self.request.user.is_student:
                 self.pattern_name = "academy:student-unit-list"
@@ -33,11 +33,10 @@ class HomeRedirectView(LoginRequiredMixin, RedirectView):  # noqa: D101
                 self.pattern_name = "academy:instructor-user-list"
             else:
                 self.handle_no_permission()
+        elif self.request.user.is_staff:
+            self.pattern_name = "admissions:staff:home"
         else:
-            if self.request.user.is_staff:
-                self.pattern_name = "admissions:staff:home"
-            else:
-                self.pattern_name = "admissions:candidate:home"
+            self.pattern_name = "admissions:candidate:home"
 
         return super().get_redirect_url(*args, **kwargs)
 
@@ -49,7 +48,9 @@ class BaseUnitListView(ListView):  # noqa: D101
     detail_view_name = None
 
     # noinspection PyAttributeOutsideInit
-    def get(self, request, *args, **kwargs):  # noqa: D102
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         self.object_list = self.get_queryset()
         data = []
         for unit in self.object_list:
@@ -64,25 +65,30 @@ class BaseUnitDetailView(DetailView):  # noqa: D101
     model = models.Unit
     template_name = None
 
-    def get(self, request, *args, **kwargs):  # noqa: D102
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         unit, grade, best_grade = self.get_object()
         context = self.get_context_data(unit=unit, grade=grade, best_grade=best_grade)
         return self.render_to_response(context)
 
     # noinspection PyAttributeOutsideInit
-    def get_object(self, queryset=None):  # noqa: D102
+    def get_object(self, queryset=None):  # noqa: ANN001, ANN101, ANN201, D102
         self.object = super().get_object(queryset=queryset)
         unit = self.object
         grade = get_last_grade(unit, self.request.user)
         best_grade = get_best_grade(unit, self.request.user)
         return unit, grade, best_grade
 
-    def post(self, request, *args, **kwargs):  # noqa: D102
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         unit, _, _ = self.get_object()
         grade = models.Grade(user=self.request.user, unit=unit)
 
         if not unit.checksum:
-            raise RuntimeError("Not checksum present for this unit")
+            msg = "Not checksum present for this unit"
+            raise RuntimeError(msg)
 
         # Grade sent on time?
         due_date = datetime.combine(unit.due_date, datetime.max.time(), tzinfo=timezone.utc)
@@ -96,8 +102,8 @@ class BaseUnitDetailView(DetailView):  # noqa: D101
         grade.save()
 
         # Send to grading
-        Grading = import_string(settings.GRADING_CLASS)
-        Grading(grade=grade).run_grading()
+        grading = import_string(settings.GRADING_CLASS)
+        grading(grade=grade).run_grading()
 
         return HttpResponseRedirect(request.path_info)
 
@@ -116,7 +122,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):  # noqa: D101
     queryset = get_user_model().objects.filter(is_student=True, failed_or_dropped=False)
     template_name = "academy/instructor/user_list.html"
 
-    def get_queryset(self):  # noqa: D102
+    def get_queryset(self):  # noqa: ANN101, ANN201, D102
         user_id = self.request.GET.get("user_id")
         can_graduate = self.request.GET.get("can_graduate")
 
@@ -129,7 +135,9 @@ class InstructorUserListView(InstructorViewsMixin, ListView):  # noqa: D101
         return self.queryset.all()
 
     # noinspection PyAttributeOutsideInit
-    def get(self, request, *args, **kwargs):  # noqa: D102
+    def get(  # noqa: ANN201, C901, D102, PLR0912, PLR0915
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa:ANN201, PLR0912, PLR0915
         # Validate query params
         validator = serializers.InstructorsViewFiltersSerializer(data=self.request.GET)
         if not validator.is_valid():

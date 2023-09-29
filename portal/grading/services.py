@@ -14,41 +14,41 @@ pattern = re.compile("[^a-zA-Z0-9-]+")
 
 
 class MockGrading:  # noqa: D101
-    def __init__(self, grade):  # noqa: D107
+    def __init__(self, grade) -> None:  # noqa: ANN001, ANN101, D107
         pass
 
-    def run_grading(self):  # noqa: D102
+    def run_grading(self):  # noqa: ANN101, ANN201, D102
         pass
 
 
 class Grading:  # noqa: D101
-    def __init__(self, grade):  # noqa: D107
+    def __init__(self, grade) -> None:  # noqa: ANN001, ANN101, D107
         self.grade = grade
 
-    def get_command(self, image, name, env):  # noqa: D102
+    def get_command(self, image, name, env):  # noqa: ANN001, ANN101, ANN201, D102
         raise NotImplementedError
 
-    def get_env(self):  # noqa: D102
+    def get_env(self):  # noqa: ANN101, ANN201, D102
         raise NotImplementedError
 
-    def get_image(self):  # noqa: D102
+    def get_image(self):  # noqa: ANN101, ANN201, D102
         raise NotImplementedError
 
-    def get_name(self):  # noqa: D102
+    def get_name(self):  # noqa: ANN101, ANN201, D102
         raise NotImplementedError
 
-    def start_message(self):  # noqa: D102
+    def start_message(self):  # noqa: ANN101, ANN201, D102
         logger.info(
             "Starting grading of `%s` for `%s`",
             self.grade.unit.pk,
             self.grade.user.username,
         )
 
-    def success_message(self):  # noqa: D102
+    def success_message(self):  # noqa: ANN101, ANN201, D102
         logger.info("Graded %s %s", self.grade.user.username, self.grade.unit.pk)
 
-    def run_command(self, cmd):  # noqa: D102
-        process = subprocess.run(cmd)
+    def run_command(self, cmd):  # noqa: ANN001, ANN101, ANN201, D102
+        process = subprocess.run(cmd, check=False)  # noqa: S603
         if process.returncode != 0:
             logger.critical(
                 "Error running container %s %s %s",
@@ -60,37 +60,37 @@ class Grading:  # noqa: D101
 
         self.success_message()
 
-    def run_grading(self):  # noqa: D102
+    def run_grading(self):  # noqa: ANN101, ANN201, D102
         image = self.get_image()
         name = self.get_name()
         env = self.get_env()
         cmd = self.get_command(image, name, env)
         self.start_message()
         logger.info(cmd)
-        subprocess.Popen(cmd)
+        subprocess.Popen(cmd)  # noqa: S603
 
 
 class KubernetesGrading(Grading):  # noqa: D101
-    def get_command(self, image, name, env):
+    def get_command(self, image, name, env):  # noqa: ANN001, ANN101, ANN201
         """Run grading container in k8s."""
-        CMD = [
+        command = [
             "kubectl",
             "run",
             name,
             "--restart=Never",
-            # "--requests='cpu=100m,memory=512Mi'",
+            # "--requests='cpu=100m,memory=512Mi'",  # noqa: ERA001
             "--rm",
             "-i",  # "--tty",
             f"--image={image}",
         ]
         for key, val in env.items():
-            CMD.extend(["--env", f"{key}={val}"])
-        return CMD
+            command.extend(["--env", f"{key}={val}"])
+        return command
 
 
 class DockerGrading(Grading):  # noqa: D101
-    def get_command(self, image, name, env):  # noqa: D102
-        CMD = [
+    def get_command(self, image, name, env):  # noqa: ANN001, ANN101, ANN201, D102
+        command = [
             "/usr/bin/docker",
             "run",
             "--rm",
@@ -100,35 +100,35 @@ class DockerGrading(Grading):  # noqa: D101
             name,
         ]
         for key, val in env.items():
-            CMD.extend(["--env", f"{key}={val}"])
-        CMD.append(image)
-        return CMD
+            command.extend(["--env", f"{key}={val}"])
+        command.append(image)
+        return command
 
 
 class AcademyGradingMixin:  # noqa: D101
     grading_view_name = "grading:academy-grade"
     checksum_view_name = "grading:academy-checksum"
 
-    def get_grading_url(self):  # noqa: D102
+    def get_grading_url(self):  # noqa: ANN101, ANN201, D102
         url = reverse(self.grading_view_name, args=(self.grade.pk,))
         url = unquote(url)
         return urljoin(settings.BASE_URL, url)
 
-    def get_checksum_url(self):  # noqa: D102
+    def get_checksum_url(self):  # noqa: ANN101, ANN201, D102
         url = reverse(self.checksum_view_name, args=(self.grade.unit.pk,))
         url = unquote(url)
         return urljoin(settings.BASE_URL, url)
 
-    def get_image(self):  # noqa: D102
+    def get_image(self):  # noqa: ANN101, ANN201, D102
         return f"ldssa/{settings.BATCH_NAME}-{self.grade.unit.code.lower()}"
 
-    def get_name(self):  # noqa: D102
-        id_ = "".join(random.choices(string.ascii_lowercase, k=8))
+    def get_name(self):  # noqa: ANN101, ANN201, D102
+        id_ = "".join(random.choices(string.ascii_lowercase, k=8))  # noqa: S311
         username = self.grade.user.username.lower()[:50]
         name = f"{self.grade.unit.code.lower()}-{username}-{id_}"
         return pattern.sub("", name)
 
-    def get_env(self):  # noqa: D102
+    def get_env(self):  # noqa: ANN101, ANN201, D102
         grader = get_user_model().objects.get(username=settings.GRADING_USERNAME)
 
         grading_url = self.get_grading_url()
@@ -150,9 +150,9 @@ class AcademyGradingMixin:  # noqa: D101
 
 
 class AcademyKubernetesGrading(AcademyGradingMixin, KubernetesGrading):  # noqa: D101
-    def run_command(self, cmd):
+    def run_command(self, cmd):  # noqa: ANN001, ANN101, ANN201
         """Do not wait for process to complete."""
-        subprocess.Popen(cmd)
+        subprocess.Popen(cmd)  # noqa: S603
 
 
 class AcademyDockerGrading(AcademyGradingMixin, KubernetesGrading):  # noqa: D101
@@ -164,10 +164,10 @@ class AdmissionsGradingMixin(AcademyGradingMixin):  # noqa: D101
     checksum_view_name = "grading:admissions-checksum"
     notebook_view_name = "grading:admissions-notebook"
 
-    def get_image(self):  # noqa: D102
+    def get_image(self):  # noqa: ANN101, ANN201, D102
         return f"ldssa/{settings.BASE_URL}-admissions-{self.grade.unit.code.lower()}:latest"
 
-    def get_env(self):  # noqa: D102
+    def get_env(self):  # noqa: ANN101, ANN201, D102
         env = super().get_env()
         notebook_url = reverse(self.notebook_view_name, args=(self.grade.pk,))
         notebook_url = unquote(notebook_url)

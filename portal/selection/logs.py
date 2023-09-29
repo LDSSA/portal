@@ -9,7 +9,7 @@ from .models import Selection, SelectionLogs
 logger = getLogger(__name__)
 
 
-class DomainException(Exception):  # noqa: D101
+class DomainExceptionError(Exception):  # noqa: D101
     pass
 
 

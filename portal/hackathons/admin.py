@@ -22,7 +22,7 @@ class HackathonAdmin(admin.ModelAdmin):  # noqa: D101
         "data_file",
     )
 
-    def save_model(self, request, obj, form, change):  # noqa: D102
+    def save_model(self, request, obj, form, change):  # noqa: ANN001, ANN101, ANN201, D102
         super().save_model(request, obj, form, change)
         for student in get_user_model().objects.filter(is_student=True):
             models.Attendance.objects.get_or_create(hackathon=obj, user=student)
@@ -80,7 +80,7 @@ class SubmissionAdmin(admin.ModelAdmin):  # noqa: D101
     )
     list_filter = ("hackathon",)
 
-    def get_name(self, obj):  # noqa: D102
+    def get_name(self, obj):  # noqa: ANN001, ANN101, ANN201, D102
         if isinstance(obj.content_object, User):
             return obj.content_object.username
 

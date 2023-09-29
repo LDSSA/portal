@@ -12,7 +12,7 @@ class ExportData(NamedTuple):  # noqa: D101
 
 def get_all_candidates() -> ExportData:  # noqa: D103
     user = User
-    user.applying_for_scholarship
+    user.applying_for_scholarship  # noqa: B018
 
     headers = {
         # profile

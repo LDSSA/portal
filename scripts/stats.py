@@ -30,7 +30,7 @@ for h in hmodels.Hackathon.objects.order_by("code").exclude(code__in=("HCKT0", "
     for sub in h.submissions.order_by("-created"):
         if sub.content_type.model == "team":
             print(  # noqa: T201
-                f"    * Team {sub.content_object.hackathon_team_id} - {sub.created}"
+                f"    * Team {sub.content_object.hackathon_team_id} - {sub.created}",
             )
         else:
             print(f"    * {sub.content_object.username} - {sub.created}")  # noqa: T201

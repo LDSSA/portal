@@ -19,7 +19,9 @@ class AcademyGradingView(generics.RetrieveUpdateAPIView):
     queryset = models.Grade.objects.all()
     serializer_class = serializers.GradeSerializer
 
-    def update(self, request, *args, **kwargs):  # noqa: D102
+    def update(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, D102
         update_result = super().update(request, *args, **kwargs)
 
         grade = self.get_object()
@@ -34,7 +36,7 @@ class AcademyGradingView(generics.RetrieveUpdateAPIView):
 
 
 class CaseInsensitiveGetObjectMixin:  # noqa: D101
-    def get_object(self):
+    def get_object(self):  # noqa: ANN101, ANN201
         """Return the object the view is displaying.
 
         You may want to override this if you need to provide non-standard
@@ -46,11 +48,14 @@ class CaseInsensitiveGetObjectMixin:  # noqa: D101
         # Perform the lookup filtering.
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
 
-        assert lookup_url_kwarg in self.kwargs, (
-            "Expected view {} to be called with a URL keyword argument "
-            'named "{}". Fix your URL conf, or set the `.lookup_field` '
-            "attribute on the view correctly.".format(self.__class__.__name__, lookup_url_kwarg)
-        )
+        if lookup_url_kwarg not in self.kwargs:
+            msg = 'Expected view {} to be called with a URL keyword argument named "{}". Fix your URL conf, or set the `.lookup_field` attribute on the view correctly.'.format(
+                self.__class__.__name__,
+                lookup_url_kwarg,
+            )
+            raise ValueError(
+                msg,
+            )
 
         filter_kwargs = {f"{self.lookup_field}__iexact": self.kwargs[lookup_url_kwarg]}
         obj = generics.get_object_or_404(queryset, **filter_kwargs)
@@ -91,7 +96,9 @@ class AdmissionsNotebookDownload(CaseInsensitiveGetObjectMixin, generics.Retriev
 
     queryset = Submission.objects.all()
 
-    def get(self, request, *args, **kwargs):  # noqa: D102
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         obj = self.get_object()
         response = HttpResponse(obj.notebook.read(), content_type="application/vnd.jupyter")
         response["Content-Disposition"] = "attachment; filename=Exercise notebook.ipynb"
