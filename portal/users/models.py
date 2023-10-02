@@ -1,10 +1,10 @@
+from cryptography.hazmat.backends import (  # noqa: D100
+    default_backend as crypto_default_backend,
+)
 from cryptography.hazmat.primitives import (
     serialization as crypto_serialization,
 )
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.backends import (
-    default_backend as crypto_default_backend,
-)
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
@@ -12,33 +12,36 @@ from django.utils.translation import gettext_lazy as _
 from djchoices import ChoiceItem, DjangoChoices
 
 
-class UserWhitelist(models.Model):
+class UserWhitelist(models.Model):  # noqa: D101
     username = models.CharField(_("Username"), max_length=255, unique=True)
     is_student = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
 
+    def __str__(self) -> str:  # noqa: ANN101, D105
+        return f"{self.username}"
 
-class Gender(DjangoChoices):
+
+class Gender(DjangoChoices):  # noqa: D101
     female = ChoiceItem("female", "Female")
     male = ChoiceItem("male", "Male")
     other = ChoiceItem("other", "Other/Prefer not to say")
 
 
-class TicketTypeSelectable(DjangoChoices):
+class TicketTypeSelectable(DjangoChoices):  # noqa: D101
     student = ChoiceItem("student", "Student")
     regular = ChoiceItem("regular", "Regular")
     company = ChoiceItem("company", "Company")
 
 
-class TicketType(DjangoChoices):
+class TicketType(DjangoChoices):  # noqa: D101
     student = ChoiceItem("student", "Student")
     regular = ChoiceItem("regular", "Regular")
     company = ChoiceItem("company", "Company")
     scholarship = ChoiceItem("scholarship", "Scholarship")
 
 
-# TODO TODO custom user manager to filter out users with unverified email addresses
-class User(AbstractUser):
+# TODO: custom user manager to filter out users with unverified email addresses  # noqa: FIX002, TD002, TD003
+class User(AbstractUser):  # noqa: D101
     # First Name and Last Name do not cover name patterns
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
@@ -68,10 +71,10 @@ class User(AbstractUser):
 
     failed_or_dropped = models.BooleanField(default=False)
 
-    def get_absolute_url(self):
+    def get_absolute_url(self):  # noqa: ANN101, ANN201, D102
         return reverse("users:detail", kwargs={"username": self.username})
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN101, ANN201, D102
         if not self.deploy_private_key and not self.deploy_public_key:
             key = rsa.generate_private_key(
                 backend=crypto_default_backend(),

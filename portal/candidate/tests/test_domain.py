@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta  # noqa: D100
 
+from dateutil import gettz
 from django.test import TestCase
 
 from portal.applications.domain import ApplicationStatus, SubmissionStatus
@@ -11,40 +12,39 @@ from portal.selection.models import Selection
 from portal.selection.status import SelectionStatus
 from portal.users.models import User
 
+LISBON_TZ = gettz("Europe/Lisbon")
 
-class TestDomain(TestCase):
-    def test_get_candidate_state_default(self) -> None:
+
+class TestDomain(TestCase):  # noqa: D101
+    def test_get_candidate_state_default(self) -> None:  # noqa: ANN101, D102
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() + timedelta(minutes=30)
+            datetime.now(LISBON_TZ) + timedelta(minutes=30),
         )
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() + timedelta(minutes=60)
+            datetime.now(LISBON_TZ) + timedelta(minutes=60),
         )
 
         candidate = User.objects.create(email="anon@adm.com")
-        self.assertEqual(
-            Domain.get_candidate_state(candidate),
-            CandidateState(
-                confirmed_email=False,
-                created_profile=False,
-                accepted_coc=False,
-                decided_scholarship=False,
-                applying_for_scholarship=None,
-                application_status=ApplicationStatus.not_started,
-                coding_test_status=SubmissionStatus.not_started,
-                slu01_status=SubmissionStatus.not_started,
-                slu02_status=SubmissionStatus.not_started,
-                slu03_status=SubmissionStatus.not_started,
-                selection_status=None,
-            ),
-        )
+        assert Domain.get_candidate_state(candidate) == CandidateState(  # noqa: S101
+            confirmed_email=False,
+            created_profile=False,
+            accepted_coc=False,
+            decided_scholarship=False,
+            applying_for_scholarship=None,
+            application_status=ApplicationStatus.not_started,
+            coding_test_status=SubmissionStatus.not_started,
+            slu01_status=SubmissionStatus.not_started,
+            slu02_status=SubmissionStatus.not_started,
+            slu03_status=SubmissionStatus.not_started,
+            selection_status=None,
+        )  # noqa: S101
 
-    def test_get_candidate_state(self) -> None:
+    def test_get_candidate_state(self) -> None:  # noqa: ANN101, D102
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() - timedelta(minutes=30)
+            datetime.now(LISBON_TZ) - timedelta(minutes=30),
         )
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() + timedelta(minutes=30)
+            datetime.now(LISBON_TZ) + timedelta(minutes=30),
         )
         candidate = User.objects.create(
             email="candidate@adm.com",
@@ -56,24 +56,21 @@ class TestDomain(TestCase):
         Application.objects.create(user=candidate)
         Selection.objects.create(user=candidate)
 
-        self.assertEqual(
-            Domain.get_candidate_state(candidate),
-            CandidateState(
-                confirmed_email=True,
-                created_profile=True,
-                accepted_coc=True,
-                decided_scholarship=True,
-                applying_for_scholarship=True,
-                application_status=ApplicationStatus.ongoing,
-                coding_test_status=SubmissionStatus.not_started,
-                slu01_status=SubmissionStatus.ongoing,
-                slu02_status=SubmissionStatus.ongoing,
-                slu03_status=SubmissionStatus.ongoing,
-                selection_status=SelectionStatus.PASSED_TEST,
-            ),
-        )
+        assert Domain.get_candidate_state(candidate) == CandidateState(  # noqa: S101
+            confirmed_email=True,
+            created_profile=True,
+            accepted_coc=True,
+            decided_scholarship=True,
+            applying_for_scholarship=True,
+            application_status=ApplicationStatus.ongoing,
+            coding_test_status=SubmissionStatus.not_started,
+            slu01_status=SubmissionStatus.ongoing,
+            slu02_status=SubmissionStatus.ongoing,
+            slu03_status=SubmissionStatus.ongoing,
+            selection_status=SelectionStatus.PASSED_TEST,
+        )  # noqa: S101
 
-    def test_candidate_state_readable(self) -> None:
+    def test_candidate_state_readable(self) -> None:  # noqa: ANN101, D102
         expected = {
             "confirmed_email": "Confirmed Email",
             "accepted_coc": "Accepted Coc",
@@ -89,6 +86,6 @@ class TestDomain(TestCase):
         }
 
         readable = Domain.candidate_state_readable(
-            Domain.get_candidate_state(User.objects.create(email="anon@adm.com"))
+            Domain.get_candidate_state(User.objects.create(email="anon@adm.com")),
         )
-        self.assertEqual(readable, expected)
+        assert readable == expected  # noqa: S101

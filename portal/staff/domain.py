@@ -1,44 +1,43 @@
-from logging import getLogger
+from logging import getLogger  # noqa: D100
 
 from constance import config
-from django.conf import settings
 
+from portal.admissions import emails
 from portal.applications.domain import Domain as ApplicationDomain
 from portal.applications.domain import (
-    DomainException as ApplicationDomainException,
+    DomainExceptionError as ApplicationDomainExceptionError,
 )
 from portal.applications.domain import (
     DomainQueries as ApplicationDomainQueries,
 )
-from portal.admissions import emails
 from portal.selection.domain import SelectionDomain
 from portal.selection.queries import SelectionQueries
 from portal.selection.status import SelectionStatus
 
-
 logger = getLogger(__name__)
 
 
-class EventsException(Exception):
+class EventsExceptionError(Exception):  # noqa: D101
     pass
 
 
-class Events:
+class Events:  # noqa: D101
     @staticmethod
-    def applications_are_over_sent_emails() -> int:
+    def applications_are_over_sent_emails() -> int:  # noqa: D102
         return ApplicationDomainQueries.applications_with_sent_emails_count()
 
     @staticmethod
-    def applications_are_over_total_emails() -> int:
+    def applications_are_over_total_emails() -> int:  # noqa: D102
         return ApplicationDomainQueries.applications_count()
 
     @staticmethod
-    def trigger_applications_are_over() -> None:
+    def trigger_applications_are_over() -> None:  # noqa: D102
         if config.PORTAL_STATUS == "admissions:applications":
             logger.error(
-                "trying to trigger `applications over` event but applications are still open"
+                "trying to trigger `applications over` event but applications are still open",
             )
-            raise EventsException("Can't trigger `applications over` event")
+            msg = "Can't trigger `applications over` event"
+            raise EventsExceptionError(msg)
 
         sent_count = 0
         q = ApplicationDomainQueries.all()
@@ -46,30 +45,31 @@ class Events:
             try:
                 ApplicationDomain.application_over(a)
                 sent_count += 1
-            except ApplicationDomainException:
+            except ApplicationDomainExceptionError:
                 pass  # means that email was already sent
 
             a.refresh_from_db()
             if a.application_over_email_sent == "passed":
                 SelectionDomain.create(a.user)
 
-        logger.info(f"sent {sent_count} `application_over` emails")
+        logger.info("sent %d `application_over` emails", sent_count)
 
     @staticmethod
-    def admissions_are_over_sent_emails() -> int:
+    def admissions_are_over_sent_emails() -> int:  # noqa: D102
         return SelectionQueries.filter_by_status_in(SelectionStatus.FINAL_STATUS).count()
 
     @staticmethod
-    def admissions_are_over_total_emails() -> int:
+    def admissions_are_over_total_emails() -> int:  # noqa: D102
         return SelectionQueries.get_all().count()
 
     @staticmethod
-    def trigger_admissions_are_over() -> None:
+    def trigger_admissions_are_over() -> None:  # noqa: D102
         if config.PORTAL_STATUS == "admissions:applications":
             logger.error(
-                "trying to trigger `admissions over` event but applications are still open"
+                "trying to trigger `admissions over` event but applications are still open",
             )
-            raise EventsException("Can't trigger `admissions over` event (applications open)")
+            msg = "Can't trigger `admissions over` event (applications open)"
+            raise EventsExceptionError(msg)
 
         if SelectionQueries.filter_by_status_in(
             [
@@ -77,11 +77,12 @@ class Events:
                 SelectionStatus.INTERVIEW,
                 SelectionStatus.SELECTED,
                 SelectionStatus.TO_BE_ACCEPTED,
-            ]
+            ],
         ).exists():
             logger.error("trying to trigger `admissions over` event but open selections exist")
-            raise EventsException(
-                "Can't trigger `admissions over` event (DRAWN, INTERVIEW, SELECTED, TO_BE_ACCEPTED exists)"
+            msg = "Can't trigger `admissions over` event (DRAWN, INTERVIEW, SELECTED, TO_BE_ACCEPTED exists)"
+            raise EventsExceptionError(
+                msg,
             )
 
         sent_count = 0
@@ -101,4 +102,4 @@ class Events:
 
             sent_count += 1
 
-        logger.info(f"sent {sent_count} `admissions_over` emails")
+        logger.info("sent %d `admissions_over` emails", sent_count)

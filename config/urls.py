@@ -1,22 +1,22 @@
-from django.conf import settings
-from django.urls import include, path, re_path
+from django.conf import settings  # noqa: D100
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.urls import include, path
 from django.views import defaults as default_views
 
 from portal.academy.views import HomeRedirectView
 from portal.users.views import InstructorsSignupView
 
-urlpatterns = [
+urlpatterns = [  # noqa: RUF005
     # General
     path("accounts/", include("allauth.urls")),
     path("accounts/instructor/signup/", InstructorsSignupView.as_view(), name="instructors_signup"),
     # path("",
-    #      TemplateView.as_view(template_name="pages/home.html"),
+    #      TemplateView.as_view(template_name="pages/home.html"),  # noqa: ERA001
     #      name="home"),
     # path("about/",
-    #      TemplateView.as_view(template_name="pages/about.html"),
-    #      name="about",
+    #      TemplateView.as_view(template_name="pages/about.html"),  # noqa: ERA001
+    #      name="about",  # noqa: ERA001
     # ),
     path("", HomeRedirectView.as_view(), name="home"),
     # Django Admin, use {% url 'admin:index' %}
@@ -60,4 +60,4 @@ if settings.DEBUG:
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
 
-        urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns = [path("__debug__/", include(debug_toolbar.urls)), *urlpatterns]

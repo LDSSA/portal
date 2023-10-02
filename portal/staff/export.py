@@ -1,18 +1,18 @@
-from typing import Any, Dict, List, NamedTuple
+from typing import Any, NamedTuple  # noqa: D100
 
 from django.db.models import F
 
 from portal.users.models import User
 
 
-class ExportData(NamedTuple):
-    headers: List[str]
-    rows: List[Dict[str, Any]]
+class ExportData(NamedTuple):  # noqa: D101
+    headers: list[str]
+    rows: list[dict[str, Any]]
 
 
-def get_all_candidates() -> ExportData:
+def get_all_candidates() -> ExportData:  # noqa: D103
     user = User
-    user.applying_for_scholarship
+    user.applying_for_scholarship  # noqa: B018
 
     headers = {
         # profile

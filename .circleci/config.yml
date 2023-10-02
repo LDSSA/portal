@@ -32,6 +32,31 @@ jobs:
           command: |
             poetry check
 
+  ruff:
+    executor: *python-executor
+    steps:
+      - checkout
+      - python/install-packages:
+          args: "--no-interaction --no-root --only dev"
+          pkg-manager: poetry
+      - run: &git-diff-py-files
+          name: List added, copied, modified, and renamed *py files
+          command: |
+            git diff --name-only --diff-filter=ACMR origin/main | grep -E "(.py$)" > diff.txt || true
+      - run:
+          name: Ruff linting
+          command: |
+            poetry run ruff check --config=pyproject.toml . &> lint_checks.txt || true
+      - run:
+          name: Diff-based ruff
+          command: &display-lint-errors |
+            grep -Ff diff.txt lint_checks.txt > lint_errors.txt || true
+            if [ -s lint_errors.txt ]; then
+              cat lint_errors.txt
+              printf 'Run the following command to fix your branch:\n make fixes'
+              exit 1
+            fi
+
   black:
     executor: *python-executor
     steps:
@@ -39,23 +64,14 @@ jobs:
       - python/install-packages:
           args: "--no-interaction --no-root --only dev"
           pkg-manager: poetry
-      - run:
-          name: List added, copied, modified, and renamed *py files
-          command: |
-            git diff --name-only --diff-filter=ACMR origin/main | grep -E "(.py$)" > diff.txt || true
+      - run: *git-diff-py-files
       - run:
           name: Black code formatting
           command: |
             poetry run black --check --diff --color --config=pyproject.toml . &> lint_checks.txt || true
       - run:
           name: Diff-based black
-          command: |
-            grep -Ff diff.txt lint_checks.txt > lint_errors.txt || true
-            if [ -s lint_errors.txt ]; then
-              cat lint_errors.txt
-              printf 'Run the following command to fix your branch:\n make fixes'
-              exit 1
-            fi
+          command: *display-lint-errors
 
   persist-checkout:
     executor: app-executor
@@ -112,6 +128,12 @@ workflows:
           filters: &ci-filter
             branches:
               ignore: main
+
+      - ruff:
+          name: Ruff linting
+          filters: *ci-filter
+          requires:
+            - Validate requirements
 
       - black:
           name: Black code formatting

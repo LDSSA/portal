@@ -1,13 +1,13 @@
-from rest_framework import serializers
+from rest_framework import serializers  # noqa: D100
 
 from portal.academy import models
-from portal.applications.models import Submission, Challenge
+from portal.applications.models import Challenge, Submission
 
 
-class GradeSerializer(serializers.ModelSerializer):
+class GradeSerializer(serializers.ModelSerializer):  # noqa: D101
     notebook = serializers.FileField(source="feedback")
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = models.Grade
         fields = (
             "score",
@@ -17,17 +17,17 @@ class GradeSerializer(serializers.ModelSerializer):
         )
 
 
-class ChecksumSerializer(serializers.ModelSerializer):
+class ChecksumSerializer(serializers.ModelSerializer):  # noqa: D101
     unit = serializers.SlugField(source="code")
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = models.Unit
         fields = (
             "unit",
             "checksum",
         )
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data):  # noqa: ANN001, ANN101, ANN201, D102
         old_checksum = instance.checksum
         instance = super().update(instance, validated_data)
 
@@ -39,17 +39,17 @@ class ChecksumSerializer(serializers.ModelSerializer):
         return instance
 
 
-class AdmissionsGradeSerializer(serializers.ModelSerializer):
+class AdmissionsGradeSerializer(serializers.ModelSerializer):  # noqa: D101
     notebook = serializers.FileField(source="feedback")
 
-    class Meta(GradeSerializer.Meta):
+    class Meta(GradeSerializer.Meta):  # noqa: D106
         model = Submission
 
 
-class AdmissionsChecksumSerializer(serializers.ModelSerializer):
+class AdmissionsChecksumSerializer(serializers.ModelSerializer):  # noqa: D101
     unit = serializers.SlugField(source="code")
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Challenge
         fields = (
             "unit",

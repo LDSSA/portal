@@ -1,4 +1,4 @@
-import pytest
+import pytest  # noqa: D100
 
 from portal.users.forms import UserCreationForm
 from portal.users.tests.factories import UserFactory
@@ -6,8 +6,8 @@ from portal.users.tests.factories import UserFactory
 pytestmark = pytest.mark.django_db
 
 
-class TestUserCreationForm:
-    def test_clean_username(self):
+class TestUserCreationForm:  # noqa: D101
+    def test_clean_username(self):  # noqa: ANN101, ANN201, D102
         # A user with proto_user params does not exist yet.
         proto_user = UserFactory.build()
 
@@ -17,11 +17,11 @@ class TestUserCreationForm:
                 "username": proto_user.username,
                 "password1": proto_user.password,
                 "password2": proto_user.password,
-            }
+            },
         )
 
-        assert form.is_valid()
-        assert form.clean_username() == proto_user.username
+        assert form.is_valid()  # noqa: S101
+        assert form.clean_username() == proto_user.username  # noqa: S101
 
         # Creating a user.
         form.save()
@@ -34,9 +34,9 @@ class TestUserCreationForm:
                 "username": proto_user.username,
                 "password1": proto_user.password,
                 "password2": proto_user.password,
-            }
+            },
         )
 
-        assert not form.is_valid()
-        assert len(form.errors) == 1
-        assert "username" in form.errors
+        assert not form.is_valid()  # noqa: S101
+        assert len(form.errors) == 1  # noqa: S101
+        assert "username" in form.errors  # noqa: S101

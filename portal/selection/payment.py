@@ -1,7 +1,5 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone  # noqa: D100
 from logging import getLogger
-from typing import Optional
-
 
 from .domain import SelectionDomain
 from .logs import SelectionEvent, log_selection_event
@@ -19,11 +17,11 @@ PRICE_TABLE = {
 }
 
 
-class PaymentException(Exception):
+class PaymentExceptionError(Exception):  # noqa: D101
     pass
 
 
-def load_payment_data(selection, staff=None):
+def load_payment_data(selection, staff=None):  # noqa: ANN001, ANN201, D103
     old_ticket_type = selection.ticket_type
     old_value = selection.payment_value
 
@@ -48,8 +46,12 @@ def load_payment_data(selection, staff=None):
     )
 
 
-def add_document(selection: Selection, document: SelectionDocument, document_type) -> None:
-    logger.info(f"selection={selection.id}: new document uploaded")
+def add_document(  # noqa: D103
+    selection: Selection,
+    document: SelectionDocument,
+    document_type,  # noqa: ANN001
+) -> None:
+    logger.info("selection=%d: new document uploaded", selection.id)
     document = SelectionDocument.objects.create(
         selection=selection,
         doc=document,
@@ -67,9 +69,9 @@ def add_document(selection: Selection, document: SelectionDocument, document_typ
     )
 
 
-def add_note(selection, note, user=None):
+def add_note(selection, note, user=None):  # noqa: ANN001, ANN201, D103
     log_selection_event(selection, SelectionEvent.note_added, data={"note": note}, user=user)
 
 
-def can_be_updated(selection: Selection) -> bool:
+def can_be_updated(selection: Selection) -> bool:  # noqa: D103
     return SelectionDomain.get_status(selection) not in SelectionStatus.FINAL_STATUS

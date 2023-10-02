@@ -1,7 +1,6 @@
-from django.urls import path
+from django.urls import path  # noqa: D100
 
 from portal.candidate import views
-
 
 app_name = "candidate"
 

@@ -1,27 +1,28 @@
-import logging
+import logging  # noqa: D100
 
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-from django.views.generic import ListView, DetailView
+from django.views.generic import DetailView, ListView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from portal.capstone import models, forms
+from portal.capstone import forms, models
 from portal.users.models import User
-from portal.users.views import StudentMixin, InstructorMixin
-
+from portal.users.views import InstructorMixin, StudentMixin
 
 logger = logging.getLogger(__name__)
 
 
-class StudentCapstoneListView(StudentMixin, ListView):
+class StudentCapstoneListView(StudentMixin, ListView):  # noqa: D101
     model = models.Capstone
     queryset = models.Capstone.objects.all()
     template_name = "capstone/student/capstone_list.html"
 
-    def get(self, request, *args, **kwargs):
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         self.object_list = self.get_queryset()
         data = []
         for capstone in self.object_list:
@@ -32,28 +33,33 @@ class StudentCapstoneListView(StudentMixin, ListView):
         return self.render_to_response(context)
 
 
-class StudentCapstoneDetailView(StudentMixin, DetailView):
+class StudentCapstoneDetailView(StudentMixin, DetailView):  # noqa: D101
     model = models.Capstone
     template_name = "capstone/student/capstone_detail.html"
 
     # noinspection PyAttributeOutsideInit
-    def get_object(self, queryset=None):
+    def get_object(self, queryset=None):  # noqa: ANN001, ANN101, ANN201, D102
         self.object = super().get_object(queryset=queryset)
 
         api, _ = models.StudentApi.objects.get_or_create(
-            capstone=self.object, user=self.request.user
+            capstone=self.object,
+            user=self.request.user,
         )
 
         reports = {}
-        for type_ in models.Report.Type.values:
+        for type_ in models.Report.Type.to_numpy():
             report, _ = models.Report.objects.get_or_create(
-                capstone=self.object, user=self.request.user, type=type_
+                capstone=self.object,
+                user=self.request.user,
+                type=type_,
             )
             reports[type_] = report
 
         return self.object, api, reports
 
-    def get(self, request, *args, **kwargs):
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         capstone, api, reports = self.get_object()
         context = self.get_context_data(
             capstone=capstone,
@@ -67,7 +73,9 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):
         )
         return self.render_to_response(context)
 
-    def post(self, request, *args, **kwargs):
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         capstone, api, reports = self.get_object()
 
         if "submit_api" in request.POST:
@@ -82,35 +90,40 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):
                     if form.is_valid():
                         form.save()
                         messages.add_message(
-                            request, messages.SUCCESS, "Report submited successfully!"
+                            request,
+                            messages.SUCCESS,
+                            "Report submited successfully!",
                         )
 
         return HttpResponseRedirect(self.get_success_url())
 
-    def get_success_url(self):
+    def get_success_url(self):  # noqa: ANN101, ANN201, D102
         return reverse("capstone:student-capstone-detail", args=(self.object.pk,))
 
 
-class InstructorCapstoneListView(InstructorMixin, ListView):
+class InstructorCapstoneListView(InstructorMixin, ListView):  # noqa: D101
     model = models.Capstone
     queryset = models.Capstone.objects.all()
     template_name = "capstone/instructor/capstone_list.html"
 
 
-class InstructorCapstoneDetailView(InstructorMixin, DetailView):
+class InstructorCapstoneDetailView(InstructorMixin, DetailView):  # noqa: D101
     model = models.Capstone
     queryset = models.Capstone.objects.all()
     template_name = "capstone/instructor/capstone_detail.html"
 
-    def get(self, request, *args, **kwargs):
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         self.object = self.get_object()
         student_data = []
         for student in User.objects.filter(is_student=True):
-            student_data.append(
+            student_data.append(  # noqa: PERF401
                 {
                     "user": student,
                     "api": models.StudentApi.objects.filter(
-                        capstone=self.object, user=student
+                        capstone=self.object,
+                        user=student,
                     ).first(),
                     "report_1_provisory": models.Report.objects.filter(
                         capstone=self.object,
@@ -118,7 +131,9 @@ class InstructorCapstoneDetailView(InstructorMixin, DetailView):
                         type=models.Report.Type.report_1_provisory,
                     ).first(),
                     "report_1_final": models.Report.objects.filter(
-                        capstone=self.object, user=student, type=models.Report.Type.report_1_final
+                        capstone=self.object,
+                        user=student,
+                        type=models.Report.Type.report_1_final,
                     ).first(),
                     "report_2_provisory": models.Report.objects.filter(
                         capstone=self.object,
@@ -126,9 +141,11 @@ class InstructorCapstoneDetailView(InstructorMixin, DetailView):
                         type=models.Report.Type.report_2_provisory,
                     ).first(),
                     "report_2_final": models.Report.objects.filter(
-                        capstone=self.object, user=student, type=models.Report.Type.report_2_final
+                        capstone=self.object,
+                        user=student,
+                        type=models.Report.Type.report_2_final,
                     ).first(),
-                }
+                },
             )
 
         context = self.get_context_data(
@@ -139,15 +156,19 @@ class InstructorCapstoneDetailView(InstructorMixin, DetailView):
         return self.render_to_response(context)
 
 
-class CapstonePredictView(APIView):
-    permission_classes = []
+class CapstonePredictView(APIView):  # noqa: D101
+    permission_classes = []  # noqa: RUF012
 
-    def post(self, request, *args, **kwargs):
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         return Response({"proba": 0.6})
 
 
-class CapstoneUpdateView(APIView):
-    permission_classes = []
+class CapstoneUpdateView(APIView):  # noqa: D101
+    permission_classes = []  # noqa: RUF012
 
-    def post(self, request, *args, **kwargs):
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         return Response({"msg": "ok"})

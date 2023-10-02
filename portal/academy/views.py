@@ -1,6 +1,4 @@
-import csv
-import logging
-from io import StringIO
+import logging  # noqa: D100
 from datetime import datetime, timezone
 
 from constance import config
@@ -8,23 +6,22 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework.settings import import_string
 
 from portal.academy import models, serializers
-from portal.academy.services import csvdata, get_last_grade, get_best_grade
-from portal.users.views import StudentViewsMixin, InstructorViewsMixin
-
+from portal.academy.services import csvdata, get_best_grade, get_last_grade
+from portal.users.views import InstructorViewsMixin, StudentViewsMixin
 
 logger = logging.getLogger(__name__)
 
 
 # noinspection PyUnresolvedReferences
-class HomeRedirectView(LoginRequiredMixin, RedirectView):
-    def get_redirect_url(self, *args, **kwargs):
+class HomeRedirectView(LoginRequiredMixin, RedirectView):  # noqa: D101
+    def get_redirect_url(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN101, ANN201, D102
         if config.PORTAL_STATUS == "academy":
             if self.request.user.is_student:
                 self.pattern_name = "academy:student-unit-list"
@@ -36,23 +33,24 @@ class HomeRedirectView(LoginRequiredMixin, RedirectView):
                 self.pattern_name = "academy:instructor-user-list"
             else:
                 self.handle_no_permission()
+        elif self.request.user.is_staff:
+            self.pattern_name = "admissions:staff:home"
         else:
-            if self.request.user.is_staff:
-                self.pattern_name = "admissions:staff:home"
-            else:
-                self.pattern_name = "admissions:candidate:home"
+            self.pattern_name = "admissions:candidate:home"
 
         return super().get_redirect_url(*args, **kwargs)
 
 
-class BaseUnitListView(ListView):
+class BaseUnitListView(ListView):  # noqa: D101
     model = models.Unit
     queryset = models.Unit.objects.order_by("specialization", "code")
     template_name = None
     detail_view_name = None
 
     # noinspection PyAttributeOutsideInit
-    def get(self, request, *args, **kwargs):
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         self.object_list = self.get_queryset()
         data = []
         for unit in self.object_list:
@@ -63,29 +61,34 @@ class BaseUnitListView(ListView):
         return self.render_to_response(context)
 
 
-class BaseUnitDetailView(DetailView):
+class BaseUnitDetailView(DetailView):  # noqa: D101
     model = models.Unit
     template_name = None
 
-    def get(self, request, *args, **kwargs):
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         unit, grade, best_grade = self.get_object()
         context = self.get_context_data(unit=unit, grade=grade, best_grade=best_grade)
         return self.render_to_response(context)
 
     # noinspection PyAttributeOutsideInit
-    def get_object(self, queryset=None):
+    def get_object(self, queryset=None):  # noqa: ANN001, ANN101, ANN201, D102
         self.object = super().get_object(queryset=queryset)
         unit = self.object
         grade = get_last_grade(unit, self.request.user)
         best_grade = get_best_grade(unit, self.request.user)
         return unit, grade, best_grade
 
-    def post(self, request, *args, **kwargs):
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         unit, _, _ = self.get_object()
         grade = models.Grade(user=self.request.user, unit=unit)
 
         if not unit.checksum:
-            raise RuntimeError("Not checksum present for this unit")
+            msg = "Not checksum present for this unit"
+            raise RuntimeError(msg)
 
         # Grade sent on time?
         due_date = datetime.combine(unit.due_date, datetime.max.time(), tzinfo=timezone.utc)
@@ -99,55 +102,27 @@ class BaseUnitDetailView(DetailView):
         grade.save()
 
         # Send to grading
-        Grading = import_string(settings.GRADING_CLASS)
-        Grading(grade=grade).run_grading()
+        grading = import_string(settings.GRADING_CLASS)
+        grading(grade=grade).run_grading()
 
         return HttpResponseRedirect(request.path_info)
 
 
-class StudentUnitListView(StudentViewsMixin, BaseUnitListView):
+class StudentUnitListView(StudentViewsMixin, BaseUnitListView):  # noqa: D101
     template_name = "academy/student/unit_list.html"
     detail_view_name = "academy:student-unit-detail"
 
 
-class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):
+class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):  # noqa: D101
     template_name = "academy/student/unit_detail.html"
 
 
-def csvdata(spc_list, unit_list, object_list):
-    csvfile = StringIO()
-    csvwriter = csv.writer(csvfile)
-
-    headers = ["username", "slack_id", "submission_date", "total_score"]
-    specs = []
-    for spc in spc_list:
-        specs.extend([spc.code for _ in range(spc.unit_count)])
-
-    first_row = headers + [spc + "-" + unit.code for spc, unit in zip(specs, unit_list)]
-
-    rows = [first_row]
-    for obj in object_list:
-        user = [
-            obj["user"].username,
-            obj["user"].slack_member_id,
-            obj["submission_date"],
-            obj["total_score"],
-        ]
-        user_row = user + [grade.score or grade.status for grade in obj["grades"] if grade]
-        rows.append(user_row)
-
-    for row in rows:
-        csvwriter.writerow(row)
-
-    return csvfile.getvalue()
-
-
-class InstructorUserListView(InstructorViewsMixin, ListView):
+class InstructorUserListView(InstructorViewsMixin, ListView):  # noqa: D101
     model = get_user_model()
     queryset = get_user_model().objects.filter(is_student=True, failed_or_dropped=False)
     template_name = "academy/instructor/user_list.html"
 
-    def get_queryset(self):
+    def get_queryset(self):  # noqa: ANN101, ANN201, D102
         user_id = self.request.GET.get("user_id")
         can_graduate = self.request.GET.get("can_graduate")
 
@@ -160,7 +135,9 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
         return self.queryset.all()
 
     # noinspection PyAttributeOutsideInit
-    def get(self, request, *args, **kwargs):
+    def get(  # noqa: ANN201, C901, D102, PLR0912, PLR0915
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa:ANN201, PLR0912, PLR0915
         # Validate query params
         validator = serializers.InstructorsViewFiltersSerializer(data=self.request.GET)
         if not validator.is_valid():
@@ -230,21 +207,21 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
             )
             response["Content-Disposition"] = "attachment; filename=student-grades.csv"
             return response
-        else:
-            context = self.get_context_data(
-                object_list=object_list,
-                spc_list=spc_list,
-                unit_list=unit_list,
-                max_score=max_score,
-                workspace_url=settings.SLACK_WORKSPACE,
-            )
-            return self.render_to_response(context)
+
+        context = self.get_context_data(
+            object_list=object_list,
+            spc_list=spc_list,
+            unit_list=unit_list,
+            max_score=max_score,
+            workspace_url=settings.SLACK_WORKSPACE,
+        )
+        return self.render_to_response(context)
 
 
-class InstructorUnitListView(InstructorViewsMixin, BaseUnitListView):
+class InstructorUnitListView(InstructorViewsMixin, BaseUnitListView):  # noqa: D101
     template_name = "academy/instructor/unit_list.html"
     detail_view_name = "academy:instructor-unit-detail"
 
 
-class InstructorUnitDetailView(InstructorViewsMixin, BaseUnitDetailView):
+class InstructorUnitDetailView(InstructorViewsMixin, BaseUnitDetailView):  # noqa: D101
     template_name = "academy/instructor/unit_detail.html"

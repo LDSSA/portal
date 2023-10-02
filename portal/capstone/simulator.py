@@ -1,4 +1,4 @@
-import json
+import json  # noqa: D100
 import logging
 import random
 import time
@@ -7,17 +7,16 @@ from concurrent.futures import ThreadPoolExecutor as PoolExecutor
 from datetime import datetime, timezone
 
 import requests
-from django.db import transaction, close_old_connections, DatabaseError
 from django.conf import settings
+from django.db import DatabaseError, close_old_connections, transaction
 
 from portal.capstone import models
-
 
 logger = logging.getLogger(__name__)
 WORKERS = 50
 
 
-def run():
+def run():  # noqa: ANN201, D103
     # Queue
 
     # Start consumer pool
@@ -32,7 +31,7 @@ def run():
             executor.submit(run_producer)
 
 
-def run_simulator():
+def run_simulator():  # noqa: ANN201, D103
     while True:
         logger.debug("Simulator cycle...")
         close_old_connections()
@@ -50,9 +49,9 @@ def run_simulator():
         time.sleep(settings.SIMULATOR_INTERVAL)
 
 
-def run_producer():
+def run_producer():  # noqa: ANN201, D103
     # Prevent thundering herd
-    time.sleep(2 * random.random())
+    time.sleep(2 * random.random())  # noqa: S311
 
     while True:
         time.sleep(settings.PRODUCER_INTERVAL)
@@ -93,11 +92,14 @@ def run_producer():
             logger.exception("Exception in producer")
 
 
-def send_datapoint(due_datapoint):
+def send_datapoint(due_datapoint):  # noqa: ANN001, ANN201, D103
     try:
         try:
             logger.info(
-                "Posting %s %s %s", due_datapoint.id, due_datapoint.user.username, due_datapoint.due
+                "Posting %s %s %s",
+                due_datapoint.id,
+                due_datapoint.user.username,
+                due_datapoint.due,
             )
             data = json.loads(due_datapoint.datapoint.data)
             response = requests.post(due_datapoint.url, json=data, timeout=settings.TIMEOUT)

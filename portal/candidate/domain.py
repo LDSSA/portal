@@ -1,11 +1,10 @@
-from typing import Dict, NamedTuple, Optional
+from typing import NamedTuple  # noqa: D100
 
-import nbformat
 import nbconvert
+import nbformat
 
-from portal.applications.domain import ApplicationStatus
+from portal.applications.domain import ApplicationStatus, SubmissionStatus
 from portal.applications.domain import Domain as ApplicationsDomain
-from portal.applications.domain import SubmissionStatus
 from portal.applications.models import Application, Challenge
 from portal.selection.domain import SelectionDomain
 from portal.selection.models import Selection
@@ -13,7 +12,7 @@ from portal.selection.status import SelectionStatusType
 from portal.users.models import User
 
 
-def notebook_to_html(nb):
+def notebook_to_html(nb):  # noqa: ANN001, ANN201, D103
     nb = nbformat.reads(nb, as_version=4)
     html_exporter = nbconvert.HTMLExporter()
     html_exporter.template_name = "classic"
@@ -21,25 +20,25 @@ def notebook_to_html(nb):
     return body
 
 
-class CandidateState(NamedTuple):
+class CandidateState(NamedTuple):  # noqa: D101
     accepted_coc: bool
     decided_scholarship: bool
-    applying_for_scholarship: Optional[bool]
-    application_status: Optional[ApplicationStatus]
-    coding_test_status: Optional[SubmissionStatus]
-    slu01_status: Optional[SubmissionStatus]
-    slu02_status: Optional[SubmissionStatus]
-    slu03_status: Optional[SubmissionStatus]
-    selection_status: Optional[SelectionStatusType]
+    applying_for_scholarship: bool | None
+    application_status: ApplicationStatus | None
+    coding_test_status: SubmissionStatus | None
+    slu01_status: SubmissionStatus | None
+    slu02_status: SubmissionStatus | None
+    slu03_status: SubmissionStatus | None
+    selection_status: SelectionStatusType | None
 
 
-class DomainException(Exception):
+class DomainExceptionError(Exception):  # noqa: D101
     pass
 
 
-class Domain:
+class Domain:  # noqa: D101
     @staticmethod
-    def get_candidate_state(candidate: User) -> CandidateState:
+    def get_candidate_state(candidate: User) -> CandidateState:  # noqa: D102
         state = {}
 
         state["accepted_coc"] = candidate.code_of_conduct_accepted
@@ -64,9 +63,9 @@ class Domain:
         return CandidateState(**state)
 
     @staticmethod
-    def candidate_state_readable(
+    def candidate_state_readable(  # noqa: D102
         candidate_state: CandidateState,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         return {
             k: k.replace("_", " ").title().replace("Slu", "SLU ")
             for k, _ in candidate_state._asdict().items()
