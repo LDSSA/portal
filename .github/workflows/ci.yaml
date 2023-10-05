@@ -2,9 +2,6 @@ name: ci
 
 on: [push, pull_request, workflow_dispatch]
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   requirements:
     # Ubunty latest @ 13-Sep-23: 
