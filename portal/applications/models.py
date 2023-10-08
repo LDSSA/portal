@@ -1,14 +1,13 @@
-from datetime import datetime  # noqa: D100
+from datetime import datetime, timezone  # noqa: D100
 from logging import getLogger
 
-from dateutil import gettz
 from django.conf import settings
 from django.db import models
 
 logger = getLogger(__name__)
 
 
-LISBON_TZ = gettz("Europe/Lisbon")
+LISBON_TZ = timezone.utc
 
 
 class Challenge(models.Model):  # noqa: D101

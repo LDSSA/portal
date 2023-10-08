@@ -1,11 +1,10 @@
-from datetime import datetime  # noqa: D100
+from datetime import datetime, timezone  # noqa: D100
 
-from dateutil import gettz
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-LISBON_TZ = gettz("Europe/Lisbon")
+LISBON_TZ = timezone.utc
 
 
 class Specialization(models.Model):  # noqa: D101
@@ -41,7 +40,7 @@ class Unit(models.Model):  # noqa: D101
 
 
 def notebook_path(instance, filename):  # noqa: ANN001, ANN201, ARG001, D103
-    now = datetime.now(LISBON_TZ).isoformat(timespec="seconds")
+    now = datetime.now().astimezone().isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/notebook_{now}.ipynb"
 
 
