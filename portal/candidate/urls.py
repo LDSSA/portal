@@ -1,7 +1,6 @@
-from django.urls import path
+from django.urls import path  # noqa: D100
 
 from portal.candidate import views
-
 
 app_name = "candidate"
 
@@ -53,9 +52,7 @@ urlpatterns = [
     ),
     path(
         "payment/upload-payment-proof",
-        views.SelectionDocumentUploadView.as_view(
-            document_type="payment_proof"
-        ),
+        views.SelectionDocumentUploadView.as_view(document_type="payment_proof"),
         name="payment-proof-upload",
     ),
     path(

@@ -1,115 +1,87 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta  # noqa: D100
 
-from django.test import TestCase
-
+import pytest
 from applications.domain import (
     ApplicationStatus,
     Domain,
-    DomainException,
+    DomainExceptionError,
     SubmissionStatus,
 )
 from applications.models import Application, Submission, SubmissionTypes
+from dateutil import gettz
+from django.test import TestCase
 from interface import interface
 from users.models import User
 
+LISBON_TZ = gettz("Europe/Lisbon")
 
-class TestDomain(TestCase):
-    def setUp(self) -> None:
-        self.aod = datetime.now() - timedelta(minutes=30)
-        self.acd = datetime.now() + timedelta(minutes=30)
+
+class TestDomain(TestCase):  # noqa: D101
+    def setUp(self) -> None:  # noqa: ANN101, D102, N802
+        self.aod = datetime.now(LISBON_TZ) - timedelta(minutes=30)
+        self.acd = datetime.now(LISBON_TZ) + timedelta(minutes=30)
         interface.feature_flag_client.set_applications_opening_date(self.aod)
         interface.feature_flag_client.set_applications_closing_date(self.acd)
 
-    def test_get_start_date(self) -> None:
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+    def test_get_start_date(self) -> None:  # noqa: ANN101, D102
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
-        self.assertEqual(
-            Domain.get_start_date(a, SubmissionTypes.coding_test), None
-        )
-        self.assertEqual(
-            Domain.get_start_date(a, SubmissionTypes.slu01), self.aod
-        )
-        self.assertEqual(
-            Domain.get_start_date(a, SubmissionTypes.slu02), self.aod
-        )
-        self.assertEqual(
-            Domain.get_start_date(a, SubmissionTypes.slu03), self.aod
-        )
+        assert Domain.get_start_date(a, SubmissionTypes.coding_test) is None  # noqa: S101
+        assert Domain.get_start_date(a, SubmissionTypes.slu01) == self.aod  # noqa: S101
+        assert Domain.get_start_date(a, SubmissionTypes.slu02) == self.aod  # noqa: S101
+        assert Domain.get_start_date(a, SubmissionTypes.slu03) == self.aod  # noqa: S101
 
-        dt_now = datetime.now()
+        dt_now = datetime.now(LISBON_TZ)
         a.coding_test_started_at = dt_now
         a.save()
-        self.assertEqual(
-            Domain.get_start_date(a, SubmissionTypes.coding_test), dt_now
-        )
+        assert Domain.get_start_date(a, SubmissionTypes.coding_test) == dt_now  # noqa: S101
 
-    def test_get_close_date(self) -> None:
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+    def test_get_close_date(self) -> None:  # noqa: ANN101, D102
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         expected_domain_buffer_delta = timedelta(minutes=2)
 
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.coding_test), self.acd
-        )
-        self.assertEqual(
-            Domain.get_end_date(
-                a, SubmissionTypes.coding_test, apply_buffer=True
-            ),
-            self.acd + expected_domain_buffer_delta,
-        )
+        assert Domain.get_end_date(a, SubmissionTypes.coding_test) == self.acd  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_end_date(a, SubmissionTypes.coding_test, apply_buffer=True)
+            == self.acd + expected_domain_buffer_delta
+        )  # noqa: S101
 
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.slu01), self.acd
-        )
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.slu01, apply_buffer=True),
-            self.acd + expected_domain_buffer_delta,
-        )
+        assert Domain.get_end_date(a, SubmissionTypes.slu01) == self.acd  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_end_date(a, SubmissionTypes.slu01, apply_buffer=True)
+            == self.acd + expected_domain_buffer_delta
+        )  # noqa: S101
 
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.slu02), self.acd
-        )
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.slu02, apply_buffer=True),
-            self.acd + expected_domain_buffer_delta,
-        )
+        assert Domain.get_end_date(a, SubmissionTypes.slu02) == self.acd  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_end_date(a, SubmissionTypes.slu02, apply_buffer=True)
+            == self.acd + expected_domain_buffer_delta
+        )  # noqa: S101
 
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.slu03), self.acd
-        )
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.slu03, apply_buffer=True),
-            self.acd + expected_domain_buffer_delta,
-        )
+        assert Domain.get_end_date(a, SubmissionTypes.slu03) == self.acd  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_end_date(a, SubmissionTypes.slu03, apply_buffer=True)
+            == self.acd + expected_domain_buffer_delta
+        )  # noqa: S101
 
         coding_test_delta = timedelta(
-            minutes=interface.feature_flag_client.get_coding_test_duration()
+            minutes=interface.feature_flag_client.get_coding_test_duration(),
         )
-        dt_now = datetime.now()
+        dt_now = datetime.now(LISBON_TZ)
         a.coding_test_started_at = dt_now
         a.save()
-        self.assertEqual(
-            Domain.get_end_date(a, SubmissionTypes.coding_test),
-            dt_now + coding_test_delta,
-        )
-        self.assertEqual(
-            Domain.get_end_date(
-                a, SubmissionTypes.coding_test, apply_buffer=True
-            ),
-            dt_now + coding_test_delta + expected_domain_buffer_delta,
-        )
+        assert (  # noqa: S101
+            Domain.get_end_date(a, SubmissionTypes.coding_test) == dt_now + coding_test_delta
+        )  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_end_date(a, SubmissionTypes.coding_test, apply_buffer=True)
+            == dt_now + coding_test_delta + expected_domain_buffer_delta
+        )  # noqa: S101
 
-    def test_get_best_score(self) -> None:
-        target_app = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
-        other_app = Application.objects.create(
-            user=User.objects.create(email="other@test.com")
-        )
+    def test_get_best_score(self) -> None:  # noqa: ANN101, D102
+        target_app = Application.objects.create(user=User.objects.create(email="target@test.com"))
+        other_app = Application.objects.create(user=User.objects.create(email="other@test.com"))
         Submission.objects.create(
             application=target_app,
             score=10,
@@ -143,39 +115,21 @@ class TestDomain(TestCase):
             submission_type=SubmissionTypes.slu03.uname,
         )
 
-        self.assertEqual(
-            Domain.get_best_score(target_app, SubmissionTypes.coding_test), 89
-        )
-        self.assertEqual(
-            Domain.get_best_score(target_app, SubmissionTypes.slu01), 73
-        )
-        self.assertEqual(
-            Domain.get_best_score(target_app, SubmissionTypes.slu02), None
-        )
-        self.assertEqual(
-            Domain.get_best_score(target_app, SubmissionTypes.slu03), 92
-        )
+        assert (  # noqa: S101
+            Domain.get_best_score(target_app, SubmissionTypes.coding_test) == 89  # noqa: PLR2004
+        )  # noqa: PLR2004, S101
+        assert Domain.get_best_score(target_app, SubmissionTypes.slu01) == 73  # noqa: PLR2004, S101
+        assert Domain.get_best_score(target_app, SubmissionTypes.slu02) is None  # noqa: S101
+        assert Domain.get_best_score(target_app, SubmissionTypes.slu03) == 92  # noqa: PLR2004, S101
 
-        self.assertEqual(
-            Domain.get_best_score(other_app, SubmissionTypes.coding_test), None
-        )
-        self.assertEqual(
-            Domain.get_best_score(other_app, SubmissionTypes.slu01), None
-        )
-        self.assertEqual(
-            Domain.get_best_score(other_app, SubmissionTypes.slu02), None
-        )
-        self.assertEqual(
-            Domain.get_best_score(other_app, SubmissionTypes.slu03), None
-        )
+        assert Domain.get_best_score(other_app, SubmissionTypes.coding_test) is None  # noqa: S101
+        assert Domain.get_best_score(other_app, SubmissionTypes.slu01) is None  # noqa: S101
+        assert Domain.get_best_score(other_app, SubmissionTypes.slu02) is None  # noqa: S101
+        assert Domain.get_best_score(other_app, SubmissionTypes.slu03) is None  # noqa: S101
 
-    def test_has_positive_score(self) -> None:
-        target_app = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
-        other_app = Application.objects.create(
-            user=User.objects.create(email="other@test.com")
-        )
+    def test_has_positive_score(self) -> None:  # noqa: ANN101, D102
+        target_app = Application.objects.create(user=User.objects.create(email="target@test.com"))
+        other_app = Application.objects.create(user=User.objects.create(email="other@test.com"))
         Submission.objects.create(
             application=target_app,
             score=10,
@@ -209,262 +163,214 @@ class TestDomain(TestCase):
             submission_type=SubmissionTypes.slu03.uname,
         )
 
-        self.assertEqual(
-            Domain.has_positive_score(target_app, SubmissionTypes.coding_test),
-            True,
-        )
-        self.assertEqual(
-            Domain.has_positive_score(target_app, SubmissionTypes.slu01), False
-        )
-        self.assertEqual(
-            Domain.has_positive_score(target_app, SubmissionTypes.slu02), False
-        )
-        self.assertEqual(
-            Domain.has_positive_score(target_app, SubmissionTypes.slu03), True
-        )
+        assert (  # noqa: S101
+            Domain.has_positive_score(target_app, SubmissionTypes.coding_test) is True
+        )  # noqa: S101
+        assert Domain.has_positive_score(target_app, SubmissionTypes.slu01) is False  # noqa: S101
+        assert Domain.has_positive_score(target_app, SubmissionTypes.slu02) is False  # noqa: S101
+        assert Domain.has_positive_score(target_app, SubmissionTypes.slu03) is True  # noqa: S101
 
-        self.assertEqual(
-            Domain.has_positive_score(other_app, SubmissionTypes.coding_test),
-            False,
-        )
-        self.assertEqual(
-            Domain.has_positive_score(other_app, SubmissionTypes.slu01), False
-        )
-        self.assertEqual(
-            Domain.has_positive_score(other_app, SubmissionTypes.slu02), False
-        )
-        self.assertEqual(
-            Domain.has_positive_score(other_app, SubmissionTypes.slu03), False
-        )
+        assert (  # noqa: S101
+            Domain.has_positive_score(other_app, SubmissionTypes.coding_test) is False
+        )  # noqa: S101
+        assert Domain.has_positive_score(other_app, SubmissionTypes.slu01) is False  # noqa: S101
+        assert Domain.has_positive_score(other_app, SubmissionTypes.slu02) is False  # noqa: S101
+        assert Domain.has_positive_score(other_app, SubmissionTypes.slu03) is False  # noqa: S101
 
-    def test_add_submission_error_close_applications(self) -> None:
+    def test_add_submission_error_close_applications(self) -> None:  # noqa: ANN101, D102
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() - timedelta(hours=5)
+            datetime.now(LISBON_TZ) - timedelta(hours=5),
         )
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() - timedelta(hours=2)
+            datetime.now(LISBON_TZ) - timedelta(hours=2),
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.slu01, Submission())
 
-    def test_add_submission_error_not_started_coding_test(self) -> None:
+    def test_add_submission_error_not_started_coding_test(self) -> None:  # noqa: ANN101, D102
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() - timedelta(minutes=30)
+            datetime.now(LISBON_TZ) - timedelta(minutes=30),
         )
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() + timedelta(minutes=30)
+            datetime.now(LISBON_TZ) + timedelta(minutes=30),
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         a.coding_test_started_at = None
         a.save()
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
-        self.assertEqual(a.submissions.count(), 0)
+        assert a.submissions.count() == 0  # noqa: S101
 
-    def test_add_submission_error_not_started(self) -> None:
+    def test_add_submission_error_not_started(self) -> None:  # noqa: ANN101, D102
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() + timedelta(minutes=30)
+            datetime.now(LISBON_TZ) + timedelta(minutes=30),
         )
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() + timedelta(minutes=60)
+            datetime.now(LISBON_TZ) + timedelta(minutes=60),
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.slu01, Submission())
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.slu02, Submission())
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.slu03, Submission())
 
-        self.assertEqual(a.submissions.count(), 0)
+        assert a.submissions.count() == 0  # noqa: S101
 
-    def test_add_submission_error_already_ended_coding_test(self) -> None:
+    def test_add_submission_error_already_ended_coding_test(self) -> None:  # noqa: ANN101, D102
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() - timedelta(minutes=30)
+            datetime.now(LISBON_TZ) - timedelta(minutes=30),
         )
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() + timedelta(minutes=30)
+            datetime.now(LISBON_TZ) + timedelta(minutes=30),
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
-        a.coding_test_started_at = datetime.now() - timedelta(hours=3)
+        a.coding_test_started_at = datetime.now(LISBON_TZ) - timedelta(hours=3)
         a.save()
 
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
-        self.assertEqual(a.submissions.count(), 0)
+        assert a.submissions.count() == 0  # noqa: S101
 
-    def test_add_submission_error_already_ended(self) -> None:
+    def test_add_submission_error_already_ended(self) -> None:  # noqa: ANN101, D102
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() - timedelta(minutes=60)
+            datetime.now(LISBON_TZ) - timedelta(minutes=60),
         )
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() - timedelta(minutes=30)
+            datetime.now(LISBON_TZ) - timedelta(minutes=30),
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.slu01, Submission())
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.slu02, Submission())
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.slu03, Submission())
 
-        self.assertEqual(a.submissions.count(), 0)
+        assert a.submissions.count() == 0  # noqa: S101
 
-    def test_add_submission_error_max_submissions(self) -> None:
+    def test_add_submission_error_max_submissions(self) -> None:  # noqa: ANN101, D102
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() - timedelta(minutes=30)
+            datetime.now(LISBON_TZ) - timedelta(minutes=30),
         )
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() + timedelta(minutes=30)
+            datetime.now(LISBON_TZ) + timedelta(minutes=30),
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
-        for _ in range(0, 251):
+        for _ in range(251):
             Submission.objects.create(
                 application=a,
                 submission_type=SubmissionTypes.coding_test.uname,
             )
-            Submission.objects.create(
-                application=a, submission_type=SubmissionTypes.slu01.uname
-            )
-            Submission.objects.create(
-                application=a, submission_type=SubmissionTypes.slu02.uname
-            )
-            Submission.objects.create(
-                application=a, submission_type=SubmissionTypes.slu03.uname
-            )
+            Submission.objects.create(application=a, submission_type=SubmissionTypes.slu01.uname)
+            Submission.objects.create(application=a, submission_type=SubmissionTypes.slu02.uname)
+            Submission.objects.create(application=a, submission_type=SubmissionTypes.slu03.uname)
 
-        a.coding_test_started_at = datetime.now()
+        a.coding_test_started_at = datetime.now(LISBON_TZ)
         a.save()
 
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.slu01, Submission())
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.slu02, Submission())
-        with self.assertRaises(DomainException):
+        with pytest.raises(DomainExceptionError):
             Domain.add_submission(a, SubmissionTypes.slu03, Submission())
 
-        self.assertEqual(a.submissions.count(), 251 * 4)
+        assert a.submissions.count() == 251 * 4  # noqa: S101
 
-    def test_add_submission(self) -> None:
+    def test_add_submission(self) -> None:  # noqa: ANN101, D102
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() - timedelta(minutes=30)
+            datetime.now(LISBON_TZ) - timedelta(minutes=30),
         )
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() + timedelta(minutes=30)
+            datetime.now(LISBON_TZ) + timedelta(minutes=30),
         )
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
-        a.coding_test_started_at = datetime.now()
+        a.coding_test_started_at = datetime.now(LISBON_TZ)
         a.save()
 
         Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
         Domain.add_submission(a, SubmissionTypes.slu01, Submission())
         Domain.add_submission(a, SubmissionTypes.slu02, Submission())
         Domain.add_submission(a, SubmissionTypes.slu03, Submission())
-        self.assertEqual(a.submissions.count(), 4)
+        assert a.submissions.count() == 4  # noqa: PLR2004, S101
 
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() - timedelta(minutes=30)
+            datetime.now(LISBON_TZ) - timedelta(minutes=30),
         )
-        # will work because end-date will be based on start_end + duration, not on the ff.closing_date
+        # will work because end-date will be based on start_end + duration,
+        # not on the ff.closing_date
         Domain.add_submission(a, SubmissionTypes.coding_test, Submission())
-        self.assertEqual(a.submissions.count(), 5)
+        assert a.submissions.count() == 5  # noqa: PLR2004, S101
 
-    def test_get_status(self) -> None:
-        a = Application.objects.create(
-            user=User.objects.create(email="target@test.com")
-        )
+    def test_get_status(self) -> None:  # noqa: ANN101, D102
+        a = Application.objects.create(user=User.objects.create(email="target@test.com"))
 
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() + timedelta(minutes=5)
+            datetime.now(LISBON_TZ) + timedelta(minutes=5),
         )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.coding_test),
-            SubmissionStatus.not_started,
-        )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu01),
-            SubmissionStatus.not_started,
-        )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu02),
-            SubmissionStatus.not_started,
-        )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu03),
-            SubmissionStatus.not_started,
-        )
-        self.assertEqual(
-            Domain.get_application_status(a), ApplicationStatus.not_started
-        )
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.coding_test)
+            == SubmissionStatus.not_started
+        )  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu01) == SubmissionStatus.not_started
+        )  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu02) == SubmissionStatus.not_started
+        )  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu03) == SubmissionStatus.not_started
+        )  # noqa: S101
+        assert Domain.get_application_status(a) == ApplicationStatus.not_started  # noqa: S101
 
         interface.feature_flag_client.set_applications_opening_date(
-            datetime.now() - timedelta(minutes=5)
+            datetime.now(LISBON_TZ) - timedelta(minutes=5),
         )
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() + timedelta(minutes=5)
+            datetime.now(LISBON_TZ) + timedelta(minutes=5),
         )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.coding_test),
-            SubmissionStatus.not_started,
-        )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu01),
-            SubmissionStatus.ongoing,
-        )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu02),
-            SubmissionStatus.ongoing,
-        )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu03),
-            SubmissionStatus.ongoing,
-        )
-        self.assertEqual(
-            Domain.get_application_status(a), ApplicationStatus.ongoing
-        )
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.coding_test)
+            == SubmissionStatus.not_started
+        )  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu01) == SubmissionStatus.ongoing
+        )  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu02) == SubmissionStatus.ongoing
+        )  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu03) == SubmissionStatus.ongoing
+        )  # noqa: S101
+        assert Domain.get_application_status(a) == ApplicationStatus.ongoing  # noqa: S101
 
         Submission.objects.create(
             application=a,
             score=99,
             submission_type=SubmissionTypes.slu01.uname,
         )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu01),
-            SubmissionStatus.passed,
-        )
-        self.assertEqual(
-            Domain.get_application_status(a), ApplicationStatus.ongoing
-        )
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu01) == SubmissionStatus.passed
+        )  # noqa: S101
+        assert Domain.get_application_status(a) == ApplicationStatus.ongoing  # noqa: S101
 
         Submission.objects.create(
             application=a,
@@ -487,35 +393,26 @@ class TestDomain(TestCase):
             submission_type=SubmissionTypes.slu03.uname,
         )
 
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.coding_test),
-            SubmissionStatus.passed,
-        )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu01),
-            SubmissionStatus.passed,
-        )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu02),
-            SubmissionStatus.passed,
-        )
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu02),
-            SubmissionStatus.passed,
-        )
-        self.assertEqual(
-            Domain.get_application_status(a), ApplicationStatus.passed
-        )
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.coding_test) == SubmissionStatus.passed
+        )  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu01) == SubmissionStatus.passed
+        )  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu02) == SubmissionStatus.passed
+        )  # noqa: S101
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu02) == SubmissionStatus.passed
+        )  # noqa: S101
+        assert Domain.get_application_status(a) == ApplicationStatus.passed  # noqa: S101
 
         slu02_sub.delete()
         interface.feature_flag_client.set_applications_closing_date(
-            datetime.now() - timedelta(minutes=5)
+            datetime.now(LISBON_TZ) - timedelta(minutes=5),
         )
         a.save()
-        self.assertEqual(
-            Domain.get_sub_type_status(a, SubmissionTypes.slu02),
-            SubmissionStatus.failed,
-        )
-        self.assertEqual(
-            Domain.get_application_status(a), ApplicationStatus.failed
-        )
+        assert (  # noqa: S101
+            Domain.get_sub_type_status(a, SubmissionTypes.slu02) == SubmissionStatus.failed
+        )  # noqa: S101
+        assert Domain.get_application_status(a) == ApplicationStatus.failed  # noqa: S101

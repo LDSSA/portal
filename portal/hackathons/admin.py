@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin  # noqa: D100
 from django.contrib.auth import get_user_model
 
 from portal.hackathons import models
@@ -6,7 +6,7 @@ from portal.users.models import User
 
 
 @admin.register(models.Hackathon)
-class HackathonAdmin(admin.ModelAdmin):
+class HackathonAdmin(admin.ModelAdmin):  # noqa: D101
     list_display = ("code", "name", "status")
     fields = (
         "status",
@@ -22,16 +22,14 @@ class HackathonAdmin(admin.ModelAdmin):
         "data_file",
     )
 
-    def save_model(self, request, obj, form, change):
+    def save_model(self, request, obj, form, change):  # noqa: ANN001, ANN101, ANN201, D102
         super().save_model(request, obj, form, change)
         for student in get_user_model().objects.filter(is_student=True):
-            models.Attendance.objects.get_or_create(
-                hackathon=obj, user=student
-            )
+            models.Attendance.objects.get_or_create(hackathon=obj, user=student)
 
 
 @admin.register(models.Team)
-class TeamAdmin(admin.ModelAdmin):
+class TeamAdmin(admin.ModelAdmin):  # noqa: D101
     list_display = (
         "hackathon_team_id",
         "name",
@@ -42,7 +40,7 @@ class TeamAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Attendance)
-class AttendanceAdmin(admin.ModelAdmin):
+class AttendanceAdmin(admin.ModelAdmin):  # noqa: D101
     list_display = (
         "hackathon",
         "user",
@@ -62,13 +60,13 @@ class AttendanceAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Submission)
-class SubmissionAdmin(admin.ModelAdmin):
+class SubmissionAdmin(admin.ModelAdmin):  # noqa: D101
     list_display = (
         "hackathon",
         "get_name",
         "score",
         "created",
-        )
+    )
     fields = (
         "hackathon",
         "content_object",
@@ -82,8 +80,8 @@ class SubmissionAdmin(admin.ModelAdmin):
     )
     list_filter = ("hackathon",)
 
-    def get_name(self, obj):
+    def get_name(self, obj):  # noqa: ANN001, ANN101, ANN201, D102
         if isinstance(obj.content_object, User):
             return obj.content_object.username
-        else:
-            return f"[{obj.content_object.hackathon_team_id}] {obj.content_object.name}"
+
+        return f"[{obj.content_object.hackathon_team_id}] {obj.content_object.name}"

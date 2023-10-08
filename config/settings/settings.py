@@ -1,17 +1,11 @@
-"""
-Base settings to build other settings files upon.
-"""
+"""Base settings to build other settings files upon."""
 
-import environ
 import os
 from datetime import datetime, timedelta, timezone
 
-from django.utils.module_loading import import_string
+import environ
 
-
-ROOT_DIR = (
-    environ.Path(__file__) - 3
-)  # (portal/config/settings/base.py - 3 = portal/)
+ROOT_DIR = environ.Path(__file__) - 3  # (portal/config/settings/base.py - 3 = portal/)
 APPS_DIR = ROOT_DIR.path("portal")
 
 env = environ.Env()
@@ -30,9 +24,7 @@ PRODUCER_INTERVAL = 1
 # GRADING
 # ------------------------------------------------------------------------------
 GRADING_USERNAME = env.str("GRADING_USERNAME")
-GRADING_CLASS = env.str(
-    "GRADING_CLASS", default="portal.grading.services.AcademyKubernetesGrading"
-)
+GRADING_CLASS = env.str("GRADING_CLASS", default="portal.grading.services.AcademyKubernetesGrading")
 GRADING_ADMISSIONS_CLASS = env.str(
     "GRADING_ADMISSIONS_CLASS",
     default="portal.grading.services.AdmissionsKubernetesGrading",
@@ -78,13 +70,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("POSTGRES_DB"),
-            "USER": os.environ.get("POSTGRES_USER"),
-            "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-            "HOST": os.environ.get("POSTGRES_HOST"),
-            "PORT": os.environ.get("POSTGRES_PORT"),
-    }
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB"),
+        "USER": os.environ.get("POSTGRES_USER"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
+        "HOST": os.environ.get("POSTGRES_HOST"),
+        "PORT": os.environ.get("POSTGRES_PORT"),
+    },
 }
 
 # CACHES
@@ -100,7 +92,7 @@ if CACHE_BACKEND == "django.core.cache.backends.locmem.LocMemCache":
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
             "LOCATION": "",
-        }
+        },
     }
 elif CACHE_BACKEND == "django_redis.cache.RedisCache":
     CACHES = {
@@ -113,7 +105,7 @@ elif CACHE_BACKEND == "django_redis.cache.RedisCache":
                 # http://niwinz.github.io/django-redis/latest/#_memcached_exceptions_behavior
                 "IGNORE_EXCEPTIONS": True,
             },
-        }
+        },
     }
 
 # URLS
@@ -241,7 +233,7 @@ STATICFILES_FINDERS = [
 if STATICFILES_STORAGE == "config.settings.settings.StaticRootS3Boto3Storage":
     AWS_DEFAULT_ACL = None
     # https://django-storages.readthedocs.io/en/latest/#installation
-    INSTALLED_APPS += ["storages"]  # noqa F405
+    INSTALLED_APPS += ["storages"]  # noqa: F405
     # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
     AWS_ACCESS_KEY_ID = env("DJANGO_AWS_ACCESS_KEY_ID")
     # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
@@ -263,12 +255,12 @@ if STATICFILES_STORAGE == "config.settings.settings.StaticRootS3Boto3Storage":
 
     # region http://stackoverflow.com/questions/10390244/
     # Full-fledge class: https://stackoverflow.com/a/18046120/104731
-    from storages.backends.s3boto3 import S3Boto3Storage  # noqa E402
+    from storages.backends.s3boto3 import S3Boto3Storage  # noqa: E402
 
-    class StaticRootS3Boto3Storage(S3Boto3Storage):
+    class StaticRootS3Boto3Storage(S3Boto3Storage):  # noqa: D101
         location = "static"
 
-    class MediaRootS3Boto3Storage(S3Boto3Storage):
+    class MediaRootS3Boto3Storage(S3Boto3Storage):  # noqa: D101
         location = "media"
         file_overwrite = False
 
@@ -276,10 +268,7 @@ if STATICFILES_STORAGE == "config.settings.settings.StaticRootS3Boto3Storage":
     DEFAULT_FILE_STORAGE = "config.settings.settings.MediaRootS3Boto3Storage"
     MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/media/"
 
-elif (
-    STATICFILES_STORAGE
-    == "django.contrib.staticfiles.storage.StaticFilesStorage"
-):
+elif STATICFILES_STORAGE == "django.contrib.staticfiles.storage.StaticFilesStorage":
     # https://docs.djangoproject.com/en/dev/ref/settings/#static-url
     STATIC_URL = "/static/"
     # https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
@@ -334,12 +323,12 @@ TEMPLATES = [
     },
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#templates
-TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG  # noqa F405
+TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG  # noqa: F405
 
 CACHE_TEMPLATES = env.bool("DJANGO_CACHE_TEMPLATES", default=True)
 if CACHE_TEMPLATES:
     # https://docs.djangoproject.com/en/dev/ref/settings/#templates
-    TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa F405
+    TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa: F405
         (
             "django.template.loaders.cached.Loader",
             [
@@ -380,18 +369,14 @@ if SECURITY_EXTRAS:
     CSRF_COOKIE_SECURE = True
     # https://docs.djangoproject.com/en/dev/topics/security/#ssl-https
     # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-seconds
-    # TODO: set this to 60 seconds first and then to 518400 once you prove the former works
+    # TODO: set this to 60 seconds first and then to 518400 once you prove the former works  # noqa: FIX002, TD002, TD003
     SECURE_HSTS_SECONDS = 60
     # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
-        "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True
-    )
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True)
     # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-preload
     SECURE_HSTS_PRELOAD = env.bool("DJANGO_SECURE_HSTS_PRELOAD", default=True)
     # https://docs.djangoproject.com/en/dev/ref/middleware/#x-content-type-options-nosniff
-    SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
-        "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True
-    )
+    SECURE_CONTENT_TYPE_NOSNIFF = env.bool("DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True)
 
 # EMAIL
 # ------------------------------------------------------------------------------
@@ -402,18 +387,12 @@ EMAIL_BACKEND = env(
 )
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = env(
-    "DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org"
-)
-ADMISSIONS_FROM_EMAIL = env(
-    "ADMISSIONS_FROM_EMAIL", default="admissions@lisbondatascience.org"
-)
+DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org")
+ADMISSIONS_FROM_EMAIL = env("ADMISSIONS_FROM_EMAIL", default="admissions@lisbondatascience.org")
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
-EMAIL_SUBJECT_PREFIX = env(
-    "DJANGO_EMAIL_SUBJECT_PREFIX", default="[LDSSA Portal]"
-)
+EMAIL_SUBJECT_PREFIX = env("DJANGO_EMAIL_SUBJECT_PREFIX", default="[LDSSA Portal]")
 
 if EMAIL_BACKEND in (
     "django.core.mail.backends.smtp.EmailBackend",
@@ -432,10 +411,7 @@ if EMAIL_BACKEND in (
         EMAIL_PORT = env("DJANGO_EMAIL_PORT")
         EMAIL_USE_TLS = env.bool("DJANGO_EMAIL_PORT")
 
-elif (
-    EMAIL_BACKEND
-    == "portal.anymail_elasticmail.elasticmail.ElasticmailBackend"
-):
+elif EMAIL_BACKEND == "portal.anymail_elasticmail.elasticmail.ElasticmailBackend":
     ANYMAIL = {
         "ELASTICMAIL_API_KEY": env("ELASTICMAIL_API_KEY"),
     }
@@ -460,7 +436,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 # django-constance
 # ------------------------------------------------------------------------------
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
-# CONSTANCE_DATABASE_CACHE_BACKEND ='default'
+# CONSTANCE_DATABASE_CACHE_BACKEND ='default'  # noqa: ERA001
 #
 # * Admissions                    -> admissions
 #   - Sign up
@@ -486,7 +462,7 @@ CONSTANCE_CONFIG = {
     "ADMISSIONS_SELECTION_START": (datetime.now(timezone.utc), ""),
     "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
 }
-ADMISSIONS_APPLICATIONS_STARTED_STATUSES = ['admissions:applications', 'admissions:selection']
+ADMISSIONS_APPLICATIONS_STARTED_STATUSES = ["admissions:applications", "admissions:selection"]
 
 
 # django-allauth
@@ -497,7 +473,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_ADAPTER = "portal.users.adapters.AccountAdapter"
-# SOCIALACCOUNT_ADAPTER = "portal.users.adapters.SocialAccountAdapter"
+# SOCIALACCOUNT_ADAPTER = "portal.users.adapters.SocialAccountAdapter"  # noqa: ERA001
 ACCOUNT_SIGNUP_FORM_CLASS = "portal.users.forms.PortalSignupForm"
 
 
@@ -514,9 +490,7 @@ if COMPRESS_ENABLED:
         STATICFILES_FINDERS = ["compressor.finders.CompressorFinder"]
 
     # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_STORAGE
-    COMPRESS_STORAGE = env(
-        "COMPRESS_STORAGE", default="compressor.storage.CompressorFileStorage"
-    )
+    COMPRESS_STORAGE = env("COMPRESS_STORAGE", default="compressor.storage.CompressorFileStorage")
     # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_URL
     COMPRESS_URL = STATIC_URL
 
@@ -524,9 +498,7 @@ if COMPRESS_ENABLED:
 # django-rest-framework
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication",
-    ),
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.TokenAuthentication",),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAdminUser",),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
 }
@@ -535,11 +507,9 @@ REST_FRAMEWORK = {
 # ------------------------------------------------------------------------------
 if DEBUG:
     # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
-    INSTALLED_APPS += ["debug_toolbar"]  # noqa F405
+    INSTALLED_APPS += ["debug_toolbar"]  # noqa: F405
     # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#middleware
-    MIDDLEWARE += [
-        "debug_toolbar.middleware.DebugToolbarMiddleware"
-    ]  # noqa F405
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]  # noqa: F405
     # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-config
     DEBUG_TOOLBAR_CONFIG = {
         "DISABLE_PANELS": [
@@ -559,20 +529,20 @@ if DEBUG:
 # ------------------------------------------------------------------------------
 # https://django-extensions.readthedocs.io/en/latest/installation_instructions.html#configuration
 if DEBUG:
-    INSTALLED_APPS += ["django_extensions"]  # noqa F405
+    INSTALLED_APPS += ["django_extensions"]  # noqa: F405
 
 # Gunicorn
 # ------------------------------------------------------------------------------
 GUNICORN_ENABLED = env.bool("GUNICORN_ENABLED", default=True)
 if GUNICORN_ENABLED:
-    INSTALLED_APPS += ["gunicorn"]  # noqa F405
+    INSTALLED_APPS += ["gunicorn"]  # noqa: F405
 
 
 # Collectfast
 # ------------------------------------------------------------------------------
 # https://github.com/antonagestam/collectfast#installation
 if STATICFILES_STORAGE == "storages.backends.s3boto.S3BotoStorage":
-    INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
+    INSTALLED_APPS = ["collectfast", *INSTALLED_APPS]  # noqa: F405
     AWS_PRELOAD_METADATA = True
 
 # Sentry
@@ -599,7 +569,7 @@ LOGGING = {
     "formatters": {
         "verbose": {
             "format": "%(levelname)s %(asctime)s %(module)s "
-            "%(name)s.%(funcName)s/%(lineno)d %(message)s"
+            "%(name)s.%(funcName)s/%(lineno)d %(message)s",
         },
     },
     "handlers": {
@@ -607,7 +577,7 @@ LOGGING = {
             "level": "DEBUG",
             "class": "logging.StreamHandler",
             "formatter": "verbose",
-        }
+        },
     },
     "loggers": {
         "": {

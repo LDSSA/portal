@@ -1,39 +1,40 @@
-import csv
+import csv  # noqa: D100
 from datetime import datetime, timedelta, timezone
 from logging import getLogger
-from portal.candidate.domain import notebook_to_html
-from typing import Any, Dict
+from typing import Any
 
-from dateutil import tz
 from constance import config
+from dateutil import tz
 from django.http import (
-    HttpResponseServerError,
     Http404,
+    HttpResponseServerError,
 )
 from django.http.response import FileResponse, HttpResponse
 from django.shortcuts import redirect
-from django.views.generic import TemplateView, View
 from django.urls import reverse
+from django.views.generic import TemplateView, View
 
 from portal.admissions import emails
-from portal.applications.domain import Domain as ApplicationDomain, Status
-from portal.applications.models import Submission, Application, Challenge
+from portal.applications.domain import Domain as ApplicationDomain
+from portal.applications.domain import Status
+from portal.applications.models import Application, Challenge, Submission
+from portal.candidate.domain import notebook_to_html
 from portal.selection.domain import SelectionDomain
 from portal.selection.draw import default_draw_params, draw, reject_draw
 from portal.selection.logs import get_selection_logs
 from portal.selection.models import Selection
-from portal.selection.queries import SelectionQueries
 from portal.selection.payment import (
     add_note,
-    load_payment_data,
     can_be_updated,
+    load_payment_data,
 )
+from portal.selection.queries import SelectionQueries
 from portal.selection.select import select
 from portal.selection.status import SelectionStatus
-from portal.staff.domain import Events, EventsException
-from portal.users.models import User, Gender, TicketType
-from portal.users.views import AdmissionsStaffViewMixin
+from portal.staff.domain import Events, EventsExceptionError
 from portal.staff.export import get_all_candidates
+from portal.users.models import Gender, TicketType, User
+from portal.users.views import AdmissionsStaffViewMixin
 
 logger = getLogger(__name__)
 
@@ -42,10 +43,10 @@ DATETIME_FMT = "%d/%m/%Y %H:%M:%S"
 TIME_FMT = "%H:%M:%S"
 
 
-class HomeView(AdmissionsStaffViewMixin, TemplateView):
+class HomeView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "staff_templates/home.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
         ctx = {
             "user": self.request.user,
             "datetime_fmt": DATETIME_FMT,
@@ -53,16 +54,12 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
             "datetime_flags": [
                 {
                     "key": "applications_opening_date",
-                    "value": config.ADMISSIONS_APPLICATIONS_START.strftime(
-                        DATETIME_FMT
-                    ),
+                    "value": config.ADMISSIONS_APPLICATIONS_START.strftime(DATETIME_FMT),
                     "label": "Challenge Submissions Opening Date",
                 },
                 {
                     "key": "applications_closing_date",
-                    "value": config.ADMISSIONS_SELECTION_START.strftime(
-                        DATETIME_FMT
-                    ),
+                    "value": config.ADMISSIONS_SELECTION_START.strftime(DATETIME_FMT),
                     "label": "Challenge Submissions Closing Date",
                 },
             ],
@@ -88,42 +85,44 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def post(self, request, *args, **kwargs):
+    def post(  # noqa: ANN201, C901, D102, PLR0912
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):
         if not request.user.is_superuser:
             return HttpResponseServerError(
-                b"error updating admin variables. Only admins can update these variables"
+                b"error updating admin variables. Only admins can update these variables",
             )
 
         key = request.POST["key"]
 
         if key == "applications_opening_date":
             date_s = request.POST["date_s"]
-            opening_date = datetime.strptime(date_s, DATETIME_FMT)
-            opening_date = opening_date.replace(
+            opening_date = datetime.strptime(date_s, DATETIME_FMT).replace(
                 tzinfo=tz.gettz("Europe/Lisbon")
             )
             if opening_date > config.ADMISSIONS_SELECTION_START:
                 return HttpResponseServerError(
-                    b"error setting opening date. opening date must be before closing date"
+                    b"error setting opening date. opening date must be before closing date",
                 )
-            else:
-                config.ADMISSIONS_APPLICATIONS_START = opening_date
+
+            config.ADMISSIONS_APPLICATIONS_START = opening_date
 
         elif key == "applications_closing_date":
             date_s = request.POST["date_s"]
-            closing_date = datetime.strptime(date_s, DATETIME_FMT)
-            closing_date = closing_date.replace(
+            closing_date = datetime.strptime(date_s, DATETIME_FMT).replace(
                 tzinfo=tz.gettz("Europe/Lisbon")
             )
             if closing_date < config.ADMISSIONS_APPLICATIONS_START:
                 return HttpResponseServerError(
-                    b"error setting closing date. closing date must be after opening date"
+                    b"error setting closing date. closing date must be after opening date",
                 )
-            else:
-                config.ADMISSIONS_SELECTION_START = closing_date
+
+            config.ADMISSIONS_SELECTION_START = closing_date
 
         elif key == "coding_test_duration":
-            duration = datetime.strptime(request.POST["date_s"], TIME_FMT)
+            duration = datetime.strptime(request.POST["date_s"], TIME_FMT).replace(
+                tzinfo=tz.gettz("Europe/Lisbon")
+            )
             config.ADMISSIONS_CODING_TEST_DURATION = timedelta(
                 hours=duration.hour,
                 minutes=duration.minute,
@@ -142,17 +141,18 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
             else:
                 config.ADMISSIONS_ACCEPTING_PAYMENT_PROFS = False
         else:
-            logger.warning(f"unknown feature flag key `{key}`.. doing nothing")
+            logger.warning("unknown feature flag key `%s`.. doing nothing", key)
 
         return redirect("home")
 
 
 class EventsView(AdmissionsStaffViewMixin, TemplateView):
-    """Trigger application and admissions ending events"""
+
+    """Trigger application and admissions ending events."""  # noqa: D211
 
     template_name = "staff_templates/events.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
         ctx = {
             "user": self.request.user,
             "emails": [
@@ -172,10 +172,12 @@ class EventsView(AdmissionsStaffViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def post(self, request, *args, **kwargs):
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         if not request.user.is_superuser:
             return HttpResponseServerError(
-                b"error triggering event. Only admins can trigger events"
+                b"error triggering event. Only admins can trigger events",
             )
 
         key = request.POST["key"]
@@ -183,60 +185,64 @@ class EventsView(AdmissionsStaffViewMixin, TemplateView):
         if key == "applications_over":
             try:
                 Events.trigger_applications_are_over()
-            except EventsException:
+            except EventsExceptionError:
                 return HttpResponseServerError(
-                    b"error triggering event. Are you sure applications are over?"
+                    b"error triggering event. Are you sure applications are over?",
                 )
 
         elif key == "admissions_over":
             try:
                 Events.trigger_admissions_are_over()
-            except EventsException:
+            except EventsExceptionError:
                 return HttpResponseServerError(
-                    b"error triggering event. Make sure there are no candidates in `drawn` or `selected`"
+                    b"error triggering event. Make sure there are no candidates in `drawn` or `selected`",
                 )
 
         return redirect("admissions:staff:events")
 
 
 class CandidateListView(AdmissionsStaffViewMixin, TemplateView):
-    """Candidate list."""
+
+    """Candidate list."""  # noqa: D211
 
     template_name = "staff_templates/candidates.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
         ctx = {"users": User.objects.filter(is_staff=False).order_by("email")}
         return super().get_context_data(**ctx)
 
 
 class CandidateDetailView(AdmissionsStaffViewMixin, TemplateView):
-    """Candidate details."""
+
+    """Candidate details."""  # noqa: D211
 
     template_name = "staff_templates/candidate.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, D102
         try:
             user = User.objects.filter(is_staff=False).get(id=kwargs["pk"])
-        except User.DoesNotExist:
-            raise Http404
+        except User.DoesNotExist as exc:
+            raise Http404 from exc
 
         try:
             application = user.application
-            total_submissions = Submission.objects.filter(
-                application=application
-            ).count()
+            total_submissions = Submission.objects.filter(application=application).count()
             application_best_scores = {
                 "coding_test": ApplicationDomain.get_best_score(
-                    application, Challenge.objects.get(code="coding_test")
+                    application,
+                    Challenge.objects.get(code="coding_test"),
                 ),
                 "slu01": ApplicationDomain.get_best_score(
-                    application, Challenge.objects.get(code="slu01")
+                    application,
+                    Challenge.objects.get(code="slu01"),
                 ),
                 "slu02": ApplicationDomain.get_best_score(
-                    application, Challenge.objects.get(code="slu02")
+                    application,
+                    Challenge.objects.get(code="slu02"),
                 ),
                 "slu03": ApplicationDomain.get_best_score(
-                    application, Challenge.objects.get(code="slu03")
+                    application,
+                    Challenge.objects.get(code="slu03"),
                 ),
             }
         except Application.DoesNotExist:
@@ -252,19 +258,18 @@ class CandidateDetailView(AdmissionsStaffViewMixin, TemplateView):
 
 
 class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
-    """Candidate application details."""
+
+    """Candidate application details."""  # noqa: D211
 
     template_name = "staff_templates/applications.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
         query = Application.objects.all().order_by("user__email")
 
-        filter_by_application_status = self.request.GET.get(
-            "application_status"
-        )
+        filter_by_application_status = self.request.GET.get("application_status")
 
         applications = []
-        count_by_type: Dict[Any, Any] = {
+        count_by_type: dict[Any, Any] = {
             "application": {
                 s: 0
                 for s in [
@@ -312,16 +317,13 @@ class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
             },
         }
         for a in query:
-            application_det_status = (
-                ApplicationDomain.get_application_detailed_status(a)
-            )
+            application_det_status = ApplicationDomain.get_application_detailed_status(a)
             for sub_type, sub_status in application_det_status.items():
                 count_by_type[sub_type][sub_status.name] += 1
 
             if (
                 filter_by_application_status is not None
-                and application_det_status["application"].name
-                != filter_by_application_status
+                and application_det_status["application"].name != filter_by_application_status
             ):
                 continue
 
@@ -331,9 +333,7 @@ class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
                     "status_list": [
                         application_det_status["application"],
                         *[
-                            ApplicationDomain.get_sub_type_status(
-                                a, Challenge.objects.get(pk=code)
-                            )
+                            ApplicationDomain.get_sub_type_status(a, Challenge.objects.get(pk=code))
                             for code in [
                                 "coding_test",
                                 "slu01",
@@ -342,7 +342,7 @@ class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
                             ]
                         ],
                     ],
-                }
+                },
             )
 
         status_enum = {
@@ -362,11 +362,12 @@ class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
 
 
 class SubmissionView(AdmissionsStaffViewMixin, TemplateView):
-    """Candidate submissions list??"""
+
+    """Candidate submissions list??."""  # noqa: D211
 
     template_name = "staff_templates/submissions.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
         query = Submission.objects.all().order_by("-created_at")
 
         user_email = self.request.GET.get("user_email", None)
@@ -382,132 +383,108 @@ class SubmissionView(AdmissionsStaffViewMixin, TemplateView):
                 "application__user__email",
                 "unit__pk",
                 "score",
-            )
+            ),
         }
         return super().get_context_data(**ctx)
 
 
-class SubmissionDownloadView(AdmissionsStaffViewMixin, View):
-    def get(self, request, *args, **kwargs):
+class SubmissionDownloadView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         try:
             submission: Submission = Submission.objects.get(id=kwargs["pk"])
-        except Submission.DoesNotExist:
-            raise Http404
+        except Submission.DoesNotExist as exc:
+            raise Http404 from exc
 
         try:
             return FileResponse(submission.notebook)
-        except ValueError:
-            raise Http404
+        except ValueError as exc:
+            raise Http404 from exc
 
 
-class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):
-    def get(self, request, *args, **kwargs):
+class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         try:
             submission: Submission = Submission.objects.get(id=kwargs["pk"])
-        except Submission.DoesNotExist:
-            raise Http404
+        except Submission.DoesNotExist as exc:
+            raise Http404 from exc
 
         try:
             return FileResponse(notebook_to_html(submission.feedback.read()))
-        except ValueError:
-            raise Http404
+        except ValueError as exc:
+            raise Http404 from exc
 
 
-class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
+class SelectionListView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "staff_templates/selections.html"
 
-    def get_context_data(self, **kwargs):
-        all_passed_test = SelectionQueries.filter_by_status_in(
-            [SelectionStatus.PASSED_TEST]
-        )
-        all_drawn = SelectionQueries.filter_by_status_in(
-            [SelectionStatus.DRAWN]
-        )
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
+        all_passed_test = SelectionQueries.filter_by_status_in([SelectionStatus.PASSED_TEST])
+        all_drawn = SelectionQueries.filter_by_status_in([SelectionStatus.DRAWN])
         all_after_draw = SelectionQueries.filter_by_status_in(
             [
                 SelectionStatus.INTERVIEW,
                 SelectionStatus.SELECTED,
                 SelectionStatus.TO_BE_ACCEPTED,
                 SelectionStatus.ACCEPTED,
-            ]
+            ],
         )
 
         # no scholarships
-        passed_test_no_scholarships = SelectionQueries.no_scholarships(
-            all_passed_test
-        )
+        passed_test_no_scholarships = SelectionQueries.no_scholarships(all_passed_test)
         drawn_no_scholarships = SelectionQueries.no_scholarships(all_drawn)
-        after_draw_no_scholarships = SelectionQueries.no_scholarships(
-            all_after_draw
-        )
+        after_draw_no_scholarships = SelectionQueries.no_scholarships(all_after_draw)
 
         drawn_candidates_no_scholarships = drawn_no_scholarships.count()
-        drawn_female_no_scholarships = drawn_no_scholarships.filter(
-            user__gender="female"
-        ).count()
+        drawn_female_no_scholarships = drawn_no_scholarships.filter(user__gender="female").count()
         drawn_company_no_scholarships = drawn_no_scholarships.filter(
-            user__ticket_type=TicketType.company
+            user__ticket_type=TicketType.company,
         ).count()
 
-        selected_accepted_candidates_no_scholarships = (
-            after_draw_no_scholarships.count()
-        )
-        selected_accepted_female_no_scholarships = (
-            after_draw_no_scholarships.filter(
-                user__gender=Gender.female
-            ).count()
-        )
-        selected_accepted_company_no_scholarships = (
-            after_draw_no_scholarships.filter(
-                user__ticket_type=TicketType.company
-            ).count()
-        )
+        selected_accepted_candidates_no_scholarships = after_draw_no_scholarships.count()
+        selected_accepted_female_no_scholarships = after_draw_no_scholarships.filter(
+            user__gender=Gender.female,
+        ).count()
+        selected_accepted_company_no_scholarships = after_draw_no_scholarships.filter(
+            user__ticket_type=TicketType.company,
+        ).count()
 
-        left_out_candidates_no_scholarships = (
-            passed_test_no_scholarships.count()
-        )
+        left_out_candidates_no_scholarships = passed_test_no_scholarships.count()
         left_out_females_no_scholarships = passed_test_no_scholarships.filter(
-            user__gender=Gender.female
+            user__gender=Gender.female,
         ).count()
-        left_out_non_company_no_scholarships = (
-            passed_test_no_scholarships.filter(
-                user__ticket_type=TicketType.company
-            ).count()
-        )
+        left_out_non_company_no_scholarships = passed_test_no_scholarships.filter(
+            user__ticket_type=TicketType.company,
+        ).count()
 
         # scholarships
-        passed_test_scholarships = SelectionQueries.scholarships(
-            all_passed_test
-        )
+        passed_test_scholarships = SelectionQueries.scholarships(all_passed_test)
         drawn_scholarships = SelectionQueries.scholarships(all_drawn)
         after_draw_scholarships = SelectionQueries.scholarships(all_after_draw)
 
         drawn_candidates_scholarships = drawn_scholarships.count()
-        drawn_female_scholarships = drawn_scholarships.filter(
-            user__gender=Gender.female
-        ).count()
+        drawn_female_scholarships = drawn_scholarships.filter(user__gender=Gender.female).count()
         drawn_company_scholarships = drawn_scholarships.filter(
-            user__ticket_type=TicketType.company
+            user__ticket_type=TicketType.company,
         ).count()
 
-        selected_accepted_candidates_scholarships = (
-            after_draw_scholarships.count()
-        )
+        selected_accepted_candidates_scholarships = after_draw_scholarships.count()
         selected_accepted_female_scholarships = after_draw_scholarships.filter(
-            user__gender=Gender.female
+            user__gender=Gender.female,
         ).count()
-        selected_accepted_company_scholarships = (
-            after_draw_scholarships.filter(
-                user__ticket_type=TicketType.company
-            ).count()
-        )
+        selected_accepted_company_scholarships = after_draw_scholarships.filter(
+            user__ticket_type=TicketType.company,
+        ).count()
 
         left_out_candidates_scholarships = passed_test_scholarships.count()
         left_out_females_scholarships = passed_test_scholarships.filter(
-            user__gender=Gender.female
+            user__gender=Gender.female,
         ).count()
         left_out_non_company_scholarships = passed_test_scholarships.filter(
-            user__ticket_type=TicketType.company
+            user__ticket_type=TicketType.company,
         ).count()
 
         ctx = {
@@ -534,14 +511,12 @@ class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
                     / default_draw_params.number_of_seats
                     * 100,
                     "pct_female": (
-                        drawn_female_no_scholarships
-                        + selected_accepted_female_no_scholarships
+                        drawn_female_no_scholarships + selected_accepted_female_no_scholarships
                     )
                     / default_draw_params.number_of_seats
                     * 100,
                     "pct_company": (
-                        drawn_company_no_scholarships
-                        + selected_accepted_company_no_scholarships
+                        drawn_company_no_scholarships + selected_accepted_company_no_scholarships
                     )
                     / default_draw_params.number_of_seats
                     * 100,
@@ -563,20 +538,17 @@ class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
                     "total_company": drawn_company_scholarships
                     + selected_accepted_company_scholarships,
                     "pct_candidates": (
-                        drawn_candidates_scholarships
-                        + selected_accepted_candidates_scholarships
+                        drawn_candidates_scholarships + selected_accepted_candidates_scholarships
                     )
                     / default_draw_params.number_of_seats
                     * 100,
                     "pct_female": (
-                        drawn_female_scholarships
-                        + selected_accepted_female_scholarships
+                        drawn_female_scholarships + selected_accepted_female_scholarships
                     )
                     / default_draw_params.number_of_seats
                     * 100,
                     "pct_company": (
-                        drawn_company_scholarships
-                        + selected_accepted_company_scholarships
+                        drawn_company_scholarships + selected_accepted_company_scholarships
                     )
                     / default_draw_params.number_of_seats
                     * 100,
@@ -589,56 +561,60 @@ class SelectionListView(AdmissionsStaffViewMixin, TemplateView):
         return super().get_context_data(**ctx)
 
 
-class SelectionDrawView(AdmissionsStaffViewMixin, View):
-    def post(self, request, *args, **kwargs):
+class SelectionDrawView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         draw(default_draw_params)
         return redirect("admissions:staff:selection-list")
 
 
-class SelectionRejectView(AdmissionsStaffViewMixin, View):
-    def post(self, request, *args, **kwargs):
+class SelectionRejectView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         selection = Selection.objects.get(id=kwargs["candidate_id"])
         reject_draw(selection)
         return redirect("admissions:staff:selection-list")
 
 
-class SelectionSelectView(AdmissionsStaffViewMixin, View):
-    def post(self, request, *args, **kwargs):
+class SelectionSelectView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         select()
         return redirect("admissions:staff:selection-list")
 
 
-class InterviewListView(AdmissionsStaffViewMixin, TemplateView):
+class InterviewListView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "./staff_templates/interviews.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
         ctx = {
-            "selections": SelectionQueries.filter_by_status_in(
-                [SelectionStatus.INTERVIEW]
-            ),
+            "selections": SelectionQueries.filter_by_status_in([SelectionStatus.INTERVIEW]),
             "selection_status": SelectionStatus,
         }
         return super().get_context_data(**ctx)
 
 
-def _get_user_selection(user_id):
+def _get_user_selection(user_id):  # noqa: ANN001, ANN202
     try:
         candidate = User.objects.get(id=user_id)
-    except User.DoesNotExist:
-        raise Http404
+    except User.DoesNotExist as exc:
+        raise Http404 from exc
 
     try:
         selection = Selection.objects.get(user=candidate)
-    except User.DoesNotExist:
-        raise Http404
+    except User.DoesNotExist as exc:
+        raise Http404 from exc
 
     return candidate, selection
 
 
-class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
+class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "./staff_templates/interview_id.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, D102
         _, selection = _get_user_selection(kwargs["pk"])
 
         if SelectionDomain.get_status(selection) != SelectionStatus.INTERVIEW:
@@ -651,13 +627,15 @@ class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, D102
         _, selection = _get_user_selection(kwargs["pk"])
         if SelectionDomain.get_status(selection) != SelectionStatus.INTERVIEW:
             return redirect("admissions:staff:interview-list")
         return super().get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         _, selection = _get_user_selection(kwargs["pk"])
         staff_user = request.user
         action = request.POST["action"]
@@ -667,7 +645,10 @@ class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
             add_note(selection, msg, staff_user)
         elif action == "reject":
             SelectionDomain.manual_update_status(
-                selection, SelectionStatus.REJECTED, staff_user, msg=msg
+                selection,
+                SelectionStatus.REJECTED,
+                staff_user,
+                msg=msg,
             )
             emails.send_interview_failed_email(
                 to_email=selection.user.email,
@@ -676,7 +657,10 @@ class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
             )
         elif action == "accept":
             SelectionDomain.manual_update_status(
-                selection, SelectionStatus.SELECTED, staff_user, msg=msg
+                selection,
+                SelectionStatus.SELECTED,
+                staff_user,
+                msg=msg,
             )
             load_payment_data(selection)
 
@@ -691,10 +675,10 @@ class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
         return redirect(request.path_info)
 
 
-class PaymentListView(AdmissionsStaffViewMixin, TemplateView):
+class PaymentListView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "staff_templates/payments.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
         ctx = {
             "selections": SelectionQueries.filter_by_status_in(
                 [
@@ -702,17 +686,17 @@ class PaymentListView(AdmissionsStaffViewMixin, TemplateView):
                     SelectionStatus.TO_BE_ACCEPTED,
                     SelectionStatus.ACCEPTED,
                     SelectionStatus.REJECTED,
-                ]
+                ],
             ),
             "selection_status": SelectionStatus,
         }
         return super().get_context_data(**ctx)
 
 
-class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
+class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "staff_templates/payment_id.html"
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, D102
         _, selection = _get_user_selection(kwargs["pk"])
         ctx = {
             "s": selection,
@@ -734,7 +718,9 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def post(self, request, *args, **kwargs):
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         _, selection = _get_user_selection(kwargs["pk"])
         staff_user = request.user
         action = request.POST["action"]
@@ -744,7 +730,10 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
             add_note(selection, msg, staff_user)
         elif action == "reject":
             SelectionDomain.manual_update_status(
-                selection, SelectionStatus.REJECTED, staff_user, msg=msg
+                selection,
+                SelectionStatus.REJECTED,
+                staff_user,
+                msg=msg,
             )
             emails.send_payment_refused_proof_email(
                 to_email=selection.user.email,
@@ -753,7 +742,10 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
             )
         elif action == "ask_additional":
             SelectionDomain.manual_update_status(
-                selection, SelectionStatus.SELECTED, staff_user, msg=msg
+                selection,
+                SelectionStatus.SELECTED,
+                staff_user,
+                msg=msg,
             )
             emails.send_payment_need_additional_proof_email(
                 to_email=selection.user.email,
@@ -762,7 +754,10 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
             )
         elif action == "accept":
             SelectionDomain.manual_update_status(
-                selection, SelectionStatus.ACCEPTED, staff_user, msg=msg
+                selection,
+                SelectionStatus.ACCEPTED,
+                staff_user,
+                msg=msg,
             )
             emails.send_payment_accepted_proof_email(
                 to_email=selection.user.email,
@@ -773,35 +768,35 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
         return redirect(request.path_info)
 
 
-class PaymentResetView(AdmissionsStaffViewMixin, View):
-    def post(self, request, *args, **kwargs):
+class PaymentResetView(AdmissionsStaffViewMixin, View):  # noqa: D101
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         _, selection = _get_user_selection(kwargs["pk"])
         try:
             load_payment_data(selection, request.user)
-            SelectionDomain.update_status(
-                selection, SelectionStatus.SELECTED, user=request.user
-            )
-        except Exception:
-            raise Http404
+            SelectionDomain.update_status(selection, SelectionStatus.SELECTED, user=request.user)
+        except Exception as exc:  # noqa: BLE001
+            raise Http404 from exc
 
         return redirect("admissions:staff:payment-detail", pk=kwargs["pk"])
 
 
-class ExportView(AdmissionsStaffViewMixin, TemplateView):
+class ExportView(AdmissionsStaffViewMixin, TemplateView):  # noqa: D101
     template_name = "staff_templates/exports.html"
 
 
-class ExportCandidatesView(AdmissionsStaffViewMixin, View):
+class ExportCandidatesView(AdmissionsStaffViewMixin, View):  # noqa: D101
     template_name = "staff_templates/exports.html"
 
-    def get(self, request, *args, **kwargs):
+    def get(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         export_data = get_all_candidates()
         filename = f"candidates@{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H:%M')}.csv"
 
         response = HttpResponse(status=200, content_type="text/csv")
-        response[
-            "Content-Disposition"
-        ] = f'attachment; filename="{filename}.csv"'
+        response["Content-Disposition"] = f'attachment; filename="{filename}.csv"'
 
         w = csv.DictWriter(response, export_data.headers, lineterminator="\n")
         w.writeheader()

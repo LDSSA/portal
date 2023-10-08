@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
 import logging
-import os
 import sys
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -16,19 +16,17 @@ def main() -> None:
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
+        msg = "Couldn't import Django. Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?"
         raise ImportError(
-            "Couldn't import Django. Are you sure it's installed and "
-            "available on your PYTHONPATH environment variable? Did you "
-            "forget to activate a virtual environment?"
+            msg,
         ) from exc
     # This allows easy placement of apps within the interior
     # portal directory.
-    current_path = os.path.dirname(os.path.abspath(__file__))
-    sys.path.append(os.path.join(current_path, "portal"))
+    current_path = Path(Path(__file__).resolve).parent
+    sys.path.append(Path(current_path) / "portal")
 
     execute_from_command_line(sys.argv)
 
 
 if __name__ == "__main__":
     main()
-

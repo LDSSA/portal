@@ -1,16 +1,80 @@
-version: 2
+version: 2.1
+
+orbs:
+  python: circleci/python@2.1.1
+
+executors:
+  app-executor:
+    docker:
+      - image: cimg/python:3.10
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+
+aliases:
+  - &python-executor
+      name: python/default
+      tag: "3.10"
 
 fast-checkout: &fast-checkout
   attach_workspace:
     at: /tmp/workspace
 
 jobs:
+  requirements:
+    executor: *python-executor
+    steps:
+      - checkout
+      - python/install-packages:
+          args: "--no-interaction --no-root"
+          pkg-manager: poetry
+      - run:
+          command: |
+            poetry check
+
+  ruff:
+    executor: *python-executor
+    steps:
+      - checkout
+      - python/install-packages:
+          args: "--no-interaction --no-root --only dev"
+          pkg-manager: poetry
+      - run: &git-diff-py-files
+          name: List added, copied, modified, and renamed *py files
+          command: |
+            git diff --name-only --diff-filter=ACMR origin/main | grep -E "(.py$)" > diff.txt || true
+      - run:
+          name: Ruff linting
+          command: |
+            poetry run ruff check --config=pyproject.toml . &> lint_checks.txt || true
+      - run:
+          name: Diff-based ruff
+          command: &display-lint-errors |
+            grep -Ff diff.txt lint_checks.txt > lint_errors.txt || true
+            if [ -s lint_errors.txt ]; then
+              cat lint_errors.txt
+              printf 'Run the following command to fix your branch:\n make fixes'
+              exit 1
+            fi
+
+  black:
+    executor: *python-executor
+    steps:
+      - checkout
+      - python/install-packages:
+          args: "--no-interaction --no-root --only dev"
+          pkg-manager: poetry
+      - run: *git-diff-py-files
+      - run:
+          name: Black code formatting
+          command: |
+            poetry run black --check --diff --color --config=pyproject.toml . &> lint_checks.txt || true
+      - run:
+          name: Diff-based black
+          command: *display-lint-errors
+
   persist-checkout:
-    docker:
-      - image: circleci/python:3.9
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+    executor: app-executor
     steps:
       - checkout
       - run:
@@ -24,11 +88,7 @@ jobs:
             - env
 
   build:
-    docker:
-      - image: circleci/python:3.9
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+    executor: app-executor
     steps:
       - *fast-checkout
       - setup_remote_docker
@@ -46,11 +106,7 @@ jobs:
           paths:
             - image/django.tar
   push:
-    docker:
-      - image: circleci/python:3.9
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+    executor: app-executor
     steps:
       - setup_remote_docker
       - attach_workspace:
@@ -64,7 +120,26 @@ jobs:
             docker push ldssa/django:$IMAGE_TAG
 
 workflows:
-  version: 2
+
+  ci:
+    jobs:
+      - requirements:
+          name: Validate requirements
+          filters: &ci-filter
+            branches:
+              ignore: main
+
+      - ruff:
+          name: Ruff linting
+          filters: *ci-filter
+          requires:
+            - Validate requirements
+
+      - black:
+          name: Black code formatting
+          filters: *ci-filter
+          requires:
+            - Validate requirements
 
   workflow:
     jobs:

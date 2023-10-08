@@ -1,6 +1,6 @@
-from django.apps import AppConfig
+from django.apps import AppConfig  # noqa: D100
 
 
-class StaffConfig(AppConfig):
+class StaffConfig(AppConfig):  # noqa: D101
     name = "portal.staff"
     verbose_name = "Staff"

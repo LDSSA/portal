@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import include, path  # noqa: D100
 
 app_name = "admissions"
 

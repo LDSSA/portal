@@ -1,10 +1,9 @@
-from django.contrib.auth import get_user_model
-from factory.django import DjangoModelFactory
+from django.contrib.auth import get_user_model  # noqa: D100
 from factory import Faker
+from factory.django import DjangoModelFactory
 
 
-class UserFactory(DjangoModelFactory):
-
+class UserFactory(DjangoModelFactory):  # noqa: D101
     username = Faker("user_name")
     email = Faker("email")
     name = Faker("name")
@@ -17,6 +16,6 @@ class UserFactory(DjangoModelFactory):
         lower_case=True,
     )
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = get_user_model()
-        django_get_or_create = ["username"]
+        django_get_or_create = ["username"]  # noqa: RUF012
