@@ -35,7 +35,6 @@ crispy-bootstrap4 = "^2022.1"
 django = "^4.2.4"
 django-anymail = "^10.1"
 django-allauth = "^0.55.0"
-django-choices = "^2.0.0"
 django-compressor = "^4.4"
 django-constance = {extras = ["database"], version = "^3.1.0"}
 django-crispy-forms = "^2.0"
