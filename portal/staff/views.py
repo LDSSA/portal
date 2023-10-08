@@ -70,7 +70,7 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
                 {
                     "key": "coding_test_duration",
                     "value": str(config.ADMISSIONS_CODING_TEST_DURATION),
-                    "label": "Challenge Submissions Opening Date",
+                    "label": "Challenge Coding Test Duration",
                 },
             ],
             "bool_flags": [
