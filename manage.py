@@ -22,7 +22,7 @@ def main() -> None:
         ) from exc
     # This allows easy placement of apps within the interior
     # portal directory.
-    current_path = Path(Path(__file__).resolve).parent
+    current_path = Path(Path(__file__).resolve()).parent
     sys.path.append(Path(current_path) / "portal")
 
     execute_from_command_line(sys.argv)
