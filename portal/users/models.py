@@ -9,7 +9,6 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from djchoices import ChoiceItem, DjangoChoices
 
 
 class UserWhitelist(models.Model):  # noqa: D101
@@ -21,23 +20,23 @@ class UserWhitelist(models.Model):  # noqa: D101
         return f"{self.username}"
 
 
-class Gender(DjangoChoices):  # noqa: D101
-    female = ChoiceItem("female", "Female")
-    male = ChoiceItem("male", "Male")
-    other = ChoiceItem("other", "Other/Prefer not to say")
+class Gender(models.TextChoices):
+    female = 'female', _("Female")
+    male = 'male', _("Male")
+    other = 'other', _("Other/Prefer not to say")
 
 
-class TicketTypeSelectable(DjangoChoices):  # noqa: D101
-    student = ChoiceItem("student", "Student")
-    regular = ChoiceItem("regular", "Regular")
-    company = ChoiceItem("company", "Company")
+class TicketTypeSelectable(models.TextChoices):
+    student = 'student', _("Student")
+    regular = 'regular', _("Regular")
+    company = 'company', _("Company")
 
 
-class TicketType(DjangoChoices):  # noqa: D101
-    student = ChoiceItem("student", "Student")
-    regular = ChoiceItem("regular", "Regular")
-    company = ChoiceItem("company", "Company")
-    scholarship = ChoiceItem("scholarship", "Scholarship")
+class TicketType(models.TextChoices):
+    student = 'student', _("Student")
+    regular = 'regular', _("Regular")
+    company = 'company', _("Company")
+    scholarship = 'scholarship', _("Scholarship")
 
 
 # TODO: custom user manager to filter out users with unverified email addresses  # noqa: FIX002, TD002, TD003
