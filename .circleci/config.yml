@@ -5,6 +5,12 @@ orbs:
 
 executors:
   app-executor:
+    parameters:
+      workspace-dir:
+        type: string
+        default: /tmp/workspace
+    environment:
+      WORKSPACE_DIR: << parameters.workspace-dir >>
     docker:
       - image: cimg/python:3.10
         auth:
@@ -87,24 +93,59 @@ jobs:
             - project
             - env
 
+  test:
+    executor: app-executor
+    parallelism: 2
+    environment:
+      TEST_RESULTS: /tmp/test-results
+    steps:
+      - *fast-checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - attach_workspace:
+          at: $WORKSPACE_DIR
+      - run:
+          name: Unit tests
+          command: |
+            mkdir -p $TEST_RESULTS
+            cd $WORKSPACE_DIR/project/$APP_DIR
+            docker compose up -d --build
+            docker compose exec django python -V && poetry -V
+            docker compose exec django poetry install --with test,dev
+
+            echo "*** Running tests with docker compose, poetry, and django unittest..."
+            docker compose exec django poetry run python manage.py test
+
+            echo "*** Running tests with docker compose, poetry, and pytest..."
+            docker compose exec django poetry run pytest
+
+            docker compose down
+      - store_artifacts:
+          path: $TEST_RESULTS
+          destination: raw-test-output
+      - store_test_results:
+          path: $TEST_RESULTS
+
   build:
     executor: app-executor
     steps:
       - *fast-checkout
-      - setup_remote_docker
+      - setup_remote_docker:
+           docker_layer_caching: true
       - run:
           name: Build django image
           command: |
             set -ex
-            cd /tmp/workspace/project
-            source /tmp/workspace/env
+            cd $WORKSPACE_DIR/project
+            source $WORKSPACE_DIR/env
             docker build -t ldssa/django:$IMAGE_TAG .
-            mkdir -p /tmp/workspace/image
-            docker save -o /tmp/workspace/image/django.tar ldssa/django:$IMAGE_TAG
+            mkdir -p $WORKSPACE_DIR/image
+            docker save -o $WORKSPACE_DIR/image/django.tar ldssa/django:$IMAGE_TAG
       - persist_to_workspace:
           root: /tmp/workspace
           paths:
             - image/django.tar
+
   push:
     executor: app-executor
     steps:
@@ -114,9 +155,9 @@ jobs:
       - run:
           name: Push django image
           command: |
-            source /tmp/workspace/env
-            docker load -i /tmp/workspace/image/django.tar
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            source $WORKSPACE_DIR/env
+            docker load -i $WORKSPACE_DIR/image/django.tar            
+            echo "$DOCKER_PASS" | docker login -u $DOCKER_USER --password-stdin
             docker push ldssa/django:$IMAGE_TAG
 
 workflows:
@@ -146,17 +187,26 @@ workflows:
       - persist-checkout:
           context: 
             - Common Env
+
       - build:
           context: 
             - Common Env
           requires:
             - persist-checkout
+
+      - test:
+          context: 
+            - Common Env
+          requires:
+            - build
+
       - approval:
           type: approval
           context: 
             - Common Env
           requires:
-            - build
+            - test
+
       - push:
           context: 
             - Common Env
