@@ -1,8 +1,7 @@
-from datetime import datetime, timedelta  # noqa: D100
+from datetime import datetime, timedelta, timezone  # noqa: D100
 
 import pytest
 from applications.models import Application, Submission, SubmissionTypes
-from dateutil import gettz
 from django.test import TestCase
 from interface import interface
 from profiles.models import Profile
@@ -12,7 +11,7 @@ from selection.status import SelectionStatus
 from staff.domain import Events, EventsExceptionError
 from users.models import User
 
-LISBON_TZ = gettz("Europe/Lisbon")
+LISBON_TZ = timezone.utc
 
 
 class TestEvents(TestCase):  # noqa: D101

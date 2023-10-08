@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta  # noqa: D100
+from datetime import datetime, timedelta, timezone  # noqa: D100
 
 import pytest
 from applications.domain import (
@@ -8,12 +8,11 @@ from applications.domain import (
     SubmissionStatus,
 )
 from applications.models import Application, Submission, SubmissionTypes
-from dateutil import gettz
 from django.test import TestCase
 from interface import interface
 from users.models import User
 
-LISBON_TZ = gettz("Europe/Lisbon")
+LISBON_TZ = timezone.utc
 
 
 class TestDomain(TestCase):  # noqa: D101

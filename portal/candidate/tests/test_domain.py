@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta  # noqa: D100
+from datetime import datetime, timedelta, timezone  # noqa: D100
 
-from dateutil import gettz
 from django.test import TestCase
 
 from portal.applications.domain import ApplicationStatus, SubmissionStatus
@@ -12,7 +11,7 @@ from portal.selection.models import Selection
 from portal.selection.status import SelectionStatus
 from portal.users.models import User
 
-LISBON_TZ = gettz("Europe/Lisbon")
+LISBON_TZ = timezone.utc
 
 
 class TestDomain(TestCase):  # noqa: D101
