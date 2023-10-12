@@ -6,4 +6,4 @@ Your friendly neighborhood LDSA Academy portal.
 
 ## Documentation
 
-You will find the complete documentation at [Notion](https://seed-puppy-a23.notion.site/DevOps-Documentation-ebc96e1358ba495f93cbb96db0f23bc8?pvs=4).
+You will find the complete documentation at [Notion](https://marble-van-259.notion.site/DevOps-Documentation-9b98a4d496524d9ea16824febeb0fec9?pvs=4).
