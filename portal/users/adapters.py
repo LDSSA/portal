@@ -51,15 +51,7 @@ class AccountAdapter(DefaultAccountAdapter):  # noqa: D101
             context,
             self.request,
         ).strip()
-        # if "txt" in bodies:
-        #     msg = EmailMultiAlternatives(subject, bodies["txt"], from_email, to)  # noqa: ERA001
-        #     if "html" in bodies:
-        #         msg.attach_alternative(bodies["html"], "text/html")  # noqa: ERA001
-        # else:  # noqa: ERA001
-        #     msg = EmailMessage(subject, bodies["html"], from_email, to)  # noqa: ERA001
-        #     msg.content_subtype = "html"  # Main content is now text/html  # noqa: ERA001
         return EmailMessage(subject, body, from_email, to)
-        # msg.content_subtype = "html"  # Main content is now text/html  # noqa: ERA001
 
     def send_mail(self, template_prefix, email, context) -> None:  # noqa: ANN001, ANN101, D102
         if template_prefix == "account/email/password_reset_key":
@@ -72,7 +64,7 @@ class AccountAdapter(DefaultAccountAdapter):  # noqa: D101
             url = build_absolute_uri(request=getattr(self, "request", None), location=path)
             send_reset_password_email(to_email=email, reset_password_url=url)
         else:
-            super.send_mail(template_prefix, email, context)
+            super().send_mail(template_prefix, email, context)
 
     def send_confirmation_mail(  # noqa: D102
         self, request: HttpRequest, emailconfirmation, signup  # noqa: ANN001, ANN101, ARG002
