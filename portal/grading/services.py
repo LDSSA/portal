@@ -165,7 +165,7 @@ class AdmissionsGradingMixin(AcademyGradingMixin):  # noqa: D101
     notebook_view_name = "grading:admissions-notebook"
 
     def get_image(self):  # noqa: ANN101, ANN201, D102
-        return f"ldssa/{settings.BASE_URL}-admissions-{self.grade.unit.code.lower()}:latest"
+        return f"ldssa/{settings.BATCH_NAME}-admissions-{self.grade.unit.code.lower()}:latest"
 
     def get_env(self):  # noqa: ANN101, ANN201, D102
         env = super().get_env()
