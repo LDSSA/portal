@@ -49,6 +49,7 @@ class UserAdmin(auth_admin.UserAdmin):  # noqa: D101
         "is_superuser",
         "can_graduate",
         "failed_or_dropped",
+        "date_joined",
     ]
     search_fields = ["username", "name"]  # noqa: RUF012
     list_filter = (
