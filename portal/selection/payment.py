@@ -10,8 +10,8 @@ logger = getLogger(__name__)
 
 
 PRICE_TABLE = {
-    "student": 100,
-    "regular": 250,
+    "student": 250,
+    "regular": 500,
     "company": 1500,
     "scholarship": 20,
 }
