@@ -47,13 +47,13 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):  # noqa: D101
         )
 
         reports = {}
-        for type_ in models.Report.Type.to_numpy():
+        for type_choice in models.Report.Type.choices:
             report, _ = models.Report.objects.get_or_create(
                 capstone=self.object,
                 user=self.request.user,
-                type=type_,
+                type=type_choice[0],  # type_choice is a tuple (value, display_name)
             )
-            reports[type_] = report
+            reports[type_choice[0]] = report
 
         return self.object, api, reports
 
