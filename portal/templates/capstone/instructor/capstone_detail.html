@@ -17,10 +17,9 @@
       <th scope="col">Slack</th>
       <th scope="col">URL</th>
       <th scope="col">Score</th>
-      <th scope="col">Report 1 Provisory</th>
-      <th scope="col">Report 1 Final</th>
-      <th scope="col">Report 2 Provisory</th>
-      <th scope="col">Report 2 Final</th>
+      <th scope="col">Proposal</th>
+      <th scope="col">Report Provisory</th>
+      <th scope="col">Report Final</th>
     </tr>
     </thead>
     <tbody>
@@ -30,10 +29,9 @@
         <td><a href="{{ workspace_url }}{{ student.user.slack_member_id }}" target="_blank" class="text-dark">{{ student.user.slack_member_id }}</a></td>
         <td>{{ student.api.url }}</td>
         <td>{{ student.api.score }}</td>
-        <td>{% if student.report_1_provisory.file %}<a href="{{ student.report_1_provisory.file.url }}">DL</a>{% endif %}</td>
-        <td>{% if student.report_1_final.file %}<a href="{{ student.report_1_final.file.url }}">DL</a>{% endif %}</td>
-        <td>{% if student.report_2_provisory.file %}<a href="{{ student.report_2_provisory.file.url }}">DL</a>{% endif %}</td>
-        <td>{% if student.report_2_final.file %}<a href="{{ student.report_2_final.file.url }}">DL</a>{% endif %}</td>
+        <td>{% if student.proposal.file %}<a href="{{ student.proposal.file.url }}">DL</a>{% endif %}</td>
+        <td>{% if student.report_provisory.file %}<a href="{{ student.report_provisory.file.url }}">DL</a>{% endif %}</td>
+        <td>{% if student.report_final.file %}<a href="{{ student.report_final.file.url }}">DL</a>{% endif %}</td>
       </tr>
     {% endfor %}
     </tbody>

@@ -21,10 +21,9 @@ class Capstone(models.Model):  # noqa: D101
     name = models.CharField(max_length=1024)
 
     scoring = models.FileField(upload_to=random_path, null=True, blank=True)
-    report_1_provisory_open = models.BooleanField(default=False)
-    report_1_final_open = models.BooleanField(default=False)
-    report_2_provisory_open = models.BooleanField(default=False)
-    report_2_final_open = models.BooleanField(default=False)
+    proposal_open = models.BooleanField(default=False)
+    report_provisory_open = models.BooleanField(default=False)
+    report_final_open = models.BooleanField(default=False)
 
     def __str__(self) -> str:  # noqa: ANN101, D105
         return self.name
@@ -44,10 +43,9 @@ class Capstone(models.Model):  # noqa: D101
 
 class Report(models.Model):  # noqa: D101, DJ008
     class Type(models.TextChoices):  # noqa: D106
-        report_1_provisory = ("report_1_provisory", "Report 1 Provisory")
-        report_1_final = ("report_1_final", "Report 1 Final")
-        report_2_provisory = ("report_2_provisory", "Report 2 Provisory")
-        report_2_final = ("report_2_final", "Report 2 Final")
+        proposal = ("proposal", "Proposal")
+        report_provisory = ("report_provisory", "Report Provisory")
+        report_final = ("report_final", "Report Final")
 
     capstone = models.ForeignKey(Capstone, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE)

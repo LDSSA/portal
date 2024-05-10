@@ -51,7 +51,7 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):  # noqa: D101
             report, _ = models.Report.objects.get_or_create(
                 capstone=self.object,
                 user=self.request.user,
-                type=type_choice[0],  # type_choice is a tuple (value, display_name)
+                type=type_choice[0],
             )
             reports[type_choice[0]] = report
 
@@ -125,25 +125,20 @@ class InstructorCapstoneDetailView(InstructorMixin, DetailView):  # noqa: D101
                         capstone=self.object,
                         user=student,
                     ).first(),
-                    "report_1_provisory": models.Report.objects.filter(
+                    "proposal": models.Report.objects.filter(
                         capstone=self.object,
                         user=student,
-                        type=models.Report.Type.report_1_provisory,
+                        type=models.Report.Type.proposal,
                     ).first(),
-                    "report_1_final": models.Report.objects.filter(
+                    "report_provisory": models.Report.objects.filter(
                         capstone=self.object,
                         user=student,
-                        type=models.Report.Type.report_1_final,
+                        type=models.Report.Type.report_provisory,
                     ).first(),
-                    "report_2_provisory": models.Report.objects.filter(
+                    "report_final": models.Report.objects.filter(
                         capstone=self.object,
                         user=student,
-                        type=models.Report.Type.report_2_provisory,
-                    ).first(),
-                    "report_2_final": models.Report.objects.filter(
-                        capstone=self.object,
-                        user=student,
-                        type=models.Report.Type.report_2_final,
+                        type=models.Report.Type.report_final,
                     ).first(),
                 },
             )

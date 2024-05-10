@@ -11,10 +11,9 @@ class CapstoneAdmin(admin.ModelAdmin):  # noqa: D101
     fields = (
         "name",
         "scoring",
-        "report_1_provisory_open",
-        "report_1_final_open",
-        "report_2_provisory_open",
-        "report_2_final_open",
+        "proposal_open",
+        "report_provisory_open",
+        "report_final_open",
     )
 
 
