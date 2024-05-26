@@ -210,7 +210,7 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):  #
                     "attendance": att,
                 },
             )
-        return sorted(object_list, key=lambda x: x["hackathon_team_id"])
+        return sorted(object_list, key=lambda x: (x["hackathon_team_id"], x["student"].name))
 
     @staticmethod
     def _filter_can_attend_next(object_list):  # noqa: ANN001, ANN205
