@@ -39,6 +39,14 @@ class TicketType(models.TextChoices):
     scholarship = 'scholarship', _("Scholarship")
 
 
+# Preference for in-person or remote
+class AcademyTypePreference(models.TextChoices):
+    in_person_then_remote = 'in_person_then_remote', _("In-person then remote")
+    remote_then_in_person = 'remote_then_in_person', _("Remote then in-person")
+    remote_only = 'remote_only', _("Remote only")
+    in_person_only = 'in_person_only', _("In-person only")
+
+
 # TODO: custom user manager to filter out users with unverified email addresses  # noqa: FIX002, TD002, TD003
 class User(AbstractUser):  # noqa: D101
     # First Name and Last Name do not cover name patterns
@@ -57,6 +65,12 @@ class User(AbstractUser):  # noqa: D101
     # Admissions
     code_of_conduct_accepted = models.BooleanField(default=False)
     applying_for_scholarship = models.BooleanField(default=None, null=True)
+    academy_type_preference = models.CharField(
+        blank=True,
+        null=True,
+        max_length=50,
+        choices=AcademyTypePreference.choices,
+    )
     profession = models.CharField(blank=True, max_length=50)
     gender = models.CharField(null=False, max_length=25, choices=Gender.choices)
     ticket_type = models.CharField(null=False, max_length=25, choices=TicketType.choices)

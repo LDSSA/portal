@@ -30,6 +30,8 @@ class CandidateState(NamedTuple):  # noqa: D101
     slu02_status: SubmissionStatus | None
     slu03_status: SubmissionStatus | None
     selection_status: SelectionStatusType | None
+    academy_type: str | None
+
 
 
 class DomainExceptionError(Exception):  # noqa: D101
@@ -45,6 +47,7 @@ class Domain:  # noqa: D101
 
         state["decided_scholarship"] = candidate.applying_for_scholarship is not None
         state["applying_for_scholarship"] = candidate.applying_for_scholarship
+        state["academy_type"] = candidate.academy_type_preference
 
         application, _ = Application.objects.get_or_create(user=candidate)
         status = ApplicationsDomain.get_application_detailed_status(application)

@@ -53,6 +53,7 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
         accordion_enabled_status = {
             "accepted_coc": False,
             "decided_scholarship": False,
+            "decided_academy_type": False,
             "admission_test": False,
             "selection_results": False,
             "payment": False,
@@ -67,10 +68,17 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
 
+        elif not state.academy_type:
+            action_point = "decided_academy_type"
+            accordion_enabled_status["accepted_coc"] = True
+            accordion_enabled_status["decided_scholarship"] = True
+            accordion_enabled_status["decided_academy_type"] = True
+
         elif state.application_status != Status.passed or state.selection_status is None:
             action_point = "admission_test"
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
+            accordion_enabled_status["decided_academy_type"] = True
             accordion_enabled_status["admission_test"] = True
 
         elif (
@@ -80,6 +88,7 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
             action_point = "selection_results"
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
+            accordion_enabled_status["decided_academy_type"] = True
             accordion_enabled_status["admission_test"] = True
             accordion_enabled_status["selection_results"] = True
 
@@ -87,6 +96,7 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
             action_point = "payment"
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
+            accordion_enabled_status["decided_academy_type"] = True
             accordion_enabled_status["admission_test"] = True
             accordion_enabled_status["selection_results"] = True
             accordion_enabled_status["payment"] = True
@@ -169,6 +179,21 @@ class ScholarshipView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, T
             user.ticket_type = TicketType.scholarship
         user.save()
         return redirect("admissions:candidate:home")
+    
+
+class AcademyTypeView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView):
+    
+        """Choose academy type preference."""  # noqa: D211
+    
+        template_name = "candidate_templates/academy_type.html"
+    
+        def post(  # noqa: ANN201, D102
+            self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+        ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+            user = request.user
+            user.academy_type_preference = request.POST["academy_type"]
+            user.save()
+            return redirect("admissions:candidate:home")
 
 
 class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101

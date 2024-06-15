@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2 class="py-5">Select Your Preferred Academy Type</h2>
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="academy_type">Please choose your preferred academy type:</label>
+                    <select class="form-control" id="academy_type" name="academy_type">
+                        <option value="in_person_then_remote">Prefer In-Person but can also do Remote</option>
+                        <option value="remote_then_in_person">Prefer Remote but can also do In-Person</option>
+                        <option value="remote_only">Remote only</option>
+                        <option value="in_person_only">In-Person only</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -11,18 +11,18 @@
     {% if state.selection_status == selection_status_values.ACCEPTED %}
         <div class="alert alert-success mb-5" role="alert">
           Admissions are now closed.<br>
-          <b>Congratulations!</b> You've been accepted in <b>Batch 5</b> of the LDSSA.
+          <b>Congratulations!</b> You've been accepted in this year's batch of the LDSSA.
         </div>
     {% elif state.selection_status == selection_status_values.REJECTED or state.selection_status == selection_status_values.NOT_SELECTED %}
         <div class="alert alert-danger mb-5" role="alert">
             Admissions are now closed. <br>
-            Sadly you've not been accepted in <b>Batch 5</b> of the LDSSA. We hope to see you again next year!
+            Sadly you've not been accepted in this batch of the LDSSA. We hope to see you again next year!
         </div>
     {% endif %}
 
     <h4 class="pb-3">Welcome to the admissions for the Lisbon Data Science Starters Academy!</h4>
     <p>
-        Thank you for your interest in participating in <b>Batch 7</b> of the LDSSA!<br>
+        Thank you for your interest in participating in the next <b>batch of the LDSSA!</b><br>
         Before you start, please read all the details about the LDSSA <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/01-Starters-Academy-(Course)/">here</a>, about this admissions process <a href="https://ldssa.github.io/wiki/Applicants/Application-process/">here</a>, and keep these main points in mind:
     </p>
 
@@ -33,7 +33,8 @@
             The three weeks after the Bootcamp and the Capstone project are heavier in terms of workload, so the necessary time commitment will likely be higher than 10 hours per week.
         </li>
         <li class="pb-3">
-            <b>The Starters Academy will be remote this year.</b> This means that all events are scheduled to happen remotely.
+            <b>The Starters Academy will have both a remove and in-person option this year.</b>
+            This should only be reflected in the Hackathons, where a batch of students will have the opportunity to meet and do hackathons in-person, and other students can do it remotely. The choice to do in-person or remote is done when applying for the course.
         </li>
         <li class="pb-3">
             Since our Academy is based in Lisbon, all the Starter's Academy activities will happen during the day, <b>Lisbon time</b>.
@@ -126,6 +127,29 @@
             </div>
           </div>
         </div>
+
+        <!-- academy type preference -->
+        <div class="card">
+          <div class="card-header" id="headingThree">
+            <h5 class="mb-0">
+              <button class="btn btn-link" data-toggle="collapse" data-target="#collapseThree" aria-controls="collapseThree" {% if not accordion_enabled_status.decided_academy_type %} disabled {% endif %}>
+                {% if state.academy_type %}
+                    <i class="fas fa-check-circle"></i>
+                {% else %}
+                    <i class="far fa-circle"></i>
+                {% endif %}
+                Academy Type
+              </button>
+            </h5>
+          </div>
+          <div id="collapseThree" class="collapse {% if action_point == 'academy_type' %} show {% endif %}" aria-labelledby="headingThree" data-parent="#accordion">
+            <div class="card-body">
+              <p>
+                  This year, the Lisbon Data Science Starters Academy will have both a remote and in-person option.
+                  You can choose your preference <a href="{% url 'admissions:candidate:academy_type' %}">here</a>.
+              </p>
+            </div>
+          </div>
 
         <!-- admission test -->
         <div class="card">

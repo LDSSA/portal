@@ -13,6 +13,7 @@ urlpatterns = [
         name="codeofconduct",
     ),
     path("scholarship", views.ScholarshipView.as_view(), name="scholarship"),
+    path("academy_type", views.AcademyTypeView.as_view(), name="academy_type"),
     path(
         "before-coding-test",
         views.CandidateBeforeCodingTestView.as_view(),
