@@ -28,33 +28,32 @@
 
     <ul>
         <li class="pb-3">
-            In order to get the most out of the experience, students should spend an average of <b>10 hours per week</b> (and no less than 5 hours per week) studying on their own time for each specialization.
-            The Bootcamp and the end of specialization Hackathons are not included in this time commitment, as these are full 10 to 12 hour day events
-            The three weeks after the Bootcamp and the Capstone project are heavier in terms of workload, so the necessary time commitment will likely be higher than 10 hours per week.
+            In order to get the most out of the study experience, students should spend an average of <b>10 hours per week</b> (and no less than 5 hours per week) studying in their own time for each specialization.
+            The Bootcamp and the Hackathons are not included in this time commitment. Bootcamp days are 4 hour events and hackathons are about 10-12 hour events.
+            The specialization 1 and the Capstone project are heavier in terms of workload, so the necessary time commitment will likely be higher than 10 hours per week.
         </li>
         <li class="pb-3">
-            <b>The Starters Academy will have both a remove and in-person option this year.</b>
-            This should only be reflected in the Hackathons, where a batch of students will have the opportunity to meet and do hackathons in-person, and other students can do it remotely. The choice to do in-person or remote is done when applying for the course.
+            <b>The Starters Academy will have both a remote and in-person option this year.</b>
+            This should only be reflected in the Hackathons, where a batch of students will have the opportunity to meet and do hackathons in-person, and other students can do it remotely. The choice to do in-person or remote is done when applying for the course. The in-person option will open only if a sufficient amount of students chooses this option.
         </li>
         <li class="pb-3">
             Since our Academy is based in Lisbon, all the Starter's Academy activities will happen during the day, <b>Lisbon time</b>.
             This includes the Bootcamp, Hackathons, and instructors' availability to answer questions on Slack.
-            <b>Students are required to be online during the Bootcamp and Hackathons.</b>
+            <b>Remote students are required to be online during the Bootcamp and the Hackathons.</b>
             For students who are in very different timezones, this probably means that they'll have to join us at unusual hours,
-            and that communicating with instructors will feel very async. So please take this into consideration when applying!
+            and that communicating with instructors will feel very async. Please take this into consideration when applying!
         </li>
         <li class="pb-3">
             You can find all the relevant dates for the Starter's Academy on this <a href=https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/01-Starters-Academy-(Course)/>Webpage</a>.
-            The Bootcamp and first Hackathon are mandatory: if you miss them, you're not allowed to join any other activities in the course and won't be able to graduate.
-            For all the Hackathons, in order to participate you're required to have a minimum score of 80% on the Learning Units of that specialization.
+            <b>The Bootcamp and first Hackathon are mandatory</b>: if you miss them, you're not allowed to join any other course activities and won't be able to graduate.
+            For all the Hackathons, in order to participate you're required to achieve a minimum score of 80% in all the Learning Units of that specialization.
         </li>
         <li class="pb-3">
             At the end of the Starters Academy, we will emit a Lisbon Data Science Starters Academy Certificate that will describe your achievements.
             This certificate will list all the Starters Academy's specializations, explain what it means to pass each specialization, and show the grades that you've achieved in each of them.
             If you miss a specialization, you'll score 0 (zero) on that specialization, and this will be shown in your certificate.
             You'll only be issued a Lisbon Data Science Starters Academy Certificate in case you miss one or zero hackathons.
-            The Bootcamp days, Hackathon #1, Specializations, and the Capstone cannot be missed or delivered late.
-            If you can't attend one of the remaining specializations you're allowed to deliver all the evaluation elements for that specialization (Learning Units + Hackathon) until the end of the following month, and it won't count as a missed specialization in the certificate.
+            The Bootcamp days, Specialization 1, Hackathon 1, and the Capstone cannot be missed.
         </li>
         <li class="pb-3">
             Everyone is expected to comply with our <a href="https://ldssa.github.io/wiki/About%20us/Code-of-Conduct/">Code of Conduct</a> in all the interactions with the Lisbon Data Science Academy.
@@ -62,7 +61,7 @@
             During this admissions process, <b>we'll ask you to read and acknowledge this Code of Conduct and you'll only be allowed to continue if you agree.</b>
         </li>
         <li class="pb-3">
-          According to our <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/07-Refund-Policy/">Refund Policy</a>, you are eligible for a full refund within 1 month after the Bootcamp start date.
+          According to our <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/07-Refund-Policy/">Refund Policy</a>, you are eligible for a full refund within 14 days after the Bootcamp start date.
       </li>
     </ul>
 
@@ -86,7 +85,7 @@
             <div class="card-body">
               <p>In order to proceed with your application to the Lisbon Data Science Starters Academy, you need to <b>read and agree with our Code of Conduct and Refund Policy</b>.</p>
               <p>Not complying with the Code of Conduct during the Academy will lead to immediate exclusion from the course, without a refund.
-              To ensure that you get the best experience our of the Academy, you should familiarize yourself with the Code of Conduct before putting any more time into this application process.</p>
+              To ensure that you get the best experience out of the Academy, you should familiarize yourself with the Code of Conduct before putting any more time into this application process.</p>
               <p>Read the Code of Conduct and Refund Policy <a href="{% url 'admissions:candidate:codeofconduct' %}">here</a>.</p>
             </div>
           </div>
@@ -120,7 +119,7 @@
                     {% if state.applying_for_scholarship %}
                         You are applying for a scholarship!
                     {% else %}
-                        You not are applying for a scholarship.
+                        You are not applying for a scholarship.
                     {% endif %}
                 {% endif %}
 
@@ -175,7 +174,7 @@
                 {% else %}
                     {% if state.application_status.name == "passed" %}
                         Congratulations! You've passed the admission test.
-                        From the {{ ADMISSIONS_SELECTION_START|date }}, we'll let you know if you've been (randomly) selected to participate in this batch of the LDSSA.
+                        From the {{ ADMISSIONS_SELECTION_START|date }}, we'll let you know if you've been selected to participate in this batch of the LDSSA.
 
                     {% elif state.application_status.name == "ongoing" %}
                         <p>You have until <b>{{ ADMISSIONS_SELECTION_START }}</b> to pass all the assignments.</p>
@@ -183,8 +182,8 @@
                         <p>For the Small Learning Units, you can start them at any time, submit them for grading as many times as you want, and the due date will always be the {{ ADMISSIONS_SELECTION_START }}.
                         For the coding test, you can also submit it for grading as many times as you want, but once you start it, <b>you only have {{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours to finish it</b>.</p>
 
-                        <p>Make sure that you only start the coding test when you have enough free and uninterrupted time to spend.
-                        Also, we <strong>strongly suggest that you complete SLU01 before starting the coding test</strong>.
+                        <p>Make sure that you only start the coding test when you have enough free and uninterrupted time. The coding test and SLUs require setting up your local environment.
+                        We <strong>strongly suggest that you complete SLU01 before starting the coding test</strong>.
                         This way, you'll setup up your local environment without any time constraints and get familiar with the grading system, leaving you better prepared to face the coding test!</p>
 
                     {% elif state.application_status.name == "failed" %}
@@ -267,7 +266,7 @@
                     <!-- Passed test, applications are closed, we're doing selections, this candidate wasn't selected yet -->
                     <!-- selection_status in [PASSED_TEST, DRAWN] -->
                     {% if state.selection_status in selection_status_values.SELECTION_AWAITING_STATUS %}
-                        We're in the process of randomly selecting this year's students for the Lisbon Data Science Starters Academy.</p>
+                        We're in the process of selecting this year's students for the Lisbon Data Science Starters Academy.</p>
                         We'll send you an email soon to let you know if you were selected or not. Make sure that you add "admissions@lisbondatascience.org" to your contact list
                         to ensure our emails are not lost in the (SPAM) void.
                         This page will also be updated with the results. Stay tuned!
@@ -282,7 +281,7 @@
                     {% elif state.selection_status in selection_status_values.SELECTION_NEGATIVE_STATUS %}
                         Unfortunately, you have not been selected for this batch of the Lisbon Data Science Starters Academy.
 
-                        <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch5-students">GitHub</a>, for free.</p>
+                        <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch-students">GitHub</a>, for free.</p>
 
                         <p>
                           If you want to give it another try next year, check our <a href="https://www.lisbondatascience.org/">website</a> and join our newsletters to be the first to receive updates about our courses and the dates for the next batch of the Academy.
