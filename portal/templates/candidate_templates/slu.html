@@ -30,13 +30,14 @@
     <div class="row">
         <div class="col-md-12 py-4">
             <p>
-                <h4>Welcome to this SLU!</h4>
+                <h1>Welcome to this SLU!</h1>
             </p>
             <p>
-                After downloading this assignment, the first thing you need to do is to setup your local environment, so that you can run the all the notebooks in this SLU.
+                After downloading the SLUs, setup your local environment, so that you can run the the Jupyter notebooks.
+                See the setup instructions below.
             </p>
             <p>
-                With your setup in place, you should go through the notebooks in this order:
+                You should go through the notebooks in this order:
                 <ul>
                     <li>
                         <code>Learning Notebook</code>: here we'll teach you all the basics of <a href="https://pandas.pydata.org/docs/">Pandas</a>.
@@ -51,26 +52,28 @@
             </p>
 
             <p>
-                Once you're done with the three notebooks, you should upload your <code>Exercise Notebook</code> for grading, in the submission box below.
-            </p>
-
-            <br>
-
-            <p>
-                <h5 id="setup-env">How to setup your local environment</h5>
+                Once you're done with the three notebooks, you should upload your <code>Exercise Notebook</code> for grading 
+                in the submission box below.
             </p>
 
             <p>
-                In order for you to go through the notebooks, you need to:
+                <h2 id="setup-env">How to setup your local environment</h2>
+            </p>
+
+            <p>
+                In order to run the notebooks, you need to:
                 <ul>
                     <li>
-                        Have Python 3.10 installed in your machine.
+                        Have Python 3.12 installed in your machine.
                     </li>
                     <li>
                         Create a python virtual environment.
                     </li>
                     <li>
-                        Install the requirements listed in the <code>requirements.txt</code>, in your virtual env (note: it is paramount that the packages that you install have the exact same version as in the <code>requirements.txt</code> file, because those are the versions that we're using to grade your notebooks).
+                        Install the requirements listed in the <code>requirements.txt</code>, in your virtual env 
+                        (note: it is paramount that the packages that you install have the exact same version as 
+                        in the <code>requirements.txt</code> file, because those are the versions that we're using 
+                        to grade your notebooks).
                     </li>
                     <li>
                         Be able open a Jupyter Notebook and run code there.
@@ -80,7 +83,10 @@
 
             <p>
                 If you know what you're doing, the above instructions should be enough!
-                Otherwise, we have a guide that explains how to set up a Python environment and install requirements <a href="https://github.com/LDSSA/batch7-students/tree/main#2-initial-setup">here</a>.
+                Otherwise, we have a guide that explains how to set up a Python environment 
+                and install requirements <a href="https://github.com/LDSSA/batch-students/">here</a>. 
+                Follow points 2 and 4 to install Python and set up the virtual environment in your OS. 
+                Follow instructions in point 5 to see how to run a Jupyter notebook.
             </p>
 
             <p>
@@ -101,30 +107,29 @@
             <br>
 
             <p>
-                <h5>Submitting your work for grading</h5>
+                <h2>Submitting your work for grading</h2>
             </p>
 
             <p>
-                After you've setup your environment and worked on the <code>Exercise Notebook</code>, you'll need to submit it for grading and get a score of at least 16 (out of 20).
+                After you've completed the <code>Exercise Notebook</code>, 
+                you'll need to submit it for grading and get a score of at least 16 (out of 20).
             </p>
-
             <p>
-                <strong>You should upload the <code>Exercise Notebook</code> with your solutions directly</strong>. You don't need to create a zip file or submit anything else!
+                <strong>You should upload the <code>Exercise Notebook</code> with your solutions directly</strong>. 
+                You don't need to create a zip file or submit anything else!
             </p>
 
             <p>
                 After you submit, you'll see the grade of your submission, and whether you passed or not.
-                You can click in "Open" in the Feedback column to see how much did you score in each question.
+                You can click in "Open" in the Feedback column to see how much you scored in each question.
             </p>
 
             <p>
                 You can make as many submissions as you like until the due date. So take your time to work on this assignment :)
             </p>
-
-            <br>
-
+            
             <p>
-                <h5>Good luck!</h5>
+                <h2 style="color:green;">Good luck!</h2>
             </p>
         </div>
     </div>
@@ -134,7 +139,7 @@
             <div class="card-deck">
                 <div class="card">
                     <div class="card-body d-flex flex-column">
-                        <p class="card-text">Use the button below to download this assignment</p>
+                        <p class="card-text">Use the button below to download the SLU</p>
                         <a href="{% url 'admissions:candidate:assignment-download' challenge.pk %}" class="btn btn-primary {% if not download_enabled %} disabled {% endif %} mt-auto align-self-start" role="button" aria-pressed="true" target="_blank">Download</a>
                     </div>
                 </div>

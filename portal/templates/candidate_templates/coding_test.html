@@ -6,7 +6,6 @@
 
 
 <div class="container">
-    <h2 class="py-5">Coding Test</h2>
 
     <div class="row">
         <div class="col-md-12 text-center">
@@ -29,45 +28,40 @@
     <div class="row">
         <div class="col-md-12 py-4">
             <p>
-                <h4>Welcome to the Coding Test!</h4>
+                <h1 style="color:blue;">Welcome to the Coding Test!</h1>
             </p>
-            <p>
-                After downloading this assignment, the first thing you need to do is to setup your local environment, so that you can run the <code>Exercise Notebook</code> with the test.
-                This setup is exactly the same as for SLU01, so if you've already done SLU01, you can just use the same virtual environment.
-                If you haven't, check how to setup your local environment <a href="{% url 'admissions:candidate:slu' 'slu01' %}#setup-env">here</a>.
-            </p>
-
-            <p>
-                In order to have your test graded, you should upload your <code>Exercise Notebook</code> in the submission box below.
-            </p>
+            <h2>Follow these instructions:</h2>
+            <ol>
+                    <li>Download the coding test with the button below</li>
+                    <li>Create a virtual environment</li>
+                    <li>Install the requirements from requirement.txt - they are different than for the SLUs</li>
+                    <li>Run the exercise notebook </li>
+                    <li>Upload the exercise notebook  for grading</li>
+            </ol>
 
             <br>
 
             <p>
-                <h5>Submitting your work for grading</h5>
+                <h2 style="color:magenta">Submitting your work for grading</h2>
             </p>
-
-            <p>
-                After you've setup your environment and worked on the <code>Exercise Notebook</code>, you'll need to submit it for grading and get a score of at least 16 (out of 20).
+            <p style="margin-left:25px;">
+                Upload the <code>Exercise Notebook</code> in the submission box below.
             </p>
-
-            <p>
-                <strong>You should upload only the <code>Exercise Notebook</code> with your solutions directly</strong>, you don't need to create a zip file or anything else!
+            <p style="margin-left:25px;">
+                <strong>You should upload only the <code>Exercise Notebook</code> with your solutions directly</strong>, 
+                you don't need to create a zip file or anything else!
             </p>
-
-            <p>
-                After you submit, you'll see the grade of your submission, and whether you passed or not.
-                You can click in "Open" in the Feedback column to see how much did you score in each question.
+            <p style="margin-left:25px;">
+                After submitting, you'll see the grade and whether you passed or not.
+                You need a score of at least 16 (out of 20). <br>
+                Click in "Open" in the Feedback column to see how much you scored in each question.
             </p>
-
-            <p>
+            <p style="margin-left:25px; margin-right:10%;">
                 You can (and should!) make as many submissions as you like during the test!
             </p>
 
-            <br>
-
             <p>
-                <h5>Good luck!</h5>
+                <h3 style="color:green;">Good luck!</h3>
             </p>
         </div>
     </div>
@@ -77,7 +71,7 @@
             <div class="card-deck">
                 <div class="card">
                     <div class="card-body d-flex flex-column">
-                        <p class="card-text">Use the button below to download this assignment</p>
+                        <p class="card-text">Use the button below to download the coding test:</p>
                         <a href="{% url 'admissions:candidate:assignment-download' 'coding_test' %}" class="btn btn-primary {% if not download_enabled %} disabled {% endif %} mt-auto align-self-start" role="button" aria-pressed="true" target="_blank">Download</a>
                     </div>
                 </div>

@@ -8,10 +8,10 @@
     <h2 class="py-5">Coding Test</h2>
 
     <div class="jumbotron py-5">
-        <h2 class="pb-4">Attention!</h4>
+        <h1 style="color:red;">Attention!</h1>
 
-        <p>You're about to start the coding test.</p>
-        <p>Once you start it, you'll only have <b>{{ ADMISSIONS_CODING_TEST_DURATION }} hours</b> to complete it.
+        <h2>You're about to start the coding test.</h2>
+        <p>Once you start it, you'll only have <b>{{ ADMISSIONS_CODING_TEST_DURATION }} hours</b> to complete it.<br>
             You can make as many submissions as you want, and you only need 1 passing submission (at least <b>{{ coding_test_subtype.pass_score|floatformat }}</b> out of <b>{{ coding_test_subtype.max_score|floatformat }}</b> points).
         </p>
         <p>We'll only consider your <b>best</b> submission, not your last one.</p>
@@ -21,7 +21,8 @@
         </p>
 
         <p><h4>
-            Please complete the setup from SLU01 before starting the coding test, or you'll be wasting your precious test time setting up your environment!!!
+            Please complete the setup from SLU01 before starting the coding test, 
+            or you'll be wasting your precious test time setting up your environment!!!
         </h4></p>
 
         <form method="post" class="pt-4">

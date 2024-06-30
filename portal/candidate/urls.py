@@ -20,6 +20,11 @@ urlpatterns = [
         name="before-coding-test",
     ),
     path(
+        "confirmation-coding-test",
+        views.CandidateConfirmationCodingTestView.as_view(),
+        name="confirmation-coding-test",
+    ),
+    path(
         "coding-test",
         views.CodingTestView.as_view(),
         name="coding-test",

@@ -179,17 +179,23 @@
                     {% elif state.application_status.name == "ongoing" %}
                         <p>You have until <b>{{ ADMISSIONS_SELECTION_START }}</b> to pass all the assignments.</p>
 
-                        <p>For the Small Learning Units, you can start them at any time, submit them for grading as many times as you want, and the due date will always be the {{ ADMISSIONS_SELECTION_START }}.
-                        For the coding test, you can also submit it for grading as many times as you want, but once you start it, <b>you only have {{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours to finish it</b>.</p>
+                        <p>For the <b>Small Learning Units</b>, you can start them at any time, submit them for grading as many times as you want, and the due date will always be the {{ ADMISSIONS_SELECTION_START }}.</p>
+                        
+                        <p>For the <b>coding test</b>, you can submit it for grading as many times as you want, but once you start it, <b>you only have {{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours to finish it</b>.
+                        Start the coding test only when you have {{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours of free and uninterrupted time. </p>
+                        
+                        <p>The coding test and SLUs require setting up your local environment with a virtual environment and be able to run Jupyter notebooks.
+                        Follow the setup instructions in points 2 and 4 <a href="https://github.com/LDSSA/batch-admissions">here</a>. If you are not familiar with Jupyter notebooks, refer to SLU00 of the <a href="https://github.com/LDSSA/ds-prep-course-2024">prep course</a>.
 
-                        <p>Make sure that you only start the coding test when you have enough free and uninterrupted time. The coding test and SLUs require setting up your local environment.
-                        We <strong>strongly suggest that you complete SLU01 before starting the coding test</strong>.
-                        This way, you'll setup up your local environment without any time constraints and get familiar with the grading system, leaving you better prepared to face the coding test!</p>
+                        See instructions in point 5 on how to run a Jupyter notebook.
+                        
+                        We <strong>strongly suggest that you complete the SLUs before starting the coding test</strong>.
+                        This way, you'll set up your local environment without any time constraints and get familiar with the grading system, leaving you better prepared to face the coding test!</p>
 
                     {% elif state.application_status.name == "failed" %}
                         <p>We're sorry, but you didn't pass the admission test...</p>
 
-                        <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch5-students">GitHub</a>, for free.</p>
+                        <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch8-students">GitHub</a>, for free.</p>
 
                         <p>
                           If you want to give it another try next year, check our <a href="https://www.lisbondatascience.org/">website</a> and join our newsletters to be the first to receive updates about our courses and the dates for the next batch of the Academy.
@@ -332,7 +338,7 @@
                     {% elif state.selection_status == selection_status_values.REJECTED %}
                         Unfortunately, your payment has not been validated, so we've had to give your spot in the Academy to the next person in line.
 
-                        <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch5-students">GitHub</a>, for free.</p>
+                        <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch-students">GitHub</a>, for free.</p>
 
                         <p>
                           If you want to give it another try next year, check our <a href="https://www.lisbondatascience.org/">website</a> and join our newsletters to be the first to receive updates about our courses and the dates for the next batch of the Academy.
