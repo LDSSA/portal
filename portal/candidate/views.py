@@ -216,8 +216,29 @@ class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
             application.coding_test_started_at = datetime.now(timezone.utc)
             application.save()
 
-        return HttpResponseRedirect(reverse("admissions:candidate:coding-test"))
+        return HttpResponseRedirect(reverse("admissions:candidate:confirmation-coding-test"))
 
+class CandidateConfirmationCodingTestView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
+    template_name = "candidate_templates/confirmation_coding_test.html"
+
+    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
+        ctx = {
+            "coding_test_duration_hours": str(
+                config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600,
+            ),
+            "coding_test_subtype": Challenge.objects.get(code="coding_test"),
+        }
+        return super().get_context_data(**ctx)
+
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+        application = Application.objects.get(user=request.user)
+        if application.coding_test_started_at is None:
+            application.coding_test_started_at = datetime.now(timezone.utc)
+            application.save()
+
+        return HttpResponseRedirect(reverse("admissions:candidate:coding-test"))
 
 def submission_view_ctx(application, challenge) -> dict[str, Any]:  # noqa: ANN001, D103
     return {
