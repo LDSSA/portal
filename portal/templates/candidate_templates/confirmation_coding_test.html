@@ -13,9 +13,10 @@
         <h2>Are you sure you want to start the test now?</h2>
 
         <h2>Did you complete the setup?</h2>
+        
+        <h2>You only have <b>{{ ADMISSIONS_CODING_TEST_DURATION }} hours</b> to complete it once you start. </h2>
 
-        <h2>You only have <b>{{ ADMISSIONS_CODING_TEST_DURATION }} hours</b> to complete it once 
-        you click the button below.</h2>
+        <h2>The time starts running when you click the button below.</h2>
         
         <form method="post" class="pt-4">
             {% csrf_token %}
