@@ -212,9 +212,6 @@ class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
     ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
         application = Application.objects.get(user=request.user)
-        if application.coding_test_started_at is None:
-            application.coding_test_started_at = datetime.now(timezone.utc)
-            application.save()
 
         return HttpResponseRedirect(reverse("admissions:candidate:confirmation-coding-test"))
 
