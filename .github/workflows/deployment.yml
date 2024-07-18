@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - devops/move-circleci-to-gha
 
 jobs:
   build-and-push:
