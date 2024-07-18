@@ -7,7 +7,7 @@ on:
       - devops/move-circleci-to-gha
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -17,33 +17,13 @@ jobs:
         run: echo "IMAGE_TAG=$(echo `git log -n1 --format='%h'`)" >> $GITHUB_ENV
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Build django image
-        run: |
-          source $GITHUB_ENV
-          docker build -t ldssa/django:$IMAGE_TAG .
-          docker save -o django.tar ldssa/django:$IMAGE_TAG
-      - name: Upload Docker image
-        uses: actions/upload-artifact@v3
-        with:
-          name: django-image
-          path: django.tar
-
-  push:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download Docker image
-        uses: actions/download-artifact@v3
-        with:
-          name: django-image
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
       - name: Log in to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASS }}
-      - name: Push django image
+      - name: Build and Push django image
         run: |
-          docker load -i django.tar
+          source $GITHUB_ENV
+          docker build -t ldssa/django:$IMAGE_TAG .
           docker push ldssa/django:$IMAGE_TAG

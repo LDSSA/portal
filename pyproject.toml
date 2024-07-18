@@ -9,6 +9,7 @@ authors = [
     "Gustavo Fonseca <gustavo.fonseca@lisbondatascience.org>",
     "João Gomes <joao.gomes@lisbondatascience.org>",
     "Carlos Regis <carlos.regis@lisbondatascience.org>",
+    "Mária Hanulová <maria.hanulova@lisbondatascience.org>",
 ]
 readme = "README.md"
 license = "MIT"
