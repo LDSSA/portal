@@ -179,21 +179,21 @@ class ScholarshipView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, T
             user.ticket_type = TicketType.scholarship
         user.save()
         return redirect("admissions:candidate:home")
-    
+
 
 class AcademyTypeView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView):
-    
-        """Choose academy type preference."""  # noqa: D211
-    
-        template_name = "candidate_templates/academy_type.html"
-    
-        def post(  # noqa: ANN201, D102
-            self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-        ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
-            user = request.user
-            user.academy_type_preference = request.POST["academy_type"]
-            user.save()
-            return redirect("admissions:candidate:home")
+
+    """Choose academy type preference."""  # noqa: D211
+
+    template_name = "candidate_templates/academy_type.html"
+
+    def post(  # noqa: ANN201, D102
+        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+        user = request.user
+        user.academy_type_preference = request.POST["academy_type"]
+        user.save()
+        return redirect("admissions:candidate:home")
 
 
 class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
@@ -214,6 +214,7 @@ class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         application = Application.objects.get(user=request.user)
 
         return HttpResponseRedirect(reverse("admissions:candidate:confirmation-coding-test"))
+
 
 class CandidateConfirmationCodingTestView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
     template_name = "candidate_templates/confirmation_coding_test.html"
@@ -236,6 +237,7 @@ class CandidateConfirmationCodingTestView(AdmissionsCandidateViewMixin, Template
             application.save()
 
         return HttpResponseRedirect(reverse("admissions:candidate:coding-test"))
+
 
 def submission_view_ctx(application, challenge) -> dict[str, Any]:  # noqa: ANN001, D103
     return {

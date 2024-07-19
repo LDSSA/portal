@@ -33,7 +33,6 @@ class CandidateState(NamedTuple):  # noqa: D101
     academy_type: str | None
 
 
-
 class DomainExceptionError(Exception):  # noqa: D101
     pass
 
