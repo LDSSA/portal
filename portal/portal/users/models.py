@@ -21,30 +21,30 @@ class UserWhitelist(models.Model):  # noqa: D101
 
 
 class Gender(models.TextChoices):
-    female = 'female', _("Female")
-    male = 'male', _("Male")
-    other = 'other', _("Other/Prefer not to say")
+    female = "female", _("Female")
+    male = "male", _("Male")
+    other = "other", _("Other/Prefer not to say")
 
 
 class TicketTypeSelectable(models.TextChoices):
-    student = 'student', _("Student")
-    regular = 'regular', _("Regular")
-    company = 'company', _("Company")
+    student = "student", _("Student")
+    regular = "regular", _("Regular")
+    company = "company", _("Company")
 
 
 class TicketType(models.TextChoices):
-    student = 'student', _("Student")
-    regular = 'regular', _("Regular")
-    company = 'company', _("Company")
-    scholarship = 'scholarship', _("Scholarship")
+    student = "student", _("Student")
+    regular = "regular", _("Regular")
+    company = "company", _("Company")
+    scholarship = "scholarship", _("Scholarship")
 
 
 # Preference for in-person or remote
 class AcademyTypePreference(models.TextChoices):
-    in_person_then_remote = 'in_person_then_remote', _("In-person then remote")
-    remote_then_in_person = 'remote_then_in_person', _("Remote then in-person")
-    remote_only = 'remote_only', _("Remote only")
-    in_person_only = 'in_person_only', _("In-person only")
+    in_person_then_remote = "in_person_then_remote", _("In-person then remote")
+    remote_then_in_person = "remote_then_in_person", _("Remote then in-person")
+    remote_only = "remote_only", _("Remote only")
+    in_person_only = "in_person_only", _("In-person only")
 
 
 # TODO: custom user manager to filter out users with unverified email addresses  # noqa: FIX002, TD002, TD003
