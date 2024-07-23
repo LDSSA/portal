@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "ldsa-portal.fullname" . }}
+  annotations:
+    cert-manager.io/issuer: {{ .Values.ingress.annotations.certManagerIssuer }}
+    nginx.ingress.kubernetes.io/proxy-body-size: "{{ .Values.ingress.annotations.proxyBodySize }}"
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress.host }}
+    secretName: {{ .Values.ingress.secretName }}
+  rules:
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ include "ldsa-portal.fullname" . }}
+            port:
+              number: {{ .Values.service.port }}

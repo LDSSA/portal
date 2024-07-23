@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ldsa-portal.fullname" . }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    rollingUpdate:
+      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+  selector:
+    matchLabels:
+      app: {{ include "ldsa-portal.name" . }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "ldsa-portal.name" . }}
+        environment: {{ .Values.environment }}
+    spec:
+      restartPolicy: Always
+      volumes:
+        - name: kubeconfig-volume
+          configMap:
+            name: {{ .Values.kubeconfigConfigMapName }}
+        - name: aws-volume
+          configMap:
+            name: {{ .Values.awsConfigMapName }}
+      containers:
+        - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          name: django
+          resources: {}
+          args:
+            - {{ .Values.startScript }}
+          volumeMounts:
+            - name: kubeconfig-volume
+              mountPath: /home/django/.kube/
+            - name: aws-volume
+              mountPath: /home/django/.aws/
+          env:
+{{- range .Values.env }}
+            - name: {{ .name }}
+              valueFrom:
+                configMapKeyRef:
+                  key: {{ .key }}
+                  name: {{ .configMapName }}
+{{- end }}
