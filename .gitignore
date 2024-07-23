@@ -275,3 +275,6 @@ portal/media/
 .envs/*
 !.envs/.local/
 deployment/configmaps
+
+# Helm
+ldsa-portal-*.tgz
