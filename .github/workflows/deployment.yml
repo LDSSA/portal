@@ -78,7 +78,7 @@ jobs:
     - name: Update image and tag in files
       run: |
         sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.short_sha }}/" deploy/portal-ldsa/values.yaml
-        sed -i "s/tag: .*/tag: ${{ steps.increment_version.outputs.new_tag }}/" deploy/portal-ldsavalues.yaml
+        sed -i "s/version: .*/version: ${{ steps.increment_version.outputs.new_tag }}/" deploy/portal-ldsa/Chart.yaml
 
     - name: Deploy to Kubernetes
       run: |
