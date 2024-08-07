@@ -65,11 +65,11 @@ jobs:
     - name: Update image and tag in files
       run: |
         pwd
-        sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.short_sha }}/" ./portal-ldsa/values.yaml
-        sed -i "s/version: .*/version: ${{ steps.vars.outputs.short_sha }}/" ./portal-ldsa/Chart.yaml
+        sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.short_sha }}/" ./ldsa-portal/values.yaml
+        sed -i "s/version: .*/version: ${{ steps.vars.outputs.short_sha }}/" ./ldsa-portal/Chart.yaml
 
     - name: Deploy to Kubernetes
       run: |
         aws eks update-kubeconfig --name portal-batch4
-        helm package deploy/ldsa-portal --destination ./package
-        helm upgrade --install ldsa-portal ./package/deploy-${{ steps.vars.outputs.short_sha }}.tgz --values deploy/ldsa-portal/values.yaml
+        helm package ldsa-portal --destination ./package
+        helm upgrade --install ldsa-portal ./package/deploy-${{ steps.vars.outputs.short_sha }}.tgz --values ./ldsa-portal/values.yaml
