@@ -29,3 +29,59 @@ jobs:
           source $GITHUB_ENV
           docker build -t ldssa/django:$IMAGE_TAG .
           docker push ldssa/django:$IMAGE_TAG
+
+
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    # needs: build-and-push
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-1
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Kubernetes
+      uses: azure/setup-kubectl@v4
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+
+    - name: Get the latest tag
+      id: get_tag
+      run: |
+        latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+        echo "Latest tag: $latest_tag"
+        echo "::set-output name=latest_tag::$latest_tag"
+
+    - name: Increment patch version
+      id: increment_version
+      run: |
+        latest_tag=${{ steps.get_tag.outputs.latest_tag }}
+        IFS='.' read -r -a parts <<< "$latest_tag"
+        patch=$((parts[2] + 1))
+        new_tag="${parts[0]}.${parts[1]}.$patch"
+        echo "New tag: $new_tag"
+        echo "::set-output name=new_tag::$new_tag"
+
+    - name: Get the short SHA
+      id: vars
+      run: echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
+
+    - name: Update image and tag in files
+      run: |
+        sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.short_sha }}/" deploy/portal-ldsa/values.yaml
+        sed -i "s/tag: .*/tag: ${{ steps.increment_version.outputs.new_tag }}/" deploy/portal-ldsavalues.yaml
+
+    - name: Deploy to Kubernetes
+      run: |
+        aws eks update-kubeconfig --name portal-batch4
+        helm package deploy/ldsa-portal --destination ./package
+        helm upgrade --install ldsa-portal ./package/deploy-0.1.0.tgz --values deploy/ldsa-portal/values.yaml
