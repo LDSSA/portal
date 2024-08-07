@@ -54,23 +54,6 @@ jobs:
     - name: Set up Helm
       uses: azure/setup-helm@v4
 
-    - name: Get the latest tag
-      id: get_tag
-      run: |
-        latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
-        echo "Latest tag: $latest_tag"
-        echo "::set-output name=latest_tag::$latest_tag"
-
-    - name: Increment patch version
-      id: increment_version
-      run: |
-        latest_tag=${{ steps.get_tag.outputs.latest_tag }}
-        IFS='.' read -r -a parts <<< "$latest_tag"
-        patch=$((parts[2] + 1))
-        new_tag="${parts[0]}.${parts[1]}.$patch"
-        echo "New tag: $new_tag"
-        echo "::set-output name=new_tag::$new_tag"
-
     - name: Get the short SHA
       id: vars
       run: echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
@@ -78,10 +61,10 @@ jobs:
     - name: Update image and tag in files
       run: |
         sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.short_sha }}/" deploy/portal-ldsa/values.yaml
-        sed -i "s/version: .*/version: ${{ steps.increment_version.outputs.new_tag }}/" deploy/portal-ldsa/Chart.yaml
+        sed -i "s/version: .*/version: ${{ steps.vars.outputs.short_sha }}/" deploy/portal-ldsa/Chart.yaml
 
     - name: Deploy to Kubernetes
       run: |
         aws eks update-kubeconfig --name portal-batch4
         helm package deploy/ldsa-portal --destination ./package
-        helm upgrade --install ldsa-portal ./package/deploy-0.1.0.tgz --values deploy/ldsa-portal/values.yaml
+        helm upgrade --install ldsa-portal ./package/deploy-${{ steps.vars.outputs.short_sha }}.tgz --values deploy/ldsa-portal/values.yaml
