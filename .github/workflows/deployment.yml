@@ -29,3 +29,45 @@ jobs:
           source $GITHUB_ENV
           docker build -t ldssa/django:$IMAGE_TAG .
           docker push ldssa/django:$IMAGE_TAG
+
+
+
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    defaults:
+          run:
+            working-directory: ./deploy
+
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-1
+
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Kubernetes
+      uses: azure/setup-kubectl@v4
+
+    - name: Set up Helm
+      uses: azure/setup-helm@v4
+
+    - name: Get the short SHA
+      id: vars
+      run: echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
+
+    - name: Update image and tag in files
+      run: |
+        sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.short_sha }}/" ./ldsa-portal/values.yaml
+
+    - name: Deploy to Kubernetes
+      run: |
+        aws eks update-kubeconfig --name portal-batch4
+        helm dependency update ldsa-portal
+        helm upgrade --install ldsa-portal ./ldsa-portal --values ./ldsa-portal/values.yaml
