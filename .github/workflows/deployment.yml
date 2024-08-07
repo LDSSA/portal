@@ -69,5 +69,5 @@ jobs:
     - name: Deploy to Kubernetes
       run: |
         aws eks update-kubeconfig --name portal-batch4
-        helm dependency build
+        helm dependency update ldsa-portal
         helm upgrade --install ldsa-portal ./ldsa-portal --values ./ldsa-portal/values.yaml
