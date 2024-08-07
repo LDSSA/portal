@@ -37,6 +37,10 @@ jobs:
     runs-on: ubuntu-latest
     # needs: build-and-push
 
+    defaults:
+          run:
+            working-directory: ./deploy
+
     steps:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v2
@@ -60,10 +64,9 @@ jobs:
 
     - name: Update image and tag in files
       run: |
-        # Where am I?
         pwd
-        sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.short_sha }}/" ./deploy/portal-ldsa/values.yaml
-        sed -i "s/version: .*/version: ${{ steps.vars.outputs.short_sha }}/" ./deploy/portal-ldsa/Chart.yaml
+        sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.short_sha }}/" ./portal-ldsa/values.yaml
+        sed -i "s/version: .*/version: ${{ steps.vars.outputs.short_sha }}/" ./portal-ldsa/Chart.yaml
 
     - name: Deploy to Kubernetes
       run: |
