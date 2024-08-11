@@ -5,7 +5,8 @@ strategy:
     maxSurge: 2
     maxUnavailable: 0
 
-environment: production
+environment: development
+nameOverride: ldsa-portal-dev
 
 kubeconfigConfigMapName: kubeconfig-configmap
 awsConfigMapName: aws-configmap
@@ -107,21 +108,21 @@ env:
 
 ingress:
   annotations:
-    certManagerIssuer: letsencrypt-main
+    certManagerIssuer: letsencrypt-dev
     proxyBodySize: "10m"
   className: nginx
-  host: portal.lisbondatascience.org
-  secretName: portal-crt
+  host: portal-dev.lisbondatascience.org
+  secretName: portal-dev-crt
 
 service:
   port: 5000
   type: ClusterIP
 
 letsencrypt:
-  name: letsencrypt-main
+  name: letsencrypt-dev
   server: https://acme-v02.api.letsencrypt.org/directory
   email: gustavo.fonseca@lisbondatascience.org
-  privateKeySecretName: letsencrypt-main
+  privateKeySecretName: letsencrypt-dev
   ingressClass: nginx
 
 serviceAccount:

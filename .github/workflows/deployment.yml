@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
 
 jobs:
   build-and-push:
@@ -29,9 +30,6 @@ jobs:
           source $GITHUB_ENV
           docker build -t ldssa/django:$IMAGE_TAG .
           docker push ldssa/django:$IMAGE_TAG
-
-
-
 
   deploy:
     runs-on: ubuntu-latest
@@ -62,12 +60,17 @@ jobs:
       id: vars
       run: echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
 
-    - name: Update image and tag in files
-      run: |
-        sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.short_sha }}/" ./ldsa-portal/values.yaml
-
     - name: Deploy to Kubernetes
       run: |
         aws eks update-kubeconfig --name portal-batch4
         helm dependency update ldsa-portal
-        helm upgrade --install ldsa-portal ./ldsa-portal --values ./ldsa-portal/values.yaml
+
+        # Define the values file we want to use depending
+        # on the branch we are pushing to.
+        if [ ${{ github.ref }} == 'refs/heads/main' ]; then
+          values_file="./ldsa-portal/values.yaml"
+        else
+          values_file="./ldsa-portal/values-dev.yaml"
+        fi
+
+        helm upgrade --install ldsa-portal ./ldsa-portal --values $values_file  --set image.tag=${{ steps.vars.outputs.short_sha }}
