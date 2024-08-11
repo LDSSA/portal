@@ -1,0 +1,48 @@
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-configmap
+data:
+
+  POSTGRES_DB: {{ .Values.postgres.db }}
+  POSTGRES_USER: postgres
+  POSTGRES_PORT: "5432"
+
+  # GENERAL
+  BASE_URL: {{ .Values.ingress.host }}
+  DJANGO_ALLOWED_HOSTS: {{ .Values.ingress.host }}
+  DJANGO_SETTINGS_MODULE: config.settings.settings
+
+  # GRADING
+  BATCH_NAME: batch8
+  STUDENT_REPO_NAME: batch-workspace
+  GRADING_USERNAME: portal-api
+
+  # DJANGO CACHES
+  DJANGO_CACHE_BACKEND: "django_redis.cache.RedisCache"
+  REDIS_URL: redis://redis:6379/0
+
+  # DJANGO SECURITY
+  DJANGO_SECURE_SSL_REDIRECT: "False"
+
+  # DJANGO EMAIL
+  DJANGO_EMAIL_BACKEND: "portal.anymail_elasticmail.elasticmail.ElasticmailBackend"
+  DJANGO_DEFAULT_FROM_EMAIL: "admissions@lisbondatascience.org"
+
+  # DJANGO STORAGES
+  DJANGO_STATICFILES_STORAGE: "config.settings.settings.StaticRootS3Boto3Storage"
+  DJANGO_AWS_STORAGE_BUCKET_NAME: portal-batch5-storage
+  DJANGO_AWS_S3_REGION_NAME: eu-west-1
+
+  # COMPRESS
+  COMPRESS_ENABLED: "True"
+  COMPRESS_STORAGE: "storages.backends.s3boto3.S3Boto3Storage"
+
+  # SENTRY
+  SENTRY_DSN: https://b6527a62cbfa4982b06938ecbfcaaa5b@sentry.io/1450635
+
+  # OTHER
+  WEB_CONCURRENCY: "4"
+  SLACK_WORKSPACE: "https://ldssa-batch8.slack.com/team/"

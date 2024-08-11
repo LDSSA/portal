@@ -420,7 +420,7 @@ elif EMAIL_BACKEND == "portal.anymail_elasticmail.elasticmail.ElasticmailBackend
 # ADMIN
 # ------------------------------------------------------------------------------
 # Django Admin URL base
-ADMIN_URL = env("DJANGO_ADMIN_URL", default="admin/")
+ADMIN_URL = "admin/"
 # https://docs.djangoproject.com/en/dev/ref/settings/#admins
 ADMINS = [
     ("Hugo Castilho", "hcastilho@lisbondatascience.org"),

@@ -62,18 +62,36 @@ jobs:
 
     - name: Deploy to Kubernetes
       run: |
-        aws eks update-kubeconfig --name portal-batch4
+        if [ ${{ github.ref }} == 'refs/heads/main' ]; then
+          values_file="./ldsa-portal/values.yaml"
+          cluster_name="portal"
+          postgres_db="portal"
+          ingress_host="portal.lisbondatascience.org"
+
+        else
+          values_file="./ldsa-portal/values-dev.yaml"
+          cluster_name="portal-dev"
+          postgres_db="portaldev"
+          ingress_host="portal.dev-lisbondatascience.org"
+        fi
+
+        aws eks update-kubeconfig --name $cluster_name
+
+        # Make sure that the cert-manager is installed
+        # kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+        
+        # We need to get redis chart repository
+        helm repo add bitnami https://charts.bitnami.com/bitnami
+        # And NGINX
+        helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+        helm repo update
         helm dependency update ldsa-portal
 
         # Define the values file we want to use depending
         # on the branch we are pushing to.
 
-        if [ ${{ github.ref }} == 'refs/heads/main' ]; then
-          values_file="./ldsa-portal/values.yaml"
-          release_name="ldsa-portal"
-        else
-          values_file="./ldsa-portal/values-dev.yaml"
-          release_name="ldsa-portal-dev"
-        fi
-
-        helm upgrade --install $release_name ./ldsa-portal --values $values_file  --set image.tag=${{ env.short_sha }}
+        helm upgrade --install ldsa-portal ./ldsa-portal \
+          --values $values_file  \
+          --set image.tag=${{ env.short_sha }} \
+          --set postgres.db=$postgres_db \
+          --set ingress.host=$ingress_host
