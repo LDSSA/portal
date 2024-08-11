@@ -63,14 +63,12 @@ jobs:
     - name: Deploy to Kubernetes
       run: |
         if [ ${{ github.ref }} == 'refs/heads/main' ]; then
-          values_file="./ldsa-portal/values.yaml"
-          cluster_name="portal"
+          cluster_name="production"
           postgres_db="portal"
           ingress_host="portal.lisbondatascience.org"
 
         else
-          values_file="./ldsa-portal/values-dev.yaml"
-          cluster_name="portal-dev"
+          cluster_name="development"
           postgres_db="portaldev"
           ingress_host="portal.dev-lisbondatascience.org"
         fi
@@ -91,7 +89,7 @@ jobs:
         # on the branch we are pushing to.
 
         helm upgrade --install ldsa-portal ./ldsa-portal \
-          --values $values_file  \
+          --values ./ldsa-portal/values.yaml  \
           --set image.tag=${{ env.short_sha }} \
           --set postgres.db=$postgres_db \
           --set ingress.host=$ingress_host
