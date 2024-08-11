@@ -6,7 +6,6 @@ strategy:
     maxUnavailable: 0
 
 environment: development
-nameOverride: ldsa-portal-dev
 
 kubeconfigConfigMapName: kubeconfig-configmap
 awsConfigMapName: aws-configmap
@@ -19,7 +18,7 @@ startScript: /app/bin/start_prod.sh
 
 env:
   - name: BASE_URL
-    key: BASE_URL
+    key: BASE_URL_DEV
     configMapName: django-configmap
   - name: STUDENT_REPO_NAME
     key: STUDENT_REPO_NAME
@@ -76,7 +75,7 @@ env:
     key: DJANGO_AWS_S3_REGION_NAME
     configMapName: django-configmap
   - name: POSTGRES_DB
-    key: POSTGRES_DB
+    key: POSTGRES_DEV_DB
     configMapName: postgres-configmap
   - name: POSTGRES_HOST
     key: POSTGRES_HOST
@@ -106,7 +105,13 @@ env:
     key: SLACK_WORKSPACE
     configMapName: django-configmap
 
+ingress-nginx:
+  controller:
+    ingressClassResource:
+      enabled: false  # Prevents the creation of IngressClass by ingress-nginx (owned by production environment)
+
 ingress:
+  enabled: true
   annotations:
     certManagerIssuer: letsencrypt-dev
     proxyBodySize: "10m"

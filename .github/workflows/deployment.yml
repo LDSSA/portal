@@ -67,10 +67,13 @@ jobs:
 
         # Define the values file we want to use depending
         # on the branch we are pushing to.
+
         if [ ${{ github.ref }} == 'refs/heads/main' ]; then
           values_file="./ldsa-portal/values.yaml"
+          release_name="ldsa-portal"
         else
           values_file="./ldsa-portal/values-dev.yaml"
+          release_name="ldsa-portal-dev"
         fi
 
-        helm upgrade --install ldsa-portal ./ldsa-portal --values $values_file  --set image.tag=${{ steps.vars.outputs.short_sha }}
+        helm upgrade --install $release_name ./ldsa-portal --values $values_file  --set image.tag=${{ steps.vars.outputs.short_sha }}
