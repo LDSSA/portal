@@ -41,7 +41,7 @@ jobs:
 
     steps:
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -58,7 +58,7 @@ jobs:
 
     - name: Get the short SHA
       id: vars
-      run: echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
+      run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: Deploy to Kubernetes
       run: |
@@ -76,4 +76,4 @@ jobs:
           release_name="ldsa-portal-dev"
         fi
 
-        helm upgrade --install $release_name ./ldsa-portal --values $values_file  --set image.tag=${{ steps.vars.outputs.short_sha }}
+        helm upgrade --install $release_name ./ldsa-portal --values $values_file  --set image.tag=${{ env.short_sha }}
