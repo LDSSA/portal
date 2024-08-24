@@ -4,19 +4,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('capstone', '0011_auto_20220114_2145'),
+        ("capstone", "0011_auto_20220114_2145"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='duedatapoint',
-            name='state',
-            field=models.CharField(choices=[('queued', 'queued'), ('success', 'success'), ('fail', 'fail')], default='queued', max_length=64),
+            model_name="duedatapoint",
+            name="state",
+            field=models.CharField(
+                choices=[
+                    ("queued", "queued"),
+                    ("success", "success"),
+                    ("fail", "fail"),
+                ],
+                default="queued",
+                max_length=64,
+            ),
         ),
         migrations.AddIndex(
-            model_name='duedatapoint',
-            index=models.Index(fields=['due', 'state'], name='capstone_du_due_1cafd1_idx'),
+            model_name="duedatapoint",
+            index=models.Index(
+                fields=["due", "state"], name="capstone_du_due_1cafd1_idx"
+            ),
         ),
     ]

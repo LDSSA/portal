@@ -12,6 +12,7 @@ middleware here, or combine a Django application with an application of another
 framework.
 
 """
+
 import os
 import sys
 from pathlib import Path
@@ -34,5 +35,5 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.settings")
 application = get_wsgi_application()
 
 # Apply WSGI middleware here.
-# from helloworld.wsgi import HelloWorldApplication  # noqa: ERA001
-# application = HelloWorldApplication(application)  # noqa: ERA001
+# from helloworld.wsgi import HelloWorldApplication
+# application = HelloWorldApplication(application)

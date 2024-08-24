@@ -1,4 +1,4 @@
-import logging  # noqa: D100
+import logging
 
 from django.conf import settings
 from django.contrib import messages
@@ -15,30 +15,35 @@ from portal.users.views import InstructorMixin, StudentMixin
 logger = logging.getLogger(__name__)
 
 
-class StudentCapstoneListView(StudentMixin, ListView):  # noqa: D101
+class StudentCapstoneListView(StudentMixin, ListView):
     model = models.Capstone
     queryset = models.Capstone.objects.all()
     template_name = "capstone/student/capstone_list.html"
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         self.object_list = self.get_queryset()
         data = []
         for capstone in self.object_list:
-            api, _ = models.StudentApi.objects.get_or_create(capstone=capstone, user=request.user)
+            api, _ = models.StudentApi.objects.get_or_create(
+                capstone=capstone, user=request.user
+            )
             data.append((capstone, api))
 
         context = self.get_context_data(object_list=data)
         return self.render_to_response(context)
 
 
-class StudentCapstoneDetailView(StudentMixin, DetailView):  # noqa: D101
+class StudentCapstoneDetailView(StudentMixin, DetailView):
     model = models.Capstone
     template_name = "capstone/student/capstone_detail.html"
 
     # noinspection PyAttributeOutsideInit
-    def get_object(self, queryset=None):  # noqa: ANN001, ANN101, ANN201, D102
+    def get_object(self, queryset=None):
         self.object = super().get_object(queryset=queryset)
 
         api, _ = models.StudentApi.objects.get_or_create(
@@ -57,9 +62,12 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):  # noqa: D101
 
         return self.object, api, reports
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         capstone, api, reports = self.get_object()
         context = self.get_context_data(
             capstone=capstone,
@@ -73,9 +81,12 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):  # noqa: D101
         )
         return self.render_to_response(context)
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         capstone, api, reports = self.get_object()
 
         if "submit_api" in request.POST:
@@ -86,7 +97,9 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):  # noqa: D101
         else:
             for report_type, report in reports.items():
                 if f"submit_{report_type}" in request.POST:
-                    form = forms.ReportForm(request.POST, request.FILES, instance=report)
+                    form = forms.ReportForm(
+                        request.POST, request.FILES, instance=report
+                    )
                     if form.is_valid():
                         form.save()
                         messages.add_message(
@@ -97,28 +110,31 @@ class StudentCapstoneDetailView(StudentMixin, DetailView):  # noqa: D101
 
         return HttpResponseRedirect(self.get_success_url())
 
-    def get_success_url(self):  # noqa: ANN101, ANN201, D102
+    def get_success_url(self):
         return reverse("capstone:student-capstone-detail", args=(self.object.pk,))
 
 
-class InstructorCapstoneListView(InstructorMixin, ListView):  # noqa: D101
+class InstructorCapstoneListView(InstructorMixin, ListView):
     model = models.Capstone
     queryset = models.Capstone.objects.all()
     template_name = "capstone/instructor/capstone_list.html"
 
 
-class InstructorCapstoneDetailView(InstructorMixin, DetailView):  # noqa: D101
+class InstructorCapstoneDetailView(InstructorMixin, DetailView):
     model = models.Capstone
     queryset = models.Capstone.objects.all()
     template_name = "capstone/instructor/capstone_detail.html"
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         self.object = self.get_object()
         student_data = []
         for student in User.objects.filter(is_student=True):
-            student_data.append(  # noqa: PERF401
+            student_data.append(
                 {
                     "user": student,
                     "api": models.StudentApi.objects.filter(
@@ -151,19 +167,25 @@ class InstructorCapstoneDetailView(InstructorMixin, DetailView):  # noqa: D101
         return self.render_to_response(context)
 
 
-class CapstonePredictView(APIView):  # noqa: D101
-    permission_classes = []  # noqa: RUF012
+class CapstonePredictView(APIView):
+    permission_classes = []
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         return Response({"proba": 0.6})
 
 
-class CapstoneUpdateView(APIView):  # noqa: D101
-    permission_classes = []  # noqa: RUF012
+class CapstoneUpdateView(APIView):
+    permission_classes = []
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         return Response({"msg": "ok"})

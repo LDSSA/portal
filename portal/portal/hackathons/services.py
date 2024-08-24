@@ -1,4 +1,4 @@
-import logging  # noqa: D100
+import logging
 import random
 from io import StringIO
 from itertools import zip_longest
@@ -11,9 +11,12 @@ from . import models
 logger = logging.getLogger(__name__)
 
 
-def generate_teams(  # noqa: ANN201, D103
-    hackathon, team_size=3, max_team_size=6, max_teams=13  # noqa: ANN001
-):  # noqa: ANN001, ANN201, D103
+def generate_teams(
+    hackathon,
+    team_size=3,
+    max_team_size=6,
+    max_teams=13,
+):
     logger.info(
         "Generating Teams Size: %s Max: %s Max teams: %s",
         team_size,
@@ -34,17 +37,22 @@ def generate_teams(  # noqa: ANN201, D103
     create_teams(hackathon, present_teams)
 
 
-def create_teams(hackathon, present_teams):  # noqa: ANN001, ANN201, D103
+def create_teams(hackathon, present_teams):
     hackathon_team_id = 1
     for students in present_teams:
-        team = models.Team.objects.create(hackathon=hackathon, hackathon_team_id=hackathon_team_id)
+        team = models.Team.objects.create(
+            hackathon=hackathon, hackathon_team_id=hackathon_team_id
+        )
         team.users.set(students)
         logger.info("Team %s students %s", hackathon_team_id, students)
         hackathon_team_id += 1
 
 
-def generate_teams_with_remote(  # noqa: ANN201, D103
-    hackathon, team_size=3, max_team_size=6, max_teams=13  # noqa: ANN001
+def generate_teams_with_remote(
+    hackathon,
+    team_size=3,
+    max_team_size=6,
+    max_teams=13,
 ):  # noqa:ANN201
     logger.info(
         "Generating Teams Size: %s Max: %s Max teams: %s",
@@ -52,9 +60,13 @@ def generate_teams_with_remote(  # noqa: ANN201, D103
         max_team_size,
         max_teams,
     )
-    present = models.Attendance.objects.filter(hackathon=hackathon, present=True, remote=False)
+    present = models.Attendance.objects.filter(
+        hackathon=hackathon, present=True, remote=False
+    )
     present = [p.user for p in present]
-    remote = models.Attendance.objects.filter(hackathon=hackathon, present=True, remote=True)
+    remote = models.Attendance.objects.filter(
+        hackathon=hackathon, present=True, remote=True
+    )
     remote = [p.user for p in remote]
     logger.debug("Present %s", present)
     logger.debug("Remote %s", remote)
@@ -70,10 +82,12 @@ def generate_teams_with_remote(  # noqa: ANN201, D103
     create_teams(hackathon, present_teams, remote_teams)
 
 
-def create_teams_with_remote(hackathon, present_teams, remote_teams):  # noqa: ANN001, ANN201, D103
+def create_teams_with_remote(hackathon, present_teams, remote_teams):
     hackathon_team_id = 1
     for students in present_teams:
-        team = models.Team.objects.create(hackathon=hackathon, hackathon_team_id=hackathon_team_id)
+        team = models.Team.objects.create(
+            hackathon=hackathon, hackathon_team_id=hackathon_team_id
+        )
         team.users.set(students)
         logger.info("Team %s students %s", hackathon_team_id, students)
         hackathon_team_id += 1
@@ -89,14 +103,17 @@ def create_teams_with_remote(hackathon, present_teams, remote_teams):  # noqa: A
         hackathon_team_id += 1
 
 
-def get_groups(items, size, max_diff=1):  # noqa: ANN001, ANN201, D103
+def get_groups(items, size, max_diff=1):
     if not len(items):
         return []
 
     logger.debug("Creating groups...")
     random.shuffle(items)
     iterators = [iter(items)] * size
-    groups = [[item for item in group if item is not None] for group in zip_longest(*iterators)]
+    groups = [
+        [item for item in group if item is not None]
+        for group in zip_longest(*iterators)
+    ]
     logger.debug(groups)
 
     logger.debug("Reshaping groups...")
@@ -110,7 +127,7 @@ def get_groups(items, size, max_diff=1):  # noqa: ANN001, ANN201, D103
     return groups
 
 
-def submission(hackathon, user, file):  # noqa: ANN001, ANN201, D103
+def submission(hackathon, user, file):
     if user.is_student:
         if hackathon.status not in ("submissions_open", "complete"):
             msg = "Hackathon closed"
@@ -125,8 +142,8 @@ def submission(hackathon, user, file):  # noqa: ANN001, ANN201, D103
                 # Check submission limit
                 num = models.Submission.objects.filter(
                     hackathon=hackathon,
-                    content_type__app_label=user._meta.app_label,  # noqa: SLF001
-                    content_type__model=user._meta.model_name,  # noqa: SLF001
+                    content_type__app_label=user._meta.app_label,
+                    content_type__model=user._meta.model_name,
                     object_id=user.id,
                 ).count()
                 if num >= hackathon.max_submissions:
@@ -136,7 +153,7 @@ def submission(hackathon, user, file):  # noqa: ANN001, ANN201, D103
     # Load hackathon functions
     glob = {}
     script = hackathon.script_file.read().decode()
-    exec(script, glob)  # noqa: S102
+    exec(script, glob)
 
     # Load true data
     y_true = StringIO(hackathon.data_file.read().decode())
@@ -145,13 +162,13 @@ def submission(hackathon, user, file):  # noqa: ANN001, ANN201, D103
     # Load prediction data
     try:
         y_pred = glob["load"](file)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         msg = "Error reading data"
         raise ValidationError(msg) from exc
 
     try:
         is_valid = glob["validate"](y_true, y_pred)
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         msg = "Error validating data"
         raise ValidationError(msg) from exc
 
@@ -163,7 +180,7 @@ def submission(hackathon, user, file):  # noqa: ANN001, ANN201, D103
     score = glob["score"](y_true, y_pred)
     models.Submission.objects.create(
         hackathon=hackathon,
-        content_type=ContentType.objects.get_for_model(user._meta.model),  # noqa: SLF001
+        content_type=ContentType.objects.get_for_model(user._meta.model),
         object_id=user.id,
         score=score,
     )

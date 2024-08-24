@@ -1,15 +1,15 @@
-from django import forms  # noqa: D100
+from django import forms
 
 from portal.capstone import models
 
 
-class ApiForm(forms.ModelForm):  # noqa: D101
-    class Meta:  # noqa: D106
+class ApiForm(forms.ModelForm):
+    class Meta:
         model = models.StudentApi
-        fields = ["url"]  # noqa: RUF012
+        fields = ["url"]
 
 
-class ReportForm(forms.ModelForm):  # noqa: D101
-    class Meta:  # noqa: D106
+class ReportForm(forms.ModelForm):
+    class Meta:
         model = models.Report
-        fields = ["file"]  # noqa: RUF012
+        fields = ["file"]

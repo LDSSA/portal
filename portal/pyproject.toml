@@ -67,7 +67,7 @@ django-coverage-plugin = "^3.1.0"
 pytest-django = "^4.5.2"
 pre-commit = "^3.4.0"
 black = "^23.7.0"
-ruff = "^0.0.290"
+ruff = "^0.6.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -87,46 +87,18 @@ warn_unused_configs = true
 module = ["*.migrations.*"]
 ignore_errors = true
 
-[tool.black]
-line-length = 100
-target-version = ['py310']
-include = '\.pyi?$'
-extend-exclude = '''
-(
-      docs
-    | migrations
-    | static/CACHE/
-)
-'''
-
 [tool.ruff]
-cache-dir = "~/.cache/ruff"
-fix = false
+# Enable pycodestyle (`E`), Pyflakes (`F`), isort (`I`), Pydocstyle (`D`), Pyupgrade (`UP`)
+# For automatic fixes, run `ruff . --fix`
+# Same as poetry config
 target-version = "py310"
-show-fixes = true
-show-source = true
-select = ["ALL"]
-ignore = [
-  "ANN",    # Type hints related, handled by MyPy
-  "COM812", # Trailing comma missing, handled by Black
-  "D211",   # No blank lines allowed before class docstring
-  "D213",   # Multi-line docstring summary should start at the second line
-  "E501",   # line too long, handled by Black
-  "RUF100", # Unused noqa directive
-]
-extend-exclude = [
-  "**/migrations/*",
-  "**/static/CACHE/*",
-  "docs",
-]
+lint.select = ["E", "F", "I", "D", "UP"]
+lint.ignore = ["D203", "D213", "D102", "D101", "D100", "D103", "D106", "E501", "D105", "D104", "D107"]
 
-[tool.ruff.pep8-naming]
-ignore-names = [
-    'foo',
-    'bar',
-]
+# Same as Black.
+line-length = 88
 
 [tool.pytest.ini_options]
 norecursedirs = "node_modules"
-addopts = '--ds=config.settings.test --ignore=portal/applications --ignore=portal/candidate --ignore=portal/selection --ignore=portal/staff'
-testpaths = ['portal']
+addopts = '--ds=config.settings.test'
+testpaths = ['tests']

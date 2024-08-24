@@ -37,6 +37,36 @@ spec:
             - name: aws-volume
               mountPath: /home/django/.aws/
           env:
+            - name: DJANGO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: django-secrets
+                  key: DJANGO_SECRET_KEY
+            - name: ELASTICMAIL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: django-secrets
+                  key: ELASTICMAIL_API_KEY
+            - name: DJANGO_AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: django-secrets
+                  key: DJANGO_AWS_ACCESS_KEY_ID
+            - name: DJANGO_AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: django-secrets
+                  key: DJANGO_AWS_SECRET_ACCESS_KEY
+            - name: POSTGRES_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: django-secrets
+                  key: POSTGRES_HOST
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: django-secrets
+                  key: POSTGRES_PASSWORD
 {{- range .Values.env }}
             - name: {{ .name }}
               valueFrom:

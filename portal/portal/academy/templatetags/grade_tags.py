@@ -1,8 +1,8 @@
-from django import template  # noqa: D100
+from django import template
 
 register = template.Library()
 
 
 @register.inclusion_tag("academy/grade.html", takes_context=True)
-def show_grade(context, grade):  # noqa: ANN001, ANN201, D103
+def show_grade(context, grade):
     return {"grade": grade, "user": context["user"]}

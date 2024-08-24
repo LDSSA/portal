@@ -1,9 +1,13 @@
-import logging  # noqa: D100
+"""Forms for the users app."""
 
-# from allauth.account.forms import SignupForm  # noqa: ERA001
+import logging
+
+import django.contrib.auth.forms
+
+# from allauth.account.forms import SignupForm
 from constance import config
 
-# from allauth.account.forms import SignupForm  # noqa: ERA001
+# from allauth.account.forms import SignupForm
 from django import forms
 from django.contrib import auth
 from django.contrib.auth import get_user_model
@@ -16,10 +20,10 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-class UserChangeForm(forms.ModelForm):  # noqa: D101
+class UserChangeForm(forms.ModelForm):
     name = forms.CharField()
 
-    def __init__(self, *args, **kwawgs) -> None:  # noqa: ANN002, ANN003, ANN101, D107
+    def __init__(self, *args, **kwawgs) -> None:
         super().__init__(*args, **kwawgs)
         if config.PORTAL_STATUS == "academy":
             del self.fields["gender"]
@@ -40,7 +44,7 @@ class UserChangeForm(forms.ModelForm):  # noqa: D101
                     disabled=True,
                 )
 
-    class Meta:  # noqa: D106
+    class Meta:
         model = User
         fields = (
             "name",
@@ -52,22 +56,18 @@ class UserChangeForm(forms.ModelForm):  # noqa: D101
             "company",
             "ticket_type",
         )
-        widgets = {  # noqa: RUF012
+        widgets = {
             "logo": forms.TextInput(),
             "github_username": forms.TextInput(),
             "slack_member_id": forms.TextInput(),
         }
 
 
-class UserCreationForm(auth.forms.UserCreationForm):  # noqa: D101
-    error_message = auth.forms.UserCreationForm.error_messages.update(
-        {"duplicate_username": _("This username has already been taken.")},
-    )
-
-    class Meta(auth.forms.UserCreationForm.Meta):  # noqa: D106
+class UserCreationForm(django.contrib.auth.forms.UserCreationForm):
+    class Meta(auth.forms.UserCreationForm.Meta):
         model = User
 
-    def clean_username(self):  # noqa: ANN101, ANN201, D102
+    def clean_username(self):
         username = self.cleaned_data["username"]
 
         try:
@@ -75,21 +75,23 @@ class UserCreationForm(auth.forms.UserCreationForm):  # noqa: D101
         except User.DoesNotExist:
             return username
 
-        raise ValidationError(self.error_messages["duplicate_username"])
+        raise ValidationError(_("A user with that username already exists."))
 
 
-class PortalSignupForm(forms.Form):  # noqa: D101
+class PortalSignupForm(forms.Form):
     name = forms.CharField(max_length=255)
 
-    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003, ANN101, D107
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        # del self.fields["username"].widget.attrs["autofocus"]  # noqa: ERA001
+        # del self.fields["username"].widget.attrs["autofocus"]
         self.fields["gender"] = forms.ChoiceField(choices=Gender.choices)
-        self.fields["ticket_type"] = forms.ChoiceField(choices=TicketTypeSelectable.choices)
+        self.fields["ticket_type"] = forms.ChoiceField(
+            choices=TicketTypeSelectable.choices
+        )
         self.fields["profession"] = forms.CharField(max_length=50, required=False)
         self.fields["company"] = forms.CharField(max_length=100, required=False)
 
-    def signup(self, request, user) -> None:  # noqa: ANN001, ANN101, ARG002, D102
+    def signup(self, request, user) -> None:
         user.name = self.cleaned_data["name"]
         user.gender = self.cleaned_data["gender"]
         user.ticket_type = self.cleaned_data["ticket_type"]

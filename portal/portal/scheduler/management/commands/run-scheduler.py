@@ -1,4 +1,4 @@
-import logging  # noqa: D100, N999
+import logging
 from time import sleep
 
 from constance import config
@@ -6,14 +6,14 @@ from django.core.management.base import BaseCommand
 from django.db import connection
 from django.utils import timezone
 
-# from portal.capstone.simulator import run  # noqa: ERA001
+# from portal.capstone.simulator import run
 logger = logging.getLogger(__name__)
 
 
-class Command(BaseCommand):  # noqa: D101
-    help = "Run scheduler"  # noqa: A003
+class Command(BaseCommand):
+    help = "Run scheduler"
 
-    def handle(self, *args, **options):  # noqa: ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def handle(self, *args, **options):
         scheduled_fcns = (update_portal_status,)
 
         while True:
@@ -35,7 +35,7 @@ class Command(BaseCommand):  # noqa: D101
             sleep(10)
 
 
-def update_portal_status():  # noqa: ANN201, D103
+def update_portal_status():
     dt = timezone.now()
 
     # Initial portal state

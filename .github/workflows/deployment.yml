@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev
 
 jobs:
   build-and-push:
@@ -30,9 +31,6 @@ jobs:
           docker build -t ldssa/django:$IMAGE_TAG .
           docker push ldssa/django:$IMAGE_TAG
 
-
-
-
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
@@ -43,7 +41,7 @@ jobs:
 
     steps:
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -60,14 +58,38 @@ jobs:
 
     - name: Get the short SHA
       id: vars
-      run: echo "::set-output name=short_sha::$(git rev-parse --short HEAD)"
-
-    - name: Update image and tag in files
-      run: |
-        sed -i "s/tag: .*/tag: ${{ steps.vars.outputs.short_sha }}/" ./ldsa-portal/values.yaml
+      run: echo "short_sha=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: Deploy to Kubernetes
       run: |
-        aws eks update-kubeconfig --name portal-batch4
+        if [ ${{ github.ref }} == 'refs/heads/main' ]; then
+          cluster_name="production"
+          postgres_db="portal"
+          ingress_host="portal.lisbondatascience.org"
+
+        else
+          cluster_name="development"
+          postgres_db="portaldev"
+          ingress_host="portal.dev-lisbondatascience.org"
+        fi
+
+        aws eks update-kubeconfig --name $cluster_name
+
+        # Make sure that the cert-manager is installed
+        # kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+        
+        # We need to get redis chart repository
+        helm repo add bitnami https://charts.bitnami.com/bitnami
+        # And NGINX
+        helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+        helm repo update
         helm dependency update ldsa-portal
-        helm upgrade --install ldsa-portal ./ldsa-portal --values ./ldsa-portal/values.yaml
+
+        # Define the values file we want to use depending
+        # on the branch we are pushing to.
+
+        helm upgrade --install ldsa-portal ./ldsa-portal \
+          --values ./ldsa-portal/values.yaml  \
+          --set image.tag=${{ env.short_sha }} \
+          --set postgres.db=$postgres_db \
+          --set ingress.host=$ingress_host

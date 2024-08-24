@@ -1,4 +1,4 @@
-import logging  # noqa: D100
+import logging
 import random
 import string
 from datetime import datetime, timezone
@@ -12,12 +12,12 @@ from portal.users.models import User
 logger = logging.getLogger(__name__)
 
 
-def report_path(instance, filename):  # noqa: ANN001, ANN201, ARG001, D103
-    randstr = "".join(random.choices(string.ascii_lowercase, k=12))  # noqa: S311
+def report_path(instance, filename):
+    randstr = "".join(random.choices(string.ascii_lowercase, k=12))
     return f"{instance.user.username}/{instance.type}_{instance.user.username}_{randstr}.pdf"
 
 
-class Capstone(models.Model):  # noqa: D101
+class Capstone(models.Model):
     name = models.CharField(max_length=1024)
 
     scoring = models.FileField(upload_to=random_path, null=True, blank=True)
@@ -25,14 +25,14 @@ class Capstone(models.Model):  # noqa: D101
     report_provisory_open = models.BooleanField(default=False)
     report_final_open = models.BooleanField(default=False)
 
-    def __str__(self) -> str:  # noqa: ANN101, D105
+    def __str__(self) -> str:
         return self.name
 
-    def score(self):  # noqa: ANN101, ANN201, D102
+    def score(self):
         # Load scoring
         glob = {}
         script = self.scoring.read().decode()
-        exec(script, glob)  # noqa: S102
+        exec(script, glob)
 
         for api in self.studentapi_set.all():
             # noinspection PyUnresolvedReferences,PyUnboundLocalVariable
@@ -41,34 +41,34 @@ class Capstone(models.Model):  # noqa: D101
             api.save()
 
 
-class Report(models.Model):  # noqa: D101, DJ008
-    class Type(models.TextChoices):  # noqa: D106
+class Report(models.Model):
+    class Type(models.TextChoices):
         proposal = ("proposal", "Proposal")
         report_provisory = ("report_provisory", "Report Provisory")
         report_final = ("report_final", "Report Final")
 
     capstone = models.ForeignKey(Capstone, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE)
-    type = models.CharField(max_length=32, choices=Type.choices)  # noqa: A003
+    type = models.CharField(max_length=32, choices=Type.choices)
     file = models.FileField(upload_to=report_path, null=True, blank=True)
     submited_at = models.DateTimeField(auto_now=True)
 
 
-class StudentApi(models.Model):  # noqa: D101, DJ008
+class StudentApi(models.Model):
     capstone = models.ForeignKey(Capstone, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE)
     url = models.CharField(max_length=255, blank=True)
     score = models.FloatField(default=0)
 
 
-class Simulator(models.Model):  # noqa: D101
+class Simulator(models.Model):
     capstone = models.ForeignKey(Capstone, models.CASCADE, related_name="simulators")
 
     name = models.CharField(max_length=1024)
     started = models.DateTimeField(null=True)
     ends = models.DateTimeField(null=True)
     interval = models.DurationField(null=True)
-    # example: predict  # noqa: ERA001
+    # example: predict
     path = models.CharField(max_length=255)
 
     STATUS_CHOICES = (
@@ -81,10 +81,10 @@ class Simulator(models.Model):  # noqa: D101
     )
     status = models.CharField(choices=STATUS_CHOICES, default="queued", max_length=64)
 
-    def __str__(self) -> str:  # noqa: ANN101, D105
+    def __str__(self) -> str:
         return self.name
 
-    def start(self):  # noqa: ANN101, ANN201, D102
+    def start(self):
         if self.status == "start":  # Started manually through the admin
             logger.info("Starting simulator: %s", self)
             now = datetime.now(timezone.utc)
@@ -94,7 +94,7 @@ class Simulator(models.Model):  # noqa: D101
 
             self.create_due_datapoints(now)
 
-    def create_due_datapoints(self, starts):  # noqa: ANN001, ANN101, ANN201, D102
+    def create_due_datapoints(self, starts):
         logger.info("Creating due datapoints for %s", self)
         self.due_datapoints.all().delete()
         datapoints = self.datapoints.order_by("id").all()
@@ -107,9 +107,12 @@ class Simulator(models.Model):  # noqa: D101
         for student_api in student_apis:
             self.add_student_api(student_api, datapoints, starts)
 
-    def add_student_api(  # noqa: ANN201, D102
-        self, student_api, datapoints, starts=None  # noqa: ANN001, ANN101
-    ):  # noqa: ANN001, ANN101, ANN201, D102
+    def add_student_api(
+        self,
+        student_api,
+        datapoints,
+        starts=None,
+    ):
         logger.info(
             "Creating due datapoints for simulator %s student %s",
             self,
@@ -138,7 +141,7 @@ class Simulator(models.Model):  # noqa: D101
             due += interval
         DueDatapoint.objects.bulk_create(due_datapoints)
 
-    def reset(self):  # noqa: ANN101, ANN201, D102
+    def reset(self):
         if self.status == "reset":
             logger.info("Resetting simulator %s", self)
             self.due_datapoints.all().delete()
@@ -146,14 +149,16 @@ class Simulator(models.Model):  # noqa: D101
             self.save()
 
 
-class Datapoint(models.Model):  # noqa: D101, DJ008
+class Datapoint(models.Model):
     simulator = models.ForeignKey(Simulator, models.CASCADE, related_name="datapoints")
     data = models.TextField(blank=True)
     outcome = models.TextField(blank=True)
 
 
-class DueDatapoint(models.Model):  # noqa: D101, DJ008
-    simulator = models.ForeignKey(Simulator, models.CASCADE, related_name="due_datapoints")
+class DueDatapoint(models.Model):
+    simulator = models.ForeignKey(
+        Simulator, models.CASCADE, related_name="due_datapoints"
+    )
     url = models.TextField()
     datapoint = models.ForeignKey(Datapoint, models.CASCADE)
     user = models.ForeignKey(User, models.CASCADE)
@@ -173,7 +178,7 @@ class DueDatapoint(models.Model):  # noqa: D101, DJ008
     response_status = models.IntegerField(null=True)
     response_timeout = models.BooleanField(default=False)
 
-    class Meta:  # noqa: D106
-        indexes = [  # noqa: RUF012
+    class Meta:
+        indexes = [
             models.Index(fields=["due", "state"]),
         ]

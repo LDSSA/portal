@@ -1,8 +1,8 @@
-from django.core.mail.backends.smtp import EmailBackend  # noqa: D100
+from django.core.mail.backends.smtp import EmailBackend
 
 
-class PortalEmailBackend(EmailBackend):  # noqa: D101
-    def _send(self, email_message):  # noqa: ANN001, ANN101, ANN202
+class PortalEmailBackend(EmailBackend):
+    def _send(self, email_message):
         if hasattr(email_message, "template_id"):
             email_message.body = email_message.body + f"\n{email_message.template_id}"
             email_message.body = email_message.body + f"\n{email_message.metadata}"

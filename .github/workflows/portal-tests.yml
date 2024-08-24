@@ -44,29 +44,35 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry install --no-root --only dev
-      - name: List added, copied, modified, and renamed *py files
-        id: git_diff
+      - name: Format code
         run: |
-          git fetch origin main
-          git diff --name-only --diff-filter=ACMR origin/main | grep -E "(.py$)" > diff.txt || true
-      - name: Ruff linting
+          poetry run ruff format .
+      - name: Lint code
         run: |
-          poetry run ruff check --config=pyproject.toml . &> lint_checks.txt || true
-      - name: Diff-based ruff
-        run: |
-          grep -Ff diff.txt lint_checks.txt > lint_errors.txt || true
-          if [ -s lint_errors.txt ]; then
-            cat lint_errors.txt
-            echo 'Run the following command to fix your branch: make fixes'
-            exit 1
-          fi
+          poetry run ruff check .
 
-  black:
+  tests:
     needs: requirements
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./portal
+    services:
+      postgres:
+        image: postgres:14.5
+        # Provide the password for postgres which matches backend config
+        env:
+          POSTGRES_DB: portal
+          POSTGRES_USER: portal
+          POSTGRES_PASSWORD: portal
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -78,20 +84,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install poetry
-          poetry install --no-root --only dev
-      - name: List added, copied, modified, and renamed *py files
-        id: git_diff
+          poetry install
+      - name: Run tests
         run: |
-          git fetch origin main
-          git diff --name-only --diff-filter=ACMR origin/main | grep -E "(.py$)" > diff.txt || true
-      - name: Black code formatting
-        run: |
-          poetry run black --check --diff --color --config=pyproject.toml . &> lint_checks.txt || true
-      - name: Diff-based black
-        run: |
-          grep -Ff diff.txt lint_checks.txt > lint_errors.txt || true
-          if [ -s lint_errors.txt ]; then
-            cat lint_errors.txt
-            echo 'Run the following command to fix your branch: make fixes'
-            exit 1
-          fi
+          cp ci.env .env
+          poetry run pytest

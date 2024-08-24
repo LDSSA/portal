@@ -6,29 +6,22 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("applications", "0003_auto_20200214_2350")]
 
     operations = [
         migrations.AddField(
             model_name="application",
             name="slu01_started_at",
-            field=models.DateTimeField(
-                default=datetime.datetime(2020, 6, 21, 0, 0)
-            ),
+            field=models.DateTimeField(default=datetime.datetime(2020, 6, 21, 0, 0)),
         ),
         migrations.AddField(
             model_name="application",
             name="slu02_started_at",
-            field=models.DateTimeField(
-                default=datetime.datetime(2020, 6, 21, 0, 0)
-            ),
+            field=models.DateTimeField(default=datetime.datetime(2020, 6, 21, 0, 0)),
         ),
         migrations.AddField(
             model_name="application",
             name="slu03_started_at",
-            field=models.DateTimeField(
-                default=datetime.datetime(2020, 6, 21, 0, 0)
-            ),
+            field=models.DateTimeField(default=datetime.datetime(2020, 6, 21, 0, 0)),
         ),
     ]

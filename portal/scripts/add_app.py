@@ -1,4 +1,4 @@
-from datetime import datetime, timezone  # noqa: D100
+from datetime import datetime, timezone
 
 from portal.capstone import models
 

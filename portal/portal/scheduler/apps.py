@@ -1,6 +1,6 @@
-from django.apps import AppConfig  # noqa: D100
+from django.apps import AppConfig
 
 
-class SchedulerConfig(AppConfig):  # noqa: D101
+class SchedulerConfig(AppConfig):
     name = "portal.scheduler"
     verbose_name = "Scheduler"

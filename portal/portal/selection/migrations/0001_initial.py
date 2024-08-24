@@ -6,7 +6,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [migrations.swappable_dependency(settings.AUTH_USER_MODEL)]
@@ -26,9 +25,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "status",
-                    models.CharField(
-                        default="Passed Test (Awaiting)", max_length=20
-                    ),
+                    models.CharField(default="Passed Test (Awaiting)", max_length=20),
                 ),
                 ("draw_rank", models.IntegerField(default=None, null=True)),
                 ("payment_value", models.FloatField(default=None, null=True)),

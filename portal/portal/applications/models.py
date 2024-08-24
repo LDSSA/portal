@@ -1,4 +1,4 @@
-from datetime import datetime, timezone  # noqa: D100
+from datetime import datetime, timezone
 from logging import getLogger
 
 from django.conf import settings
@@ -10,28 +10,28 @@ logger = getLogger(__name__)
 LISBON_TZ = timezone.utc
 
 
-class Challenge(models.Model):  # noqa: D101
+class Challenge(models.Model):
     code = models.CharField(max_length=50, primary_key=True)
     file = models.FileField(blank=True)
     checksum = models.TextField(blank=True)
     max_score = models.FloatField(default=20)
     pass_score = models.FloatField(default=16)
 
-    def __str__(self) -> str:  # noqa: ANN101, D105
+    def __str__(self) -> str:
         return f"{self.code}"
 
 
-def notebook_path(instance, filename):  # noqa: ANN001, ANN201, ARG001, D103
+def notebook_path(instance, filename):
     now = datetime.now(LISBON_TZ).isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/notebook_{now}.ipynb"
 
 
-def feedback_path(instance, filename):  # noqa: ANN001, ANN201, ARG001, D103
+def feedback_path(instance, filename):
     now = datetime.now(LISBON_TZ).isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/feeback_{now}.ipynb"
 
 
-class Submission(models.Model):  # noqa: D101, DJ008
+class Submission(models.Model):
     application = models.ForeignKey(
         to="applications.Application",
         on_delete=models.CASCADE,
@@ -53,25 +53,27 @@ class Submission(models.Model):  # noqa: D101, DJ008
         ("checksum-failed", "Checksum verification failed"),
         ("graded", "Graded"),
     )
-    status = models.CharField(max_length=1024, choices=STATUSES, default="never-submitted")
+    status = models.CharField(
+        max_length=1024, choices=STATUSES, default="never-submitted"
+    )
     score = models.FloatField(default=0, null=False)
     message = models.TextField(blank=True)
     feedback = models.FileField(upload_to=feedback_path, null=True, blank=True)
 
 
-class SubmissionsExceptionError(Exception):  # noqa: D101
+class SubmissionsExceptionError(Exception):
     detail = "submission error"
 
 
-class SubmissionsClosedExceptionError(SubmissionsExceptionError):  # noqa: D101
+class SubmissionsClosedExceptionError(SubmissionsExceptionError):
     detail = "submission error (closed)"
 
 
-class SubmissionsNotOpenExceptionError(SubmissionsExceptionError):  # noqa: D101
+class SubmissionsNotOpenExceptionError(SubmissionsExceptionError):
     detail = "submission error (not open yet)"
 
 
-class Application(models.Model):  # noqa: D101, DJ008
+class Application(models.Model):
     user = models.OneToOneField("users.User", on_delete=models.CASCADE)
 
     updated_at = models.DateTimeField(auto_now=True)
@@ -84,7 +86,7 @@ class Application(models.Model):  # noqa: D101, DJ008
     # None -> email not sent
     # passed -> `you have passed` email sent
     # failed -> `you have failed` email sent
-    application_over_email_sent = models.CharField(  # noqa: DJ001
+    application_over_email_sent = models.CharField(
         null=True,
         default=None,
         max_length=10,

@@ -1,4 +1,4 @@
-from django.urls import path  # noqa: D100
+from django.urls import path
 
 from portal.users.views import (
     user_update_view,
@@ -6,8 +6,8 @@ from portal.users.views import (
 
 app_name = "users"
 urlpatterns = [
-    # path("", view=user_list_view, name="list"),  # noqa: ERA001
-    # path("~redirect/", view=user_redirect_view, name="redirect"),  # noqa: ERA001
+    # path("", view=user_list_view, name="list"),
+    # path("~redirect/", view=user_redirect_view, name="redirect"),
     path("profile/", view=user_update_view, name="profile"),
-    # path("<str:username>/", view=user_detail_view, name="detail"),  # noqa: ERA001
+    # path("<str:username>/", view=user_detail_view, name="detail"),
 ]

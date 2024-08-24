@@ -1,18 +1,18 @@
-from django.core.management.base import BaseCommand, CommandError  # noqa: D100, N999
+from django.core.management.base import BaseCommand, CommandError
 
 from portal.users.management.commands._create_user import add_user_options, create_user
 
 
-class Command(BaseCommand):  # noqa: D101
-    help = "Creates an instructor user in portal"  # noqa: A003
+class Command(BaseCommand):
+    help = "Creates an instructor user in portal"
 
-    def add_arguments(self, parser):  # noqa: ANN001, ANN101, ANN201, D102
+    def add_arguments(self, parser):
         add_user_options(parser)
 
-    def handle(self, *args, **options):  # noqa: ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def handle(self, *args, **options):
         try:
             user = create_user(user_type="instructor", **options)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             msg = f"Could not create instructor: {e}"
             raise CommandError(msg) from e
 

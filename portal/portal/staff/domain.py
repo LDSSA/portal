@@ -1,4 +1,4 @@
-from logging import getLogger  # noqa: D100
+from logging import getLogger
 
 from constance import config
 
@@ -17,21 +17,21 @@ from portal.selection.status import SelectionStatus
 logger = getLogger(__name__)
 
 
-class EventsExceptionError(Exception):  # noqa: D101
+class EventsExceptionError(Exception):
     pass
 
 
-class Events:  # noqa: D101
+class Events:
     @staticmethod
-    def applications_are_over_sent_emails() -> int:  # noqa: D102
+    def applications_are_over_sent_emails() -> int:
         return ApplicationDomainQueries.applications_with_sent_emails_count()
 
     @staticmethod
-    def applications_are_over_total_emails() -> int:  # noqa: D102
+    def applications_are_over_total_emails() -> int:
         return ApplicationDomainQueries.applications_count()
 
     @staticmethod
-    def trigger_applications_are_over() -> None:  # noqa: D102
+    def trigger_applications_are_over() -> None:
         if config.PORTAL_STATUS == "admissions:applications":
             logger.error(
                 "trying to trigger `applications over` event but applications are still open",
@@ -55,15 +55,17 @@ class Events:  # noqa: D101
         logger.info("sent %d `application_over` emails", sent_count)
 
     @staticmethod
-    def admissions_are_over_sent_emails() -> int:  # noqa: D102
-        return SelectionQueries.filter_by_status_in(SelectionStatus.FINAL_STATUS).count()
+    def admissions_are_over_sent_emails() -> int:
+        return SelectionQueries.filter_by_status_in(
+            SelectionStatus.FINAL_STATUS
+        ).count()
 
     @staticmethod
-    def admissions_are_over_total_emails() -> int:  # noqa: D102
+    def admissions_are_over_total_emails() -> int:
         return SelectionQueries.get_all().count()
 
     @staticmethod
-    def trigger_admissions_are_over() -> None:  # noqa: D102
+    def trigger_admissions_are_over() -> None:
         if config.PORTAL_STATUS == "admissions:applications":
             logger.error(
                 "trying to trigger `admissions over` event but applications are still open",
@@ -79,7 +81,9 @@ class Events:  # noqa: D101
                 SelectionStatus.TO_BE_ACCEPTED,
             ],
         ).exists():
-            logger.error("trying to trigger `admissions over` event but open selections exist")
+            logger.error(
+                "trying to trigger `admissions over` event but open selections exist"
+            )
             msg = "Can't trigger `admissions over` event (DRAWN, INTERVIEW, SELECTED, TO_BE_ACCEPTED exists)"
             raise EventsExceptionError(
                 msg,

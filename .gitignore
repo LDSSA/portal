@@ -278,3 +278,6 @@ deployment/configmaps
 
 # Helm
 ldsa-portal-*.tgz
+
+# Terraform
+.terraform/

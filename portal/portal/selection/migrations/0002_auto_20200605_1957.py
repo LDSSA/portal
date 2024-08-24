@@ -4,16 +4,13 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("selection", "0001_initial")]
 
     operations = [
         migrations.AlterField(
             model_name="selection",
             name="status",
-            field=models.CharField(
-                default="Passed Test (Awaiting)", max_length=40
-            ),
+            field=models.CharField(default="Passed Test (Awaiting)", max_length=40),
         ),
         migrations.AlterField(
             model_name="selection",

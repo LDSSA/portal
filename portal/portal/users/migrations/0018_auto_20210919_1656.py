@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0017_alter_user_applying_for_scholarship'),
+        ("users", "0017_alter_user_applying_for_scholarship"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='can_attend_next',
+            model_name="user",
+            name="can_attend_next",
             field=models.BooleanField(default=True),
         ),
         migrations.AddField(
-            model_name='user',
-            name='can_graduate',
+            model_name="user",
+            name="can_graduate",
             field=models.BooleanField(default=True),
         ),
     ]

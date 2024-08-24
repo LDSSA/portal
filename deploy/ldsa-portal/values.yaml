@@ -12,7 +12,7 @@ awsConfigMapName: aws-configmap
 
 image:
   repository: ldssa/django
-  tag: 3097b4a
+  tag: UNSET
 
 startScript: /app/bin/start_prod.sh
 
@@ -35,12 +35,6 @@ env:
   - name: DJANGO_SETTINGS_MODULE
     key: DJANGO_SETTINGS_MODULE
     configMapName: django-configmap
-  - name: DJANGO_SECRET_KEY
-    key: DJANGO_SECRET_KEY
-    configMapName: django-configmap
-  - name: DJANGO_ADMIN_URL
-    key: DJANGO_ADMIN_URL
-    configMapName: django-configmap
   - name: DJANGO_CACHE_BACKEND
     key: DJANGO_CACHE_BACKEND
     configMapName: django-configmap
@@ -56,17 +50,8 @@ env:
   - name: DJANGO_DEFAULT_FROM_EMAIL
     key: DJANGO_DEFAULT_FROM_EMAIL
     configMapName: django-configmap
-  - name: ELASTICMAIL_API_KEY
-    key: ELASTICMAIL_API_KEY
-    configMapName: django-configmap
   - name: DJANGO_STATICFILES_STORAGE
     key: DJANGO_STATICFILES_STORAGE
-    configMapName: django-configmap
-  - name: DJANGO_AWS_ACCESS_KEY_ID
-    key: DJANGO_AWS_ACCESS_KEY_ID
-    configMapName: django-configmap
-  - name: DJANGO_AWS_SECRET_ACCESS_KEY
-    key: DJANGO_AWS_SECRET_ACCESS_KEY
     configMapName: django-configmap
   - name: DJANGO_AWS_STORAGE_BUCKET_NAME
     key: DJANGO_AWS_STORAGE_BUCKET_NAME
@@ -76,19 +61,13 @@ env:
     configMapName: django-configmap
   - name: POSTGRES_DB
     key: POSTGRES_DB
-    configMapName: postgres-configmap
-  - name: POSTGRES_HOST
-    key: POSTGRES_HOST
-    configMapName: postgres-configmap
-  - name: POSTGRES_PASSWORD
-    key: POSTGRES_PASSWORD
-    configMapName: postgres-configmap
+    configMapName: django-configmap
   - name: POSTGRES_PORT
     key: POSTGRES_PORT
-    configMapName: postgres-configmap
+    configMapName: django-configmap
   - name: POSTGRES_USER
     key: POSTGRES_USER
-    configMapName: postgres-configmap
+    configMapName: django-configmap
   - name: SENTRY_DSN
     key: SENTRY_DSN
     configMapName: django-configmap
@@ -107,10 +86,10 @@ env:
 
 ingress:
   annotations:
-    certManagerIssuer: letsencrypt-main
+    certManagerIssuer: letsencrypt
     proxyBodySize: "10m"
   className: nginx
-  host: portal.lisbondatascience.org
+  host: UNSET
   secretName: portal-crt
 
 service:
@@ -118,10 +97,10 @@ service:
   type: ClusterIP
 
 letsencrypt:
-  name: letsencrypt-main
+  name: letsencrypt
   server: https://acme-v02.api.letsencrypt.org/directory
   email: gustavo.fonseca@lisbondatascience.org
-  privateKeySecretName: letsencrypt-main
+  privateKeySecretName: letsencrypt
   ingressClass: nginx
 
 serviceAccount:
@@ -129,3 +108,6 @@ serviceAccount:
 
 autoscaling:
   enabled: false
+
+postgres:
+  db: UNSET

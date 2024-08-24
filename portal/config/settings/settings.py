@@ -24,7 +24,9 @@ PRODUCER_INTERVAL = 1
 # GRADING
 # ------------------------------------------------------------------------------
 GRADING_USERNAME = env.str("GRADING_USERNAME")
-GRADING_CLASS = env.str("GRADING_CLASS", default="portal.grading.services.AcademyKubernetesGrading")
+GRADING_CLASS = env.str(
+    "GRADING_CLASS", default="portal.grading.services.AcademyKubernetesGrading"
+)
 GRADING_ADMISSIONS_CLASS = env.str(
     "GRADING_ADMISSIONS_CLASS",
     default="portal.grading.services.AdmissionsKubernetesGrading",
@@ -233,7 +235,7 @@ STATICFILES_FINDERS = [
 if STATICFILES_STORAGE == "config.settings.settings.StaticRootS3Boto3Storage":
     AWS_DEFAULT_ACL = None
     # https://django-storages.readthedocs.io/en/latest/#installation
-    INSTALLED_APPS += ["storages"]  # noqa: F405
+    INSTALLED_APPS += ["storages"]
     # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
     AWS_ACCESS_KEY_ID = env("DJANGO_AWS_ACCESS_KEY_ID")
     # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html#settings
@@ -255,12 +257,12 @@ if STATICFILES_STORAGE == "config.settings.settings.StaticRootS3Boto3Storage":
 
     # region http://stackoverflow.com/questions/10390244/
     # Full-fledge class: https://stackoverflow.com/a/18046120/104731
-    from storages.backends.s3boto3 import S3Boto3Storage  # noqa: E402
+    from storages.backends.s3boto3 import S3Boto3Storage
 
-    class StaticRootS3Boto3Storage(S3Boto3Storage):  # noqa: D101
+    class StaticRootS3Boto3Storage(S3Boto3Storage):
         location = "static"
 
-    class MediaRootS3Boto3Storage(S3Boto3Storage):  # noqa: D101
+    class MediaRootS3Boto3Storage(S3Boto3Storage):
         location = "media"
         file_overwrite = False
 
@@ -323,12 +325,12 @@ TEMPLATES = [
     },
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#templates
-TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG  # noqa: F405
+TEMPLATES[0]["OPTIONS"]["debug"] = DEBUG
 
 CACHE_TEMPLATES = env.bool("DJANGO_CACHE_TEMPLATES", default=True)
 if CACHE_TEMPLATES:
     # https://docs.djangoproject.com/en/dev/ref/settings/#templates
-    TEMPLATES[0]["OPTIONS"]["loaders"] = [  # noqa: F405
+    TEMPLATES[0]["OPTIONS"]["loaders"] = [
         (
             "django.template.loaders.cached.Loader",
             [
@@ -369,14 +371,18 @@ if SECURITY_EXTRAS:
     CSRF_COOKIE_SECURE = True
     # https://docs.djangoproject.com/en/dev/topics/security/#ssl-https
     # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-seconds
-    # TODO: set this to 60 seconds first and then to 518400 once you prove the former works  # noqa: FIX002, TD002, TD003
+    # TODO: set this to 60 seconds first and then to 518400 once you prove the former works
     SECURE_HSTS_SECONDS = 60
     # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True)
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
+        "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True
+    )
     # https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-preload
     SECURE_HSTS_PRELOAD = env.bool("DJANGO_SECURE_HSTS_PRELOAD", default=True)
     # https://docs.djangoproject.com/en/dev/ref/middleware/#x-content-type-options-nosniff
-    SECURE_CONTENT_TYPE_NOSNIFF = env.bool("DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True)
+    SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
+        "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF", default=True
+    )
 
 # EMAIL
 # ------------------------------------------------------------------------------
@@ -387,8 +393,12 @@ EMAIL_BACKEND = env(
 )
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
-DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org")
-ADMISSIONS_FROM_EMAIL = env("ADMISSIONS_FROM_EMAIL", default="admissions@lisbondatascience.org")
+DEFAULT_FROM_EMAIL = env(
+    "DJANGO_DEFAULT_FROM_EMAIL", default="notifications@lisbondatascience.org"
+)
+ADMISSIONS_FROM_EMAIL = env(
+    "ADMISSIONS_FROM_EMAIL", default="admissions@lisbondatascience.org"
+)
 # https://docs.djangoproject.com/en/dev/ref/settings/#server-email
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
@@ -420,7 +430,7 @@ elif EMAIL_BACKEND == "portal.anymail_elasticmail.elasticmail.ElasticmailBackend
 # ADMIN
 # ------------------------------------------------------------------------------
 # Django Admin URL base
-ADMIN_URL = env("DJANGO_ADMIN_URL", default="admin/")
+ADMIN_URL = "admin/"
 # https://docs.djangoproject.com/en/dev/ref/settings/#admins
 ADMINS = [
     ("Hugo Castilho", "hcastilho@lisbondatascience.org"),
@@ -436,7 +446,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 # django-constance
 # ------------------------------------------------------------------------------
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
-# CONSTANCE_DATABASE_CACHE_BACKEND ='default'  # noqa: ERA001
+# CONSTANCE_DATABASE_CACHE_BACKEND ='default'
 #
 # * Admissions                    -> admissions
 #   - Sign up
@@ -462,7 +472,10 @@ CONSTANCE_CONFIG = {
     "ADMISSIONS_SELECTION_START": (datetime.now(timezone.utc), ""),
     "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
 }
-ADMISSIONS_APPLICATIONS_STARTED_STATUSES = ["admissions:applications", "admissions:selection"]
+ADMISSIONS_APPLICATIONS_STARTED_STATUSES = [
+    "admissions:applications",
+    "admissions:selection",
+]
 
 
 # django-allauth
@@ -473,7 +486,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_ADAPTER = "portal.users.adapters.AccountAdapter"
-# SOCIALACCOUNT_ADAPTER = "portal.users.adapters.SocialAccountAdapter"  # noqa: ERA001
+# SOCIALACCOUNT_ADAPTER = "portal.users.adapters.SocialAccountAdapter"
 ACCOUNT_SIGNUP_FORM_CLASS = "portal.users.forms.PortalSignupForm"
 
 
@@ -490,7 +503,9 @@ if COMPRESS_ENABLED:
         STATICFILES_FINDERS = ["compressor.finders.CompressorFinder"]
 
     # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_STORAGE
-    COMPRESS_STORAGE = env("COMPRESS_STORAGE", default="compressor.storage.CompressorFileStorage")
+    COMPRESS_STORAGE = env(
+        "COMPRESS_STORAGE", default="compressor.storage.CompressorFileStorage"
+    )
     # https://django-compressor.readthedocs.io/en/latest/settings/#django.conf.settings.COMPRESS_URL
     COMPRESS_URL = STATIC_URL
 
@@ -498,7 +513,9 @@ if COMPRESS_ENABLED:
 # django-rest-framework
 # ------------------------------------------------------------------------------
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework.authentication.TokenAuthentication",),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.TokenAuthentication",
+    ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAdminUser",),
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
 }
@@ -507,9 +524,9 @@ REST_FRAMEWORK = {
 # ------------------------------------------------------------------------------
 if DEBUG:
     # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
-    INSTALLED_APPS += ["debug_toolbar"]  # noqa: F405
+    INSTALLED_APPS += ["debug_toolbar"]
     # https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#middleware
-    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]  # noqa: F405
+    MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
     # https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-config
     DEBUG_TOOLBAR_CONFIG = {
         "DISABLE_PANELS": [
@@ -529,20 +546,20 @@ if DEBUG:
 # ------------------------------------------------------------------------------
 # https://django-extensions.readthedocs.io/en/latest/installation_instructions.html#configuration
 if DEBUG:
-    INSTALLED_APPS += ["django_extensions"]  # noqa: F405
+    INSTALLED_APPS += ["django_extensions"]
 
 # Gunicorn
 # ------------------------------------------------------------------------------
 GUNICORN_ENABLED = env.bool("GUNICORN_ENABLED", default=True)
 if GUNICORN_ENABLED:
-    INSTALLED_APPS += ["gunicorn"]  # noqa: F405
+    INSTALLED_APPS += ["gunicorn"]
 
 
 # Collectfast
 # ------------------------------------------------------------------------------
 # https://github.com/antonagestam/collectfast#installation
 if STATICFILES_STORAGE == "storages.backends.s3boto.S3BotoStorage":
-    INSTALLED_APPS = ["collectfast", *INSTALLED_APPS]  # noqa: F405
+    INSTALLED_APPS = ["collectfast", *INSTALLED_APPS]
     AWS_PRELOAD_METADATA = True
 
 # Sentry

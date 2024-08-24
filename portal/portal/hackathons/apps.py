@@ -1,6 +1,6 @@
-from django.apps import AppConfig  # noqa: D100
+from django.apps import AppConfig
 
 
-class HackathonsConfig(AppConfig):  # noqa: D101
+class HackathonsConfig(AppConfig):
     name = "portal.hackathons"
     verbose_name = "Hackathons"

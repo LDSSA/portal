@@ -4,25 +4,24 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('selection', '0005_auto_20210527_1819'),
+        ("selection", "0005_auto_20210527_1819"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='selection',
-            name='payment_due_date',
+            model_name="selection",
+            name="payment_due_date",
             field=models.DateTimeField(blank=True, default=None, null=True),
         ),
         migrations.AlterField(
-            model_name='selection',
-            name='payment_value',
+            model_name="selection",
+            name="payment_value",
             field=models.FloatField(blank=True, default=None, null=True),
         ),
         migrations.AlterField(
-            model_name='selection',
-            name='ticket_type',
+            model_name="selection",
+            name="ticket_type",
             field=models.CharField(blank=True, default=None, max_length=40, null=True),
         ),
     ]
