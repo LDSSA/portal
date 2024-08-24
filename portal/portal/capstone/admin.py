@@ -1,4 +1,4 @@
-from datetime import datetime, timezone  # noqa: D100
+from datetime import datetime, timezone
 
 from django.contrib import admin
 
@@ -6,7 +6,7 @@ from portal.capstone import models
 
 
 @admin.register(models.Capstone)
-class CapstoneAdmin(admin.ModelAdmin):  # noqa: D101
+class CapstoneAdmin(admin.ModelAdmin):
     list_display = ("name",)
     fields = (
         "name",
@@ -18,19 +18,19 @@ class CapstoneAdmin(admin.ModelAdmin):  # noqa: D101
 
 
 @admin.register(models.Report)
-class ReportAdmin(admin.ModelAdmin):  # noqa: D101
+class ReportAdmin(admin.ModelAdmin):
     list_display = ("capstone", "user", "type")
     fields = ("capstone", "user", "type", "file", "submited_at")
 
 
 @admin.register(models.StudentApi)
-class StudentApiAdmin(admin.ModelAdmin):  # noqa: D101
+class StudentApiAdmin(admin.ModelAdmin):
     list_display = ("capstone", "user", "url")
     fields = ("capstone", "user", "url")
 
 
 @admin.register(models.Simulator)
-class SimulatorAdmin(admin.ModelAdmin):  # noqa: D101
+class SimulatorAdmin(admin.ModelAdmin):
     list_display = ("name", "capstone", "status", "ends")
     fields = (
         "name",
@@ -48,29 +48,29 @@ class SimulatorAdmin(admin.ModelAdmin):  # noqa: D101
 
 
 @admin.register(models.Datapoint)
-class DatapointAdmin(admin.ModelAdmin):  # noqa: D101
+class DatapointAdmin(admin.ModelAdmin):
     list_display = ("id", "simulator", "data", "outcome")
     fields = ("simulator", "data", "outcome")
     list_filter = ("simulator",)
 
 
-class OldFilter(admin.SimpleListFilter):  # noqa: D101
+class OldFilter(admin.SimpleListFilter):
     title = "Old"
 
     # Parameter for the filter that will be used in the URL query.
     parameter_name = "old"
 
-    def lookups(self, request, model_admin):  # noqa: ANN001, ANN101, ANN201, ARG002, D102
+    def lookups(self, request, model_admin):
         return (("now", "now"),)
 
-    def queryset(self, request, queryset):  # noqa: ANN001, ANN101, ANN201, ARG002, D102
+    def queryset(self, request, queryset):
         if self.value() == "now":
             return queryset.filter(due__lte=datetime.now(timezone.utc))
         return None
 
 
 @admin.register(models.DueDatapoint)
-class DueDatapointAdmin(admin.ModelAdmin):  # noqa: D101
+class DueDatapointAdmin(admin.ModelAdmin):
     list_filter = (OldFilter, "state", "simulator", "user", "simulator")
 
     list_display = ("id", "simulator", "user", "datapoint", "state", "due")

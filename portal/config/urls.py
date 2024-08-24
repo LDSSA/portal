@@ -1,4 +1,4 @@
-from django.conf import settings  # noqa: D100
+from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
@@ -7,16 +7,20 @@ from django.views import defaults as default_views
 from portal.academy.views import HomeRedirectView
 from portal.users.views import InstructorsSignupView
 
-urlpatterns = [  # noqa: RUF005
+urlpatterns = [
     # General
     path("accounts/", include("allauth.urls")),
-    path("accounts/instructor/signup/", InstructorsSignupView.as_view(), name="instructors_signup"),
+    path(
+        "accounts/instructor/signup/",
+        InstructorsSignupView.as_view(),
+        name="instructors_signup",
+    ),
     # path("",
-    #      TemplateView.as_view(template_name="pages/home.html"),  # noqa: ERA001
+    #      TemplateView.as_view(template_name="pages/home.html"),
     #      name="home"),
     # path("about/",
-    #      TemplateView.as_view(template_name="pages/about.html"),  # noqa: ERA001
-    #      name="about",  # noqa: ERA001
+    #      TemplateView.as_view(template_name="pages/about.html"),
+    #      name="about",
     # ),
     path("", HomeRedirectView.as_view(), name="home"),
     # Django Admin, use {% url 'admin:index' %}

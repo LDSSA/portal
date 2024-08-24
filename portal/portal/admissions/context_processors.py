@@ -1,18 +1,18 @@
-from constance import config  # noqa: D100
+from constance import config
 from django.conf import settings
 
 from portal.selection.models import Selection
 from portal.users.models import User
 
 
-def user_has_payment(user: User) -> bool:  # noqa: D103
+def user_has_payment(user: User) -> bool:
     try:
         return user.selection.payment_value is not None
     except Selection.DoesNotExist:
         return False
 
 
-def admissions_context_processor(request):  # noqa: ANN001, ANN201, D103
+def admissions_context_processor(request):
     my_dict = {
         "PORTAL_STATUS": config.PORTAL_STATUS,
         "ACADEMY_START": config.ACADEMY_START,
@@ -29,7 +29,8 @@ def admissions_context_processor(request):  # noqa: ANN001, ANN201, D103
         my_dict.update(
             {
                 "code_of_conduct_accepted": request.user.code_of_conduct_accepted,
-                "scholarship_decided": request.user.applying_for_scholarship is not None,
+                "scholarship_decided": request.user.applying_for_scholarship
+                is not None,
                 "applying_for_scholarship": request.user.applying_for_scholarship,
                 "user_has_payment": user_has_payment(request.user),
             },

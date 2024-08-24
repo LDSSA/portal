@@ -1,12 +1,12 @@
-import contextlib  # noqa: D100
+import contextlib
 
-from django.apps import AppConfig  # noqa: D100
+from django.apps import AppConfig
 
 
-class UsersAppConfig(AppConfig):  # noqa: D101
+class UsersAppConfig(AppConfig):
     name = "portal.users"
     verbose_name = "Users"
 
-    def ready(self):  # noqa: ANN101, ANN201, D102
+    def ready(self):
         with contextlib.suppress(ImportError):
-            import users.signals  # noqa: F401
+            pass

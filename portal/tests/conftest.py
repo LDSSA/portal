@@ -1,21 +1,46 @@
-from datetime import datetime  # noqa: D100
+from datetime import datetime
 
 import pytest
 from dateutil import tz
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.test import RequestFactory
+from factory import Faker
+from factory.django import DjangoModelFactory
 
 from portal.academy.models import Grade, Specialization, Unit
 from portal.hackathons.models import Attendance, Hackathon
 from portal.users.models import User
-from portal.users.tests.factories import UserFactory
 
 LISBON_TZ = tz.gettz("Europe/Lisbon")
 
 
+class UserFactory(DjangoModelFactory):
+    username = Faker("user_name")
+    email = Faker("email")
+    name = Faker("name")
+    password = Faker(
+        "password",
+        length=42,
+        special_chars=True,
+        digits=True,
+        upper_case=True,
+        lower_case=True,
+    )
+
+    class Meta:
+        model = get_user_model()
+        django_get_or_create = ["username"]
+
+
+@pytest.fixture
+def proto_user():
+    return UserFactory()
+
+
 @pytest.mark.django_db()
 @pytest.fixture(autouse=True)
-def _cleanup_db() -> None:  # noqa: D103
+def _cleanup_db() -> None:
     User.objects.all().delete()
     Specialization.objects.all().delete()
     Unit.objects.all().delete()
@@ -25,7 +50,7 @@ def _cleanup_db() -> None:  # noqa: D103
 
 
 @pytest.fixture()
-def grader():  # noqa: ANN201, D103
+def grader():
     return User.objects.create(
         username="grader",
         name="Grader User",
@@ -38,7 +63,7 @@ def grader():  # noqa: ANN201, D103
 
 
 @pytest.fixture()
-def student():  # noqa: ANN201, D103
+def student():
     return User.objects.create(
         username="test_student",
         name="test_student",
@@ -50,7 +75,7 @@ def student():  # noqa: ANN201, D103
 
 
 @pytest.fixture()
-def student2():  # noqa: ANN201, D103
+def student2():
     return User.objects.create(
         username="test_student_2",
         name="test_student_2",
@@ -62,7 +87,7 @@ def student2():  # noqa: ANN201, D103
 
 
 @pytest.fixture()
-def instructor():  # noqa: ANN201, D103
+def instructor():
     return User.objects.create(
         username="test_instructor",
         name="test_instructor",
@@ -74,7 +99,7 @@ def instructor():  # noqa: ANN201, D103
 
 
 @pytest.fixture()
-def specialization():  # noqa: ANN201, D103
+def specialization():
     return Specialization.objects.create(
         code="S01",
         name="bootcamp",
@@ -84,7 +109,7 @@ def specialization():  # noqa: ANN201, D103
 
 
 @pytest.fixture()
-def slu1(specialization, instructor):  # noqa: ANN001, ANN201, D103
+def slu1(specialization, instructor):
     return Unit.objects.create(
         specialization=specialization,
         code="SLU01",
@@ -99,7 +124,7 @@ def slu1(specialization, instructor):  # noqa: ANN001, ANN201, D103
 
 
 @pytest.fixture()
-def slu2(specialization, instructor):  # noqa: ANN001, ANN201, D103
+def slu2(specialization, instructor):
     return Unit.objects.create(
         specialization=specialization,
         code="SLU02",
@@ -114,7 +139,7 @@ def slu2(specialization, instructor):  # noqa: ANN001, ANN201, D103
 
 
 @pytest.fixture()
-def hackathon1(specialization, instructor):  # noqa: ANN001, ANN201, ARG001, D103
+def hackathon1(specialization, instructor):
     return Hackathon.objects.create(
         code="HCKT01",
         name="Hackathon 1 - Binary classification",
@@ -124,7 +149,7 @@ def hackathon1(specialization, instructor):  # noqa: ANN001, ANN201, ARG001, D10
 
 
 @pytest.fixture()
-def hackathon2(specialization, instructor):  # noqa: ANN001, ANN201, ARG001, D103
+def hackathon2(specialization, instructor):
     return Hackathon.objects.create(
         code="HCKT02",
         name="Hackathon 2 - Data wrangling",
@@ -134,7 +159,7 @@ def hackathon2(specialization, instructor):  # noqa: ANN001, ANN201, ARG001, D10
 
 
 @pytest.fixture()
-def hackathon3(specialization, instructor):  # noqa: ANN001, ANN201, ARG001, D103
+def hackathon3(specialization, instructor):
     return Hackathon.objects.create(
         code="HCKT03",
         name="Hackathon 3 - Time series",
@@ -144,7 +169,7 @@ def hackathon3(specialization, instructor):  # noqa: ANN001, ANN201, ARG001, D10
 
 
 @pytest.fixture()
-def grade_slu1(student, slu1):  # noqa: ANN001, ANN201, D103
+def grade_slu1(student, slu1):
     return Grade.objects.create(
         user=student,
         unit=slu1,
@@ -156,7 +181,7 @@ def grade_slu1(student, slu1):  # noqa: ANN001, ANN201, D103
 
 
 @pytest.fixture()
-def grade_slu2(student, slu2):  # noqa: ANN001, ANN201, D103
+def grade_slu2(student, slu2):
     return Grade.objects.create(
         user=student,
         unit=slu2,
@@ -168,15 +193,15 @@ def grade_slu2(student, slu2):  # noqa: ANN001, ANN201, D103
 
 
 @pytest.fixture(autouse=True)
-def _media_storage(settings, tmpdir):  # noqa: ANN001, ANN202, D103
+def _media_storage(settings, tmpdir):
     settings.MEDIA_ROOT = tmpdir.strpath
 
 
 @pytest.fixture()
-def user() -> settings.AUTH_USER_MODEL:  # noqa: D103
+def user() -> settings.AUTH_USER_MODEL:
     return UserFactory()
 
 
 @pytest.fixture()
-def request_factory() -> RequestFactory:  # noqa: D103
+def request_factory() -> RequestFactory:
     return RequestFactory()

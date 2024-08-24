@@ -1,4 +1,4 @@
-import json  # noqa: D100
+import json
 import logging
 
 from anymail.backends.base_requests import (
@@ -15,10 +15,10 @@ V2_API_URL = "https://api.elasticemail.com/v2/"
 V4_API_URL = "https://api.elasticemail.com/v4/"
 
 
-class ElasticmailBackend(AnymailRequestsBackend):  # noqa: D101
+class ElasticmailBackend(AnymailRequestsBackend):
     esp_name = "Elasticmail"
 
-    def __init__(self, **kwargs) -> None:  # noqa: ANN003, ANN101
+    def __init__(self, **kwargs) -> None:
         """Init options from Django settings."""
         esp_name = self.esp_name
         self.api_key = get_anymail_setting(
@@ -36,9 +36,9 @@ class ElasticmailBackend(AnymailRequestsBackend):  # noqa: D101
         if not api_url.endswith("/"):
             api_url += "/"
         super().__init__(api_url, **kwargs)
-        # self.debug_api_requests = True  # noqa: ERA001
+        # self.debug_api_requests = True
 
-    def build_message_payload(self, message, defaults):  # noqa: ANN001, ANN101, ANN201, D102
+    def build_message_payload(self, message, defaults):
         return ElasticmailV4Payload(
             message,
             defaults,
@@ -48,9 +48,12 @@ class ElasticmailBackend(AnymailRequestsBackend):  # noqa: D101
             },
         )
 
-    def parse_recipient_status(  # noqa: ANN201, D102
-        self, response, payload, message  # noqa: ANN001, ANN101
-    ):  # noqa: ANN001, ANN101, ANN201, D102
+    def parse_recipient_status(
+        self,
+        response,
+        payload,
+        message,
+    ):
         try:
             parsed_response = self.deserialize_json_response(response, payload, message)
         except json.JSONDecodeError as exc:
@@ -71,14 +74,14 @@ class ElasticmailBackend(AnymailRequestsBackend):  # noqa: D101
         }
 
 
-class ElasticmailV4Payload(RequestsPayload):  # noqa: D101
-    def get_api_endpoint(self):  # noqa: ANN101, ANN201, D102
+class ElasticmailV4Payload(RequestsPayload):
+    def get_api_endpoint(self):
         return "emails/transactional"
 
-    def serialize_data(self):  # noqa: ANN101, ANN201, D102
+    def serialize_data(self):
         return self.serialize_json(self.data)
 
-    def init_payload(self):  # noqa: ANN101, ANN201, D102
+    def init_payload(self):
         self.data = {
             "Recipients": {
                 "To": [],
@@ -92,7 +95,7 @@ class ElasticmailV4Payload(RequestsPayload):  # noqa: D101
             },
         }
 
-    def set_from_email_list(self, emails):  # noqa: ANN001, ANN101, ANN201, D102
+    def set_from_email_list(self, emails):
         # If your backend supports multiple from emails, override this to handle the whole list;
         # otherwise just implement set_from_email
         if len(emails) > 1:
@@ -101,10 +104,10 @@ class ElasticmailV4Payload(RequestsPayload):  # noqa: D101
         if len(emails) > 0:
             self.data["Content"]["From"] = emails[0].address
 
-    def set_from_email(self, email):  # noqa: ANN001, ANN101, ANN201, D102
+    def set_from_email(self, email):
         self.data["Content"]["From"] = email.address
 
-    def add_recipient(self, recipient_type, email):  # noqa: ANN001, ANN101, ANN201, D102
+    def add_recipient(self, recipient_type, email):
         type_map = {
             "to": "To",
             "cc": "CC",
@@ -112,42 +115,42 @@ class ElasticmailV4Payload(RequestsPayload):  # noqa: D101
         }
         self.data["Recipients"][type_map[recipient_type]].append(email.address)
 
-    def set_subject(self, subject):  # noqa: ANN001, ANN101, ANN201, D102
+    def set_subject(self, subject):
         self.data["Content"]["Subject"] = subject
 
-    def set_reply_to(self, emails):  # noqa: ANN001, ANN101, ANN201, D102
+    def set_reply_to(self, emails):
         if len(emails) > 0:
             self.data["Content"]["ReplyTo"] = emails[0].address
             if len(emails) > 1:
                 self.unsupported_feature("Multiple reply_to addresses")
 
-    def set_extra_headers(self, headers):  # noqa: ANN001, ANN101, ANN201, ARG002, D102
+    def set_extra_headers(self, headers):
         # headers is a CaseInsensitiveDict, and is a copy (so is safe to modify)
         self.unsupported_feature("extra_headers")
 
-    def set_text_body(self, body):  # noqa: ANN001, ANN101, ANN201, D102
+    def set_text_body(self, body):
         self.data["Content"]["Merge"].update({"message": body})
 
-    def set_html_body(self, body):  # noqa: ANN001, ANN101, ANN201, D102
+    def set_html_body(self, body):
         self.data["Content"]["Merge"].update({"message": body})
 
-    def add_alternative(self, content, mimetype):  # noqa: ANN001, ANN101, ANN201, D102
+    def add_alternative(self, content, mimetype):
         if mimetype == "text/plain":
             self.set_txt_body(content)
         else:
-            self.unsupported_feature("alternative part with type '%s'" % mimetype)
+            self.unsupported_feature(f"alternative part with type '{mimetype}'")
 
-    def add_attachment(self, attachment):  # noqa: ANN001, ANN101, ANN201, D102
+    def add_attachment(self, attachment):
         pass
 
-    def set_template_id(self, template_id):  # noqa: ANN001, ANN101, ANN201, D102
+    def set_template_id(self, template_id):
         self.data["Content"]["TemplateName"] = template_id
 
-    def set_metadata(self, metadata):  # noqa: ANN001, ANN101, ANN201, D102
+    def set_metadata(self, metadata):
         self.data["Content"]["Merge"].update(metadata)
 
-    def set_track_clicks(self, track_clicks):  # noqa: ANN001, ANN101, ANN201, D102
+    def set_track_clicks(self, track_clicks):
         self.data["Options"]["TrackClicks"] = "true" if track_clicks else "false"
 
-    def set_track_opens(self, track_opens):  # noqa: ANN001, ANN101, ANN201, D102
+    def set_track_opens(self, track_opens):
         self.data["Options"]["TrackOpens"] = "true" if track_opens else "false"

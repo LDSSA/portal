@@ -1,4 +1,4 @@
-from logging import getLogger  # noqa: D100
+from logging import getLogger
 
 from portal.admissions import emails
 from portal.users.models import TicketType
@@ -11,11 +11,11 @@ from .status import SelectionStatus
 logger = getLogger(__name__)
 
 
-def requires_interview(selection):  # noqa: ANN001, ANN201, D103
+def requires_interview(selection):
     return selection.user.ticket_type == TicketType.scholarship
 
 
-def select() -> None:  # noqa: D103
+def select() -> None:
     for selection in SelectionQueries.filter_by_status_in([SelectionStatus.DRAWN]):
         if requires_interview(selection):
             to_interview(selection)
@@ -23,7 +23,7 @@ def select() -> None:  # noqa: D103
             to_selected(selection)
 
 
-def to_selected(selection):  # noqa: ANN001, ANN201, D103
+def to_selected(selection):
     SelectionDomain.update_status(selection, SelectionStatus.SELECTED)
     load_payment_data(selection)
 
@@ -36,7 +36,7 @@ def to_selected(selection):  # noqa: ANN001, ANN201, D103
     )
 
 
-def to_interview(selection):  # noqa: ANN001, ANN201, D103
+def to_interview(selection):
     SelectionDomain.update_status(selection, SelectionStatus.INTERVIEW)
     emails.send_selected_interview_details(
         to_email=selection.user.email,

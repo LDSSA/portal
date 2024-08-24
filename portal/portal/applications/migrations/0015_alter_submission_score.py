@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('applications', '0014_alter_submission_status'),
+        ("applications", "0014_alter_submission_status"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='submission',
-            name='score',
+            model_name="submission",
+            name="score",
             field=models.FloatField(default=0),
         ),
     ]

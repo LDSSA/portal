@@ -1,4 +1,4 @@
-from typing import NamedTuple  # noqa: D100
+from typing import NamedTuple
 
 import nbconvert
 import nbformat
@@ -12,7 +12,7 @@ from portal.selection.status import SelectionStatusType
 from portal.users.models import User
 
 
-def notebook_to_html(nb):  # noqa: ANN001, ANN201, D103
+def notebook_to_html(nb):
     nb = nbformat.reads(nb, as_version=4)
     html_exporter = nbconvert.HTMLExporter()
     html_exporter.template_name = "classic"
@@ -20,7 +20,7 @@ def notebook_to_html(nb):  # noqa: ANN001, ANN201, D103
     return body
 
 
-class CandidateState(NamedTuple):  # noqa: D101
+class CandidateState(NamedTuple):
     accepted_coc: bool
     decided_scholarship: bool
     applying_for_scholarship: bool | None
@@ -33,13 +33,13 @@ class CandidateState(NamedTuple):  # noqa: D101
     academy_type: str | None
 
 
-class DomainExceptionError(Exception):  # noqa: D101
+class DomainExceptionError(Exception):
     pass
 
 
-class Domain:  # noqa: D101
+class Domain:
     @staticmethod
-    def get_candidate_state(candidate: User) -> CandidateState:  # noqa: D102
+    def get_candidate_state(candidate: User) -> CandidateState:
         state = {}
 
         state["accepted_coc"] = candidate.code_of_conduct_accepted
@@ -51,7 +51,9 @@ class Domain:  # noqa: D101
         application, _ = Application.objects.get_or_create(user=candidate)
         status = ApplicationsDomain.get_application_detailed_status(application)
         state["application_status"] = status["application"]
-        state["coding_test_status"] = status[Challenge.objects.get(code="coding_test").code]
+        state["coding_test_status"] = status[
+            Challenge.objects.get(code="coding_test").code
+        ]
         state["slu01_status"] = status[Challenge.objects.get(code="slu01").code]
         state["slu02_status"] = status[Challenge.objects.get(code="slu02").code]
         state["slu03_status"] = status[Challenge.objects.get(code="slu03").code]
@@ -65,7 +67,7 @@ class Domain:  # noqa: D101
         return CandidateState(**state)
 
     @staticmethod
-    def candidate_state_readable(  # noqa: D102
+    def candidate_state_readable(
         candidate_state: CandidateState,
     ) -> dict[str, str]:
         return {

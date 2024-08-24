@@ -1,6 +1,6 @@
-from django.apps import AppConfig  # noqa: D100
+from django.apps import AppConfig
 
 
-class SelectionConfig(AppConfig):  # noqa: D101
+class SelectionConfig(AppConfig):
     name = "portal.selection"
     verbose_name = "Selection"

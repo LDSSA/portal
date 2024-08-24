@@ -4,17 +4,10 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [("applications", "0004_auto_20200301_1823")]
 
     operations = [
-        migrations.RemoveField(
-            model_name="application", name="slu01_started_at"
-        ),
-        migrations.RemoveField(
-            model_name="application", name="slu02_started_at"
-        ),
-        migrations.RemoveField(
-            model_name="application", name="slu03_started_at"
-        ),
+        migrations.RemoveField(model_name="application", name="slu01_started_at"),
+        migrations.RemoveField(model_name="application", name="slu02_started_at"),
+        migrations.RemoveField(model_name="application", name="slu03_started_at"),
     ]

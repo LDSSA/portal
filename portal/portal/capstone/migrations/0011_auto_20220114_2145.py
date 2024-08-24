@@ -4,46 +4,45 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('capstone', '0010_rename_delivery_report_submited_at'),
+        ("capstone", "0010_rename_delivery_report_submited_at"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='capstone',
-            name='report_1_final_due_date',
+            model_name="capstone",
+            name="report_1_final_due_date",
         ),
         migrations.RemoveField(
-            model_name='capstone',
-            name='report_1_provisory_due_date',
+            model_name="capstone",
+            name="report_1_provisory_due_date",
         ),
         migrations.RemoveField(
-            model_name='capstone',
-            name='report_2_final_due_date',
+            model_name="capstone",
+            name="report_2_final_due_date",
         ),
         migrations.RemoveField(
-            model_name='capstone',
-            name='report_2_provisory_due_date',
+            model_name="capstone",
+            name="report_2_provisory_due_date",
         ),
         migrations.AddField(
-            model_name='capstone',
-            name='report_1_final_open',
+            model_name="capstone",
+            name="report_1_final_open",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='capstone',
-            name='report_1_provisory_open',
+            model_name="capstone",
+            name="report_1_provisory_open",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='capstone',
-            name='report_2_final_open',
+            model_name="capstone",
+            name="report_2_final_open",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='capstone',
-            name='report_2_provisory_open',
+            model_name="capstone",
+            name="report_2_provisory_open",
             field=models.BooleanField(default=False),
         ),
     ]

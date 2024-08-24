@@ -1,6 +1,6 @@
-from django.apps import AppConfig  # noqa: D100
+from django.apps import AppConfig
 
 
-class CandidateConfig(AppConfig):  # noqa: D101
+class CandidateConfig(AppConfig):
     name = "portal.candidate"
     verbose_name = "Candidate"

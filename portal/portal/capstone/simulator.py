@@ -1,4 +1,4 @@
-import json  # noqa: D100
+import json
 import logging
 import random
 import time
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 WORKERS = 50
 
 
-def run():  # noqa: ANN201, D103
+def run():
     # Queue
 
     # Start consumer pool
@@ -31,7 +31,7 @@ def run():  # noqa: ANN201, D103
             executor.submit(run_producer)
 
 
-def run_simulator():  # noqa: ANN201, D103
+def run_simulator():
     while True:
         logger.debug("Simulator cycle...")
         close_old_connections()
@@ -49,9 +49,9 @@ def run_simulator():  # noqa: ANN201, D103
         time.sleep(settings.SIMULATOR_INTERVAL)
 
 
-def run_producer():  # noqa: ANN201, D103
+def run_producer():
     # Prevent thundering herd
-    time.sleep(2 * random.random())  # noqa: S311
+    time.sleep(2 * random.random())
 
     while True:
         time.sleep(settings.PRODUCER_INTERVAL)
@@ -92,7 +92,7 @@ def run_producer():  # noqa: ANN201, D103
             logger.exception("Exception in producer")
 
 
-def send_datapoint(due_datapoint):  # noqa: ANN001, ANN201, D103
+def send_datapoint(due_datapoint):
     try:
         try:
             logger.info(
@@ -102,10 +102,14 @@ def send_datapoint(due_datapoint):  # noqa: ANN001, ANN201, D103
                 due_datapoint.due,
             )
             data = json.loads(due_datapoint.datapoint.data)
-            response = requests.post(due_datapoint.url, json=data, timeout=settings.TIMEOUT)
+            response = requests.post(
+                due_datapoint.url, json=data, timeout=settings.TIMEOUT
+            )
 
         except requests.exceptions.RequestException as exc:
-            logger.info("Student API Request Exception %s", due_datapoint.id, exc_info=True)
+            logger.info(
+                "Student API Request Exception %s", due_datapoint.id, exc_info=True
+            )
 
             due_datapoint.state = "fail"
             due_datapoint.response_exception = exc.__class__.__name__

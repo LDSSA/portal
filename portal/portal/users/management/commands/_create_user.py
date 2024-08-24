@@ -5,14 +5,16 @@ from allauth.account.models import EmailAddress
 from portal.users.models import User
 
 
-def add_user_options(parser) -> None:  # noqa: ANN001
+def add_user_options(parser) -> None:
     parser.add_argument("-u", "--username", type=str, required=True)
     parser.add_argument("-p", "--password", type=str, required=True)
     parser.add_argument("-e", "--email", type=str, required=True)
     parser.add_argument("-n", "--name", type=str, required=True)
     parser.add_argument("-git", "--github", type=str, required=True)
     parser.add_argument("-s", "--slack", type=str, required=True)
-    parser.add_argument("-g", "--gender", type=str, choices=["female", "male"], required=True)
+    parser.add_argument(
+        "-g", "--gender", type=str, choices=["female", "male"], required=True
+    )
     parser.add_argument(
         "-t",
         "--ticket",
@@ -22,17 +24,17 @@ def add_user_options(parser) -> None:  # noqa: ANN001
     )
 
 
-def create_user(  # noqa: PLR0913
-    username,  # noqa: ANN001
-    password,  # noqa: ANN001
-    email,  # noqa: ANN001
-    name,  # noqa: ANN001
-    github,  # noqa: ANN001
-    slack,  # noqa: ANN001
-    gender,  # noqa: ANN001
-    ticket,  # noqa: ANN001
-    user_type="student",  # noqa: ANN001
-    **kwargs,  # noqa: ANN003, ARG001
+def create_user(
+    username,
+    password,
+    email,
+    name,
+    github,
+    slack,
+    gender,
+    ticket,
+    user_type="student",
+    **kwargs,
 ) -> User:
     if user_type == "student":
         is_student = True

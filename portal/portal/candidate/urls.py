@@ -1,4 +1,4 @@
-from django.urls import path  # noqa: D100
+from django.urls import path
 
 from portal.candidate import views
 

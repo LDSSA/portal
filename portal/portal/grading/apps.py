@@ -1,6 +1,6 @@
-from django.apps import AppConfig  # noqa: D100
+from django.apps import AppConfig
 
 
-class GradingConfig(AppConfig):  # noqa: D101
+class GradingConfig(AppConfig):
     name = "portal.grading"
     verbose_name = "Grading"

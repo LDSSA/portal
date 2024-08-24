@@ -1,4 +1,4 @@
-import logging  # noqa: D100
+import logging
 from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urljoin
@@ -42,10 +42,10 @@ from portal.users.views import (
 logger = logging.getLogger(__name__)
 
 
-class HomeView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
+class HomeView(AdmissionsCandidateViewMixin, TemplateView):
     template_name = "candidate_templates/home.html"
 
-    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
+    def get_context_data(self, **kwargs):
         state = CandidateDomain.get_candidate_state(self.request.user)
 
         # the action_point is the first open section in the steps accordion
@@ -74,7 +74,9 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
             accordion_enabled_status["decided_scholarship"] = True
             accordion_enabled_status["decided_academy_type"] = True
 
-        elif state.application_status != Status.passed or state.selection_status is None:
+        elif (
+            state.application_status != Status.passed or state.selection_status is None
+        ):
             action_point = "admission_test"
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
@@ -116,7 +118,9 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
             "applications_close_datetime": config.ADMISSIONS_SELECTION_START.strftime(
                 "%Y-%m-%d %H:%M",
             ),
-            "applications_close_date": config.ADMISSIONS_SELECTION_START.strftime("%Y-%m-%d"),
+            "applications_close_date": config.ADMISSIONS_SELECTION_START.strftime(
+                "%Y-%m-%d"
+            ),
             "coding_test_duration": str(config.ADMISSIONS_CODING_TEST_DURATION),
             "accordion_enabled_status": accordion_enabled_status,
         }
@@ -124,14 +128,16 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
 
 
 class ContactView(AdmissionsCandidateViewMixin, TemplateView):
-
-    """Send email to site admins."""  # noqa: D211
+    """Send email to site admins."""
 
     template_name = "candidate_templates/contactus.html"
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         user = request.user
         user_url = reverse("admissions:staff:candidate-detail", args=(user.pk,))
         message = request.POST["message"]
@@ -150,29 +156,35 @@ class ContactView(AdmissionsCandidateViewMixin, TemplateView):
 
 
 class CodeOfConductView(AdmissionsCandidateViewMixin, TemplateView):
-
-    """View and accept code of conduct."""  # noqa: D211
+    """View and accept code of conduct."""
 
     template_name = "candidate_templates/code_of_conduct.html"
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         user = request.user
         user.code_of_conduct_accepted = True
         user.save()
         return redirect("admissions:candidate:home")
 
 
-class ScholarshipView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView):
-
-    """Read scholarship conditions and chose to apply."""  # noqa: D211
+class ScholarshipView(
+    AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView
+):
+    """Read scholarship conditions and chose to apply."""
 
     template_name = "candidate_templates/scholarship.html"
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         user = request.user
         user.applying_for_scholarship = request.POST["decision"] == "yes"
         if user.applying_for_scholarship:
@@ -181,25 +193,29 @@ class ScholarshipView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, T
         return redirect("admissions:candidate:home")
 
 
-class AcademyTypeView(AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView):
-
-    """Choose academy type preference."""  # noqa: D211
+class AcademyTypeView(
+    AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView
+):
+    """Choose academy type preference."""
 
     template_name = "candidate_templates/academy_type.html"
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         user = request.user
         user.academy_type_preference = request.POST["academy_type"]
         user.save()
         return redirect("admissions:candidate:home")
 
 
-class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
+class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
     template_name = "candidate_templates/before_coding_test.html"
 
-    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
+    def get_context_data(self, **kwargs):
         ctx = {
             "coding_test_duration_hours": str(
                 config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600,
@@ -208,18 +224,23 @@ class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
-        application = Application.objects.get(user=request.user)
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
+        Application.objects.get(user=request.user)
 
-        return HttpResponseRedirect(reverse("admissions:candidate:confirmation-coding-test"))
+        return HttpResponseRedirect(
+            reverse("admissions:candidate:confirmation-coding-test")
+        )
 
 
-class CandidateConfirmationCodingTestView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
+class CandidateConfirmationCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
     template_name = "candidate_templates/confirmation_coding_test.html"
 
-    def get_context_data(self, **kwargs):  # noqa: ANN003, ANN101, ANN201, ARG002, D102
+    def get_context_data(self, **kwargs):
         ctx = {
             "coding_test_duration_hours": str(
                 config.ADMISSIONS_CODING_TEST_DURATION.total_seconds() / 3600,
@@ -228,9 +249,12 @@ class CandidateConfirmationCodingTestView(AdmissionsCandidateViewMixin, Template
         }
         return super().get_context_data(**ctx)
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         application = Application.objects.get(user=request.user)
         if application.coding_test_started_at is None:
             application.coding_test_started_at = datetime.now(timezone.utc)
@@ -239,7 +263,7 @@ class CandidateConfirmationCodingTestView(AdmissionsCandidateViewMixin, Template
         return HttpResponseRedirect(reverse("admissions:candidate:coding-test"))
 
 
-def submission_view_ctx(application, challenge) -> dict[str, Any]:  # noqa: ANN001, D103
+def submission_view_ctx(application, challenge) -> dict[str, Any]:
     return {
         "challenge": challenge,
         "status": Domain.get_sub_type_status(application, challenge).name,
@@ -249,25 +273,37 @@ def submission_view_ctx(application, challenge) -> dict[str, Any]:  # noqa: ANN0
         "best_score": Domain.get_best_score(application, challenge),
         "download_enabled": Domain.can_add_submission(application, challenge),
         "upload_enabled": Domain.can_add_submission(application, challenge),
-        "submissions": Submission.objects.filter(application=application, unit=challenge).order_by(
+        "submissions": Submission.objects.filter(
+            application=application, unit=challenge
+        ).order_by(
             "-updated_at",
         ),
-        "coding_test_started_at_ms": int(application.coding_test_started_at.timestamp() * 1000)
+        "coding_test_started_at_ms": int(
+            application.coding_test_started_at.timestamp() * 1000
+        )
         if application.coding_test_started_at is not None
         else None,
     }
 
 
-class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
-        if config.PORTAL_STATUS not in settings.ADMISSIONS_APPLICATIONS_STARTED_STATUSES:
+class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
+        if (
+            config.PORTAL_STATUS
+            not in settings.ADMISSIONS_APPLICATIONS_STARTED_STATUSES
+        ):
             return HttpResponseRedirect(reverse("home"))
 
         application, _ = Application.objects.get_or_create(user=request.user)
         if application.coding_test_started_at is None:
-            return HttpResponseRedirect(reverse("admissions:candidate:before-coding-test"))
+            return HttpResponseRedirect(
+                reverse("admissions:candidate:before-coding-test")
+            )
 
         submission_type_ = Challenge.objects.get(code="coding_test")
         ctx = {
@@ -280,13 +316,19 @@ class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
         return HttpResponse(template.render(ctx, request))
 
 
-class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):  # noqa: D101
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         assignment_id = kwargs.get("pk")
         application = Application.objects.get(user=request.user)
-        if assignment_id == "coding_test" and application.coding_test_started_at is None:
+        if (
+            assignment_id == "coding_test"
+            and application.coding_test_started_at is None
+        ):
             raise Http404
 
         obj = Challenge.objects.get(code=assignment_id)
@@ -296,14 +338,20 @@ class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):  # noqa: D101
             raise Http404 from exc
 
 
-class SluView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+class SluView(AdmissionsCandidateViewMixin, TemplateView):
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         if kwargs["pk"] == "coding_test":
             raise Http404
 
-        if config.PORTAL_STATUS not in settings.ADMISSIONS_APPLICATIONS_STARTED_STATUSES:
+        if (
+            config.PORTAL_STATUS
+            not in settings.ADMISSIONS_APPLICATIONS_STARTED_STATUSES
+        ):
             return HttpResponseRedirect(reverse("home"))
 
         application, _ = Application.objects.get_or_create(user=request.user)
@@ -314,12 +362,14 @@ class SluView(AdmissionsCandidateViewMixin, TemplateView):  # noqa: D101
 
 
 class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
+    """Submit challenges."""
 
-    """Submit challenges."""  # noqa: D211
-
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         # Send to grading
         pk = kwargs.get("pk")
         challenge = Challenge.objects.get(code=pk)
@@ -341,17 +391,20 @@ class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
         return HttpResponseRedirect(reverse("admissions:candidate:slu", args=(pk,)))
 
 
-class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):  # noqa: D101
+class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):
     queryset = Submission.objects.all()
 
-    def get_queryset(self):  # noqa: ANN101, ANN201, D102
+    def get_queryset(self):
         if self.request.user.is_staff:
             return super().get_queryset()
         return super().get_queryset().filter(user=self.request.user)
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         obj = self.get_object()
         try:
             return FileResponse(obj.notebook)
@@ -359,15 +412,18 @@ class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):  # noqa: 
             raise Http404 from exc
 
 
-class SubmissionFeedbackDownloadView(AdmissionsViewMixin, generic.DetailView):  # noqa: D101
+class SubmissionFeedbackDownloadView(AdmissionsViewMixin, generic.DetailView):
     queryset = Submission.objects.all()
 
-    def get_queryset(self):  # noqa: ANN101, ANN201, D102
+    def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         obj = self.get_object()
         try:
             return HttpResponse(notebook_to_html(obj.feedback.read()))
@@ -375,10 +431,13 @@ class SubmissionFeedbackDownloadView(AdmissionsViewMixin, generic.DetailView):  
             raise Http404 from exc
 
 
-class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):  # noqa: D101
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         try:
             selection = request.user.selection
         except Selection.DoesNotExist as exc:
@@ -399,9 +458,12 @@ class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):  #
         }
         return HttpResponse(template.render(context, request))
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         try:
             selection = request.user.selection
         except Selection.DoesNotExist as exc:
@@ -414,18 +476,21 @@ class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):  #
         return HttpResponseRedirect(reverse("admissions:candidate:payment"))
 
 
-class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):  # noqa: D101
+class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")
 
-    def get_queryset(self):  # noqa: ANN101, ANN201, D102
+    def get_queryset(self):
         if self.request.user.is_staff:
             return super().get_queryset()
         return super().get_queryset().filter(selection=self.request.user.selection)
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         obj = self.get_object()
         try:
             return FileResponse(obj.doc)
@@ -433,14 +498,17 @@ class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):  #
             raise Http404 from exc
 
 
-class SelectionDocumentUploadView(AdmissionsViewMixin, generic.DetailView):  # noqa: D101
+class SelectionDocumentUploadView(AdmissionsViewMixin, generic.DetailView):
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")
     document_type = None
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         add_document(
             request.user.selection,
             document=request.FILES["file"],

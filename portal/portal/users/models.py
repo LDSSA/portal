@@ -1,4 +1,4 @@
-from cryptography.hazmat.backends import (  # noqa: D100
+from cryptography.hazmat.backends import (
     default_backend as crypto_default_backend,
 )
 from cryptography.hazmat.primitives import (
@@ -11,12 +11,12 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 
-class UserWhitelist(models.Model):  # noqa: D101
+class UserWhitelist(models.Model):
     username = models.CharField(_("Username"), max_length=255, unique=True)
     is_student = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
 
-    def __str__(self) -> str:  # noqa: ANN101, D105
+    def __str__(self) -> str:
         return f"{self.username}"
 
 
@@ -47,8 +47,8 @@ class AcademyTypePreference(models.TextChoices):
     in_person_only = "in_person_only", _("In-person only")
 
 
-# TODO: custom user manager to filter out users with unverified email addresses  # noqa: FIX002, TD002, TD003
-class User(AbstractUser):  # noqa: D101
+# TODO: custom user manager to filter out users with unverified email addresses
+class User(AbstractUser):
     # First Name and Last Name do not cover name patterns
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
@@ -73,7 +73,9 @@ class User(AbstractUser):  # noqa: D101
     )
     profession = models.CharField(blank=True, max_length=50)
     gender = models.CharField(null=False, max_length=25, choices=Gender.choices)
-    ticket_type = models.CharField(null=False, max_length=25, choices=TicketType.choices)
+    ticket_type = models.CharField(
+        null=False, max_length=25, choices=TicketType.choices
+    )
     company = models.CharField(blank=True, max_length=100)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -84,10 +86,10 @@ class User(AbstractUser):  # noqa: D101
 
     failed_or_dropped = models.BooleanField(default=False)
 
-    def get_absolute_url(self):  # noqa: ANN101, ANN201, D102
+    def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
 
-    def save(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN101, ANN201, D102
+    def save(self, *args, **kwargs):
         if not self.deploy_private_key and not self.deploy_public_key:
             key = rsa.generate_private_key(
                 backend=crypto_default_backend(),

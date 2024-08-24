@@ -1,24 +1,24 @@
-from .logs import SelectionEvent, log_selection_event  # noqa: D100
+from .logs import SelectionEvent, log_selection_event
 from .models import Selection
 from .status import SelectionStatusType
 
 
-class SelectionDomain:  # noqa: D101
+class SelectionDomain:
     @staticmethod
-    def create(user):  # noqa: ANN001, ANN205, D102
+    def create(user):
         return Selection.objects.get_or_create(user=user)[0]
 
     @staticmethod
-    def get_status(selection):  # noqa: ANN001, ANN205, D102
+    def get_status(selection):
         return SelectionStatusType(selection.status)
 
     @staticmethod
-    def update_status(  # noqa: ANN205, D102
-        selection,  # noqa: ANN001
-        status,  # noqa: ANN001
+    def update_status(
+        selection,
+        status,
         *,
-        draw_rank=None,  # noqa: ANN001
-        user=None,  # noqa: ANN001
+        draw_rank=None,
+        user=None,
     ):
         old_status = SelectionDomain.get_status(selection)
         selection.status = status
@@ -40,7 +40,7 @@ class SelectionDomain:  # noqa: D101
         )
 
     @staticmethod
-    def manual_update_status(selection, status, user, *, msg=""):  # noqa: ANN001, ANN205, D102
+    def manual_update_status(selection, status, user, *, msg=""):
         old_status = SelectionDomain.get_status(selection)
         selection.status = status
 

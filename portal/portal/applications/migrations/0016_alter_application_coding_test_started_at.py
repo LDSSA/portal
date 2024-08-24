@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('applications', '0015_alter_submission_score'),
+        ("applications", "0015_alter_submission_score"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='application',
-            name='coding_test_started_at',
+            model_name="application",
+            name="coding_test_started_at",
             field=models.DateTimeField(blank=True, default=None, null=True),
         ),
     ]

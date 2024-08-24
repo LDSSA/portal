@@ -1,4 +1,4 @@
-import logging  # noqa: D100
+import logging
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -19,20 +19,25 @@ logger = logging.getLogger(__name__)
 
 
 # noinspection PyAttributeOutsideInit
-class LeaderboardView(LoginRequiredMixin, generic.DetailView):  # noqa: D101
+class LeaderboardView(LoginRequiredMixin, generic.DetailView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.all()
     template_name = "hackathons/leaderboard.html"
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         self.object = self.get_object()
 
         submissions = {}
         # If scores are to be descending (higher is top score)
         ordering = "-" if self.object.descending else ""
-        for submission in models.Submission.objects.filter(hackathon=self.object).order_by(
+        for submission in models.Submission.objects.filter(
+            hackathon=self.object
+        ).order_by(
             ordering + "score",
             "created",
         ):
@@ -44,17 +49,20 @@ class LeaderboardView(LoginRequiredMixin, generic.DetailView):  # noqa: D101
         return self.render_to_response(context)
 
 
-class MockSubmission:  # noqa: D101
-    def __init__(self, score) -> None:  # noqa: ANN001, ANN101, D107
+class MockSubmission:
+    def __init__(self, score) -> None:
         self.score = score
 
 
-class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):  # noqa: D101
+class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):
     template_name = "hackathons/leaderboard.html"
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         submissions = {}
         # Get the teams for this hackathon
         hckt06 = models.Hackathon.objects.filter(code="HCKT06")[0]
@@ -89,20 +97,20 @@ class FrankenLeaderboardView(LoginRequiredMixin, generic.TemplateView):  # noqa:
         return self.render_to_response(context)
 
 
-class StudentHackathonListView(StudentViewsMixin, generic.ListView):  # noqa: D101
+class StudentHackathonListView(StudentViewsMixin, generic.ListView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/student/hackathon_list.html"
 
 
 # noinspection PyUnusedLocal
-class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):  # noqa: D101
+class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/student/hackathon_detail.html"
 
     # noinspection PyAttributeOutsideInit
-    def get_object(self, queryset=None):  # noqa: ANN001, ANN101, ANN201, D102
+    def get_object(self, queryset=None):
         self.object = super().get_object(queryset=queryset)
         hackathon = self.object
 
@@ -118,9 +126,12 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):  # noqa
 
         return hackathon, attendance, team
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         hackathon, attendance, team = self.get_object()
         context = self.get_context_data(
             hackathon=hackathon,
@@ -132,13 +143,18 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):  # noqa
         )
         return self.render_to_response(context)
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         hackathon, attendance, team = self.get_object()
 
         if "attendance" in request.POST:
-            attendance_form = forms.StudentAttendanceForm(request.POST, instance=attendance)
+            attendance_form = forms.StudentAttendanceForm(
+                request.POST, instance=attendance
+            )
             if attendance_form.is_valid():
                 attendance_form.save()
 
@@ -149,8 +165,10 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):  # noqa
 
         elif "submit" in request.POST:
             try:
-                score = services.submission(hackathon, request.user, request.FILES["data"])
-            except Exception as exc:  # noqa: BLE001
+                score = services.submission(
+                    hackathon, request.user, request.FILES["data"]
+                )
+            except Exception as exc:
                 messages.add_message(
                     request,
                     messages.ERROR,
@@ -163,37 +181,39 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):  # noqa
                     logger.exception("Unhandled Exception during scoring")
 
             else:
-                messages.add_message(request, messages.SUCCESS, "Score: %s" % score)
+                messages.add_message(request, messages.SUCCESS, f"Score: {score}")
 
         return HttpResponseRedirect(self.get_success_url())
 
-    def get_success_url(self):  # noqa: ANN101, ANN201, D102
+    def get_success_url(self):
         return reverse("hackathons:student-hackathon-detail", args=(self.object.pk,))
 
 
-class InstructorHackathonListView(InstructorViewsMixin, generic.ListView):  # noqa: D101
+class InstructorHackathonListView(InstructorViewsMixin, generic.ListView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_list.html"
 
 
-class InstructorHackathonSettingsView(InstructorViewsMixin, generic.UpdateView):  # noqa: D101
+class InstructorHackathonSettingsView(InstructorViewsMixin, generic.UpdateView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_settings.html"
     form_class = forms.InstructorHackathonForm
 
-    def get_success_url(self):  # noqa: ANN101, ANN201, D102
-        return reverse("hackathons:instructor-hackathon-settings", args=(self.object.pk,))
+    def get_success_url(self):
+        return reverse(
+            "hackathons:instructor-hackathon-settings", args=(self.object.pk,)
+        )
 
 
 # noinspection PyAttributeOutsideInit,PyUnusedLocal
-class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):  # noqa: D101
+class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_admin.html"
 
-    def get_object_list(self):  # noqa: ANN101, ANN201, D102
+    def get_object_list(self):
         object_list = []
         attendance = models.Attendance.objects.filter(hackathon=self.object)
         for att in attendance:
@@ -204,21 +224,28 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):  #
 
             object_list.append(
                 {
-                    "hackathon_team_id": team.hackathon_team_id if team is not None else 0,
+                    "hackathon_team_id": team.hackathon_team_id
+                    if team is not None
+                    else 0,
                     "student": att.user,
                     "team": team,
                     "attendance": att,
                 },
             )
-        return sorted(object_list, key=lambda x: (x["hackathon_team_id"], x["student"].name))
+        return sorted(
+            object_list, key=lambda x: (x["hackathon_team_id"], x["student"].name)
+        )
 
     @staticmethod
-    def _filter_can_attend_next(object_list):  # noqa: ANN001, ANN205
+    def _filter_can_attend_next(object_list):
         return [item for item in object_list if item["student"].can_attend_next]
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         self.object = self.get_object()
         object_list = self.get_object_list()
         if request.GET.get("filter_eligible"):
@@ -227,9 +254,12 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):  #
         context = self.get_context_data(object=self.object, object_list=object_list)
         return self.render_to_response(context)
 
-    def post(  # noqa: ANN201, C901, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN201
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         self.object = self.get_object()
         object_list = self.get_object_list()
 
@@ -264,7 +294,9 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):  #
             )
 
         elif new_status == "taking_attendance":
-            for user in get_user_model().objects.filter(is_student=True, failed_or_dropped=False):
+            for user in get_user_model().objects.filter(
+                is_student=True, failed_or_dropped=False
+            ):
                 attendance, _ = models.Attendance.objects.get_or_create(
                     user=user,
                     hackathon=self.object,
@@ -272,7 +304,9 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):  #
 
         # Update graduation eligibility status of user
         elif new_status == "complete" and cur_status == "submissions_closed":
-            for user in get_user_model().objects.filter(is_student=True, failed_or_dropped=False):
+            for user in get_user_model().objects.filter(
+                is_student=True, failed_or_dropped=False
+            ):
                 user.can_graduate = check_graduation_status(user)
                 user.save()
 
@@ -282,19 +316,22 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):  #
 
         return HttpResponseRedirect(self.get_success_url())
 
-    def get_success_url(self):  # noqa: ANN101, ANN201, D102
+    def get_success_url(self):
         return reverse("hackathons:instructor-hackathon-admin", args=(self.object.pk,))
 
 
 # noinspection PyUnusedLocal
-class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):  # noqa: D101
+class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):
     model = models.Hackathon
     queryset = models.Hackathon.objects.order_by("code")
     template_name = "hackathons/instructor/hackathon_detail.html"
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         self.object = self.get_object()
         context = self.get_context_data(
             hackathon=self.object,
@@ -302,13 +339,18 @@ class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):  
         )
         return self.render_to_response(context)
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         self.object = self.get_object()
 
         try:
-            score = services.submission(self.object, request.user, request.FILES["data"])
+            score = services.submission(
+                self.object, request.user, request.FILES["data"]
+            )
         except ValidationError as exc:
             messages.add_message(
                 request,
@@ -324,21 +366,21 @@ class InstructorHackathonDetailView(InstructorViewsMixin, generic.DetailView):  
             logger.exception("Unhandled Exception during scoring")
 
         else:
-            messages.add_message(request, messages.SUCCESS, "Score: %s" % score)
+            messages.add_message(request, messages.SUCCESS, f"Score: {score}")
 
         return HttpResponseRedirect(self.get_success_url())
 
-    def get_success_url(self):  # noqa: ANN101, ANN201, D102
+    def get_success_url(self):
         return reverse("hackathons:instructor-hackathon-detail", args=(self.object.pk,))
 
 
-class HackathonSetupView(generics.UpdateAPIView):  # noqa: D101
+class HackathonSetupView(generics.UpdateAPIView):
     queryset = models.Hackathon.objects.all()
     serializer_class = serializers.HackathonSerializer
     lookup_url_kwarg = "pk"
     lookup_field = "pk__iexact"
 
-    def get_object(self):  # noqa: ANN101, ANN201, D102
+    def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
 
         filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_url_kwarg]}

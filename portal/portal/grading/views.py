@@ -1,4 +1,4 @@
-import logging  # noqa: D100
+import logging
 
 from django.http import HttpResponse
 from rest_framework import generics
@@ -13,15 +13,17 @@ logger = logging.getLogger(__name__)
 
 
 class AcademyGradingView(generics.RetrieveUpdateAPIView):
-
-    """Receive notebook grade."""  # noqa: D211
+    """Receive notebook grade."""
 
     queryset = models.Grade.objects.all()
     serializer_class = serializers.GradeSerializer
 
-    def update(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, D102
+    def update(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         update_result = super().update(request, *args, **kwargs)
 
         grade = self.get_object()
@@ -35,8 +37,8 @@ class AcademyGradingView(generics.RetrieveUpdateAPIView):
         return update_result
 
 
-class CaseInsensitiveGetObjectMixin:  # noqa: D101
-    def get_object(self):  # noqa: ANN101, ANN201
+class CaseInsensitiveGetObjectMixin:
+    def get_object(self):
         """Return the object the view is displaying.
 
         You may want to override this if you need to provide non-standard
@@ -49,10 +51,7 @@ class CaseInsensitiveGetObjectMixin:  # noqa: D101
         lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
 
         if lookup_url_kwarg not in self.kwargs:
-            msg = 'Expected view {} to be called with a URL keyword argument named "{}". Fix your URL conf, or set the `.lookup_field` attribute on the view correctly.'.format(
-                self.__class__.__name__,
-                lookup_url_kwarg,
-            )
+            msg = f'Expected view {self.__class__.__name__} to be called with a URL keyword argument named "{lookup_url_kwarg}". Fix your URL conf, or set the `.lookup_field` attribute on the view correctly.'
             raise ValueError(
                 msg,
             )
@@ -66,40 +65,49 @@ class CaseInsensitiveGetObjectMixin:  # noqa: D101
         return obj
 
 
-class AcademyChecksumView(CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView):
-
-    """Receive and retrieve notebook checksum."""  # noqa: D211
+class AcademyChecksumView(
+    CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView
+):
+    """Receive and retrieve notebook checksum."""
 
     queryset = models.Unit.objects.all()
     serializer_class = serializers.ChecksumSerializer
 
 
-class AdmissionsGradingView(CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView):
-
-    """Receive notebook grade."""  # noqa: D211
+class AdmissionsGradingView(
+    CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView
+):
+    """Receive notebook grade."""
 
     queryset = Submission.objects.all()
     serializer_class = serializers.AdmissionsGradeSerializer
 
 
-class AdmissionsChecksumView(CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView):
-
-    """Receive and retrieve notebook checksum."""  # noqa: D211
+class AdmissionsChecksumView(
+    CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView
+):
+    """Receive and retrieve notebook checksum."""
 
     queryset = Challenge.objects.all()
     serializer_class = serializers.AdmissionsChecksumSerializer
 
 
-class AdmissionsNotebookDownload(CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView):
-
-    """Receive and retrieve notebook checksum."""  # noqa: D211
+class AdmissionsNotebookDownload(
+    CaseInsensitiveGetObjectMixin, generics.RetrieveUpdateAPIView
+):
+    """Receive and retrieve notebook checksum."""
 
     queryset = Submission.objects.all()
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         obj = self.get_object()
-        response = HttpResponse(obj.notebook.read(), content_type="application/vnd.jupyter")
+        response = HttpResponse(
+            obj.notebook.read(), content_type="application/vnd.jupyter"
+        )
         response["Content-Disposition"] = "attachment; filename=Exercise notebook.ipynb"
         return response

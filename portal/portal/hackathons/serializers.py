@@ -1,9 +1,9 @@
-from rest_framework import serializers  # noqa: D100
+from rest_framework import serializers
 
 from portal.hackathons import models
 
 
-class HackathonSerializer(serializers.ModelSerializer):  # noqa: D101
-    class Meta:  # noqa: D106
+class HackathonSerializer(serializers.ModelSerializer):
+    class Meta:
         model = models.Hackathon
-        fields = ["script_file", "data_file"]  # noqa: RUF012
+        fields = ["script_file", "data_file"]

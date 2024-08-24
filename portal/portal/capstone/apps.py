@@ -1,6 +1,6 @@
-from django.apps import AppConfig  # noqa: D100
+from django.apps import AppConfig
 
 
-class CapstoneConfig(AppConfig):  # noqa: D101
+class CapstoneConfig(AppConfig):
     name = "portal.capstone"
     verbose_name = "Capstone"

@@ -1,4 +1,4 @@
-import logging  # noqa: D100
+import logging
 from datetime import datetime, timezone
 
 from constance import config
@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 
 
 # noinspection PyUnresolvedReferences
-class HomeRedirectView(LoginRequiredMixin, RedirectView):  # noqa: D101
-    def get_redirect_url(self, *args, **kwargs):  # noqa: ANN002, ANN003, ANN101, ANN201, D102
+class HomeRedirectView(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
         if config.PORTAL_STATUS == "academy":
             if self.request.user.is_student:
                 self.pattern_name = "academy:student-unit-list"
@@ -41,48 +41,59 @@ class HomeRedirectView(LoginRequiredMixin, RedirectView):  # noqa: D101
         return super().get_redirect_url(*args, **kwargs)
 
 
-class BaseUnitListView(ListView):  # noqa: D101
+class BaseUnitListView(ListView):
     model = models.Unit
     queryset = models.Unit.objects.order_by("specialization", "code")
     template_name = None
     detail_view_name = None
 
     # noinspection PyAttributeOutsideInit
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         self.object_list = self.get_queryset()
         data = []
         for unit in self.object_list:
             grade = get_best_grade(unit, request.user)
             data.append((unit, grade))
 
-        context = self.get_context_data(object_list=data, detail_view_name=self.detail_view_name)
+        context = self.get_context_data(
+            object_list=data, detail_view_name=self.detail_view_name
+        )
         return self.render_to_response(context)
 
 
-class BaseUnitDetailView(DetailView):  # noqa: D101
+class BaseUnitDetailView(DetailView):
     model = models.Unit
     template_name = None
 
-    def get(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         unit, grade, best_grade = self.get_object()
         context = self.get_context_data(unit=unit, grade=grade, best_grade=best_grade)
         return self.render_to_response(context)
 
     # noinspection PyAttributeOutsideInit
-    def get_object(self, queryset=None):  # noqa: ANN001, ANN101, ANN201, D102
+    def get_object(self, queryset=None):
         self.object = super().get_object(queryset=queryset)
         unit = self.object
         grade = get_last_grade(unit, self.request.user)
         best_grade = get_best_grade(unit, self.request.user)
         return unit, grade, best_grade
 
-    def post(  # noqa: ANN201, D102
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
-    ):  # noqa: ANN001, ANN002, ANN003, ANN101, ANN201, ARG002, D102
+    def post(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):
         unit, _, _ = self.get_object()
         grade = models.Grade(user=self.request.user, unit=unit)
 
@@ -91,7 +102,9 @@ class BaseUnitDetailView(DetailView):  # noqa: D101
             raise RuntimeError(msg)
 
         # Grade sent on time?
-        due_date = datetime.combine(unit.due_date, datetime.max.time(), tzinfo=timezone.utc)
+        due_date = datetime.combine(
+            unit.due_date, datetime.max.time(), tzinfo=timezone.utc
+        )
         grade.on_time = datetime.now(timezone.utc) <= due_date
 
         # Clear grade
@@ -108,21 +121,21 @@ class BaseUnitDetailView(DetailView):  # noqa: D101
         return HttpResponseRedirect(request.path_info)
 
 
-class StudentUnitListView(StudentViewsMixin, BaseUnitListView):  # noqa: D101
+class StudentUnitListView(StudentViewsMixin, BaseUnitListView):
     template_name = "academy/student/unit_list.html"
     detail_view_name = "academy:student-unit-detail"
 
 
-class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):  # noqa: D101
+class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):
     template_name = "academy/student/unit_detail.html"
 
 
-class InstructorUserListView(InstructorViewsMixin, ListView):  # noqa: D101
+class InstructorUserListView(InstructorViewsMixin, ListView):
     model = get_user_model()
     queryset = get_user_model().objects.filter(is_student=True, failed_or_dropped=False)
     template_name = "academy/instructor/user_list.html"
 
-    def get_queryset(self):  # noqa: ANN101, ANN201, D102
+    def get_queryset(self):
         user_id = self.request.GET.get("user_id")
         can_graduate = self.request.GET.get("can_graduate")
 
@@ -135,13 +148,18 @@ class InstructorUserListView(InstructorViewsMixin, ListView):  # noqa: D101
         return self.queryset.all()
 
     # noinspection PyAttributeOutsideInit
-    def get(  # noqa: ANN201, C901, D102, PLR0912, PLR0915
-        self, request, *args, **kwargs  # noqa: ANN001, ANN002, ANN003, ANN101, ARG002
+    def get(
+        self,
+        request,
+        *args,
+        **kwargs,
     ):  # noqa:ANN201, PLR0912, PLR0915
         # Validate query params
         validator = serializers.InstructorsViewFiltersSerializer(data=self.request.GET)
         if not validator.is_valid():
-            msg = " ".join([f"Filter '{k}': {v[0].lower()}" for k, v in validator.errors.items()])
+            msg = " ".join(
+                [f"Filter '{k}': {v[0].lower()}" for k, v in validator.errors.items()]
+            )
             messages.error(request, _(msg))
             return redirect("academy:instructor-user-list")
         query_params = validator.validated_data
@@ -218,10 +236,10 @@ class InstructorUserListView(InstructorViewsMixin, ListView):  # noqa: D101
         return self.render_to_response(context)
 
 
-class InstructorUnitListView(InstructorViewsMixin, BaseUnitListView):  # noqa: D101
+class InstructorUnitListView(InstructorViewsMixin, BaseUnitListView):
     template_name = "academy/instructor/unit_list.html"
     detail_view_name = "academy:instructor-unit-detail"
 
 
-class InstructorUnitDetailView(InstructorViewsMixin, BaseUnitDetailView):  # noqa: D101
+class InstructorUnitDetailView(InstructorViewsMixin, BaseUnitDetailView):
     template_name = "academy/instructor/unit_detail.html"
