@@ -71,4 +71,5 @@ jobs:
           poetry install
       - name: Run tests
         run: |
+          cp local.env .env
           poetry run pytest
