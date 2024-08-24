@@ -57,6 +57,22 @@ jobs:
     defaults:
       run:
         working-directory: ./portal
+    services:
+      postgres:
+        image: postgres:14.5
+        # Provide the password for postgres which matches backend config
+        env:
+          POSTGRES_DB: portal
+          POSTGRES_USER: portal
+          POSTGRES_PASSWORD: portal
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
