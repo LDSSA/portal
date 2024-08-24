@@ -87,5 +87,5 @@ jobs:
           poetry install
       - name: Run tests
         run: |
-          cp local.env .env
+          cp ci.env .env
           poetry run pytest
