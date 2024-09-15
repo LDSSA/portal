@@ -56,7 +56,6 @@ class User(AbstractUser):
     # Academy
     is_student = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
-    logo = models.TextField(blank=True)
     slack_member_id = models.TextField(blank=True)
     github_username = models.TextField(blank=True)
     deploy_private_key = models.TextField(blank=True)
