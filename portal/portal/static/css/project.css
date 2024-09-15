@@ -19,3 +19,23 @@ table img {
   background-color: #f2dede;
   border-color: #eed3d7;
 }
+
+/* Center the form on the page */
+.form-container {
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+/* Style the deploy key section */
+.deploy-key {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 5px;
+  font-family: monospace;
+}
+
+/* Customize button styles */
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: black;
+}
