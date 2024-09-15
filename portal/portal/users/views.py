@@ -2,12 +2,12 @@ import logging
 
 from allauth.account.views import SignupView
 from constance import config
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, RedirectView, UpdateView
-from django.contrib import messages
 
 from . import forms
 

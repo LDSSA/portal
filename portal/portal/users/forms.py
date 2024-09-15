@@ -8,8 +8,6 @@ import django.contrib.auth.forms
 from constance import config
 
 # from allauth.account.forms import SignupForm
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
 from django import forms
 from django.contrib import auth
 from django.contrib.auth import get_user_model
@@ -22,9 +20,6 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-from django import forms
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
 
 class UserChangeForm(forms.ModelForm):
     name = forms.CharField(required=True)
