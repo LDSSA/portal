@@ -202,19 +202,17 @@ user_list_view = UserListView.as_view()
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = forms.UserChangeForm
-    template_name = 'users/user_form.html'  # Explicitly specify the template name
+    template_name = "users/user_form.html"  # Explicitly specify the template name
 
     def get_object(self):
         return self.request.user
 
     def get_success_url(self):
-        return reverse('users:profile')
-    
+        return reverse("users:profile")
+
     def form_valid(self, form):
-        messages.success(self.request, 'Your profile was updated successfully.')
+        messages.success(self.request, "Your profile was updated successfully.")
         return super().form_valid(form)
-
-
 
 
 user_update_view = UserUpdateView.as_view()

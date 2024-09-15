@@ -20,7 +20,6 @@ User = get_user_model()
 logger = logging.getLogger(__name__)
 
 
-
 class UserChangeForm(forms.ModelForm):
     name = forms.CharField(required=True)
     github_username = forms.CharField(required=True)
@@ -28,7 +27,7 @@ class UserChangeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
+
         # Remove fields based on portal status
         if config.PORTAL_STATUS == "academy":
             fields_to_remove = ["gender", "profession", "company", "ticket_type"]
@@ -53,7 +52,6 @@ class UserChangeForm(forms.ModelForm):
             "company",
             "ticket_type",
         )
-
 
 
 class UserCreationForm(django.contrib.auth.forms.UserCreationForm):
