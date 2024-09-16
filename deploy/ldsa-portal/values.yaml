@@ -23,9 +23,6 @@ env:
   - name: STUDENT_REPO_NAME
     key: STUDENT_REPO_NAME
     configMapName: django-configmap
-  - name: BATCH_NAME
-    key: BATCH_NAME
-    configMapName: django-configmap
   - name: GRADING_USERNAME
     key: GRADING_USERNAME
     configMapName: django-configmap

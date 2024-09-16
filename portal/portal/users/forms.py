@@ -21,34 +21,30 @@ logger = logging.getLogger(__name__)
 
 
 class UserChangeForm(forms.ModelForm):
-    name = forms.CharField()
+    name = forms.CharField(required=True)
+    github_username = forms.CharField(required=True)
+    slack_member_id = forms.CharField(required=True)
 
-    def __init__(self, *args, **kwawgs) -> None:
-        super().__init__(*args, **kwawgs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Remove fields based on portal status
         if config.PORTAL_STATUS == "academy":
-            del self.fields["gender"]
-            del self.fields["profession"]
-            del self.fields["company"]
-            del self.fields["ticket_type"]
-
+            fields_to_remove = ["gender", "profession", "company", "ticket_type"]
         else:
-            del self.fields["logo"]
-            del self.fields["github_username"]
-            del self.fields["slack_member_id"]
-            if config.PORTAL_STATUS not in (
-                "admissions",
-                "admissions:applications",
-            ):
+            fields_to_remove = ["github_username", "slack_member_id"]
+            if config.PORTAL_STATUS not in ("admissions", "admissions:applications"):
                 self.fields["ticket_type"] = forms.ChoiceField(
                     choices=TicketType.choices,
                     disabled=True,
                 )
+        for field in fields_to_remove:
+            del self.fields[field]
 
     class Meta:
         model = User
         fields = (
             "name",
-            "logo",
             "github_username",
             "slack_member_id",
             "gender",
@@ -56,11 +52,6 @@ class UserChangeForm(forms.ModelForm):
             "company",
             "ticket_type",
         )
-        widgets = {
-            "logo": forms.TextInput(),
-            "github_username": forms.TextInput(),
-            "slack_member_id": forms.TextInput(),
-        }
 
 
 class UserCreationForm(django.contrib.auth.forms.UserCreationForm):

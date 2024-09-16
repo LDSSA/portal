@@ -31,7 +31,6 @@ class UserAdmin(auth_admin.UserAdmin):
                     "gender",
                     "profession",
                     "company",
-                    "logo",
                     "github_username",
                     "slack_member_id",
                     "failed_or_dropped",

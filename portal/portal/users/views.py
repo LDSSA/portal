@@ -2,6 +2,7 @@ import logging
 
 from allauth.account.views import SignupView
 from constance import config
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
@@ -201,12 +202,17 @@ user_list_view = UserListView.as_view()
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = forms.UserChangeForm
-
-    def get_success_url(self) -> str:
-        return reverse("users:profile")
+    template_name = "users/user_form.html"  # Explicitly specify the template name
 
     def get_object(self):
-        return User.objects.get(username=self.request.user.username)
+        return self.request.user
+
+    def get_success_url(self):
+        return reverse("users:profile")
+
+    def form_valid(self, form):
+        messages.success(self.request, "Your profile was updated successfully.")
+        return super().form_valid(form)
 
 
 user_update_view = UserUpdateView.as_view()

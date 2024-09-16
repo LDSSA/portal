@@ -844,7 +844,6 @@
     updated_at: 2021-04-14 20:32:27.106363+00:00
     date_joined: 2021-04-14 20:32:27.106363+00:00
     name: Admin
-    logo: qwe
     student: false
     slack_member_id: qwe
     github_username: qwe
@@ -924,7 +923,6 @@
     created_at: 2021-04-14 20:32:27.106363+00:00
     updated_at: 2021-04-14 20:32:27.106363+00:00
     name: ''
-    logo: ''
     student: true
     slack_member_id: 'U01SZUU0R2M'
     github_username: ''
