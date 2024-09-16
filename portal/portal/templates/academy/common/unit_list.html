@@ -12,7 +12,7 @@
     </div>
   </div>
 
-  <table class="table table-hover">
+  <table class="table table-hover table-striped">
     <thead>
       <tr>
         <th scope="col">Code</th>
@@ -20,22 +20,30 @@
         <th scope="col">Due Date</th>
         <th scope="col">Instructor</th>
         <th scope="col">Grade</th>
+        <th scope="col">Status</th>
       </tr>
     </thead>
     <tbody>
      {% for unit, grade in object_list %}
       <tr  id="row-{{ unit.code }}">
-        <th>
+        <td>
           <a href="{% url detail_view_name unit.pk %}">
             {{ unit.specialization.code }}/{{ unit.pk }}
           </a>
-        </th>
+        </td>
         <td>{{ unit.name }}</td>
-        <td>{{ unit.due_date }}</td>
-        <td>{{ unit.instructor.name |default:unit.instructor.username}}</td>
+        <td>{{ unit.due_date|date:"F j, Y"  }}</td>
+        <td>{{ unit.instructor.name|default:unit.instructor.username }}</td>
         <td>
           {% show_grade grade %}
         </td>
+        <td>
+          {% if unit.open %}
+            <span class="badge badge-success">Open</span>
+          {% else %}
+            <span class="badge badge-danger">Closed</span>
+          {% endif %}
+        </td>        
       </tr>
       {% endfor %}
     </tbody>
