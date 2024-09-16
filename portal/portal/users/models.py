@@ -49,6 +49,7 @@ class AcademyTypePreference(models.TextChoices):
 
 # TODO: custom user manager to filter out users with unverified email addresses
 class User(AbstractUser):
+    email = models.EmailField(unique=True, null=False)
     # First Name and Last Name do not cover name patterns
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, max_length=255)
