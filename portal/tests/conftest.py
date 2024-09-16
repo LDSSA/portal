@@ -52,6 +52,7 @@ def _cleanup_db() -> None:
 @pytest.fixture()
 def grader():
     return User.objects.create(
+        email=Faker("email"),
         username="grader",
         name="Grader User",
         github_username="GraderUser",
@@ -65,6 +66,7 @@ def grader():
 @pytest.fixture()
 def student():
     return User.objects.create(
+        email=Faker("email"),
         username="test_student",
         name="test_student",
         github_username="TestUser",
@@ -77,6 +79,7 @@ def student():
 @pytest.fixture()
 def student2():
     return User.objects.create(
+        email=Faker("email"),
         username="test_student_2",
         name="test_student_2",
         github_username="TestUser2",
@@ -89,6 +92,7 @@ def student2():
 @pytest.fixture()
 def instructor():
     return User.objects.create(
+        email=Faker("email"),
         username="test_instructor",
         name="test_instructor",
         github_username="TestInstructor",
