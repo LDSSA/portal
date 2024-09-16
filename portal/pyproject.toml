@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "portal"
-version = "0.1.0"
+version = "0.2.0"
 description = "LDSA Portal for running Starters Academy"
 authors = [
     "Hugo Castilho <hugo.castilho@lisbondatascience.org>",

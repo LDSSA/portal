@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] - 2024-09-16
+
+- Enforcing unique email addresses for users.
+- Removed logo from users since it wasn't being used.
+- Improved initial form for students.
+
 ## [0.1.0] - 2024-08-24
 
 ### Added
