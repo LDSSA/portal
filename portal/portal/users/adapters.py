@@ -1,13 +1,16 @@
 import logging
 from typing import Any
 
+from allauth.account import app_settings
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.forms import EmailAwarePasswordResetTokenGenerator
+from allauth.account.models import EmailAddress
 from allauth.account.utils import filter_users_by_email, user_pk_to_url_str
 from allauth.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.utils import build_absolute_uri
 from constance import config
+from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.http import HttpRequest
 from django.shortcuts import render
@@ -30,6 +33,15 @@ class AccountAdapter(DefaultAccountAdapter):
         if request.path == reverse("instructors_signup"):
             return True
         return getattr(config, "ACCOUNT_ALLOW_REGISTRATION", True)
+
+    def clean_email(self, email):
+        email = super().clean_email(email)
+        if email and app_settings.UNIQUE_EMAIL:
+            if EmailAddress.objects.filter(email=email).exists():
+                raise ValidationError(
+                    "A user is already registered with this e-mail address."
+                )
+        return email
 
     def render_mail(self, template_prefix, email, context):
         """Render an e-mail to `email`.
