@@ -7,8 +7,8 @@ from urllib.parse import unquote, urljoin
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from rest_framework.reverse import reverse
 from rest_framework.authtoken.models import Token
+from rest_framework.reverse import reverse
 
 logger = logging.getLogger(__name__)
 pattern = re.compile("[^a-zA-Z0-9-]+")

@@ -114,17 +114,18 @@ class BaseUnitDetailView(DetailView):
         grade.message = ""
         grade.save()
 
-
         # Send to grading
         grading = import_string(settings.GRADING_CLASS)
         grading(grade=grade).run_grading()
 
-        messages.info(request, """
+        messages.info(
+            request,
+            """
             We are now running the grading, please wait for the results!
             If your grade is stuck at "sent" for more than 5 minutes, please contact the instructors.
-            """
+            """,
         )
-        
+
         return HttpResponseRedirect(request.path_info)
 
 
