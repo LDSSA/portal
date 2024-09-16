@@ -7,6 +7,7 @@ from urllib.parse import unquote, urljoin
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from rest_framework.authtoken.models import Token
 from rest_framework.reverse import reverse
 
 logger = logging.getLogger(__name__)
@@ -130,7 +131,21 @@ class AcademyGradingMixin:
         return pattern.sub("", name)
 
     def get_env(self):
-        grader = get_user_model().objects.get(username=settings.GRADING_USERNAME)
+        # Check if grader already exists
+        if get_user_model().objects.filter(username=settings.GRADING_USERNAME).exists():
+            grader = get_user_model().objects.get(username=settings.GRADING_USERNAME)
+        else:
+            grader = get_user_model().objects.create(
+                username=settings.GRADING_USERNAME,
+                email="grading@grading.org",
+            )
+
+        # Check if grader already has an auth token
+        if Token.objects.filter(user=grader).exists():
+            token = Token.objects.get(user=grader)
+        else:
+            token = Token.objects.create(user=grader)
+            token.save()
 
         grading_url = self.get_grading_url()
         checksum_url = self.get_checksum_url()

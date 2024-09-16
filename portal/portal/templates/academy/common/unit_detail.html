@@ -5,64 +5,59 @@
 {% block title %}{{ unit.code }}{% endblock %}
 
 {% block content %}
-  <div class="container">
-    <div class="row mb-5 mt-5">
-      <div class="col">
-        <h1>{{ unit.code }}: {{ unit.name }}</h1>
-      </div>
+  <div class="container my-5">
+    <!-- Header Section -->
+    <h1 class="display-5">{{ unit.code }}: {{ unit.name }}</h1>
+    <div class="row align-items-center mb-4">
       <div class="col-md-auto">
-        Last Grade:
+        <span class="font-weight-bold">Last Grade:</span>
         {% show_grade grade %}
       </div>
       <div class="col-md-auto">
-        Best Grade:
+        <span class="font-weight-bold">Best Grade:</span>
         {% show_grade best_grade %}
       </div>
       {% if unit.open %}
         <div class="col-md-auto">
           <form method="post">
             {% csrf_token %}
-            <input type="submit" class="btn btn-dark" value="Grade">
+            <button type="submit" class="btn btn-dark">Grade</button>
           </form>
         </div>
       {% endif %}
     </div>
 
+    <!-- Failure Message -->
     {% if grade.status == "failed" %}
-    <div class="row">
-      <div class="mb-4">
-        <h5>Fail message:</h5>
-        <span>{{ grade.message }}</span>
+      <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Fail message:</h4>
+        <p>{{ grade.message }}</p>
       </div>
-    </div>
     {% endif %}
 
-    <div class="row">
-      <div class="col-md-auto">
-        <div class="mb-4">
-          <h5>Due date:</h5>
-          <span>{{ unit.due_date }}</span>
-        </div>
-        <div>
-          <h5>Instructor:</h5>
-          <span>{{ unit.instructor.name }}</span>
-        </div>
-      </div>
+    <!-- Unit Details -->
+    <div class="card mb-4">
+      <div class="card-body">
+        <div class="row">
+          <!-- Sidebar Information -->
+          <div class="col-md-4">
+            <div class="mb-3">
+              <h5>Due Date:</h5>
+              <p>{{ unit.due_date|date:"F j, Y" }}</p>
+            </div>
+            <div class="mb-3">
+              <h5>Instructor:</h5>
+              <p>{{ unit.instructor.name }}</p>
+            </div>
+          </div>
 
-      <div class="w-100"></div>
-
-      <div class="col-md">
-        <div>
-          <h5>Description:</h5>
-          <div style="text-align: justify">
-            <span>{{ unit.description }}</span>
+          <!-- Description -->
+          <div class="col-md-8">
+            <h5>Description:</h5>
+            <p class="text-justify">{{ unit.description }}</p>
           </div>
         </div>
       </div>
     </div>
-
-    <div class="col">
-    </div>
   </div>
 {% endblock content %}
-
