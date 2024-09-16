@@ -7,6 +7,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.1] - 2024-09-16
+
+- Adding message after clicking the Grade button in the unit list.
+- Creating the `GRADING_USER` and a Token if it doesn't exist yet.
+
 ## [0.2.0] - 2024-09-16
 
 - Enforcing unique email addresses for users.
