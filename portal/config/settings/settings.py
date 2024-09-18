@@ -31,7 +31,7 @@ GRADING_ADMISSIONS_CLASS = env.str(
     "GRADING_ADMISSIONS_CLASS",
     default="portal.grading.services.AdmissionsKubernetesGrading",
 )
-BASE_URL = env.str("BASE_URL")
+BASE_URL = f'https://{env.str("BASE_URL")}'
 STUDENT_REPO_NAME = env.str("STUDENT_REPO_NAME")
 IN_DEV = True if "dev" in BASE_URL else False
 
