@@ -16,7 +16,7 @@ data:
   DJANGO_SETTINGS_MODULE: config.settings.settings
 
   # GRADING
-  STUDENT_REPO_NAME: batch-workspace
+  STUDENT_REPO_NAME: batch8-workspace
   GRADING_USERNAME: portal-api
 
   # DJANGO CACHES
