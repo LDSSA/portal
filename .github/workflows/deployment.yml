@@ -65,12 +65,12 @@ jobs:
         if [ ${{ github.ref }} == 'refs/heads/main' ]; then
           cluster_name="production"
           postgres_db="portal"
-          ingress_host="portal.lisbondatascience.org"
+          ingress_host="https://portal.lisbondatascience.org"
 
         else
           cluster_name="development"
           postgres_db="portaldev"
-          ingress_host="portal.dev-lisbondatascience.org"
+          ingress_host="https://portal.dev-lisbondatascience.org"
         fi
 
         aws eks update-kubeconfig --name $cluster_name
