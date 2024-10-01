@@ -57,7 +57,7 @@ class Grade(models.Model):
     )
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="grades")
     created = models.DateTimeField(auto_now_add=True)
-    notebook = models.FileField(upload_to=notebook_path, null=True)
+    notebook = models.FileField(upload_to=notebook_path, null=True, blank=True)
 
     STATUSES = (
         ("never-submitted", "Unsubmitted"),
@@ -71,7 +71,7 @@ class Grade(models.Model):
     status = models.CharField(
         max_length=1024, choices=STATUSES, default="never-submitted"
     )
-    score = models.FloatField(null=True)
+    score = models.FloatField(null=True, blank=True)
     message = models.TextField(blank=True)
     feedback = models.FileField(upload_to=feedback_path, null=True)
     on_time = models.BooleanField(default=True)
