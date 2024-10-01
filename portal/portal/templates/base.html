@@ -163,10 +163,6 @@
         {% block content %}
         <!-- Default content -->
         {% endblock content %}
-
-        {% block extra_js %}
-        <!-- Extra JS -->
-        {% endblock extra_js %}
     </div>
 
     <!-- Le javascript
@@ -184,6 +180,9 @@
     <script src="{% static 'js/project.js' %}"></script>
     {% endcompress %}
     {% endblock javascript %}
+    {% block extra_js %}
+    <!-- Extra JS -->
+    {% endblock extra_js %}
   </body>
 </html>
 
