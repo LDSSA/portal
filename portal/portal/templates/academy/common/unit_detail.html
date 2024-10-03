@@ -61,3 +61,14 @@
     </div>
   </div>
 {% endblock content %}
+
+{% block extra_js %}
+{% if grade.status == "sent" %}
+  <script>
+  // Refresh the page every 30 seconds (30000 milliseconds)
+    setTimeout(function(){
+        location.reload();
+    }, 30000);
+  </script>
+{% endif %}
+{% endblock %}

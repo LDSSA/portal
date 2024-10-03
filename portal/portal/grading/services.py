@@ -138,6 +138,7 @@ class AcademyGradingMixin:
             grader = get_user_model().objects.create(
                 username=settings.GRADING_USERNAME,
                 email="grading@grading.org",
+                is_staff=True,
             )
 
         # Check if grader already has an auth token
