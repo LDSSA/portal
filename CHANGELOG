@@ -7,6 +7,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.2] - 2024-10-03
+
+- Refreshing after 30 seconds the Students page when status="sent".
+- Portal API user is automatically set as `staff` so it can access the API.
+
 ## [0.2.1] - 2024-09-16
 
 - Adding message after clicking the Grade button in the unit list.
@@ -26,5 +31,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Added this CHANGELOG file to track changes to the project.
 - Set up terraforms, and Helm charts to deploy the app to dev and to prod.
 
-[unreleased]: https://github.com/altos-labs/science-hub/compare/v0.1.0...HEAD
+[unreleased]: https://github.com/altos-labs/science-hub/compare/v0.2.2...HEAD
+[0.2.2]: https://github.com/altos-labs/altos-app-commons-python/compare/v0.2.1...v0.2.2
+[0.2.1]: https://github.com/altos-labs/altos-app-commons-python/compare/v0.2.0...v0.2.1
+[0.2.0]: https://github.com/altos-labs/altos-app-commons-python/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/altos-labs/altos-app-commons-python/tree/v0.1.0
