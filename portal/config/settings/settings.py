@@ -213,6 +213,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 # STORAGES
@@ -597,14 +598,21 @@ LOGGING = {
         },
     },
     "loggers": {
-        "": {
+        "root": {
             "handlers": ["console"],
             "level": "DEBUG",
         },
         "parso": {
-            "handlers": ["console"],
             "level": "WARNING",
-            "propagate": False,
+        },
+        "botocore": {
+            "level": "WARNING",
+        },
+        "urllib3": {
+            "level": "WARNING",
+        },
+        "s3transfer": {
+            "level": "WARNING",
         },
     },
 }

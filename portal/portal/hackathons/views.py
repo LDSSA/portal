@@ -42,7 +42,11 @@ class LeaderboardView(LoginRequiredMixin, generic.DetailView):
             "created",
         ):
             if submission.content_object not in submissions:
-                submissions[submission.content_object] = submission
+                count = models.Submission.objects.filter(
+                    content_type=submission.content_type,
+                    object_id=submission.object_id,
+                ).count()
+                submissions[submission.content_object] = (submission, count)
 
         context = self.get_context_data(object=self.object, submissions=submissions)
 
