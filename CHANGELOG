@@ -9,7 +9,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.2.3] - 2024-10-20
 
-- Fixed the password reset view to not validate the email address.
 - Improve Team Admin page to make it easier to adjust the team members.
 
 ## [0.2.2] - 2024-10-03
