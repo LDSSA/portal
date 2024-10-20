@@ -18,6 +18,7 @@
         <th scope="col">Team</th>
         <th scope="col">Name</th>
         <th scope="col">Score</th>
+        <th scope="col">Submissions</th>
       </tr>
     </thead>
     <tbody>
@@ -28,7 +29,8 @@
          </th>
          <td>{{ obj.hackathon_team_id }}</td>
          <td>{{ obj.name }}</td>
-         <td>{{ submission.score|floatformat:3 }}</td>
+         <td>{{ submission.0.score|floatformat:3 }}</td>
+         <td>{{ submission.1 }}</td>
        </tr>
       {% endfor %}
     </tbody>
