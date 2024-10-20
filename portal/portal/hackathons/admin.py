@@ -37,6 +37,7 @@ class TeamAdmin(admin.ModelAdmin):
         "hackathon",
     )
     list_filter = ("hackathon",)
+    filter_horizontal = ("users",)
 
 
 @admin.register(models.Attendance)
