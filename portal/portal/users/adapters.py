@@ -36,6 +36,12 @@ class AccountAdapter(DefaultAccountAdapter):
 
     def clean_email(self, email):
         email = super().clean_email(email)
+        request = getattr(self, "request", None)
+        
+        # Skip unique email check if it's a password reset request
+        if request and request.path == reverse("account_reset_password"):
+            return email
+        
         if email and app_settings.UNIQUE_EMAIL:
             if EmailAddress.objects.filter(email=email).exists():
                 raise ValidationError(
