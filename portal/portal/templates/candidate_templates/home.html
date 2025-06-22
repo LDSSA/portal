@@ -100,11 +100,10 @@
             <h5 class="mb-0">
               <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo" aria-controls="collapseTwo" {% if not accordion_enabled_status.accepted_coc %} disabled {% endif %}>
                 {% if state.accepted_coc %}
-                    <i class="fas fa-check-circle"></i>
+                    <i class="fas fa-check-circle"></i> The code of conduct and the refund policy were accepted.
                 {% else %}
-                    <i class="far fa-circle"></i>
+                    <i class="far fa-circle"></i> The code of conduct and the refund policy were accepted.
                 {% endif %}
-                The code of conduct and the refund policy were accepted.
               </button>
             </h5>
           </div>
@@ -155,8 +154,10 @@
               <button class="btn btn-link" data-toggle="collapse" data-target="#collapseThree" aria-controls="collapseThree" {% if not accordion_enabled_status.decided_academy_type %} disabled {% endif %}>
                 {% if state.academy_type %}
                     <i class="fas fa-check-circle"></i>
+                {% else %}
+                    <i class="far fa-circle"></i>
                 {% endif %}
-                <p>Academy option: state.academy_type</p>
+                Academy Type
               </button>
             </h5>
           </div>
