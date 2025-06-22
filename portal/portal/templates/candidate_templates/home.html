@@ -31,7 +31,7 @@
     <p>
         Before you start, please read all the details about the LDSSA 
         <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/01-Starters-Academy-(Course)/">here</a>, 
-        about this admissions process <a href="https://ldssa.github.io/wiki/Applicants/Application-process/">here</a>, 
+        about this admission process <a href="https://ldssa.github.io/wiki/Applicants/Application-process/">here</a>, 
         and keep these main points in mind:
     </p>
 
@@ -44,13 +44,13 @@
         <br>
         <li class="pb-3">
             <b>The Starters Academy will have both a remote and in-person option this year.</b> This should only be reflected in the Hackathons, <br>
-            where a batch of students will have the opportunity to meet and do hackathons in-person, and other students can do it remotely. <br>
+            where the in-person students will have the opportunity to meet and do the hackathons in-person, and the remote students will do it remotely. <br>
             The choice to do in-person or remote is done when applying for the course. The in-person option will open only if a sufficient number <br>
             of students chooses this option.
         </li>
         <br>
         <li class="pb-3">
-            Since our Academy is based in Lisbon, all the Starter's Academy activities will happen during the day, <b>Lisbon time</b>. This includes <br>
+            Since our Academy is based in Lisbon, all the activities will happen during the day of <b>Lisbon time</b>. This includes <br>
             the bootcamp classes, the hackathons, and instructors' availability to answer questions on Slack. <b>Remote students are required to be online <br>
             during the bootcamp and the hackathons.</b>  For students who are in very different timezones, this probably means that they'll have to join us <br>
             at unusual hours, and that communicating with instructors will feel very async. Please take this into consideration when applying!
@@ -60,7 +60,7 @@
             You can find all the relevant dates for the Starter's Academy on this 
             <a href=https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/01-Starters-Academy-(Course)/>Webpage</a>.
             <b>The bootcamp and the first and last hackathons are mandatory</b>. <br>
-            If you cannot complete the first specialization and the first hackathon, you won't be allowed to join any other course activities and won't be able <br>
+            If you cannot complete the first specialization and the first hackathon, you won't be allowed to proceed with the rest of the course and won't be able <br>
             to graduate. If you don't take part in the last hackathon, you won't be able to continue with the capstone project. In order to participate <br>
             in the hackathons, you're required to achieve a minimum score of 80% in all the learning units of that specialization. You have to complete all <br>
             the learning units to graduate, but you can miss one hackathon (except for the first and the last).
@@ -81,13 +81,13 @@
         <br>
         <li class="pb-3">
           According to our <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/07-Refund-Policy/">refund policy</a>, 
-          you are eligible for a full refund within 14 days after the Bootcamp start date.
+          you are eligible for a full refund within 14 days after the bootcamp start date.
       </li>
     </ul>
 
     <h3 class="py-2" id="next">Your next steps:</h3>
     <h4>
-        1. Accept the code of conduct of conduct and the refund policy
+        1. Accept the code of conduct and the refund policy
     </h4>
     <p>
         Read and accept the code of conduct and the refund policy
@@ -120,7 +120,7 @@
         </p>
         {% if not state.decided_scholarship %}
              <p>
-                Read our scholarships terms & conditions carefully and decide whether you want to apply <a href="{% url 'admissions:candidate:scholarship' %}">here</a>.
+                Read our scholarship terms & conditions carefully and decide whether you want to apply <a href="{% url 'admissions:candidate:scholarship' %}">here</a>.
             </p>
         {% else %}
         <div class="card">
@@ -140,10 +140,11 @@
 
         <!-- academy type preference -->
         <h4>
-            3. Choose your preference for remote or in-person mode.
+            3. Choose your preference for remote or in-person mode
         </h4>    
         <p>
-            This year, the Lisbon Data Science Starters Academy will have a remote and an in-person option. The in-person option opens only if a sufficient number of students chooses this option. 
+            This year, the Lisbon Data Science Starters Academy will have a remote and an in-person option. The in-person option opens only if a sufficient number <br>
+            of students chooses this option. 
         </p>
         <p>
             Choose your preference <a href="{% url 'admissions:candidate:academy_type' %}">here</a>.
@@ -153,15 +154,18 @@
             <h5 class="mb-0">
               <button class="btn btn-link" data-toggle="collapse" data-target="#collapseThree" aria-controls="collapseThree" {% if not accordion_enabled_status.decided_academy_type %} disabled {% endif %}>
                 {% if state.academy_type %}
-                <p>Academy option: </p>
                     <i class="fas fa-check-circle"></i>
                 {% endif %}
+                <p>Academy option: state.academy_type</p>
               </button>
             </h5>
           </div>
         </div>
 
         <!-- admission test -->
+        <h4>
+            4. The admission tests
+        </h4>    
         <div class="card">
             <div class="card-header" id="headingFour">
               <h5 class="mb-0">
@@ -183,8 +187,10 @@
                     <p>The admission tests will open on the <b>{{ ADMISSIONS_APPLICATIONS_START }}</b>. Come back then to start working on the tests!</p>
                     
                     <p>The coding test and SLUs require setting up your local environment with a virtual environment with Python 3.12 and be able to run Jupyter notebooks. <br>
-                        If you don't have such a setup, you can follow the setup instructions in points <b>2</b> and <b>4</b> <a href="https://github.com/LDSSA/batch-students">here</a>. If you are not familiar with Jupyter notebooks, refer to SLU00 of the <a href="https://github.com/LDSSA/ds-prep-course-2024">prep course</a>. <br>
-                        See instructions in sections <b>3.2</b>b> and <b>3.3</b> of point <b>5</b>b> on how to run a Jupyter notebook. Ignore the rest of the setup for now. </p>
+                        If you don't have such a setup, you can follow the setup instructions in points <b>2</b> and <b>4</b> <a href="https://github.com/LDSSA/batch-students">here</a>.
+                        See instructions in sections <b>3.2</b> and <b>3.3</b> of point <b>5</b> on how to run a Jupyter notebook. <br>
+                        Ignore the rest of the setup for now.  If you are not familiar with Jupyter notebooks, refer to SLU00 of the <a href="https://github.com/LDSSA/ds-prep-course-2025">prep course</a>.
+                    </p>
 
                 {% elif PORTAL_STATUS == "admissions" %}                        
                     {% if state.application_status.name == "passed" %}
