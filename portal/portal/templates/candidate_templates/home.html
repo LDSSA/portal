@@ -41,6 +41,7 @@
             The bootcamp classes and the hackathons are not included in this time commitment. The two bootcamp days 
             are 4 hour events and the hackathons are 9-10 hours long.
         </li>
+        <br>
         <li class="pb-3">
             <b>The Starters Academy will have both a remote and in-person option this year.</b>
             This should only be reflected in the Hackathons, where a batch of students will have the opportunity to 
@@ -48,6 +49,7 @@
             The choice to do in-person or remote is done when applying for the course. 
             The in-person option will open only if a sufficient amount of students chooses this option.
         </li>
+        <br>
         <li class="pb-3">
             Since our Academy is based in Lisbon, all the Starter's Academy activities will happen during the day, 
             <b>Lisbon time</b>. This includes the bootcamp classes, the hackathons, and instructors' availability 
@@ -56,6 +58,7 @@
             have to join us at unusual hours, and that communicating with instructors will feel very async. 
             Please take this into consideration when applying!
         </li>
+        <br>
         <li class="pb-3">
             You can find all the relevant dates for the Starter's Academy on this 
             <a href=https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/01-Starters-Academy-(Course)/>Webpage</a>.
@@ -67,24 +70,34 @@
             learning units of that specialization. You have to complete all the learning units to graduate, but you can miss
             one hackathon (except for the first and the last).
         </li>
+        <br>
         <li class="pb-3">
-            At the end of the Starters Academy, we will emit a Lisbon Data Science Starters Academy Certificate that will describe your achievements.
-            This certificate will list all the Starters Academy's specializations, explain what it means to pass each specialization, and show the grades that you've achieved in each of them.
-            If you miss a specialization, you'll score 0 (zero) on that specialization, and this will be shown in your certificate.
-            You'll only be issued a Lisbon Data Science Starters Academy Certificate in case you miss one or zero hackathons.
-            The Bootcamp days, Specialization 1, Hackathon 1, and the Capstone cannot be missed.
+            If you complete the Academy, you will receive a certificate. The certificate will list all the Starters Academy's 
+            specializations with your grades.
         </li>
+        <br>
         <li class="pb-3">
-            Everyone is expected to comply with our <a href="https://ldssa.github.io/wiki/About%20us/Code-of-Conduct/">Code of Conduct</a> in all the interactions with the Lisbon Data Science Academy.
-            This includes the candidates applying to the Starters Academy.
-            During this admissions process, <b>we'll ask you to read and acknowledge this Code of Conduct and you'll only be allowed to continue if you agree.</b>
+            Everyone is expected to comply with our <a href="https://ldssa.github.io/wiki/About%20us/Code-of-Conduct/">code of conduct</a> 
+            in all the interactions with the Lisbon Data Science Academy. This includes the candidates applying to the Starters Academy.
+            During this admissions process, <b>we'll ask you to read and acknowledge the code of conduct 
+            and you'll only be allowed to continue if you agree.</b>
         </li>
+        <br>
         <li class="pb-3">
-          According to our <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/07-Refund-Policy/">Refund Policy</a>, you are eligible for a full refund within 14 days after the Bootcamp start date.
+          According to our <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/07-Refund-Policy/">refund policy</a>, 
+          you are eligible for a full refund within 14 days after the Bootcamp start date.
       </li>
     </ul>
 
     <h4 class="py-2" id="next">Your next steps</h4>
+    <h5>
+        Accept the code of conduct of conduct and the refund policy.
+    </h5>
+    <p>
+        Not complying with the code of conduct during the Academy will lead to immediate exclusion from the 
+        course, without a refund. Read and accept the code of conduct and the refund policy
+         <a href="{% url 'admissions:candidate:codeofconduct' %}">here</a>.
+    </p>
     <div id="accordion" class="mb-5">
         <!-- code of conduct -->
         <div class="card">
@@ -96,16 +109,22 @@
                 {% else %}
                     <i class="far fa-circle"></i>
                 {% endif %}
-                Accept Code of Conduct and Refund Policy
+                The code of conduct and the refund policy were accepted.
               </button>
             </h5>
           </div>
           <div id="collapseTwo" class="collapse {% if action_point == 'accepted_coc' %} show {% endif %}" aria-labelledby="headingTwo" data-parent="#accordion">
             <div class="card-body">
-              <p>In order to proceed with your application to the Lisbon Data Science Starters Academy, you need to <b>read and agree with our Code of Conduct and Refund Policy</b>.</p>
-              <p>Not complying with the Code of Conduct during the Academy will lead to immediate exclusion from the course, without a refund.
-              To ensure that you get the best experience out of the Academy, you should familiarize yourself with the Code of Conduct before putting any more time into this application process.</p>
-              <p>Read the Code of Conduct and Refund Policy <a href="{% url 'admissions:candidate:codeofconduct' %}">here</a>.</p>
+              <h5 class="mb-0">
+              <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo" aria-controls="collapseTwo" {% if not accordion_enabled_status.accepted_coc %} disabled {% endif %}>
+                {% if state.accepted_coc %}
+                    <i class="fas fa-check-circle"></i>
+                {% else %}
+                    <i class="far fa-circle"></i>
+                {% endif %}
+                The code of conduct and the refund policy were accepted.
+              </button>
+            </h5>
             </div>
           </div>
         </div>
@@ -128,7 +147,7 @@
             <div class="card-body">
                 {% if not state.decided_scholarship %}
                 <p>
-                    You can read our Scholarships Terms & Conditions carefully and decide whether you want to apply <a href="{% url 'admissions:candidate:scholarship' %}">here</a>.
+                    You can read our ccholarships terms & conditions carefully and decide whether you want to apply <a href="{% url 'admissions:candidate:scholarship' %}">here</a>.
                 </p>
                 <p>
                     You have to explicitly tell us if you want to apply for a scholarship or not.
