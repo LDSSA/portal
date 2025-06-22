@@ -86,6 +86,7 @@
     </ul>
 
     <h3 class="py-2" id="next">Your next steps:</h3>
+    <div id="accordion" class="mb-5"></div>
     <h4>
         1. Accept the code of conduct and the refund policy
     </h4>
@@ -95,9 +96,8 @@
          <a href="{% url 'admissions:candidate:codeofconduct' %}">here</a>.
     </p>
     {% else %}
-    <div id="accordion" class="mb-5">
         <!-- code of conduct -->
-        <div class="card">
+       <div class="card">
           <div class="card-header" id="headingTwo">
             <h5 class="mb-0">
               <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo" aria-controls="collapseTwo" {% if not accordion_enabled_status.accepted_coc %} disabled {% endif %}>
@@ -106,12 +106,13 @@
             </h5>
           </div>
         </div>
-        {% endif %}
+    {% endif %}
+       
 
         <!-- scholarships -->
-        <h4>
-            2. Choose if you want to apply for a scholarship
-        </h4> 
+    <h4>
+        2. Choose if you want to apply for a scholarship
+    </h4> 
         <p>
             You have to explicitly tell us if you want to apply for a scholarship or not. You won't be able to move forward in your application before this confirmation.
         </p>
