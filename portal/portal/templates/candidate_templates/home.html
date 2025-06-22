@@ -101,8 +101,6 @@
               <button class="btn btn-link" data-toggle="collapse" data-target="#collapseTwo" aria-controls="collapseTwo" {% if not accordion_enabled_status.accepted_coc %} disabled {% endif %}>
                 {% if state.accepted_coc %}
                     <i class="fas fa-check-circle"></i> The code of conduct and the refund policy were accepted.
-                {% else %}
-                    <i class="far fa-circle"></i> The code of conduct and the refund policy were accepted.
                 {% endif %}
               </button>
             </h5>
@@ -129,7 +127,7 @@
                     {% if state.applying_for_scholarship %}
                         You are applying for a scholarship!
                     {% else %}
-                        You are not applying for a scholarship.
+                        <i class="fas fa-check-circle"></i>  You are not applying for a scholarship.
                     {% endif %}
                 {% endif %}
               </button>
@@ -153,11 +151,8 @@
             <h5 class="mb-0">
               <button class="btn btn-link" data-toggle="collapse" data-target="#collapseThree" aria-controls="collapseThree" {% if not accordion_enabled_status.decided_academy_type %} disabled {% endif %}>
                 {% if state.academy_type %}
-                    <i class="fas fa-check-circle"></i>
-                {% else %}
-                    <i class="far fa-circle"></i>
+                    <i class="fas fa-check-circle"></i> academy_type
                 {% endif %}
-                Academy Type
               </button>
             </h5>
           </div>
@@ -172,13 +167,10 @@
               <h5 class="mb-0">
                 <button class="btn btn-link" data-toggle="collapse" data-target="#collapseFour" aria-controls="collapseFour" {% if not accordion_enabled_status.admission_test %} disabled {% endif %}>
                     {% if state.application_status.name == "passed" %}
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-check-circle"></i> Admission Test
                     {% elif state.application_status.name == "failed" %}
-                        <i class="fas fa-times-circle"></i>
-                    {% else %}
-                        <i class="far fa-circle"></i>
+                        <i class="fas fa-times-circle"></i> Admission Test
                     {% endif %}
-                    Admission Test
                   </button>
               </h5>
             </div>
