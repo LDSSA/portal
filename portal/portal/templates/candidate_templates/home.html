@@ -206,8 +206,16 @@
                         
                     <p>Start the coding test only when you have {{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours of free and uninterrupted time. </p>
                         
-                    We <strong>strongly suggest that you complete the SLUs before starting the coding test</strong>.<br>
+                    <strong>We strongly suggest that you complete the SLUs before starting the coding test</strong>.<br>
                     This way, you'll get familiar with the environment and the grading system without time constraints,leaving you better prepared to face the coding test!</p>
+
+                    <p>The coding test and SLUs require setting up your local environment with a virtual environment with Python 3.12 and be able to run Jupyter notebooks. <br>
+                        If you don't have such a setup, you can follow the setup instructions in points <b>2</b> and <b>4</b> <a href="https://github.com/LDSSA/batch-students">here</a>.
+                        See instructions in sections <b>3.2</b> and <b>3.3</b> of point <b>5</b> on how to run a Jupyter notebook. <br>
+                        Ignore the rest of the setup for now.  If you are not familiar with Jupyter notebooks, refer to SLU00 of the <a href="https://github.com/LDSSA/ds-prep-course-2025">prep course</a>.
+                    </p>
+
+                    <p>Follow the links below to download the SLUs or start the coding test.</p>
 
                 {% elif state.application_status.name == "failed" %}
                     <p>We're sorry, but you didn't pass the admission test...</p>
@@ -236,7 +244,7 @@
                             {% else %}
                                 <i class="far fa-circle"></i>
                             {% endif %}
-                            <a href="{% url 'admissions:candidate:coding-test' %}">Coding Test</a>
+                            <a href="{% url 'admissions:candidate:before-coding-test' %}">Coding Test</a>
                         </li>
                         <li class="list-group-item">
                             {% if state.slu02_status.name == "passed" %}
