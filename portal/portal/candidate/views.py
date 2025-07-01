@@ -257,7 +257,7 @@ class CandidateConfirmationCodingTestView(AdmissionsCandidateViewMixin, Template
     ):
         application = Application.objects.get(user=request.user)
         if application.coding_test_started_at is None:
-            application.coding_test_started_at = datetime.now(timezone.utc)
+            application.coding_test_started_at = datetime.now(timezone.utc) # this should move after download
             application.save()
 
         return HttpResponseRedirect(reverse("admissions:candidate:coding-test"))
@@ -300,7 +300,7 @@ class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
             return HttpResponseRedirect(reverse("home"))
 
         application, _ = Application.objects.get_or_create(user=request.user)
-        if application.coding_test_started_at is None:
+        if application.coding_test_started_at is None:  # this should probably go
             return HttpResponseRedirect(
                 reverse("admissions:candidate:before-coding-test")
             )
@@ -327,7 +327,7 @@ class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
         application = Application.objects.get(user=request.user)
         if (
             assignment_id == "coding_test"
-            and application.coding_test_started_at is None
+            and application.coding_test_started_at is None #this has to change
         ):
             raise Http404
 
