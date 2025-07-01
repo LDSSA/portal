@@ -15,15 +15,14 @@
             You can make as many submissions as you want, and you only need 1 passing submission (at least <b>{{ coding_test_subtype.pass_score|floatformat }}</b> out of <b>{{ coding_test_subtype.max_score|floatformat }}</b> points).
         </p>
         <p>We'll only consider your <b>best</b> submission, not your last one.</p>
-        <p>
-            Your time will start once you click the button below, and it can't be stopped.
-            So make sure you're free for the next {{ ADMISSIONS_CODING_TEST_DURATION }} hours!
-        </p>
-
         <p><h4>
             Please complete the setup before starting the coding test, 
             or you'll be wasting your precious test time setting up your environment!!!
         </h4></p>
+        <p>
+           Make sure you're free for the next {{ ADMISSIONS_CODING_TEST_DURATION }} hours before proceeding!
+        </p>
+
 
         <form method="post" class="pt-4">
             {% csrf_token %}
