@@ -200,20 +200,20 @@
                         <ul>
                             <li>can be started at any time during the admissions period</li>
                             <li>can be submitted for grading as many times as you want</li>
-                            <li>have to completed by {{ ADMISSIONS_SELECTION_START }}.</li>
+                            <li>have to be completed by {{ ADMISSIONS_SELECTION_START }}.</li>
                         </ul>
                     </p>
                     <p><b>The coding test</b>
                         <ul>
                             <li>can be started at any time during the admissions period</li>
                             <li>can be submitted for grading as many times as you want</li>
-                            <li>have to be completed within <b>{{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours</b> from starting it, latest by {{ ADMISSIONS_SELECTION_START }}.</li>
+                            <li>have to be completed <b> within {{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours from starting it</b>, latest by {{ ADMISSIONS_SELECTION_START }}.</li>
                         </ul>
                         
                     <p>Start the coding test only when you have {{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours of free and uninterrupted time. </p>
                         
                     <strong>We strongly suggest that you complete the SLUs before starting the coding test</strong>.<br>
-                    This way, you'll get familiar with the environment and the grading system without time constraints,leaving you better prepared to face the coding test!</p>
+                    This way, you'll get familiar with the environment and the grading system without time constraints, leaving you better prepared to face the coding test!</p>
 
                     <p>The coding test and SLUs require setting up your local environment with a virtual environment with Python 3.12 and be able to run Jupyter notebooks. <br>
                         If you don't have such a setup, you can follow the setup instructions in points <b>2</b> and <b>4</b> <a href="https://github.com/LDSSA/batch-students">here</a>.
@@ -226,16 +226,6 @@
                     </p>
 
                     <p>Follow the links below to download the SLUs or start the coding test.</p>
-
-                    {% elif state.application_status.name == "failed" %}
-                        <p>We're sorry, but you didn't pass the admission test...</p>
-
-                        <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch8-students">GitHub</a>, for free.</p>
-
-                        <p>
-                          If you want to give it another try next year, check our <a href="https://www.lisbondatascience.org/">website</a> and join our newsletters to be the first to receive updates about our courses and the dates for the next batch of the Academy.
-                        </p>
-                    {% endif %}
 
                     <ul class="list-group list-group-flush pt-3">
                         <li class="list-group-item">
@@ -279,6 +269,15 @@
                             <a href="{% url 'admissions:candidate:slu' 'slu03' %}">SLU03</a>
                         </li>
                     </ul>
+                    {% elif state.application_status.name == "failed" %}
+                        <p>We're sorry, but you didn't pass the admission test...</p>
+
+                        <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch8-students">GitHub</a>, for free.</p>
+
+                        <p>
+                          If you want to give it another try next year, check our <a href="https://www.lisbondatascience.org/">website</a> and join our newsletters to be the first to receive updates about our courses and the dates for the next batch of the Academy.
+                        </p>
+                    {% endif %}
 
                 {% endif %}
               </div>
