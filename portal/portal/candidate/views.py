@@ -338,7 +338,7 @@ class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
 
         obj = Challenge.objects.get(code=assignment_id)
         try:
-            download_counter_var[pk]=+1
+            download_counter_var[assignment_id]=+1
             return FileResponse(obj.file)
         except ValueError as exc:
             raise Http404 from exc
