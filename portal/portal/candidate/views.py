@@ -335,7 +335,7 @@ class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
         #                        "slu01":application.slu01_downloaded,
         #                        "slu02":application.slu02_downloaded,
         #                        "slu03":application.slu03_downloaded}
-#
+
         obj = Challenge.objects.get(code=assignment_id)
         try:
             #download_counter_var[assignment_id]=+1
