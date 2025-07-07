@@ -332,9 +332,9 @@ class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
             raise Http404
         
         #download_counter_var = {"coding_test":application.coding_test_downloaded, 
-                                "slu01":application.slu01_downloaded,
-                                "slu02":application.slu02_downloaded,
-                                "slu03":application.slu03_downloaded}
+        #                        "slu01":application.slu01_downloaded,
+        #                        "slu02":application.slu02_downloaded,
+        #                        "slu03":application.slu03_downloaded}
 
         obj = Challenge.objects.get(code=assignment_id)
         try:
