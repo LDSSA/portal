@@ -330,9 +330,15 @@ class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
             and application.coding_test_started_at is None #this has to change
         ):
             raise Http404
+        
+        #download_counter_var = {"coding_test":application.coding_test_downloaded, 
+        #                        "slu01":application.slu01_downloaded,
+        #                        "slu02":application.slu02_downloaded,
+        #                        "slu03":application.slu03_downloaded}
 
         obj = Challenge.objects.get(code=assignment_id)
         try:
+            #download_counter_var[assignment_id]=+1
             return FileResponse(obj.file)
         except ValueError as exc:
             raise Http404 from exc
