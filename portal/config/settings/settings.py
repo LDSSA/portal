@@ -474,7 +474,7 @@ CONSTANCE_CONFIG = {
     "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
 }
 ADMISSIONS_APPLICATIONS_STARTED_STATUSES = [
-    "admissions:applications",
+    "admissions",
     "admissions:selection",
 ]
 

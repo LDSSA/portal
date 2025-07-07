@@ -162,60 +162,70 @@
         <h4>
             4. The admission tests
         </h4>
-        {% if PORTAL_STATUS == "admissions-applications" %}
-                    <p>The admission tests will open on the <b>{{ ADMISSIONS_APPLICATIONS_START }}</b>. Come back then to start working on the tests!</p>
+        <div class="card">
+            <div class="card-header" id="headingFour">
+              <h5 class="mb-0">
+                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseFour" aria-controls="collapseFour" {% if not accordion_enabled_status.admission_test %} disabled {% endif %}>
+                    {% if state.application_status.name == "passed" %}
+                        <i class="fas fa-check-circle"></i>
+                    {% elif state.application_status.name == "failed" %}
+                        <i class="fas fa-times-circle"></i>
+                    {% else %}
+                        <i class="far fa-circle"></i>
+                    {% endif %}
+                    Admission Test
+                  </button>
+              </h5>
+            </div>
+            <div id="collapseFour" class="collapse {% if action_point == 'admission_test' %} show {% endif %}" aria-labelledby="collapseFour" data-parent="#accordion">
+              <div class="card-body">
+                {% if PORTAL_STATUS == "admissions-aplications" %}
+                     <p>The admission tests will open on the <b>{{ ADMISSIONS_APPLICATIONS_START }}</b>. Come back then to start working on the tests!</p>
                     
                     <p>The coding test and SLUs require setting up your local environment with a virtual environment with Python 3.12 and be able to run Jupyter notebooks. <br>
                         If you don't have such a setup, you can follow the setup instructions in points <b>2</b> and <b>4</b> <a href="https://github.com/LDSSA/batch-students">here</a>.
                         See instructions in sections <b>3.2</b> and <b>3.3</b> of point <b>5</b> on how to run a Jupyter notebook. <br>
                         Ignore the rest of the setup for now.  If you are not familiar with Jupyter notebooks, refer to SLU00 of the <a href="https://github.com/LDSSA/ds-prep-course-2025">prep course</a>.
                     </p>
-        {% elif PORTAL_STATUS == "admissions" %}                        
-        <div class="card">
-            <div class="card-header" id="headingFour">
-              <h5 class="mb-0">
-                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseFour" aria-controls="collapseFour" {% if not accordion_enabled_status.admission_test %} disabled {% endif %}>
+                {% else %}
                     {% if state.application_status.name == "passed" %}
-                        <i class="fas fa-check-circle"></i> Admission Test
-                    {% elif state.application_status.name == "failed" %}
-                        <i class="fas fa-times-circle"></i> Admission Test
-                    {% endif %}
-                  </button>
-              </h5>
-            </div> 
-                {% if state.application_status.name == "passed" %}
-                    Congratulations! You've passed the admission test. We'll let you know after the {{ ADMISSIONS_SELECTION_START|date }} if you've been selected for this batch of the LDSSA.
+                        Congratulations! You've passed the admission test.
+                        From the {{ ADMISSIONS_SELECTION_START|date }}, we'll let you know if you've been selected to participate in this batch of the LDSSA.
 
-                {% elif state.application_status.name == "ongoing" %}
-                    <p>You have until <b>{{ ADMISSIONS_SELECTION_START }}</b> to pass all the assignments. You need to solve three small learning units (SLUs) <br>
+                    {% elif state.application_status.name == "ongoing" %}
+                        <p>You have until <b>{{ ADMISSIONS_SELECTION_START }}</b> to pass all the assignments. You need to solve three small learning units (SLUs) <br>
                        and one Python coding test.</p>
 
                     <p>The <b>SLUs</b>
                         <ul>
                             <li>can be started at any time during the admissions period</li>
                             <li>can be submitted for grading as many times as you want</li>
-                            <li>have to completed by {{ ADMISSIONS_SELECTION_START }}.</li>
+                            <li>have to be completed by {{ ADMISSIONS_SELECTION_START }}.</li>
                         </ul>
                     </p>
                     <p><b>The coding test</b>
                         <ul>
                             <li>can be started at any time during the admissions period</li>
                             <li>can be submitted for grading as many times as you want</li>
-                            <li>have to be completed within <b>{{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours</b> from starting it, latest by {{ ADMISSIONS_SELECTION_START }}.</li>
+                            <li>have to be completed <b> within {{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours from starting it</b>, latest by {{ ADMISSIONS_SELECTION_START }}.</li>
                         </ul>
                         
                     <p>Start the coding test only when you have {{ ADMISSIONS_CODING_TEST_DURATION_HOURS }} hours of free and uninterrupted time. </p>
                         
-                    We <strong>strongly suggest that you complete the SLUs before starting the coding test</strong>.<br>
-                    This way, you'll get familiar with the environment and the grading system without time constraints,leaving you better prepared to face the coding test!</p>
+                    <strong>We strongly suggest that you complete the SLUs before starting the coding test</strong>.<br>
+                    This way, you'll get familiar with the environment and the grading system without time constraints, leaving you better prepared to face the coding test!</p>
 
-                {% elif state.application_status.name == "failed" %}
-                    <p>We're sorry, but you didn't pass the admission test...</p>
+                    <p>The coding test and SLUs require setting up your local environment with a virtual environment with Python 3.12 and be able to run Jupyter notebooks. <br>
+                        If you don't have such a setup, you can follow the setup instructions in points <b>2</b> and <b>4</b> <a href="https://github.com/LDSSA/batch-students">here</a>.
+                        See instructions in sections <b>3.2</b> and <b>3.3</b> of point <b>5</b> on how to run a Jupyter notebook. <br>
+                        Ignore the rest of the setup for now.  If you are not familiar with Jupyter notebooks, refer to SLU00 of the <a href="https://github.com/LDSSA/ds-prep-course-2025">prep course</a>.
+                    </p>
 
-                    <p>Remember that all the materials used in the Academy will be released in our <a href="https://github.com/LDSSA/batch-students">GitHub</a>, for free, if you want to follow along.</p>
+                    <p>
+                        We advise against using vscode, it might make the coding test and SLU grading fail.
+                    </p>
 
-                    <p> If you want to give it another try next year, check our <a href="https://www.lisbondatascience.org/">website</a> and join our newsletters to be the first to receive updates <br>about our courses and the dates for the next batch of the Academy. </p>
-                {% endif %}
+                    <p>Follow the links below to download the SLUs or start the coding test.</p>
 
                     <ul class="list-group list-group-flush pt-3">
                         <li class="list-group-item">
@@ -259,8 +269,17 @@
                             <a href="{% url 'admissions:candidate:slu' 'slu03' %}">SLU03</a>
                         </li>
                     </ul>
+                    {% elif state.application_status.name == "failed" %}
+                        <p>We're sorry, but you didn't pass the admission test...</p>
 
-        {% endif %}
+                        <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch8-students">GitHub</a>, for free.</p>
+
+                        <p>
+                          If you want to give it another try next year, check our <a href="https://www.lisbondatascience.org/">website</a> and join our newsletters to be the first to receive updates about our courses and the dates for the next batch of the Academy.
+                        </p>
+                    {% endif %}
+
+                {% endif %}
               </div>
             </div>
         </div>
