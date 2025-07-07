@@ -82,9 +82,9 @@ class Application(models.Model):
     # coding test ##########################################################
     coding_test_started_at = models.DateTimeField(null=True, blank=True, default=None)
     coding_test_downloaded = models.IntegerField()
-    slu01_downloaded = models.IntegerField()
-    slu02_downloaded = models.IntegerField()
-    slu03_downloaded = models.IntegerField()
+    #slu01_downloaded = models.IntegerField(default=0)
+    #slu02_downloaded = models.IntegerField(default=0)
+    #slu03_downloaded = models.IntegerField(default=0)
 
     # stores data about sent email
     # None -> email not sent
