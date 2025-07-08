@@ -143,7 +143,7 @@ class Domain:
         application: Application,
         challenge,
     ):
-        if config.PORTAL_STATUS != "admissions":
+        if config.PORTAL_STATUS != "admissions:tests":
             return False
 
         dt_now = datetime.now(timezone.utc)
