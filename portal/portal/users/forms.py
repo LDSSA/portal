@@ -33,7 +33,7 @@ class UserChangeForm(forms.ModelForm):
             fields_to_remove = ["gender", "profession", "company", "ticket_type"]
         else:
             fields_to_remove = ["github_username", "slack_member_id"]
-            if config.PORTAL_STATUS not in ("admissions:signup", "admissions:tests"): #maybe during the whole admissions?
+            if config.PORTAL_STATUS not in ("admissions", "admissions:applications"): #maybe during the whole admissions?
                 self.fields["ticket_type"] = forms.ChoiceField(
                     choices=TicketType.choices,
                     disabled=True,
