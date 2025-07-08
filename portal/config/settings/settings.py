@@ -449,8 +449,8 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 # CONSTANCE_DATABASE_CACHE_BACKEND ='default'
 #
-# * Admissions                    -> admissions
-#   - Sign up
+# * Admissions                    
+#   - Sign up                     -> admissions
 #   - Applications                -> admissions:applications
 #     - CoC
 #     - Scholarship
@@ -474,7 +474,7 @@ CONSTANCE_CONFIG = {
     "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
 }
 ADMISSIONS_APPLICATIONS_STARTED_STATUSES = [
-    "admissions",
+    "admissions:applications",
     "admissions:selection",
 ]
 

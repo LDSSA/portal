@@ -179,7 +179,7 @@
             </div>
             <div id="collapseFour" class="collapse {% if action_point == 'admission_test' %} show {% endif %}" aria-labelledby="collapseFour" data-parent="#accordion">
               <div class="card-body">
-                {% if PORTAL_STATUS == "admissions-signup" %}
+                {% if PORTAL_STATUS == "admissions" %}
                      <p>The admission tests will open on the <b>{{ ADMISSIONS_APPLICATIONS_START }}</b>. Come back then to start working on the tests!</p>
                     
                     <p>The coding test and SLUs require setting up your local environment with a virtual environment with Python 3.12 and be able to run Jupyter notebooks. <br>
