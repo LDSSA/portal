@@ -32,7 +32,7 @@ class Events:
 
     @staticmethod
     def trigger_applications_are_over() -> None:
-        if config.PORTAL_STATUS == "admissions:applications":
+        if config.PORTAL_STATUS == "admissions:tests":
             logger.error(
                 "trying to trigger `applications over` event but applications are still open",
             )
@@ -66,7 +66,7 @@ class Events:
 
     @staticmethod
     def trigger_admissions_are_over() -> None:
-        if config.PORTAL_STATUS == "admissions:applications":
+        if config.PORTAL_STATUS == "admissions:tests":
             logger.error(
                 "trying to trigger `admissions over` event but applications are still open",
             )
