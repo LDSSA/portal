@@ -45,6 +45,8 @@ def update_portal_status():
             logger.info("Opening applications...")
 
             config.PORTAL_STATUS = "admissions:applications"
+            # Disable sign ups
+            #config.ACCOUNT_ALLOW_REGISTRATION = False
 
     elif config.PORTAL_STATUS == "admissions:applications":
         if dt >= config.ADMISSIONS_SELECTION_START:
