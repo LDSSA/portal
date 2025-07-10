@@ -183,7 +183,7 @@ class AdmissionsGradingMixin(AcademyGradingMixin):
 
     def get_image(self):
         prefix = "dev-" if settings.IN_DEV else ""
-        return f"ldssa/{prefix}batch-{self.grade.unit.code.lower()}:latest"
+        return f"ldssa/{prefix}batch-admissions-{self.grade.unit.code.lower()}:latest"
 
     def get_env(self):
         env = super().get_env()
@@ -191,6 +191,8 @@ class AdmissionsGradingMixin(AcademyGradingMixin):
         notebook_url = unquote(notebook_url)
         notebook_url = urljoin(settings.BASE_URL, notebook_url)
         env["NOTEBOOK_URL"] = notebook_url
+        env["REPO_NAME"] = settings.STUDENT_REPO_NAME #added this
+
         return env
 
 
