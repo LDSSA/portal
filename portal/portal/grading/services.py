@@ -191,7 +191,7 @@ class AdmissionsGradingMixin(AcademyGradingMixin):
         notebook_url = unquote(notebook_url)
         notebook_url = urljoin(settings.BASE_URL, notebook_url)
         env["NOTEBOOK_URL"] = notebook_url
-        env[]"REPO_NAME"] = settings.STUDENT_REPO_NAME #added this
+        env["REPO_NAME"] = settings.STUDENT_REPO_NAME #added this
 
         return env
 
