@@ -68,6 +68,9 @@
               {% else %}
                 {# ADMISSIONS CANDIDATES #}
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admissions:candidate' %}">Home</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'admissions:candidate:codeofconduct' %}">Code of Conduct</a>
                 </li>
                 {% if code_of_conduct_accepted %}
