@@ -466,11 +466,11 @@ CONSTANCE_CONFIG = {
         "One of: admissions, admissions:applications, admissions:selection, academy",
     ),
     # Academy config
-    "ACADEMY_START": (datetime.now(timezone.utc), ""),
+    "ACADEMY_START": (datetime.date(datetime.now(timezone.utc).year,9,15), ""),
     # Admissions config
     "ADMISSIONS_CODING_TEST_DURATION": (timedelta(hours=3), ""),
-    "ADMISSIONS_APPLICATIONS_START": (datetime.now(timezone.utc), ""),
-    "ADMISSIONS_SELECTION_START": (datetime.now(timezone.utc), ""),
+    "ADMISSIONS_APPLICATIONS_START": (datetime.date(datetime.now(timezone.utc).year,7,7), ""),
+    "ADMISSIONS_SELECTION_START": (datetime.date(datetime.now(timezone.utc).year,8,3), ""),
     "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
 }
 ADMISSIONS_APPLICATIONS_STARTED_STATUSES = [
