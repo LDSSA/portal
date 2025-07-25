@@ -462,7 +462,7 @@ CONSTANCE_CONFIG = {
     # Portal config
     "ACCOUNT_ALLOW_REGISTRATION": (True, "Allow Sign Ups"),  # Allow sign ups
     "PORTAL_STATUS": (
-        "admissions:applications
+        "admissions:applications",
         "One of: admissions, admissions:applications, admissions:selection, academy",
     ),
     # Academy config
