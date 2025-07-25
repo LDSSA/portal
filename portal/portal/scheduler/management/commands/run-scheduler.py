@@ -48,6 +48,7 @@ def update_portal_status():
             # Disable sign ups
             #config.ACCOUNT_ALLOW_REGISTRATION = False
 
+    '''
     elif config.PORTAL_STATUS == "admissions:applications":
         if dt >= config.ADMISSIONS_SELECTION_START:
             # Selection phase starts, applicants can not longer make submissions
@@ -60,3 +61,4 @@ def update_portal_status():
 
     elif config.PORTAL_STATUS == "admissions:selection" and dt >= config.ACADEMY_START:
         config.PORTAL_STATUS = "academy"
+    '''    
