@@ -40,7 +40,7 @@ def update_portal_status():
 
     # Initial portal state
     #if config.PORTAL_STATUS == "admissions":
-    if dt >= config.ADMISSIONS_APPLICATIONS_START:
+    if dt >= config.ADMISSIONS_APPLICATIONS_START and dt<config.ADMISSIONS_SELECTION_START:
         # Application phase starts, applicants can start making submissions
         logger.info("Opening applications...")
 
