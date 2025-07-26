@@ -2,9 +2,8 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models
-from django.utils import timezone
 
-LISBON_TZ = timezone.utc
+LISBON_TZ = datetime.timezone.utc
 
 
 class Specialization(models.Model):
