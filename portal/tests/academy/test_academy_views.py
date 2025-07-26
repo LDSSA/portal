@@ -1,11 +1,11 @@
-from datetime import datetime #, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from http import HTTPStatus
 
 import pytest
 from dateutil import tz
 from django.urls import reverse
 
-#from portal.academy.services import get_last_grade
+from portal.academy.services import get_last_grade
 from portal.academy.views import csvdata
 
 PASSING_SCORE = 16
@@ -67,7 +67,7 @@ def test_csvdata(
         "test_student,U12J14XV12Z,2021-08-15 00:00:00+01:00,38,18,20\r\n"
     )
 
-'''
+
 @pytest.mark.django_db(transaction=True)
 def test_grade_on_time(client, student, slu1):
     slu1.due_date = datetime.now(timezone.utc) + timedelta(days=5)
@@ -82,4 +82,3 @@ def test_grade_on_time(client, student, slu1):
 
     client.post(reverse("academy:student-unit-detail", args=(slu1.pk,)))
     assert get_last_grade(slu1, student).on_time is False
-'''
