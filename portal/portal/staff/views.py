@@ -85,6 +85,7 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
                 },
             ],
         }
+        config.ACADEMY_START = datetime.now(timezone.utc)+timedelta(days=25)
         return super().get_context_data(**ctx)
 
     def post(
@@ -111,7 +112,6 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
         #        )
 
             config.ADMISSIONS_APPLICATIONS_START = opening_date
-            config.ACADEMY_START = datetime.now(timezone.utc)+timedelta(days=25)
 
         elif key == "applications_closing_date":
             date_s = request.POST["date_s"]
