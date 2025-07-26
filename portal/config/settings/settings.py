@@ -458,6 +458,7 @@ CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 #   - Selection                   -> admissions:selection
 # * Academy                       -> academy
 #
+
 CONSTANCE_CONFIG = {
     # Portal config
     "ACCOUNT_ALLOW_REGISTRATION": (True, "Allow Sign Ups"),  # Allow sign ups
@@ -466,11 +467,11 @@ CONSTANCE_CONFIG = {
         "One of: admissions, admissions:applications, admissions:selection, academy",
     ),
     # Academy config
-    "ACADEMY_START": (datetime(year=datetime.now(timezone.utc).year,month=9,day=15, tzinfo=timezone.utc), ""),
+    "ACADEMY_START": (datetime.now(timezone.utc).year, ""),
     # Admissions config
     "ADMISSIONS_CODING_TEST_DURATION": (timedelta(hours=3), ""),
-    "ADMISSIONS_APPLICATIONS_START": (datetime(year=datetime.now(timezone.utc).year,month=7,day=7,tzinfo=timezone.utc), ""),
-    "ADMISSIONS_SELECTION_START": (datetime(year=datetime.now(timezone.utc).year,month=8,day=3,tzinfo=timezone.utc), ""),
+    "ADMISSIONS_APPLICATIONS_START": (datetime.now(timezone.utc).year, ""),
+    "ADMISSIONS_SELECTION_START": (datetime.now(timezone.utc).year, ""),
     "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
 }
 ADMISSIONS_APPLICATIONS_STARTED_STATUSES = [
