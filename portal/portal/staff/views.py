@@ -85,6 +85,7 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
                 },
             ],
         }
+        config.ACADEMY_START = datetime.now(timezone.utc)+timedelta(days=25)
         return super().get_context_data(**ctx)
 
     def post(
@@ -105,10 +106,10 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
             opening_date = datetime.strptime(date_s, DATETIME_FMT).replace(
                 tzinfo=tz.gettz("Europe/Lisbon")
             )
-            if opening_date > config.ADMISSIONS_SELECTION_START:
-                return HttpResponseServerError(
-                    b"error setting opening date. opening date must be before closing date",
-                )
+        #    if opening_date > config.ADMISSIONS_SELECTION_START:
+        #        return HttpResponseServerError(
+        #            b"error setting opening date. opening date must be before closing date",
+        #        )
 
             config.ADMISSIONS_APPLICATIONS_START = opening_date
 
@@ -117,10 +118,10 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
             closing_date = datetime.strptime(date_s, DATETIME_FMT).replace(
                 tzinfo=tz.gettz("Europe/Lisbon")
             )
-            if closing_date < config.ADMISSIONS_APPLICATIONS_START:
-                return HttpResponseServerError(
-                    b"error setting closing date. closing date must be after opening date",
-                )
+            #if closing_date < config.ADMISSIONS_APPLICATIONS_START:
+            #    return HttpResponseServerError(
+            #        b"error setting closing date. closing date must be after opening date",
+            #    )
 
             config.ADMISSIONS_SELECTION_START = closing_date
 

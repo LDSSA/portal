@@ -1,8 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.conf import settings
 from django.db import models
-from django.utils import timezone
 
 LISBON_TZ = timezone.utc
 
@@ -28,7 +27,7 @@ class Unit(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     instructor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    due_date = models.DateField(default=timezone.now)
+    due_date = models.DateField(default=datetime.now(timezone.utc))
     open = models.BooleanField(default=False)
 
     checksum = models.TextField(blank=True)
