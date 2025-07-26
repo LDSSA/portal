@@ -1,7 +1,7 @@
 """Base settings to build other settings files upon."""
 
 import os
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 
 import environ
 
@@ -466,11 +466,11 @@ CONSTANCE_CONFIG = {
         "One of: admissions, admissions:applications, admissions:selection, academy",
     ),
     # Academy config
-    "ACADEMY_START": (date(datetime.now(timezone.utc).year,9,15), ""),
+    "ACADEMY_START": (datetime.now(timezone.utc), ""),
     # Admissions config
     "ADMISSIONS_CODING_TEST_DURATION": (timedelta(hours=3), ""),
-    "ADMISSIONS_APPLICATIONS_START": (date(datetime.now(timezone.utc).year,7,7), ""),
-    "ADMISSIONS_SELECTION_START": (date(datetime.now(timezone.utc).year,8,3), ""),
+    "ADMISSIONS_APPLICATIONS_START": (datetime.now(timezone.utc), ""),
+    "ADMISSIONS_SELECTION_START": (datetime.now(timezone.utc), ""),
     "ADMISSIONS_ACCEPTING_PAYMENT_PROFS": (True, ""),
 }
 ADMISSIONS_APPLICATIONS_STARTED_STATUSES = [
