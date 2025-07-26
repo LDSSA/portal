@@ -5,7 +5,7 @@ import pytest
 from dateutil import tz
 from django.urls import reverse
 
-from portal.academy.services import get_last_grade
+#from portal.academy.services import get_last_grade
 from portal.academy.views import csvdata
 
 PASSING_SCORE = 16
