@@ -1,4 +1,4 @@
-from datetime import datetime
+#from datetime import datetime
 
 from django.conf import settings
 from django.db import models
@@ -40,12 +40,12 @@ class Unit(models.Model):
 
 
 def notebook_path(instance, filename):
-    now = datetime.now().astimezone().isoformat(timespec="seconds")
+    now = timezone.now().astimezone().isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/notebook_{now}.ipynb"
 
 
 def feedback_path(instance, filename):
-    now = datetime.now(LISBON_TZ).isoformat(timespec="seconds")
+    now = timezone.now(LISBON_TZ).isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/feedback_{now}.ipynb"
 
 
