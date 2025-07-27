@@ -458,6 +458,7 @@ CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 #   - Selection                   -> admissions:selection
 # * Academy                       -> academy
 #
+
 CONSTANCE_CONFIG = {
     # Portal config
     "ACCOUNT_ALLOW_REGISTRATION": (True, "Allow Sign Ups"),  # Allow sign ups
