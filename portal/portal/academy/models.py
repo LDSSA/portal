@@ -1,8 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from django.conf import settings
 from django.db import models
-from django.utils import timezone
 
 LISBON_TZ = timezone.utc
 
