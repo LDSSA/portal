@@ -109,7 +109,6 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
                 return HttpResponseServerError(
                     b"error setting opening date. opening date must be before closing date",
                 )
-
             config.ADMISSIONS_APPLICATIONS_START = opening_date
 
         elif key == "applications_closing_date":
