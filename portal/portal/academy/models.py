@@ -1,7 +1,8 @@
-from datetime import datetime, timezone
+#from datetime import datetime
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 LISBON_TZ = timezone.utc
 
@@ -27,7 +28,7 @@ class Unit(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     instructor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    due_date = models.DateField(default=datetime.now(timezone.utc))
+    due_date = models.DateField(default=timezone.now())
     open = models.BooleanField(default=False)
 
     checksum = models.TextField(blank=True)
@@ -39,12 +40,12 @@ class Unit(models.Model):
 
 
 def notebook_path(instance, filename):
-    now = datetime.now().astimezone().isoformat(timespec="seconds")
+    now = timezone.now().astimezone().isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/notebook_{now}.ipynb"
 
 
 def feedback_path(instance, filename):
-    now = datetime.now(LISBON_TZ).isoformat(timespec="seconds")
+    now = timezone.now(LISBON_TZ).isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/feedback_{now}.ipynb"
 
 
