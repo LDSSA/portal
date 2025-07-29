@@ -6,7 +6,7 @@ from allauth.account.adapter import DefaultAccountAdapter
 from allauth.account.forms import EmailAwarePasswordResetTokenGenerator
 from allauth.account.models import EmailAddress
 from allauth.account.utils import filter_users_by_email, user_pk_to_url_str
-from allauth.exceptions import ImmediateHttpResponse
+from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.utils import build_absolute_uri
 from constance import config

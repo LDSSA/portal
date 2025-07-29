@@ -12,16 +12,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="application",
             name="slu01_started_at",
-            field=models.DateTimeField(default=datetime.datetime(2020, 6, 21, 0, 0)),
+            field=models.DateTimeField(default=datetime.datetime(2020, 6, 21, 0, 0, tzinfo=datetime.timezone.utc)),
         ),
         migrations.AddField(
             model_name="application",
             name="slu02_started_at",
-            field=models.DateTimeField(default=datetime.datetime(2020, 6, 21, 0, 0)),
+            field=models.DateTimeField(default=datetime.datetime(2020, 6, 21, 0, 0, tzinfo=datetime.timezone.utc)),
         ),
         migrations.AddField(
             model_name="application",
             name="slu03_started_at",
-            field=models.DateTimeField(default=datetime.datetime(2020, 6, 21, 0, 0)),
+            field=models.DateTimeField(default=datetime.datetime(2020, 6, 21, 0, 0, tzinfo=datetime.timezone.utc)),
         ),
     ]
