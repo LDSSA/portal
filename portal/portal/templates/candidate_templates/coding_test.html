@@ -43,6 +43,24 @@
 
             <br>
 
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    {% if status == "passed" %}
+                    <div class="alert alert-success" role="alert">
+                        You have passed with {{ best_score }}/{{ challenge.max_score }}!
+                    </div>
+                    {% endif %}
+                    {% if status == "ongoing"%}
+                    <div class="alert alert-warning" role="alert" id="countdown"> </div>
+                    {% endif %}
+                    {% if status == "failed" %}
+                    <div class="alert alert-danger" role="alert">
+                        You have failed!
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
             <p>
                 <h2 style="color:magenta">Submitting your work for grading</h2>
             </p>
