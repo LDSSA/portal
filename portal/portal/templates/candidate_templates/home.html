@@ -179,8 +179,14 @@
             </div>
             <div id="collapseFour" class="collapse {% if action_point == 'admission_test' %} show {% endif %}" aria-labelledby="collapseFour" data-parent="#accordion">
               <div class="card-body">
-                {% if PORTAL_STATUS == "admissions" %}
+                {% if PORTAL_STATUS == "admissions" and state.application_status.name == "ongoing" %}
                      <p>The admission tests will open on the <b>{{ ADMISSIONS_APPLICATIONS_START }}</b>. Come back then to start working on the tests!</p>
+
+                     <p>
+                        The admission tests consist of three learning units (SLUSs) and a coding test. In the SLUs, you have to study a learning notebook and then <br>
+                        solve an exercise notebook. The coding test is an exercise notebook that has to solved within 3 hours.<br>
+                        If you need a Python refresher or need to practice exercise solving before starting the admissions tests, check out our <a href="https://github.com/LDSSA/ds-prep-course-2025/">prep course</a>.
+                    </p>
                     
                     <p>The coding test and SLUs require setting up your local environment with a virtual environment with Python 3.12 and be able to run Jupyter notebooks. <br>
                         If you don't have such a setup, you can follow the setup instructions in points <b>2</b> and <b>4</b> <a href="https://github.com/LDSSA/batch-students">here</a>.
