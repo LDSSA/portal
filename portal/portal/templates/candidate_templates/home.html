@@ -303,6 +303,8 @@
             </div>
         </div>
         {{ state.application_status.name }}
+        {{ state.selection_status }}
+
         <!-- selection results (only shows if candidate passed admission test and selection has started or we went into second round) -->
         {% if state.application_status.name == "passed" %}
             <div class="card">
