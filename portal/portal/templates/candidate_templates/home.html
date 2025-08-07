@@ -195,7 +195,7 @@
                         Ignore the rest of the setup for now.  If you are not familiar with Jupyter notebooks, refer to SLU00 of the <a href="https://github.com/LDSSA/ds-prep-course-2025">prep course</a>.
                     </p>
                 {% elif PORTAL_STATUS == "admissions:applications" %}
-                    {%if state.application_status.name == "passed" %}
+                    {% if state.application_status.name == "passed" %}
                         Congratulations! You've passed the admission tests.
                         From the {{ ADMISSIONS_SELECTION_START|date }}, we'll let you know if you've been selected to participate in this batch of the LDSSA.
 
@@ -406,7 +406,7 @@
                 </div>
                 </div>
             </div>
-
+        {% endif %}
 </div>
 
 {% endtimezone %}
