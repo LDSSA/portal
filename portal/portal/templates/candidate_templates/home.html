@@ -29,6 +29,13 @@
     </p>
 
     <p>
+        The admission tests consist of three learning units (SLUSs) and a coding test. In the SLUs, you have to study a learning notebook and then <br>
+        solve an exercise notebook. The coding test is an exercise notebook that has to solved within 3 hours.<br>
+        If you need a Python refresher or need to practice exercise solving before starting the admissions tests, check out our <a href="https://github.com/LDSSA/ds-prep-course-2025/">prep course</a>.
+        <br> Read on and go though steps 1-3 to get access to the admission tests.
+    </p>
+
+    <p>
         Before you start, please read all the details about the LDSSA 
         <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/01-Starters-Academy-(Course)/">here</a>, 
         about this admission process <a href="https://ldssa.github.io/wiki/Applicants/Application-process/">here</a>, 
@@ -181,12 +188,6 @@
               <div class="card-body">
                 {% if PORTAL_STATUS == "admissions" and state.application_status.name == "ongoing" %}
                      <p>The admission tests will open on the <b>{{ ADMISSIONS_APPLICATIONS_START }}</b>. Come back then to start working on the tests!</p>
-
-                     <p>
-                        The admission tests consist of three learning units (SLUSs) and a coding test. In the SLUs, you have to study a learning notebook and then <br>
-                        solve an exercise notebook. The coding test is an exercise notebook that has to solved within 3 hours.<br>
-                        If you need a Python refresher or need to practice exercise solving before starting the admissions tests, check out our <a href="https://github.com/LDSSA/ds-prep-course-2025/">prep course</a>.
-                    </p>
                     
                     <p>The coding test and SLUs require setting up your local environment with a virtual environment with Python 3.12 and be able to run Jupyter notebooks. <br>
                         If you don't have such a setup, you can follow the setup instructions in points <b>2</b> and <b>4</b> <a href="https://github.com/LDSSA/batch-students">here</a>.
@@ -302,11 +303,11 @@
               </div>
             </div>
         </div>
-        {{ state.application_status.name }}
-        {{ state.selection_status }}
-
+   
         <!-- selection results (only shows if candidate passed admission test and selection has started or we went into second round) -->
         {% if state.application_status.name == "passed" %}
+        Congratulations, you have successfully passed the admission tests! 
+           {% if state.selection_status.name is not None}
             <div class="card">
                 <div class="card-header" id="headingFive">
                 <h5 class="mb-0">
@@ -361,6 +362,7 @@
                 </div>
                 </div>
             </div>
+            {% endif %}
         {% endif %}
 
         <!-- payment (only shows if candidate has passed the test and was selected) -->
