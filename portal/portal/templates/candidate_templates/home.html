@@ -199,7 +199,7 @@
                         From the {{ ADMISSIONS_SELECTION_START|date }}, we'll let you know if you've been selected to participate in this batch of the LDSSA.
 
                     {% elif state.application_status.name == "ongoing" %}
-                        <p>You have until <b>{{ ADMISSIONS_SELECTION_START }}</b> to pass all the assignments. You need to solve three small learning units (SLUs) <br>
+                    <p>You have until <b>{{ ADMISSIONS_SELECTION_START }}</b> to pass all the assignments. You need to solve three small learning units (SLUs) <br>
                        and one Python coding test.</p>
 
                     <p>The <b>SLUs</b>
@@ -303,8 +303,8 @@
             </div>
         </div>
 
-        <!-- selection results (only shows if candidate passed admission test and selection has started) -->
-        {% if state.application_status.name == "passed" and state.selection_status is not None %}
+        <!-- selection results (only shows if candidate passed admission test and selection has started or we went into second round) -->
+        {% if state.application_status.name == "passed" %}
             <div class="card">
                 <div class="card-header" id="headingFive">
                 <h5 class="mb-0">
