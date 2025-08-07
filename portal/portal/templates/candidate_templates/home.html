@@ -9,10 +9,6 @@
 
     <h1 class="py-5">Hello {% if first_name %}{{ first_name }}{% else %}future data scientist{% endif %}!</h1>
 
-    {% if state.application_status.name == "passed" %}
-        Congratulations, you have successfully passed the admission tests! 
-    {% endif %}    
-
     {% if state.selection_status == selection_status_values.ACCEPTED %}
         <div class="alert alert-success mb-5" role="alert">
           Admissions are now closed.<br>
