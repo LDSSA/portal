@@ -90,6 +90,7 @@ class Application(models.Model):
     # None -> email not sent
     # passed -> `you have passed` email sent
     # failed -> `you have failed` email sent
+    # do we need this field? It should be resettable
     application_over_email_sent = models.CharField(
         null=True,
         default=None,

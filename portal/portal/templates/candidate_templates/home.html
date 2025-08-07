@@ -29,6 +29,13 @@
     </p>
 
     <p>
+        The admission tests consist of three learning units (SLUSs) and a coding test. In the SLUs, you have to study a learning notebook and then <br>
+        solve an exercise notebook. The coding test is an exercise notebook that has to solved within 3 hours.<br>
+        If you need a Python refresher or need to practice exercise solving before starting the admissions tests, check out our <a href="https://github.com/LDSSA/ds-prep-course-2025/">prep course</a>.
+        <br> Read on and go though steps 1-3 to get access to the admission tests.
+    </p>
+
+    <p>
         Before you start, please read all the details about the LDSSA 
         <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/01-Starters-Academy-(Course)/">here</a>, 
         about this admission process <a href="https://ldssa.github.io/wiki/Applicants/Application-process/">here</a>, 
@@ -181,25 +188,19 @@
               <div class="card-body">
                 {% if PORTAL_STATUS == "admissions" and state.application_status.name == "ongoing" %}
                      <p>The admission tests will open on the <b>{{ ADMISSIONS_APPLICATIONS_START }}</b>. Come back then to start working on the tests!</p>
-
-                     <p>
-                        The admission tests consist of three learning units (SLUSs) and a coding test. In the SLUs, you have to study a learning notebook and then <br>
-                        solve an exercise notebook. The coding test is an exercise notebook that has to solved within 3 hours.<br>
-                        If you need a Python refresher or need to practice exercise solving before starting the admissions tests, check out our <a href="https://github.com/LDSSA/ds-prep-course-2025/">prep course</a>.
-                    </p>
                     
                     <p>The coding test and SLUs require setting up your local environment with a virtual environment with Python 3.12 and be able to run Jupyter notebooks. <br>
                         If you don't have such a setup, you can follow the setup instructions in points <b>2</b> and <b>4</b> <a href="https://github.com/LDSSA/batch-students">here</a>.
                         See instructions in sections <b>3.2</b> and <b>3.3</b> of point <b>5</b> on how to run a Jupyter notebook. <br>
                         Ignore the rest of the setup for now.  If you are not familiar with Jupyter notebooks, refer to SLU00 of the <a href="https://github.com/LDSSA/ds-prep-course-2025">prep course</a>.
                     </p>
-                {% else %}
+                {% elif PORTAL_STATUS == "admissions:applications" %}
                     {% if state.application_status.name == "passed" %}
-                        Congratulations! You've passed the admission test.
+                        Congratulations! You've passed the admission tests.
                         From the {{ ADMISSIONS_SELECTION_START|date }}, we'll let you know if you've been selected to participate in this batch of the LDSSA.
 
                     {% elif state.application_status.name == "ongoing" %}
-                        <p>You have until <b>{{ ADMISSIONS_SELECTION_START }}</b> to pass all the assignments. You need to solve three small learning units (SLUs) <br>
+                    <p>You have until <b>{{ ADMISSIONS_SELECTION_START }}</b> to pass all the assignments. You need to solve three small learning units (SLUs) <br>
                        and one Python coding test.</p>
 
                     <p>The <b>SLUs</b>
@@ -292,17 +293,21 @@
                         <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch8-students">GitHub</a>, for free.</p>
 
                         <p>
-                          We are opening a second round of applications on 18th August, come back then if you want to try again.
+                            If you want to give it another try next year, check our <a href="https://www.lisbondatascience.org/">website</a> and
+                            join our newsletters <br> to be the first to receive updates about our courses and the dates for the next batch of the Academy.
                         </p>
+
                     {% endif %}
 
                 {% endif %}
               </div>
             </div>
         </div>
-
-        <!-- selection results (only shows if candidate passed admission test and selection has started) -->
-        {% if state.application_status.name == "passed" and state.selection_status is not None %}
+   
+        <!-- selection results (only shows if candidate passed admission test and selection has started or we went into second round) -->
+        {% if state.application_status.name == "passed" %}
+        Congratulations, you have successfully passed the admission tests! 
+           {% if state.selection_status.name is not None %}
             <div class="card">
                 <div class="card-header" id="headingFive">
                 <h5 class="mb-0">
@@ -357,6 +362,7 @@
                 </div>
                 </div>
             </div>
+            {% endif %}
         {% endif %}
 
         <!-- payment (only shows if candidate has passed the test and was selected) -->
@@ -388,7 +394,7 @@
                         Your payment has been accepted! Welcome to <b>Batch 9</b> of the Lisbon Data Science Starters Academy!
                     {% elif state.selection_status == selection_status_values.REJECTED %}
                         Unfortunately, your payment has not been validated, so we've had to give your spot in the Academy to the next person in line.
-
+                    
                         <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch-students">GitHub</a>, for free.</p>
 
                         <p>
@@ -401,8 +407,6 @@
                 </div>
             </div>
         {% endif %}
-    </div>
-
 </div>
 
 {% endtimezone %}
