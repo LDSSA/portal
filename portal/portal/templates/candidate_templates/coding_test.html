@@ -97,7 +97,7 @@
                 </div>
                 <div class="card">
                     <div class="card-body d-flex flex-column">
-                        <p class="card-text">Use the buttons below to upload the coding test for grading:</p>
+                        <p class="card-text">Use the buttons below to upload the coding test for grading. <br> To see your grade, wait a minute after submitting, then refresh the page.</p>
                     <form action="{% url 'admissions:candidate:submission-upload' 'coding_test' %}" enctype="multipart/form-data" method="POST" class="m-0 mt-auto">
                         {% csrf_token %}
                         <div class="custom-file mb-3">
