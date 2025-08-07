@@ -179,17 +179,23 @@
             </div>
             <div id="collapseFour" class="collapse {% if action_point == 'admission_test' %} show {% endif %}" aria-labelledby="collapseFour" data-parent="#accordion">
               <div class="card-body">
-                {% if PORTAL_STATUS == "admissions" %}
+                {% if PORTAL_STATUS == "admissions" and state.application_status.name == "ongoing" %}
                      <p>The admission tests will open on the <b>{{ ADMISSIONS_APPLICATIONS_START }}</b>. Come back then to start working on the tests!</p>
+
+                     <p>
+                        The admission tests consist of three learning units (SLUSs) and a coding test. In the SLUs, you have to study a learning notebook and then <br>
+                        solve an exercise notebook. The coding test is an exercise notebook that has to solved within 3 hours.<br>
+                        If you need a Python refresher or need to practice exercise solving before starting the admissions tests, check out our <a href="https://github.com/LDSSA/ds-prep-course-2025/">prep course</a>.
+                    </p>
                     
                     <p>The coding test and SLUs require setting up your local environment with a virtual environment with Python 3.12 and be able to run Jupyter notebooks. <br>
                         If you don't have such a setup, you can follow the setup instructions in points <b>2</b> and <b>4</b> <a href="https://github.com/LDSSA/batch-students">here</a>.
                         See instructions in sections <b>3.2</b> and <b>3.3</b> of point <b>5</b> on how to run a Jupyter notebook. <br>
                         Ignore the rest of the setup for now.  If you are not familiar with Jupyter notebooks, refer to SLU00 of the <a href="https://github.com/LDSSA/ds-prep-course-2025">prep course</a>.
                     </p>
-                {% else %}
-                    {% if state.application_status.name == "passed" %}
-                        Congratulations! You've passed the admission test.
+                {% elif PORTAL_STATUS == "admissions:applications" %}
+                    {%if state.application_status.name == "passed" %}
+                        Congratulations! You've passed the admission tests.
                         From the {{ ADMISSIONS_SELECTION_START|date }}, we'll let you know if you've been selected to participate in this batch of the LDSSA.
 
                     {% elif state.application_status.name == "ongoing" %}
@@ -223,6 +229,17 @@
 
                     <p>
                         We advise against using vscode, it might make the coding test and SLU grading fail.
+                    </p>
+
+                    <p>
+                        Tips for a successful coding test:
+                        <ul>
+                            <li>If you need a Python refresher, check out our <a href="https://github.com/LDSSA/ds-prep-course-2025/">prep course</a>.</li>
+                            <li>Mind the time limit.</li>
+                            <li>Read all exercises first, then start with the easiest one.</li>
+                            <li>If you get stuck on an exercise, move to the next one.</li>
+                        </ul>
+
                     </p>
 
                     <p>Follow the links below to download the SLUs or start the coding test.</p>
@@ -275,8 +292,10 @@
                         <p>Remember that all the contents used in the Academy are available in our <a href="https://github.com/LDSSA/batch8-students">GitHub</a>, for free.</p>
 
                         <p>
-                          If you want to give it another try next year, check our <a href="https://www.lisbondatascience.org/">website</a> and join our newsletters to be the first to receive updates about our courses and the dates for the next batch of the Academy.
+                            If you want to give it another try next year, check our <a href="https://www.lisbondatascience.org/">website</a> and
+                            join our newsletters <br> to be the first to receive updates about our courses and the dates for the next batch of the Academy.
                         </p>
+
                     {% endif %}
 
                 {% endif %}

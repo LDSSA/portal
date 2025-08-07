@@ -58,3 +58,4 @@ def update_portal_status():
 
     elif dt >= config.ACADEMY_START:
         config.PORTAL_STATUS = "academy"
+
