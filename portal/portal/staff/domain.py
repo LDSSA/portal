@@ -7,6 +7,7 @@ from portal.admissions import emails
 from portal.applications.domain import (
     DomainQueries as ApplicationDomainQueries,
 )
+
 from portal.selection.domain import SelectionDomain
 from portal.selection.queries import SelectionQueries
 from portal.selection.status import SelectionStatus
