@@ -30,7 +30,7 @@ def load_payment_data(selection, staff=None):
 
     selection.ticket_type = ticket_type
     selection.payment_value = value
-    selection.payment_due_date = datetime.now(timezone.utc) + timedelta(hours=48)
+    selection.payment_due_date = datetime.now(timezone.utc) + timedelta(days=7)
     selection.save()
 
     log_selection_event(
