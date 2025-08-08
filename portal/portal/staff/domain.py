@@ -42,6 +42,8 @@ class Events:
                  #a.application_over_email_sent = None
                  #a.save()
                  logger.info(a.user.email)
+            logger.info(a.user.email)
+            logger.info(a.coding_test_started_at)     
             # up to here
             '''
             try:
