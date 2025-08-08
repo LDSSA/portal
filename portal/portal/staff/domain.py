@@ -4,6 +4,10 @@ from portal.admissions import emails
 from portal.applications.domain import (
     DomainQueries as ApplicationDomainQueries,
 )
+from portal.applications.domain import Domain as ApplicationDomain
+from portal.applications.domain import (
+    DomainExceptionError as ApplicationDomainExceptionError,
+)
 from portal.selection.domain import SelectionDomain
 from portal.selection.queries import SelectionQueries
 from portal.selection.status import SelectionStatus
@@ -36,24 +40,18 @@ class Events:
         sent_count = 0
         q = ApplicationDomainQueries.all()
         for a in q:
-            '''
+            
             try:
                 ApplicationDomain.application_over(a)
                 sent_count += 1
             except ApplicationDomainExceptionError:
                 pass  # means that email was already sent
 
-            '''
+            
             a.refresh_from_db()
-            logger.info(a.application_over_email_sent)
-            a.application_over_email_sent = None
-            a.save()
-            logger.info(a.application_over_email_sent)
-            '''
             if a.application_over_email_sent == "passed":
                 SelectionDomain.create(a.user)
-            '''    
-            a.refresh_from_db()
+            
             logger.info(a.application_over_email_sent)
 
         logger.info("sent %d `application_over` emails", sent_count)
