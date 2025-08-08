@@ -11,12 +11,6 @@ from portal.selection.domain import SelectionDomain
 from portal.selection.queries import SelectionQueries
 from portal.selection.status import SelectionStatus
 
-'''
-from portal.applications.domain import Domain as ApplicationDomain
-from portal.applications.domain import (
-    DomainExceptionError as ApplicationDomainExceptionError,
-)
-'''
 
 logger = getLogger(__name__)
 
