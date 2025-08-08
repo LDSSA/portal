@@ -39,11 +39,8 @@ class Events:
             # this should be removed later
             a.refresh_from_db()
             if a.coding_test_started_at is None:
-                 #a.application_over_email_sent = None
-                 #a.save()
-                 logger.info(a.user.email)
-            logger.info(a.user.email)
-            logger.info(a.coding_test_started_at)     
+                 a.application_over_email_sent = None
+                 a.save()
             # up to here
             '''
             try:
@@ -57,7 +54,8 @@ class Events:
             if a.application_over_email_sent == "passed":
                 SelectionDomain.create(a.user)
             '''
-
+            a.refresh_from_db()
+            logger.info(a.user.email)
             logger.info(a.application_over_email_sent)
 
         logger.info("sent %d `application_over` emails", sent_count)
