@@ -1,14 +1,12 @@
 from logging import getLogger
-
 from constance import config
-
 from portal.admissions import emails
+from portal.applications.domain import (
+    DomainQueries as ApplicationDomainQueries,
+)
 from portal.applications.domain import Domain as ApplicationDomain
 from portal.applications.domain import (
     DomainExceptionError as ApplicationDomainExceptionError,
-)
-from portal.applications.domain import (
-    DomainQueries as ApplicationDomainQueries,
 )
 from portal.selection.domain import SelectionDomain
 from portal.selection.queries import SelectionQueries
@@ -32,25 +30,32 @@ class Events:
 
     @staticmethod
     def trigger_applications_are_over() -> None:
-        if config.PORTAL_STATUS == "admissions:applications":
+        if config.PORTAL_STATUS != "admissions:selection":
             logger.error(
-                "trying to trigger `applications over` event but applications are still open",
+                "trying to trigger `applications over` event but portal is not in selection status",
             )
-            msg = "Can't trigger `applications over` event"
+            msg = "Can't trigger `applications over` event, portal status has to be admissions:selection"
             raise EventsExceptionError(msg)
 
         sent_count = 0
         q = ApplicationDomainQueries.all()
         for a in q:
+            # this should be removed later
+            a.application_over_email_sent = None
+            a.save()
+            # up to here
             try:
                 ApplicationDomain.application_over(a)
                 sent_count += 1
             except ApplicationDomainExceptionError:
                 pass  # means that email was already sent
 
+            
             a.refresh_from_db()
             if a.application_over_email_sent == "passed":
                 SelectionDomain.create(a.user)
+            
+            logger.info(a.application_over_email_sent)
 
         logger.info("sent %d `application_over` emails", sent_count)
 

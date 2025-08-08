@@ -3,7 +3,14 @@
 {% block content %}
 
 <div class="container">
-    <h2 class="py-5">Bulk Emails</h2>
+    <h2 class="py-5">Events</h2>
+    <p>
+        End applications: use after the admission tests are over. Sends an email with the result to the users and <br> 
+        creates Selection objects. Can be used only when the portal is in admissions:selection state.
+    </p>
+    <p>
+        End admissions: sends emails ending admissions. Check exactly what else it does.
+    </p>
 
     <hr>
     {% for email in emails %}

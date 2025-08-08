@@ -193,7 +193,7 @@ class EventsView(AdmissionsStaffViewMixin, TemplateView):
                 Events.trigger_applications_are_over()
             except EventsExceptionError:
                 return HttpResponseServerError(
-                    b"error triggering event. Are you sure applications are over?",
+                    b"error triggering event. Are you sure applications are over? Portal has to be in selection mode.",
                 )
 
         elif key == "admissions_over":
