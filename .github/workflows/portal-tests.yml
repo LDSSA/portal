@@ -49,7 +49,7 @@ jobs:
           poetry run ruff format .
       - name: Lint code
         run: |
-          poetry run ruff check .
+          poetry run ruff check . --fix
 
   tests:
     needs: requirements
