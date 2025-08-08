@@ -197,8 +197,8 @@ class Domain:
             )
             application.application_over_email_sent = "passed"
             application.save()
-
-        else:
+        
+        elif status == ApplicationStatus.failed:  
             emails.send_application_is_over_failed(
                 to_email=application.user.email, to_name=to_name
             )
