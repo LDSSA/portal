@@ -38,7 +38,7 @@ class Events:
         for a in q:
             # this should be removed later
             a.refresh_from_db()
-            if a.coding_test_started_at == None:
+            if a.coding_test_started_at is None:
                  #a.application_over_email_sent = None
                  #a.save()
                  logger.info(a.user.email)
