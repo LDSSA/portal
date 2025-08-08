@@ -45,12 +45,15 @@ class Events:
 
             '''
             a.refresh_from_db()
-            '''
+            logger.info(a.application_over_email_sent)
             a.application_over_email_sent = None
             a.save()
+            logger.info(a.application_over_email_sent)
             '''
             if a.application_over_email_sent == "passed":
                 SelectionDomain.create(a.user)
+            '''    
+            a.refresh_from_db()
             logger.info(a.application_over_email_sent)
 
         logger.info("sent %d `application_over` emails", sent_count)
