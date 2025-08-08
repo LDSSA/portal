@@ -41,20 +41,23 @@ class Events:
         q = ApplicationDomainQueries.all()
         for a in q:
             # this should be removed later
-            a.application_over_email_sent = None
-            a.save()
+            if a.application_over_email_sent = 'failed':
+                 a.application_over_email_sent = None
+                 a.save()
             # up to here
+            '''
             try:
                 ApplicationDomain.application_over(a)
                 sent_count += 1
             except ApplicationDomainExceptionError:
                 pass  # means that email was already sent
-
+            
             
             a.refresh_from_db()
             if a.application_over_email_sent == "passed":
                 SelectionDomain.create(a.user)
-            
+            '''
+
             logger.info(a.application_over_email_sent)
 
         logger.info("sent %d `application_over` emails", sent_count)
