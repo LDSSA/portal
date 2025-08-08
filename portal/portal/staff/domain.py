@@ -37,7 +37,7 @@ class Events:
         q = ApplicationDomainQueries.all()
         for a in q:
             # this should be removed later
-            if a.application_over_email_sent = 'failed':
+            if a.application_over_email_sent == 'failed':
                  a.application_over_email_sent = None
                  a.save()
             # up to here
