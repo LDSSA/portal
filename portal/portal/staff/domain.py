@@ -37,9 +37,11 @@ class Events:
         q = ApplicationDomainQueries.all()
         for a in q:
             # this should be removed later
-            if a.application_over_email_sent == 'failed':
-                 a.application_over_email_sent = None
-                 a.save()
+            a.refresh_from_db()
+            if a.coding_test_started_at == None:
+                 #a.application_over_email_sent = None
+                 #a.save()
+                 logger.info(a.user.email)
             # up to here
             '''
             try:
