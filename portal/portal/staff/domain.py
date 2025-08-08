@@ -54,6 +54,7 @@ class Events:
             if a.application_over_email_sent == "passed":
                 SelectionDomain.create(a.user)
             '''
+            a.refresh_from_db()
             logger.info(a.user.email)
             logger.info(a.application_over_email_sent)
 
