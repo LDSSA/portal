@@ -51,7 +51,7 @@ class Events:
             '''
             if a.application_over_email_sent == "passed":
                 SelectionDomain.create(a.user)
-            logger.info(a)
+            logger.info(a.application_over_email_sent)
 
         logger.info("sent %d `application_over` emails", sent_count)
 
