@@ -40,7 +40,10 @@ class Events:
         sent_count = 0
         q = ApplicationDomainQueries.all()
         for a in q:
-            
+            # this should be removed later
+            a.application_over_email_sent = None
+            a.save()
+            # up to here
             try:
                 ApplicationDomain.application_over(a)
                 sent_count += 1
