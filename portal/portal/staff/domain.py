@@ -3,9 +3,9 @@ from logging import getLogger
 from constance import config
 
 from portal.admissions import emails
-from portal.applications.domain import Domain as ApplicationDomain
-from portal.applications.domain import (
-    DomainExceptionError as ApplicationDomainExceptionError,
+#from portal.applications.domain import Domain as ApplicationDomain
+#from portal.applications.domain import (
+#    DomainExceptionError as ApplicationDomainExceptionError,
 )
 from portal.applications.domain import (
     DomainQueries as ApplicationDomainQueries,
