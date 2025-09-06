@@ -44,7 +44,7 @@ class Events:
         selection_users = [q_s.user for q_s in q_selection]
         
         for a in q:
-            if q.user not in q_selection:
+            if q.user not in selection_users:
                 logger.info(f'new user {q.user.email}')
             else:
                 logger.info(f'select user {q.user.email}')
