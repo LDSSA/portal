@@ -36,36 +36,27 @@ class Events:
             )
             msg = "Can't trigger `applications over` event, portal status has to be admissions:selection"
             raise EventsExceptionError(msg)
-        '''
+    
         sent_count = 0
-        '''
         q = ApplicationDomainQueries.all()
         q_selection = SelectionQueries.get_all()
         selection_users = [q_s.user for q_s in q_selection]
         
         for a in q:
-            if a.user not in selection_users:
-                logger.info(f'new user {a.user.email}')
-            else:
-                logger.info(f'select user {a.user.email}')
-        
-            '''
-            try:
-                    ApplicationDomain.application_over(a)
-                    sent_count += 1    
-            except ApplicationDomainExceptionError:
-                pass  # means that email was already sent
-            
-            a.refresh_from_db()
-            if a.application_over_email_sent == "passed":
-                SelectionDomain.create(a.user)
-            
-            a.refresh_from_db()
             logger.info(a.user.email)
-            logger.info(a.application_over_email_sent)
-
+            if a.user not in selection_users:
+                logger.info(f'user not in selection {a.user.email}')
+                application_status = ApplicationDomain.application_over(a)
+                sent_count += 1
+                if application_status == "passed":
+                    SelectionDomain.create(a.user)
+                logger.info(application_status)
+                a.refresh_from_db()
+                logger.info(a.application_over_email_sent)
+            else:
+                logger.info(f'user already selected {a.user.email}')    
+            
         logger.info("sent %d `application_over` emails", sent_count)
-        '''
 
     @staticmethod
     def admissions_are_over_sent_emails() -> int:
