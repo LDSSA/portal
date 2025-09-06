@@ -38,15 +38,21 @@ class Events:
             raise EventsExceptionError(msg)
         '''
         sent_count = 0
+        '''
         q = ApplicationDomainQueries.all()
-        '''
         q_selection = SelectionQueries.get_all()
-        selection_emails = [q_s.user.email for q_s in q_selection]
-        '''
+        selection_users = [q_s.user for q_s in q_selection]
+        
         for a in q:
+            if q.user not in selection_users:
+                logger.info(f'new user {q.user.email}')
+            else:
+                logger.info(f'select user {q.user.email}')
+        
+            '''
             try:
-                ApplicationDomain.application_over(a)
-                sent_count += 1
+                    ApplicationDomain.application_over(a)
+                    sent_count += 1    
             except ApplicationDomainExceptionError:
                 pass  # means that email was already sent
             
@@ -60,7 +66,6 @@ class Events:
 
         logger.info("sent %d `application_over` emails", sent_count)
         '''
-        logger.info('selection emails', selection_emails)
 
     @staticmethod
     def admissions_are_over_sent_emails() -> int:
