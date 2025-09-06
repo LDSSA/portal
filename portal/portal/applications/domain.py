@@ -184,13 +184,12 @@ class Domain:
 
     @staticmethod
     def application_over(application: Application) -> str:
-        ''' 
+        to_name = application.user.name
+        ''' this is not useful with two application waves - see how to organize this
         if application.application_over_email_sent is not None:
             msg = "email was already sent"
             raise DomainExceptionError(msg)
         '''
-        to_name = application.user.name
-
         status = Domain.get_application_status(application)
         if status == ApplicationStatus.passed:
             emails.send_application_is_over_passed(
