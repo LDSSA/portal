@@ -197,7 +197,7 @@ class Domain:
             )
             application.application_over_email_sent = "passed"
             application.save()
-            logger.info('Sent applications over email, status passed',application.user.email)
+            logger.info(f'Sent applications over email, status passed: {application.user.email}')
             return 'passed'
         
         elif status == ApplicationStatus.failed:  
@@ -206,7 +206,7 @@ class Domain:
             )
             application.application_over_email_sent = "failed"
             application.save()
-            logger.info('Sent applications over email, status failed',application.user.email)
+            logger.info(f'Sent applications over email, status failed: {application.user.email}')
             return 'failed'
 
     @staticmethod
