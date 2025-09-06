@@ -184,7 +184,8 @@ class Domain:
 
     @staticmethod
     def application_over(application: Application) -> str:
-        '''  this is not useful with two application waves - think about how to organize this
+        ''' 
+        # this is not useful with two application waves - think about how to organize this
         if application.application_over_email_sent is not None:
             msg = "email was already sent"
             raise DomainExceptionError(msg)
