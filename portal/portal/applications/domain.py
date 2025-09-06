@@ -183,13 +183,13 @@ class Domain:
         sub.save()
 
     @staticmethod
-    def application_over(application: Application) -> None:
+    def application_over(application: Application) -> str:
+        to_name = application.user.name
+        ''' this is not useful with two application waves - see how to organize this
         if application.application_over_email_sent is not None:
             msg = "email was already sent"
             raise DomainExceptionError(msg)
-
-        to_name = application.user.name
-
+        '''
         status = Domain.get_application_status(application)
         if status == ApplicationStatus.passed:
             emails.send_application_is_over_passed(
@@ -197,7 +197,8 @@ class Domain:
             )
             application.application_over_email_sent = "passed"
             application.save()
-            logger.info('Sent applications over email, status passed',application.user.email)
+            logger.info(f'Sent applications over email, status passed: {application.user.email}')
+            return 'passed'
         
         elif status == ApplicationStatus.failed:  
             emails.send_application_is_over_failed(
@@ -205,7 +206,8 @@ class Domain:
             )
             application.application_over_email_sent = "failed"
             application.save()
-            logger.info('Sent applications over email, status failed',application.user.email)
+            logger.info(f'Sent applications over email, status failed: {application.user.email}')
+            return 'failed'
 
     @staticmethod
     def get_candidate_release_zip(sub_type_uname: str) -> str:
