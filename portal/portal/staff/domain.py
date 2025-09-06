@@ -4,6 +4,10 @@ from portal.admissions import emails
 from portal.applications.domain import (
     DomainQueries as ApplicationDomainQueries,
 )
+from portal.applications.domain import Domain as ApplicationDomain
+from portal.applications.domain import (
+    DomainExceptionError as ApplicationDomainExceptionError,
+)
 from portal.selection.domain import SelectionDomain
 from portal.selection.queries import SelectionQueries
 from portal.selection.status import SelectionStatus
@@ -32,33 +36,31 @@ class Events:
             )
             msg = "Can't trigger `applications over` event, portal status has to be admissions:selection"
             raise EventsExceptionError(msg)
-
+        '''
         sent_count = 0
         q = ApplicationDomainQueries.all()
+        '''
+        q_selection = SelectionQueries.get_all()
+        selection_emails = [q_s.email for q_s in q_selection]
+        '''
         for a in q:
-            # this should be removed later
-            a.refresh_from_db()
-            if a.coding_test_started_at is None:
-                 a.application_over_email_sent = None
-                 a.save()
-            # up to here
-            '''
             try:
                 ApplicationDomain.application_over(a)
                 sent_count += 1
             except ApplicationDomainExceptionError:
                 pass  # means that email was already sent
             
-            
             a.refresh_from_db()
             if a.application_over_email_sent == "passed":
                 SelectionDomain.create(a.user)
-            '''
+            
             a.refresh_from_db()
             logger.info(a.user.email)
             logger.info(a.application_over_email_sent)
 
         logger.info("sent %d `application_over` emails", sent_count)
+        '''
+        logger.info('selection emails', selection_emails)
 
     @staticmethod
     def admissions_are_over_sent_emails() -> int:

@@ -41,10 +41,10 @@ def send_application_is_over_failed(to_email, to_name):
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
-        subject="Sorry! You did not pass the current application round. Stay tuned for the second round which will open on 18th August 2025."
+        subject="Sorry! You did not pass the LDSSA admissions tests."
     )
     email.template_id = "Admissions - failed admission tests"
-    email.metadatae = {"to_name": to_name}
+    email.metadata = {"to_name": to_name}
     email.send()
 
 
