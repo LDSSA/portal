@@ -41,7 +41,7 @@ class Events:
         q = ApplicationDomainQueries.all()
         '''
         q_selection = SelectionQueries.get_all()
-        selection_emails = [q_s.email for q_s in q_selection]
+        selection_emails = [q_s.user for q_s in q_selection]
         '''
         for a in q:
             try:
