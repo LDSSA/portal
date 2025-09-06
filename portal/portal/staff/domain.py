@@ -46,14 +46,13 @@ class Events:
             logger.info(a.user.email)
             if a.user not in selection_users:
                 logger.info(f'user not in selection {a.user.email}')
-                try:
-                    application_status = ApplicationDomain.application_over(a)
-                    sent_count += 1
-                    if application_status == "passed":
-                        SelectionDomain.create(a.user)
-                    logger.info(application_status)
-                    a.refresh_from_db()
-                    logger.info(a.application_over_email_sent)
+                application_status = ApplicationDomain.application_over(a)
+                sent_count += 1
+                if application_status == "passed":
+                    SelectionDomain.create(a.user)
+                logger.info(application_status)
+                a.refresh_from_db()
+                logger.info(a.application_over_email_sent)
             else:
                 logger.info(f'user already selected {a.user.email}')    
             
