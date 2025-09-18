@@ -183,7 +183,7 @@ class AdmissionsGradingMixin(AcademyGradingMixin):
 
     def get_image(self):
         prefix = "dev-" if settings.IN_DEV else ""
-        return f"ldssa/{prefix}batch8-admissions-{self.grade.unit.code.lower()}:latest"
+        return f"ldssa/{prefix}batch-admissions-{self.grade.unit.code.lower()}:latest"
 
     def get_env(self):
         env = super().get_env()
