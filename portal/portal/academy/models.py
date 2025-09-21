@@ -45,7 +45,7 @@ def notebook_path(instance, filename):
 
 
 def feedback_path(instance, filename):
-    now = timezone.now(LISBON_TZ).isoformat(timespec="seconds")
+    now = timezone.now().isoformat(timespec="seconds")
     return f"{instance.unit.code}/{instance.user.username}/feedback_{now}.ipynb"
 
 
