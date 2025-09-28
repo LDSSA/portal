@@ -140,7 +140,7 @@ class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):
 
 class InstructorUserListView(InstructorViewsMixin, ListView):
     model = get_user_model()
-    queryset = get_user_model().objects.filter(is_student=True, failed_or_dropped=False)
+    set = get_user_model().objects.filter(is_student=True, failed_or_dropped=False)
     template_name = "academy/instructor/user_list.html"
 
     def get_queryset(self):

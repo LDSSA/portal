@@ -36,6 +36,7 @@ def get_all_candidates() -> ExportData:
         "payment_value": "selection__payment_value",
         "payment_ticket_type": "selection__ticket_type",
         "payment_due_date": "selection__payment_due_date",
+        "academy_type_preference": "academy_type_preference",
     }
 
     rows = (
