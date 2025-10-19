@@ -85,5 +85,5 @@ class SubmissionAdmin(admin.ModelAdmin):
         if isinstance(obj.content_object, User):
             try:
                 return f"[{obj.content_object.hackathon_team_id}] {obj.content_object.name}"
-            except:
+            except AttributeError:
                 return obj.content_object.username
