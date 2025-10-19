@@ -83,6 +83,7 @@ class SubmissionAdmin(admin.ModelAdmin):
 
     def get_name(self, obj):
         if isinstance(obj.content_object, User):
-            return obj.content_object.username
-
-        return f"[{obj.content_object.hackathon_team_id}] {obj.content_object.name}"
+            try:
+                return f"[{obj.content_object.hackathon_team_id}] {obj.content_object.name}"
+            except AttributeError:
+                return obj.content_object.username
