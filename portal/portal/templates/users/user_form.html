@@ -19,7 +19,11 @@
         </div>
     </div>
 
-    <h2 class="mt-5">Deploy Key</h2>
+    <h2 class="mt-5">Course workspace setup</h2>
+    <p>Create a private GitHub repository named <strong>{{ STUDENT_REPO_NAME }}</strong> under the GitHub username entered above. Add the public deploy key below under that repository’s Settings → Deploy keys; read access is sufficient.</p>
+    <p>Copy the learning-unit folders from <a href="https://github.com/LDSSA/batch-students">the student materials repository</a> into your workspace, preserving their folder names. Commit and push your exercise notebook before clicking Grade in the portal. The published materials repository and your private workspace serve different purposes.</p>
+    <p>Enter your Slack member ID, and contact an instructor if you need a Slack invitation.</p>
+    <h2 class="mt-5">Public deploy key</h2>
     <div class="card mb-3">
         <div class="card-body deploy-key">
             <p class="card-text">{{ user.deploy_public_key }}</p>

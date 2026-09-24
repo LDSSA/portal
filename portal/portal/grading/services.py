@@ -67,7 +67,7 @@ class Grading:
         env = self.get_env()
         cmd = self.get_command(image, name, env)
         self.start_message()
-        logger.info(cmd)
+        logger.info("Launching grading image=%s job=%s", image, name)
         subprocess.Popen(cmd)
 
 

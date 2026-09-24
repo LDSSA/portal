@@ -36,7 +36,7 @@ spec:
               mountPath: /home/django/.kube/
             - name: aws-volume
               mountPath: /home/django/.aws/
-          env:
+          env: &portalEnv
             - name: DJANGO_SECRET_KEY
               valueFrom:
                 secretKeyRef:
@@ -74,3 +74,9 @@ spec:
                   key: {{ .key }}
                   name: {{ .configMapName }}
 {{- end }}
+        - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          name: admissions-scheduler
+          resources: {}
+          args:
+            - /app/bin/start_scheduler.sh
+          env: *portalEnv

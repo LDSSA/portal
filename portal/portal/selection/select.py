@@ -4,6 +4,7 @@ from portal.admissions import emails
 from portal.users.models import TicketType
 
 from .domain import SelectionDomain
+from .models import ScholarshipStatus
 from .payment import load_payment_data
 from .queries import SelectionQueries
 from .status import SelectionStatus
@@ -24,6 +25,8 @@ def select() -> None:
 
 
 def to_selected(selection):
+    if not selection.user.admissions_requires_exam:
+        raise ValueError("Only exam applicants enter the draw workflow.")
     SelectionDomain.update_status(selection, SelectionStatus.SELECTED)
     load_payment_data(selection)
 
@@ -37,6 +40,9 @@ def to_selected(selection):
 
 
 def to_interview(selection):
+    if not selection.user.admissions_requires_exam:
+        raise ValueError("Only exam applicants enter the draw workflow.")
+    selection.scholarship_status = ScholarshipStatus.PENDING
     SelectionDomain.update_status(selection, SelectionStatus.INTERVIEW)
     emails.send_selected_interview_details(
         to_email=selection.user.email,

@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
+{% load tz %}
 
 {% block content %}
+{% if no_exam_scheduled and not admissions_requires_exam %}<p class="alert alert-info">Payment documents can be submitted from {{ no_exam_payments_start|timezone:"Europe/Lisbon"|date:"Y-m-d" }} through {{ no_exam_payments_deadline|timezone:"Europe/Lisbon"|date:"Y-m-d" }} (Lisbon time). Staff can review submitted documents after this period.</p>{% endif %}
 
 <div class="container">
     <h2 class="py-5">
@@ -69,7 +71,7 @@
             <div>
                 <h6 class="my-0">Due date</h6>
             </div>
-            <span class="text-muted">{{ s.payment_due_date|date:"Y-m-d" }}</span>
+            <span class="text-muted">{% if no_exam_scheduled and not admissions_requires_exam %}{{ no_exam_payments_deadline|timezone:"Europe/Lisbon"|date:"Y-m-d" }} (end of day, Lisbon time){% else %}{{ s.payment_due_date|date:"Y-m-d" }}{% endif %}</span>
             </li>
         </ul>
         </div>

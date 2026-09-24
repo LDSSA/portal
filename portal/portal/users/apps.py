@@ -1,5 +1,3 @@
-import contextlib
-
 from django.apps import AppConfig
 
 
@@ -8,5 +6,4 @@ class UsersAppConfig(AppConfig):
     verbose_name = "Users"
 
     def ready(self):
-        with contextlib.suppress(ImportError):
-            pass
+        from . import signals  # noqa: F401

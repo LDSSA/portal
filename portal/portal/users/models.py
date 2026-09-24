@@ -47,6 +47,11 @@ class AcademyTypePreference(models.TextChoices):
     in_person_only = "in_person_only", _("In-person only")
 
 
+class AdmissionsMode(models.TextChoices):
+    EXAM = "exam", _("Exam")
+    NO_EXAM = "no_exam", _("No exam")
+
+
 # TODO: custom user manager to filter out users with unverified email addresses
 class User(AbstractUser):
     email = models.EmailField(unique=True, null=False)
@@ -62,7 +67,21 @@ class User(AbstractUser):
     deploy_private_key = models.TextField(blank=True)
     deploy_public_key = models.TextField(blank=True)
 
-    # Admissions
+    # Admissions: snapshot the mode at signup; changing the default is not a migration.
+    admissions_mode = models.CharField(
+        max_length=10,
+        choices=AdmissionsMode.choices,
+        default=AdmissionsMode.EXAM,
+        editable=False,
+    )
+    registration_completed_at = models.DateTimeField(
+        null=True, blank=True, editable=False
+    )
+
+    @property
+    def admissions_requires_exam(self):
+        return self.admissions_mode == AdmissionsMode.EXAM
+
     code_of_conduct_accepted = models.BooleanField(default=False)
     applying_for_scholarship = models.BooleanField(default=None, null=True)
     academy_type_preference = models.CharField(

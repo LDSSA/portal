@@ -21,7 +21,7 @@ class StudentAttendanceForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if self.instance.hackathon.status != "taking_attendance":
+        if self.instance.hackathon.status != "marking_presences":
             msg = "Marking attendance is closed"
             raise forms.ValidationError(msg)
         return cleaned_data

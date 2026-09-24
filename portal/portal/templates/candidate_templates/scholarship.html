@@ -16,6 +16,7 @@
       {% endif %}
     {% endif %}
 
+    {% if admissions_requires_exam %}
     <div>
     <p>
       In this batch of the Lisbon Data Science Starters Academy, we’ll have 10 seats for people who live with no / low income and therefore <br>
@@ -51,7 +52,7 @@
             the shared document). The actual decision will be made by the Academy’s executive team, based only on the content of the report.
         </li><br>
         <li>
-          In case the scholarship is granted, the candidate will have 48h to pay the 20€ fee and submit their payment proof. The payment proof will be <br>
+          In case the scholarship is granted, the candidate will have {{ ADMISSIONS_PAYMENT_DAYS }} days to pay the 20€ fee and submit their payment proof. The payment proof will be <br>
           validated by a staff member of the Academy, and in case it’s valid, the candidate is accepted in the batch of the LDSSA.
         </li><br>
         <li>
@@ -72,31 +73,14 @@
     <br>
   </div>
 
-  {% if not scholarship_decided %}
-    <div class="jumbotron p-3">
-        <p>
-          Do you want to apply for a scholarship?
-        </p>
-        <div class="row">
-          <div class="col-md-1">
-          <form method="post">
-              {% csrf_token %}
-              <input type="hidden" name="decision" value="yes">
-              <button type="submit" class="btn btn-primary">Yes</button>
-          </form>
-        </div>
-        <div class="col-md-1">
-          <form method="post">
-              {% csrf_token %}
-              <input type="hidden" name="decision" value="no">
-              <button type="submit" class="btn btn-primary">No</button>
-          </form>
-        </div>
-      </div>
-
-    </div>
+  {% else %}
+    <p>Scholarships support applicants who cannot afford the normal fees (€250 for student tickets, €500 for regular tickets and €1500 for company tickets). Approved scholarship tickets cost €20.</p>
+    <p>Complete registration to submit your scholarship request. Staff will review your circumstances and contact you if they need further information. There is no admission exam or seat draw.</p>
+    <p>If approved, pay the €20 fee within {{ ADMISSIONS_PAYMENT_DAYS }} days of receiving payment instructions and submit proof for staff verification.</p>
+    <p><strong>Your scholarship choice is final. If your scholarship is refused, your admission ends; you cannot switch to a normal ticket.</strong></p>
   {% endif %}
-
+  {% if not scholarship_decided %}
+    <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">Save decision</button></form>
+  {% endif %}
 </div>
-
 {% endblock %}

@@ -17,7 +17,7 @@
         <span class="font-weight-bold">Best Grade:</span>
         {% show_grade best_grade %}
       </div>
-      {% if unit.open %}
+      {% if unit.submissions_open %}
         <div class="col-md-auto">
           <form method="post">
             {% csrf_token %}
@@ -27,6 +27,12 @@
       {% endif %}
     </div>
 
+    <p>Late submissions remain available for learning while the unit is open, but do not count toward certification unless an administrator validates an exception.</p>
+    {% if grade.pk and not grade.on_time %}<p class="text-warning">Your latest submission was late.</p>{% endif %}
+    {% if grade.deadline_valid_override != None %}
+    <p>Deadline validation override: <strong>{{ grade.deadline_valid_override|yesno:"valid,invalid" }}</strong>.
+      Reason: {{ grade.deadline_override_reason }}. The original submission timestamp and lateness are retained.</p>
+    {% endif %}
     <!-- Failure Message -->
     {% if grade.status == "failed" %}
       <div class="alert alert-danger" role="alert">
@@ -42,7 +48,8 @@
           <!-- Sidebar Information -->
           <div class="col-md-4">
             <div class="mb-3">
-              <h5>Due Date:</h5>
+              <h5>Certificate deadline (end of day, Lisbon time):</h5>
+              <p>{% if unit.required_for_certificate %}Required for certification{% else %}Optional unit{% endif %}</p>
               <p>{{ unit.due_date|date:"F j, Y" }}</p>
             </div>
             <div class="mb-3">

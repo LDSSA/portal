@@ -9,7 +9,6 @@ from allauth.account.utils import filter_users_by_email, user_pk_to_url_str
 from allauth.core.exceptions import ImmediateHttpResponse
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.utils import build_absolute_uri
-from constance import config
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.http import HttpRequest
@@ -21,6 +20,7 @@ from portal.admissions.emails import (
     send_reset_password_email,
     send_signup_email,
 )
+from portal.admissions.policy import new_signups_open
 from portal.users.models import UserWhitelist
 
 logger = logging.getLogger(__name__)
@@ -31,8 +31,8 @@ class AccountAdapter(DefaultAccountAdapter):
 
     def is_open_for_signup(self, request: HttpRequest):
         if request.path == reverse("instructors_signup"):
-            return True
-        return getattr(config, "ACCOUNT_ALLOW_REGISTRATION", True)
+            return False
+        return new_signups_open()
 
     def clean_email(self, email):
         email = super().clean_email(email)
@@ -107,7 +107,7 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         request: HttpRequest,
         sociallogin: Any,
     ):
-        return getattr(config, "ACCOUNT_ALLOW_REGISTRATION", True)
+        return new_signups_open()
 
 
 class SocialAccountWhitelistAdapter(DefaultSocialAccountAdapter):
@@ -116,7 +116,7 @@ class SocialAccountWhitelistAdapter(DefaultSocialAccountAdapter):
         request: HttpRequest,
         sociallogin: Any,
     ):
-        return getattr(config, "ACCOUNT_ALLOW_REGISTRATION", True)
+        return new_signups_open()
 
     def pre_social_login(
         self,

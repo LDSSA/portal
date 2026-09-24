@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
+from django.utils.html import format_html
 
 
 def send_signup_email(to_email, email_confirmation_url):
@@ -8,8 +9,13 @@ def send_signup_email(to_email, email_confirmation_url):
         bcc=["admissions@lisbondatascience.org"],
         subject="Action needed: Confirm your email address",
     )
-    email.template_id = "Admissions - confirm email"
-    email.metadata = {"email_confirmation_url": email_confirmation_url}
+    email.template_id = "Admissions - generic message"
+    email.body = format_html(
+        "Welcome to the Lisbon Data Science Starters Academy admissions portal.<br>"
+        'Please <a href="{}">confirm your email address</a>, then return to the portal '
+        "to complete your registration. Replying to this email does not verify your account.",
+        email_confirmation_url,
+    )
     email.send()
 
 
@@ -41,7 +47,7 @@ def send_application_is_over_failed(to_email, to_name):
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
-        subject="Sorry! You did not pass the LDSSA admissions tests."
+        subject="Sorry! You did not pass the LDSSA admissions tests.",
     )
     email.template_id = "Admissions - failed admission tests"
     email.metadata = {"to_name": to_name}
@@ -71,14 +77,19 @@ def send_selected_and_payment_details(
         to=[to_email],
         bcc=["admissions@lisbondatascience.org"],
         from_email=settings.ADMISSIONS_FROM_EMAIL,
-        subject="You're ALMOST IN!",
+        subject="Complete your LDSSA enrollment",
     )
-    email.template_id = "Admissions - selected and payment details"
-    email.metadata = {
-        "to_name": to_name,
-        "payment_value": payment_value,
-        "payment_due_date": payment_due_date,
-    }
+    email.template_id = "Admissions - generic message"
+    email.body = format_html(
+        "Hello {},<br>You have been selected after the admission tests. "
+        "Please pay €{} and submit your payment documents by {}. "
+        '<a href="{}">Open the portal</a> for bank details and document submission. '
+        "A student-rate ticket also requires a student ID.",
+        to_name,
+        payment_value,
+        payment_due_date,
+        settings.BASE_URL,
+    )
     email.send()
 
 
@@ -161,8 +172,13 @@ def send_selected_interview_details(to_email, to_name):
         from_email=settings.ADMISSIONS_FROM_EMAIL,
         subject="LDSSA scholarship interview details",
     )
-    email.template_id = "Admissions - selected interview details"
-    email.metadata = {"to_name": to_name}
+    email.template_id = "Admissions - generic message"
+    email.body = format_html(
+        "Hello {},<br>You have been selected for a scholarship interview. "
+        "Staff will contact you to arrange a time. Please wait for the decision before paying. "
+        "If the scholarship is refused, your admission ends; it cannot be converted to a full-fee application.",
+        to_name,
+    )
     email.send()
 
 

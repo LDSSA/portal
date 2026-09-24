@@ -11,9 +11,6 @@ class ExportData(NamedTuple):
 
 
 def get_all_candidates() -> ExportData:
-    user = User
-    user.applying_for_scholarship
-
     headers = {
         # profile
         "create_at": "created_at",
@@ -21,6 +18,12 @@ def get_all_candidates() -> ExportData:
         "email": "email",
         "coc_accepted": "code_of_conduct_accepted",
         "applying_for_scholarship": "applying_for_scholarship",
+        "admissions_mode": "admissions_mode",
+        "registration_completed_at": "registration_completed_at",
+        "is_student": "is_student",
+        "scholarship_status": "selection__scholarship_status",
+        "scholarship_decided_at": "selection__scholarship_decided_at",
+        "scholarship_decided_by": "selection__scholarship_decided_by__email",
         # profile
         "profile_create_at": "created_at",
         "profile_updated_at": "updated_at",

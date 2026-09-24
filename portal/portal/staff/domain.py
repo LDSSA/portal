@@ -1,16 +1,18 @@
 from logging import getLogger
+
 from constance import config
+from django.db import transaction
+
 from portal.admissions import emails
+from portal.applications.domain import Domain as ApplicationDomain
 from portal.applications.domain import (
     DomainQueries as ApplicationDomainQueries,
 )
-from portal.applications.domain import Domain as ApplicationDomain
-from portal.applications.domain import (
-    DomainExceptionError as ApplicationDomainExceptionError,
-)
 from portal.selection.domain import SelectionDomain
+from portal.selection.enrollment import _activate_student
 from portal.selection.queries import SelectionQueries
 from portal.selection.status import SelectionStatus
+from portal.users.models import User
 
 logger = getLogger(__name__)
 
@@ -36,16 +38,16 @@ class Events:
             )
             msg = "Can't trigger `applications over` event, portal status has to be admissions:selection"
             raise EventsExceptionError(msg)
-    
+
         sent_count = 0
         q = ApplicationDomainQueries.all()
         q_selection = SelectionQueries.get_all()
         selection_users = [q_s.user for q_s in q_selection]
-        
+
         for a in q:
             logger.info(a.user.email)
             if a.user not in selection_users:
-                logger.info(f'user not in selection {a.user.email}')
+                logger.info(f"user not in selection {a.user.email}")
                 application_status = ApplicationDomain.application_over(a)
                 sent_count += 1
                 if application_status == "passed":
@@ -54,8 +56,8 @@ class Events:
                 a.refresh_from_db()
                 logger.info(a.application_over_email_sent)
             else:
-                logger.info(f'user already selected {a.user.email}')    
-            
+                logger.info(f"user already selected {a.user.email}")
+
         logger.info("sent %d `application_over` emails", sent_count)
 
     @staticmethod
@@ -70,7 +72,7 @@ class Events:
 
     @staticmethod
     def trigger_admissions_are_over() -> None:
-        if config.PORTAL_STATUS == "admissions:applications":
+        if config.PORTAL_STATUS not in ("admissions:selection", "academy"):
             logger.error(
                 "trying to trigger `admissions over` event but applications are still open",
             )
@@ -97,8 +99,9 @@ class Events:
         for selection in SelectionQueries.get_all():
             selection_status = SelectionDomain.get_status(selection)
             if selection_status == SelectionStatus.ACCEPTED:
-                selection.user.is_student = True
-                selection.user.save()
+                with transaction.atomic():
+                    user = User.objects.select_for_update().get(pk=selection.user_id)
+                    _activate_student(user)
 
             if selection_status == SelectionStatus.PASSED_TEST:
                 # this user was never selected
