@@ -162,7 +162,7 @@ def draw(params: DrawParams) -> None:
     counters = get_draw_counters(current_candidates)
     draw_rank = SelectionQueries.max_rank(current_candidates) + 1
 
-    while counters.total != params.number_of_seats:
+    while counters.total < params.number_of_seats:
         selection = draw_next(params, counters)
         if selection is None:
             # no more suitable candidates
@@ -176,6 +176,8 @@ def draw(params: DrawParams) -> None:
 
 
 def reject_draw(selection: Selection) -> None:
+    if not selection.user.admissions_requires_exam:
+        raise DrawExceptionError("No-exam applicants do not enter the draw.")
     current_status = SelectionDomain.get_status(selection)
     if current_status != SelectionStatus.DRAWN:
         msg = f"Can't reject draw for candidate in status {current_status}."

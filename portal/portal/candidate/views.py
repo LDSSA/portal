@@ -5,6 +5,9 @@ from urllib.parse import urljoin
 
 from constance import config
 from django.conf import settings
+from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.http import (
     Http404,
     HttpResponse,
@@ -19,6 +22,7 @@ from django.views.generic import TemplateView
 from rest_framework.settings import import_string
 
 from portal.admissions import emails
+from portal.admissions.policy import academy_open, registration_changes_open
 from portal.applications.domain import Domain, Status
 from portal.applications.models import (
     Application,
@@ -27,16 +31,27 @@ from portal.applications.models import (
 )
 from portal.candidate.domain import Domain as CandidateDomain
 from portal.candidate.domain import notebook_to_html
-from portal.selection.domain import SelectionDomain
+from portal.candidate.forms import (
+    AcademyTypeForm,
+    CodeOfConductForm,
+    DocumentUploadForm,
+    ScholarshipForm,
+)
+from portal.selection.enrollment import (
+    complete_registration,
+    record_registration_step,
+    submit_payment,
+    upload_document,
+)
 from portal.selection.models import Selection, SelectionDocument
-from portal.selection.payment import add_document, can_be_updated
+from portal.selection.payment import can_be_updated
 from portal.selection.queries import SelectionDocumentQueries
 from portal.selection.status import SelectionStatus
-from portal.users.models import TicketType
 from portal.users.views import (
     AdmissionsCandidateViewMixin,
     AdmissionsViewMixin,
     CandidateAcceptedCoCMixin,
+    ExamCandidateRequiredMixin,
 )
 
 logger = logging.getLogger(__name__)
@@ -45,8 +60,23 @@ logger = logging.getLogger(__name__)
 class HomeView(AdmissionsCandidateViewMixin, TemplateView):
     template_name = "candidate_templates/home.html"
 
+    def get_template_names(self):
+        if not self.request.user.admissions_requires_exam:
+            return ["candidate_templates/home_no_exam.html"]
+        return [self.template_name]
+
     def get_context_data(self, **kwargs):
         state = CandidateDomain.get_candidate_state(self.request.user)
+        if not self.request.user.admissions_requires_exam:
+            return super().get_context_data(
+                state=state,
+                selection=Selection.objects.filter(user=self.request.user).first(),
+                selection_status_values=SelectionStatus,
+                first_name=self.request.user.name.split(" ")[0],
+                registration_open=registration_changes_open(self.request.user),
+                academy_access_open=academy_open(self.request.user),
+                **kwargs,
+            )
 
         # the action_point is the first open section in the steps accordion
         # accordion_enabled_status say whether each accordion section should be enabled
@@ -155,64 +185,64 @@ class ContactView(AdmissionsCandidateViewMixin, TemplateView):
         return HttpResponse(template.render({}, request))
 
 
-class CodeOfConductView(AdmissionsCandidateViewMixin, TemplateView):
-    """View and accept code of conduct."""
+class RegistrationStepView(AdmissionsCandidateViewMixin, generic.FormView):
+    step = None
+    value_field = None
 
+    def form_valid(self, form):
+        value = form.cleaned_data[self.value_field]
+        if self.step == "scholarship":
+            value = value == "yes"
+        try:
+            record_registration_step(self.request.user, self.step, value)
+        except ValidationError as exc:
+            form.add_error(None, exc)
+            return self.form_invalid(form)
+        return redirect("admissions:candidate:home")
+
+
+class CodeOfConductView(RegistrationStepView):
     template_name = "candidate_templates/code_of_conduct.html"
-
-    def post(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):
-        user = request.user
-        user.code_of_conduct_accepted = True
-        user.save()
-        return redirect("admissions:candidate:home")
+    form_class = CodeOfConductForm
+    step = "coc"
+    value_field = "accepted"
 
 
-class ScholarshipView(
-    AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView
-):
-    """Read scholarship conditions and chose to apply."""
-
+class ScholarshipView(CandidateAcceptedCoCMixin, RegistrationStepView):
     template_name = "candidate_templates/scholarship.html"
-
-    def post(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):
-        user = request.user
-        user.applying_for_scholarship = request.POST["decision"] == "yes"
-        if user.applying_for_scholarship:
-            user.ticket_type = TicketType.scholarship
-        user.save()
-        return redirect("admissions:candidate:home")
+    form_class = ScholarshipForm
+    step = "scholarship"
+    value_field = "decision"
 
 
-class AcademyTypeView(
-    AdmissionsCandidateViewMixin, CandidateAcceptedCoCMixin, TemplateView
-):
-    """Choose academy type preference."""
-
+class AcademyTypeView(CandidateAcceptedCoCMixin, RegistrationStepView):
     template_name = "candidate_templates/academy_type.html"
+    form_class = AcademyTypeForm
+    step = "academy_type"
+    value_field = "academy_type"
 
-    def post(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):
-        user = request.user
-        user.academy_type_preference = request.POST["academy_type"]
-        user.save()
+    def get_initial(self):
+        return {"academy_type": self.request.user.academy_type_preference}
+
+
+class CompleteRegistrationView(AdmissionsCandidateViewMixin, generic.View):
+    def post(self, request, *args, **kwargs):
+        if request.user.admissions_requires_exam:
+            raise Http404
+        try:
+            if complete_registration(request.user) is None:
+                messages.error(
+                    request,
+                    "Complete your profile and all three steps while registration is open.",
+                )
+        except ValidationError as exc:
+            messages.error(request, "; ".join(exc.messages))
         return redirect("admissions:candidate:home")
 
 
-class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
+class CandidateBeforeCodingTestView(
+    ExamCandidateRequiredMixin, AdmissionsCandidateViewMixin, TemplateView
+):
     template_name = "candidate_templates/before_coding_test.html"
 
     def get_context_data(self, **kwargs):
@@ -237,7 +267,9 @@ class CandidateBeforeCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         )
 
 
-class CandidateConfirmationCodingTestView(AdmissionsCandidateViewMixin, TemplateView):
+class CandidateConfirmationCodingTestView(
+    ExamCandidateRequiredMixin, AdmissionsCandidateViewMixin, TemplateView
+):
     template_name = "candidate_templates/confirmation_coding_test.html"
 
     def get_context_data(self, **kwargs):
@@ -255,10 +287,18 @@ class CandidateConfirmationCodingTestView(AdmissionsCandidateViewMixin, Template
         *args,
         **kwargs,
     ):
-        application = Application.objects.get(user=request.user)
-        if application.coding_test_started_at is None:
-            application.coding_test_started_at = datetime.now(timezone.utc) # this should move after download
-            application.save()
+        now = datetime.now(timezone.utc)
+        if (
+            not config.ADMISSIONS_APPLICATIONS_START
+            <= now
+            < config.ADMISSIONS_SELECTION_START
+        ):
+            return HttpResponseBadRequest("The admission tests are not open.")
+        with transaction.atomic():
+            application = Application.objects.select_for_update().get(user=request.user)
+            if application.coding_test_started_at is None:
+                application.coding_test_started_at = now
+                application.save(update_fields=["coding_test_started_at"])
 
         return HttpResponseRedirect(reverse("admissions:candidate:coding-test"))
 
@@ -286,7 +326,9 @@ def submission_view_ctx(application, challenge) -> dict[str, Any]:
     }
 
 
-class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
+class CodingTestView(
+    ExamCandidateRequiredMixin, AdmissionsCandidateViewMixin, TemplateView
+):
     def get(
         self,
         request,
@@ -316,7 +358,9 @@ class CodingTestView(AdmissionsCandidateViewMixin, TemplateView):
         return HttpResponse(template.render(ctx, request))
 
 
-class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
+class AssignmentDownloadView(
+    ExamCandidateRequiredMixin, AdmissionsViewMixin, TemplateView
+):
     def get(
         self,
         request,
@@ -327,24 +371,24 @@ class AssignmentDownloadView(AdmissionsViewMixin, TemplateView):
         application = Application.objects.get(user=request.user)
         if (
             assignment_id == "coding_test"
-            and application.coding_test_started_at is None #this has to change
+            and application.coding_test_started_at is None  # this has to change
         ):
             raise Http404
-        
-        #download_counter_var = {"coding_test":application.coding_test_downloaded, 
+
+        # download_counter_var = {"coding_test":application.coding_test_downloaded,
         #                        "slu01":application.slu01_downloaded,
         #                        "slu02":application.slu02_downloaded,
         #                        "slu03":application.slu03_downloaded}
 
         obj = Challenge.objects.get(code=assignment_id)
         try:
-            #download_counter_var[assignment_id]=+1
+            # download_counter_var[assignment_id]=+1
             return FileResponse(obj.file)
         except ValueError as exc:
             raise Http404 from exc
 
 
-class SluView(AdmissionsCandidateViewMixin, TemplateView):
+class SluView(ExamCandidateRequiredMixin, AdmissionsCandidateViewMixin, TemplateView):
     def get(
         self,
         request,
@@ -367,7 +411,9 @@ class SluView(AdmissionsCandidateViewMixin, TemplateView):
         return HttpResponse(template.render(ctx, request))
 
 
-class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
+class SubmissionView(
+    ExamCandidateRequiredMixin, AdmissionsCandidateViewMixin, generic.View
+):
     """Submit challenges."""
 
     def post(
@@ -397,8 +443,12 @@ class SubmissionView(AdmissionsCandidateViewMixin, generic.View):
         return HttpResponseRedirect(reverse("admissions:candidate:slu", args=(pk,)))
 
 
-class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):
-    queryset = Submission.objects.all()
+class SubmissionDownloadView(
+    ExamCandidateRequiredMixin, AdmissionsViewMixin, generic.DetailView
+):
+    queryset = Submission.objects.filter(
+        user__admissions_mode="exam", application__user__admissions_mode="exam"
+    )
 
     def get_queryset(self):
         if self.request.user.is_staff:
@@ -418,8 +468,12 @@ class SubmissionDownloadView(AdmissionsViewMixin, generic.DetailView):
             raise Http404 from exc
 
 
-class SubmissionFeedbackDownloadView(AdmissionsViewMixin, generic.DetailView):
-    queryset = Submission.objects.all()
+class SubmissionFeedbackDownloadView(
+    ExamCandidateRequiredMixin, AdmissionsViewMixin, generic.DetailView
+):
+    queryset = Submission.objects.filter(
+        user__admissions_mode="exam", application__user__admissions_mode="exam"
+    )
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
@@ -449,6 +503,9 @@ class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):
         except Selection.DoesNotExist as exc:
             raise Http404 from exc
 
+        if selection.payment_value is None:
+            return redirect("admissions:candidate:home")
+
         payment_proofs = SelectionDocumentQueries.get_payment_proof_documents(selection)
         student_ids = SelectionDocumentQueries.get_student_id_documents(selection)
 
@@ -464,22 +521,12 @@ class CandidatePaymentView(AdmissionsCandidateViewMixin, generic.DetailView):
         }
         return HttpResponse(template.render(context, request))
 
-    def post(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):
+    def post(self, request, *args, **kwargs):
         try:
-            selection = request.user.selection
-        except Selection.DoesNotExist as exc:
-            raise Http404 from exc
-        SelectionDomain.manual_update_status(
-            selection,
-            SelectionStatus.TO_BE_ACCEPTED,
-            request.user,
-        )
-        return HttpResponseRedirect(reverse("admissions:candidate:payment"))
+            submit_payment(request.user)
+        except ValidationError as exc:
+            messages.error(request, "; ".join(exc.messages))
+        return redirect("admissions:candidate:payment")
 
 
 class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):
@@ -489,7 +536,7 @@ class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):
     def get_queryset(self):
         if self.request.user.is_staff:
             return super().get_queryset()
-        return super().get_queryset().filter(selection=self.request.user.selection)
+        return super().get_queryset().filter(selection__user=self.request.user)
 
     def get(
         self,
@@ -504,20 +551,20 @@ class SelectionDocumentDownloadView(AdmissionsViewMixin, generic.DetailView):
             raise Http404 from exc
 
 
-class SelectionDocumentUploadView(AdmissionsViewMixin, generic.DetailView):
+class SelectionDocumentUploadView(AdmissionsCandidateViewMixin, generic.DetailView):
     model = SelectionDocument
     queryset = SelectionDocument.objects.order_by("pk")
     document_type = None
 
-    def post(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):
-        add_document(
-            request.user.selection,
-            document=request.FILES["file"],
-            document_type=self.document_type,
-        )
-        return HttpResponseRedirect(reverse("admissions:candidate:payment"))
+    def post(self, request, *args, **kwargs):
+        form = DocumentUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                upload_document(
+                    request.user, form.cleaned_data["file"], self.document_type
+                )
+            except ValidationError as exc:
+                messages.error(request, "; ".join(exc.messages))
+        else:
+            messages.error(request, "Choose a non-empty document to upload.")
+        return redirect("admissions:candidate:payment")

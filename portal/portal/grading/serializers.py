@@ -7,6 +7,14 @@ from portal.applications.models import Challenge, Submission
 class GradeSerializer(serializers.ModelSerializer):
     notebook = serializers.FileField(source="feedback")
 
+    def update(self, instance, validated_data):
+        # Callbacks may only change grading output, never staff deadline decisions.
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+        if validated_data:
+            instance.save(update_fields=list(validated_data))
+        return instance
+
     class Meta:
         model = models.Grade
         fields = (
@@ -34,7 +42,7 @@ class ChecksumSerializer(serializers.ModelSerializer):
         if old_checksum != instance.checksum:
             for grade in models.Grade.objects.filter(unit=instance, status="graded"):
                 grade.status = "out-of-date"
-                grade.save()
+                grade.save(update_fields=["status"])
 
         return instance
 

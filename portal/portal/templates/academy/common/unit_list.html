@@ -12,6 +12,12 @@
     </div>
   </div>
 
+  {% if course_progression_block_reason %}
+  <p class="alert alert-warning">{{ course_progression_block_reason }}</p>
+  {% elif user.is_student and not user.can_graduate %}
+  <p class="alert alert-warning">You are currently ineligible for certification. You can continue studying and submitting work. Contact an instructor if you believe a submission or attendance record is incorrect.</p>
+  {% endif %}
+  <p>Deadlines are at the end of the indicated day in Lisbon time. Optional units are not required for certification.</p>
   <table class="table table-hover table-striped">
     <thead>
       <tr>
@@ -31,14 +37,14 @@
             {{ unit.specialization.code }}/{{ unit.pk }}
           </a>
         </td>
-        <td>{{ unit.name }}</td>
+        <td>{{ unit.name }}{% if not unit.required_for_certificate %} (optional){% endif %}</td>
         <td>{{ unit.due_date|date:"F j, Y"  }}</td>
         <td>{{ unit.instructor.name|default:unit.instructor.username }}</td>
         <td>
           {% show_grade grade %}
         </td>
         <td>
-          {% if unit.open %}
+          {% if unit.submissions_open %}
             <span class="badge badge-success">Open</span>
           {% else %}
             <span class="badge badge-danger">Closed</span>

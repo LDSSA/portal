@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load tz %}
+{% block content %}
+{% if no_exam_scheduled and not admissions_requires_exam %}<p class="alert alert-info">Payment documents can be submitted from {{ no_exam_payments_start|timezone:"Europe/Lisbon"|date:"Y-m-d" }} through {{ no_exam_payments_deadline|timezone:"Europe/Lisbon"|date:"Y-m-d" }} (Lisbon time). Staff can review submitted documents after this period.</p>{% endif %}
+<div class="container">
+  <h1 class="py-5">Hello {{ first_name|default:"future data scientist" }}!</h1>
+  {% include "candidate_templates/admissions_introduction.html" %}
+  <p>There is no admission exam or seat draw. Complete the three steps below, then pay the course fee and submit payment proof. Scholarship requests require staff approval.</p>
+  {% if not registration_open and not selection %}<p class="alert alert-warning">Registration is currently closed.</p>{% endif %}
+  <h3>Your next steps</h3>
+  <h4>1. Accept the code of conduct and the refund policy</h4>
+  {% if state.accepted_coc %}<p>Accepted.</p>{% else %}<p><a href="{% url 'admissions:candidate:codeofconduct' %}">Read and accept the policies</a>.</p>{% endif %}
+  <h4>2. Choose if you want to apply for a scholarship</h4>
+  {% if state.decided_scholarship %}<p>Scholarship requested: {{ state.applying_for_scholarship|yesno:"Yes,No" }}.</p>{% else %}<p><a href="{% url 'admissions:candidate:scholarship' %}">Read the terms and choose yes or no</a>.</p>{% endif %}
+  <h4>3. Choose your preference for remote or in-person mode</h4>
+  {% if state.academy_type %}<p>{{ request.user.get_academy_type_preference_display }}.</p>{% else %}<p><a href="{% url 'admissions:candidate:academy_type' %}">Choose your attendance preference</a>.</p>{% endif %}
+  {% if selection %}
+    <h3>Enrollment status</h3>
+    {% if selection.status == selection_status_values.INTERVIEW %}
+      <p class="alert alert-info">Your registration is complete. Staff are reviewing your scholarship request. Please wait for their decision before paying.</p>
+    {% elif selection.status == selection_status_values.SELECTED %}
+      <p>Your registration is complete. <a href="{% url 'admissions:candidate:payment' %}">Pay the fee and submit your payment proof</a> by {% if no_exam_scheduled and not admissions_requires_exam %}{{ no_exam_payments_deadline|timezone:"Europe/Lisbon"|date:"Y-m-d" }} (end of day, Lisbon time){% else %}{{ selection.payment_due_date|date:"Y-m-d" }}{% endif %}.</p>
+    {% elif selection.status == selection_status_values.TO_BE_ACCEPTED %}
+      <p class="alert alert-info">Staff are verifying your payment documents.</p>
+      <p><a href="{% url 'admissions:candidate:payment' %}">View your payment documents</a>.</p>
+    {% elif selection.status == selection_status_values.ACCEPTED %}
+      <p class="alert alert-success">Your payment is verified and your enrollment is complete.</p>
+      {% if request.user.is_student and academy_access_open %}<p><a href="{% url 'academy:student-unit-list' %}">Go to your learning units</a>.</p>
+      {% else %}<p>Course access opens on or after {{ ACADEMY_START|timezone:"Europe/Lisbon"|date:"Y-m-d" }}, once enabled by staff.</p>{% endif %}
+    {% elif selection.status == selection_status_values.REJECTED %}
+      {% if selection.scholarship_status == "rejected" %}<p class="alert alert-danger">Your scholarship was refused and your admission has ended. You cannot switch to a normal ticket.</p>
+      {% else %}<p class="alert alert-danger">Your admission has ended. Please check your email for the staff decision.</p>{% endif %}
+    {% endif %}
+  {% elif registration_open and state.accepted_coc and state.decided_scholarship and state.academy_type %}
+    <p>Make sure your <a href="{% url 'users:profile' %}">profile</a> is complete.</p>
+    <form method="post" action="{% url 'admissions:candidate:complete-registration' %}">{% csrf_token %}<button class="btn btn-primary">Complete registration</button></form>
+  {% endif %}
+</div>
+{% endblock %}

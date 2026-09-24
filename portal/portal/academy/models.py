@@ -1,4 +1,4 @@
-#from datetime import datetime
+# from datetime import datetime
 
 from django.conf import settings
 from django.db import models
@@ -28,8 +28,20 @@ class Unit(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     instructor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    due_date = models.DateField(default=timezone.now())
+    due_date = models.DateField(default=timezone.localdate)
+    required_for_certificate = models.BooleanField(default=True)
     open = models.BooleanField(default=False)
+    available_on = models.DateField(null=True, blank=True)
+
+    @property
+    def submissions_open(self):
+        from zoneinfo import ZoneInfo
+
+        return self.open and (
+            self.available_on is None
+            or timezone.now().astimezone(ZoneInfo("Europe/Lisbon")).date()
+            >= self.available_on
+        )
 
     checksum = models.TextField(blank=True)
 
@@ -75,3 +87,39 @@ class Grade(models.Model):
     message = models.TextField(blank=True)
     feedback = models.FileField(upload_to=feedback_path, null=True)
     on_time = models.BooleanField(default=True)
+    deadline_valid_override = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text="Unknown uses the recorded on-time result; Yes accepts the deadline exception; No invalidates it.",
+    )
+    deadline_override_reason = models.TextField(blank=True)
+    deadline_override_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="deadline_overrides",
+    )
+    deadline_override_at = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def deadline_valid(self):
+        return (
+            self.on_time
+            if self.deadline_valid_override is None
+            else self.deadline_valid_override
+        )
+
+
+class GradeDeadlineDecision(models.Model):
+    grade = models.ForeignKey(
+        Grade, on_delete=models.CASCADE, related_name="deadline_decisions"
+    )
+    previous_value = models.BooleanField(null=True)
+    new_value = models.BooleanField(null=True)
+    reason = models.TextField()
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL
+    )
+    actor_username = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_now_add=True)

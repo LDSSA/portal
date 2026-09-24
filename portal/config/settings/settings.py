@@ -449,7 +449,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 # CONSTANCE_DATABASE_CACHE_BACKEND ='default'
 #
-# * Admissions                    
+# * Admissions
 #   - Sign up                     -> admissions
 #   - Applications                -> admissions:applications
 #     - CoC
@@ -459,7 +459,57 @@ CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 # * Academy                       -> academy
 #
 
+CONSTANCE_SUPERUSER_ONLY = True
+CONSTANCE_ADDITIONAL_FIELDS = {
+    "admissions_mode": [
+        "django.forms.fields.ChoiceField",
+        {
+            "choices": (("exam", "Exam"), ("no_exam", "No exam")),
+        },
+    ],
+}
 CONSTANCE_CONFIG = {
+    "NO_EXAM_USE_SCHEDULE": (
+        False,
+        "Apply the no-exam calendar in addition to the manual switches.",
+    ),
+    "NO_EXAM_SIGNUPS_START": (
+        datetime(2000, 1, 1, tzinfo=timezone.utc),
+        "No-exam signup opening (inclusive).",
+    ),
+    "NO_EXAM_SIGNUPS_END": (
+        datetime(2000, 1, 1, tzinfo=timezone.utc),
+        "No-exam signup closing (exclusive).",
+    ),
+    "NO_EXAM_REGISTRATION_END": (
+        datetime(2000, 1, 1, tzinfo=timezone.utc),
+        "Existing applicants may complete registration before this instant.",
+    ),
+    "NO_EXAM_PAYMENTS_START": (
+        datetime(2000, 1, 1, tzinfo=timezone.utc),
+        "Payment document submission opens at this instant.",
+    ),
+    "NO_EXAM_PAYMENTS_END": (
+        datetime(2000, 1, 1, tzinfo=timezone.utc),
+        "Payment document submission closes at this instant.",
+    ),
+    "ADMISSIONS_MODE": (
+        "exam",
+        "Mode for NEW applicants; existing accounts retain their mode.",
+        "admissions_mode",
+    ),
+    "NO_EXAM_REGISTRATION_OPEN": (
+        False,
+        "Allow no-exam applicants to complete registration.",
+    ),
+    "NO_EXAM_ACADEMY_ACCESS_OPEN": (
+        False,
+        "Allow paid no-exam students into the academy after ACADEMY_START.",
+    ),
+    "ADMISSIONS_PAYMENT_DAYS": (
+        7,
+        "Days to pay after payment instructions are issued.",
+    ),
     # Portal config
     "ACCOUNT_ALLOW_REGISTRATION": (True, "Allow Sign Ups"),  # Allow sign ups
     "PORTAL_STATUS": (

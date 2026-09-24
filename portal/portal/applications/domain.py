@@ -4,9 +4,10 @@ from logging import getLogger
 from typing import Any
 
 from constance import config
-from django.db import models
+from django.db import models, transaction
 
 from portal.admissions import emails
+from portal.admissions.policy import registration_ready
 from portal.applications.models import Application, Challenge, Submission
 
 logger = getLogger(__name__)
@@ -46,10 +47,15 @@ class Domain:
         cls,
         application: Application,
     ) -> dict[str, Status]:
+        if not application.user.admissions_requires_exam:
+            raise DomainExceptionError("This applicant does not take admission tests.")
         chall_status = {}
         for chall in Challenge.objects.all():
             chall_status[chall.code] = cls.get_sub_type_status(application, chall)
 
+        required = {"coding_test", "slu01", "slu02", "slu03"}
+        if not required.issubset(chall_status):
+            return {"application": ApplicationStatus.not_started, **chall_status}
         application_status = None
         if any((s == SubmissionStatus.failed for _, s in chall_status.items())):
             application_status = ApplicationStatus.failed
@@ -123,10 +129,8 @@ class Domain:
     @staticmethod
     def get_best_score(application: Application, challenge):
         return Submission.objects.filter(
-            application=application, unit=challenge
-        ).aggregate(
-            models.Max("score"),
-        )["score__max"]
+            application=application, unit=challenge, status="graded"
+        ).aggregate(models.Max("score"),)["score__max"]
 
     @classmethod
     def has_positive_score(
@@ -143,10 +147,20 @@ class Domain:
         application: Application,
         challenge,
     ):
+        if not application.user.admissions_requires_exam or not registration_ready(
+            application.user
+        ):
+            return False
         if config.PORTAL_STATUS != "admissions:applications":
             return False
 
         dt_now = datetime.now(timezone.utc)
+        if (
+            not config.ADMISSIONS_APPLICATIONS_START
+            <= dt_now
+            < config.ADMISSIONS_SELECTION_START
+        ):
+            return False
         start_dt = Domain.get_start_date(application, challenge)
 
         if start_dt is None:
@@ -183,31 +197,38 @@ class Domain:
         sub.save()
 
     @staticmethod
+    @transaction.atomic
     def application_over(application: Application) -> str:
+        application = Application.objects.select_for_update().get(pk=application.pk)
+        if not application.user.admissions_requires_exam:
+            raise DomainExceptionError("No-exam applicants have no exam result.")
         to_name = application.user.name
-        ''' this is not useful with two application waves - see how to organize this
-        if application.application_over_email_sent is not None:
-            msg = "email was already sent"
-            raise DomainExceptionError(msg)
-        '''
         status = Domain.get_application_status(application)
+        # Repeated staff actions are safe; a later wave with a different result
+        # still generates its own notification.
+        if application.application_over_email_sent == status.name:
+            return status.name
         if status == ApplicationStatus.passed:
             emails.send_application_is_over_passed(
                 to_email=application.user.email, to_name=to_name
             )
             application.application_over_email_sent = "passed"
             application.save()
-            logger.info(f'Sent applications over email, status passed: {application.user.email}')
-            return 'passed'
-        
-        elif status == ApplicationStatus.failed:  
+            logger.info(
+                f"Sent applications over email, status passed: {application.user.email}"
+            )
+            return "passed"
+
+        elif status == ApplicationStatus.failed:
             emails.send_application_is_over_failed(
                 to_email=application.user.email, to_name=to_name
             )
             application.application_over_email_sent = "failed"
             application.save()
-            logger.info(f'Sent applications over email, status failed: {application.user.email}')
-            return 'failed'
+            logger.info(
+                f"Sent applications over email, status failed: {application.user.email}"
+            )
+            return "failed"
 
     @staticmethod
     def get_candidate_release_zip(sub_type_uname: str) -> str:
@@ -217,7 +238,7 @@ class Domain:
 class DomainQueries:
     @staticmethod
     def all() -> Any:
-        return Application.objects.all()
+        return Application.objects.filter(user__admissions_mode="exam")
 
     @staticmethod
     def applications_count() -> int:
@@ -225,6 +246,8 @@ class DomainQueries:
 
     @staticmethod
     def applications_with_sent_emails_count() -> int:
-        return Application.objects.filter(
-            application_over_email_sent__isnull=False
-        ).count()
+        return (
+            DomainQueries.all()
+            .filter(application_over_email_sent__isnull=False)
+            .count()
+        )

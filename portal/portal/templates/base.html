@@ -29,122 +29,48 @@
         </a>
     
 
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
           {% if request.user.is_authenticated %}
-            {% if PORTAL_STATUS != "academy" %}
-              {% if request.user.is_staff %}
-                {# ADMISSIONS STAFF #}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admissions:staff:events' %}">Events</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admissions:staff:candidate-list' %}">Candidates</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admissions:staff:application-list' %}">Applications</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admissions:staff:submission-list' %}">Submissions</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admissions:staff:selection-list' %}">Selections</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admissions:staff:interview-list' %}">Interviews</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admissions:staff:payment-list' %}">Payments</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admissions:staff:export' %}">Exports</a>
-                </li>
-                {% comment %} 
-                <li class="nav-item">
-                    <a class="nav-link" href="/admin">Django-Admin</a>
-                </li> 
-                {% endcomment %}
-                {# END ADMISSIONS STAFF #}
-              {% else %}
-                {# ADMISSIONS CANDIDATES #}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'home' %}">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admissions:candidate:codeofconduct' %}">Code of Conduct</a>
-                </li>
-                {% if code_of_conduct_accepted %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'admissions:candidate:scholarship' %}">Scholarships</a>
-                </li>
-                {% if PORTAL_STATUS in ADMISSIONS_APPLICATIONS_STARTED_STATUSES and scholarship_decided %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Submissions
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                      <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu01' %}">SLU01</a>
-                      <a class="dropdown-item" href="{% url 'admissions:candidate:coding-test' %}">Coding Test</a>
-                      <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu02' %}">SLU02</a>
-                      <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu03' %}">SLU03</a>
-                    </div>
-                  </li>
-                {% if user_has_payment %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'admissions:candidate:payment' %}">Payment</a>
-                    </li>
-                {% endif %}
-                {% endif %}
-                {% endif %}
-                {# END ADMISSIONS CANDIDATES #}
-              {% endif %}
-            {% else %}
-              {% if request.user.is_student %}
-              {# STUDENT #}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'academy:student-unit-list' %}">Learning Units</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'hackathons:student-hackathon-list' %}">Hackathons</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'capstone:student-capstone-list' %}">Capstones</a>
-                </li>
-              {# END STUDENT #}
-              {% endif %}
-              {% if request.user.is_instructor %}
-              {# INSTRUCTOR #}
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'academy:instructor-user-list' %}">Students</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'academy:instructor-unit-list' %}">Learning Units</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'hackathons:instructor-hackathon-list' %}">Hackathons</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="{% url 'capstone:instructor-capstone-list' %}">Capstones</a>
-                </li>
-              {# END INSTRUCTOR #}
-              {% endif %}
+          <ul class="navbar-nav mr-auto">
+            {% if request.user.is_staff or request.user.is_superuser %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:staff:home' %}">Admissions settings</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:staff:events' %}">Exam events</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:staff:candidate-list' %}">Candidates</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:staff:application-list' %}">Exam applications</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:staff:submission-list' %}">Exam submissions</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:staff:selection-list' %}">Exam selections</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:staff:interview-list' %}">Scholarships</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:staff:payment-list' %}">Payments</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:staff:export' %}">Exports</a></li>
+            {% elif not request.user.is_instructor %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:candidate:home' %}">Admissions</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:candidate:codeofconduct' %}">Code of conduct</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:candidate:scholarship' %}">Scholarships</a></li>
+            {% if admissions_requires_exam and code_of_conduct_accepted and scholarship_decided and PORTAL_STATUS in ADMISSIONS_APPLICATIONS_STARTED_STATUSES %}
+            <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="examMenu" data-toggle="dropdown">Admission tests</a><div class="dropdown-menu" aria-labelledby="examMenu">
+              <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu01' %}">SLU01</a>
+              <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu02' %}">SLU02</a>
+              <a class="dropdown-item" href="{% url 'admissions:candidate:slu' 'slu03' %}">SLU03</a>
+              <a class="dropdown-item" href="{% url 'admissions:candidate:coding-test' %}">Coding test</a>
+            </div></li>{% endif %}
+            {% if user_has_payment %}<li class="nav-item"><a class="nav-link" href="{% url 'admissions:candidate:payment' %}">Payment</a></li>{% endif %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'admissions:candidate:contact' %}">Contact us</a></li>
             {% endif %}
-            </ul>
-            <ul class="navbar-nav">
-              {% if PORTAL_STATUS != "academy" %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'admissions:candidate:contact' %}">{% trans "Contact Us" %}</a>
-              </li>
-              {% endif %}
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'users:profile' %}">{% trans "Profile" %}</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="{% url 'account_logout' %}">{% trans "Sign Out" %}</a>
-              </li>
-            </ul>
+            {% if request.user.is_student and academy_access_open %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'academy:student-unit-list' %}">Learning units</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'hackathons:student-hackathon-list' %}">Hackathons</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'capstone:student-capstone-list' %}">Capstones</a></li>
+            {% endif %}
+            {% if request.user.is_instructor or request.user.is_staff or request.user.is_superuser %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'academy:instructor-user-list' %}">Students</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'academy:instructor-unit-list' %}">Learning units</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'hackathons:instructor-hackathon-list' %}">Hackathons</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'capstone:instructor-capstone-list' %}">Capstones</a></li>
             {% endif %}
           </ul>
+          <ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="{% url 'users:profile' %}">Profile</a></li><li class="nav-item"><a class="nav-link" href="{% url 'account_logout' %}">Sign out</a></li></ul>
+          {% endif %}
         </div>
       </nav>
 

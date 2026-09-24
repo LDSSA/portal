@@ -1,0 +1,84 @@
+    <h2 class="pb-3">Welcome to the admissions for the Lisbon Data Science Starters Academy!</h2>
+    <p>
+        We will soon invite you to the admissions channel on the batch 10 slack where you can contact us in case of trouble.<br>
+        You can also contact us on <a href="mailto:admissions@lisbondatascience.org">admissions@lisbondatascience.org</a>. It can happen that some emails sent by us land in your spam folder or take longer to deliver.
+    </p>
+
+    <p>
+        {% if admissions_requires_exam %}
+        The admission tests consist of three learning units (SLUSs) and a coding test. In the SLUs, you have to study a learning notebook and then <br>
+        solve an exercise notebook. The coding test is an exercise notebook that has to solved within 3 hours.<br>
+        If you need a Python refresher or need to practice exercise solving before starting the admissions tests, check out our <a href="https://github.com/LDSSA/ds-prep-course-2025/">prep course</a>.<br>
+        Read on and go though steps 1-3 to get access to the admission tests.
+
+        {% else %}
+        The Starters Academy is a <b>Python-based Data Science course</b>, so students are expected to already be <b>proficient in Python programming</b> before the course begins.
+        You should be comfortable writing and understanding Python code and using the language to solve programming exercises independently.<br>
+        If you need a Python refresher or need to practice exercise solving before starting the course, check out our <a href="https://github.com/LDSSA/ds-prep-course-2025/">prep course</a>. <br>
+        Read on and go through steps 1–3 to complete your registration.
+        {% endif %}
+    </p>
+
+    <p>
+        Before you start, please read all the details about the LDSSA
+        <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/01-Starters-Academy-(Course)/">here</a>,
+        about this admission process <a href="https://ldssa.github.io/wiki/Applicants/Application-process/">here</a>,
+        and keep these main points in mind:
+    </p>
+
+    <ul>
+        <li class="pb-3">
+            Students need an average of <b>10 to 15 hours per week</b> to study the learning materials during the academy. It can get a bit more in the first <br>
+            specialization and some parts of the capstone. The bootcamp classes and the hackathons are not included in this time commitment. <br>
+            The two bootcamp days are 4 hour events and the hackathons are 9-10 hours long.
+        </li>
+        <br>
+        <li class="pb-3">
+            <!-- HYBRID REMOTE - IN PERSON VERSION:
+            <b>The Starters Academy will have both a remote and in person option this year.</b> This should only be reflected in the Hackathons, <br>
+            where the in-person students will have the opportunity to meet and do the hackathons in person, and the remote students will do it remotely. <br>
+            The choice to do in-person or remote is done when applying for the course. The in-person option will open only if a sufficient number <br>
+            of students choose this option. -->
+
+            <!-- REMOTE-ONLY VERSION: -->
+            <b>The Starters Academy will be fully remote this year.</b> We are currently considering the possibility of holding the graduation party in person for students who are able to be in Lisbon at the time. <br>
+            This option is still being evaluated, and we will provide updated information as soon as more details are available.
+
+        </li>
+        <br>
+        <li class="pb-3">
+            <!-- HYBRID REMOTE - IN PERSON VERSION:
+            Since our Academy is based in Lisbon, all the activities will happen during the day of <b>Lisbon time</b>. This includes <br>
+            the bootcamp classes, the hackathons, and instructors' availability to answer questions on Slack. <b>Remote students are required to be online <br>
+            during the bootcamp and the hackathons.</b>  For students who are in very different timezones, this probably means that they'll have to join us <br>
+            at unusual hours, and that communicating with instructors will feel very async. Please take this into consideration when applying! -->
+
+            Since our Academy is based in Lisbon, all the activities will happen during the day of <b>Lisbon time</b>. This includes <br>
+            the bootcamp classes, the hackathons, and instructors' availability to answer questions on Slack. <b>Students are required to be online <br>
+            during the bootcamp and the hackathons.</b>  For students who are in very different timezones, this probably means that they'll have to join us <br>
+            at unusual hours, and that communicating with instructors will feel very async. Please take this into consideration when applying!
+        </li>
+        <br>
+        <li class="pb-3">
+            You can find all the relevant dates for the Starter's Academy on this
+            <a href=https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/01-Starters-Academy-(Course)/>Webpage</a>.
+            <b>The bootcamp and the first and last hackathons are mandatory</b>. <br>
+            {% if admissions_requires_exam %}If you cannot complete the first specialization and the first hackathon, you won't be allowed to proceed with the rest of the course and won't be able to graduate. If you don't take part in the last hackathon, you won't be able to continue with the capstone project. In order to participate in the hackathons, you're required to achieve a minimum score of 80% (16/20) in all the learning units of that specialization. You have to complete all the learning units to graduate, but you can miss one hackathon (except for the first and the last).{% else %}For certification, pass every mandatory learning unit with at least 16/20 by its specialization deadline and attend Hackathons 1 and 6. You may miss at most one other hackathon. SLU18, SLU19 and the two hackathon-training units are optional. Failing to complete S01 by its deadline or missing Hackathon 1 prevents progression to the rest of the course. Missing a later specialization deadline or Hackathon 6 makes you ineligible for certification, but does not by itself stop continued study. Contact staff if a portal incident affected your submission.{% endif %}
+        </li>
+        <br>
+        <li class="pb-3">
+            If you complete the Academy, you will receive a certificate. The certificate will list all the Starters Academy's
+            specializations with your grades.
+        </li>
+        <br>
+        <li class="pb-3">
+            Everyone is expected to comply with our <a href="https://ldssa.github.io/wiki/About%20us/Code-of-Conduct/">code of conduct</a>
+            in all the interactions with the Lisbon Data Science Academy. This includes the candidates applying to the Starters Academy. Not complying with the code of conduct during the Academy will lead to immediate exclusion from the course, without a refund. During this admissions process, <b>we'll ask you to read and acknowledge the code of conduct and you'll only be allowed to continue if you agree.</b>
+        </li>
+        <br>
+        <li class="pb-3">
+          According to our <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/07-Refund-Policy/">refund policy</a>,
+          you are eligible for a full refund within 14 days after the bootcamp start date.
+      </li>
+    </ul>
+

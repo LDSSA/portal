@@ -17,7 +17,7 @@
                     <th scope="col">Gender</th>
                     <th scope="col">Ticket Type</th>
                     <th scope="col">Company</th>
-                    <th scope="col">Selection Status</th>
+                    <th scope="col">Admissions mode</th><th scope="col">Selection Status</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -29,7 +29,7 @@
                     <td>{{ u.gender }}</td>
                     <td>{{ u.ticket_type }}</td>
                     <td>{{ u.company }}</td>
-                    <td>{{ u.status }}</td>
+                    <td>{{ u.get_admissions_mode_display }}</td><td>{{ u.selection.status }}</td>
                 </tr>
                 {% endfor %}
                 </tbody>

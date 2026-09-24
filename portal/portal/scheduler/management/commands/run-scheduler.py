@@ -3,59 +3,60 @@ from time import sleep
 
 from constance import config
 from django.core.management.base import BaseCommand
-from django.db import connection
+from django.db import close_old_connections
 from django.utils import timezone
 
-# from portal.capstone.simulator import run
+from portal.selection.notifications import deliver_pending_emails
+
 logger = logging.getLogger(__name__)
 
 
+def update_portal_status():
+    """Advance the exam calendar even while new signups use no-exam admissions."""
+    now = timezone.now()
+    if now >= config.ACADEMY_START:
+        status = "academy"
+    elif now >= config.ADMISSIONS_SELECTION_START:
+        status = "admissions:selection"
+    elif now >= config.ADMISSIONS_APPLICATIONS_START:
+        status = "admissions:applications"
+    else:
+        status = "admissions"
+    if config.PORTAL_STATUS != status:
+        config.PORTAL_STATUS = status
+    # The signup adapter applies the exam deadline. Never overwrite the master
+    # signup flag: doing so would also close no-exam registrations.
+
+
+def refresh_certificates():
+    from portal.academy.services import refresh_certificate_eligibility
+    from portal.users.models import User
+
+    for user in User.objects.filter(is_student=True).iterator():
+        refresh_certificate_eligibility(user)
+
+
 class Command(BaseCommand):
-    help = "Run scheduler"
+    help = "Run the exam calendar scheduler and enrollment email worker"
 
     def handle(self, *args, **options):
-        scheduled_fcns = (update_portal_status,)
-
+        cycles = 0
         while True:
-            logger.info("Running scheduler...")
-
-            try:
-                for fcn in scheduled_fcns:
-                    fcn()
-            except Exception:
-                logger.exception("Exception in %s", fcn.__name__)
-
-            # Close connection after each run
-            # https://code.djangoproject.com/ticket/21596#comment:29
-            # https://docs.djangoproject.com/en/1.0/ref/databases/
-            connection.close()
-            logger.info("Scheduler done...")
-
-            # chill
+            for operation in (update_portal_status, deliver_pending_emails):
+                try:
+                    operation()
+                except Exception:
+                    logger.exception(
+                        "Scheduler operation failed: %s", operation.__name__
+                    )
+                finally:
+                    close_old_connections()
+            if cycles % 360 == 0:
+                try:
+                    refresh_certificates()
+                except Exception:
+                    logger.exception("Certificate refresh failed")
+                finally:
+                    close_old_connections()
+            cycles += 1
             sleep(10)
-
-
-def update_portal_status():
-    dt = timezone.now()
-
-    # Initial portal state
-    if dt >= config.ADMISSIONS_APPLICATIONS_START and dt < config.ADMISSIONS_SELECTION_START:
-        # Application phase starts, applicants can start making submissions
-        logger.info("Setting portal status to applications...")
-
-        config.PORTAL_STATUS = "admissions:applications"
-        # Disable sign ups
-        #config.ACCOUNT_ALLOW_REGISTRATION = False
-    
-    elif dt >= config.ADMISSIONS_SELECTION_START and dt < config.ACADEMY_START:
-            # Selection phase starts, applicants can not longer make submissions
-            logger.info("Closing candidate applications...")
-            logger.info("Opening candidate selection...")
-
-            config.PORTAL_STATUS = "admissions:selection"
-            # Disable sign ups
-            config.ACCOUNT_ALLOW_REGISTRATION = False
-
-    elif dt >= config.ACADEMY_START:
-        config.PORTAL_STATUS = "academy"
-

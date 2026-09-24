@@ -1,40 +1,56 @@
 import logging
 import random
 from io import StringIO
-from itertools import zip_longest
 
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.db import transaction
 
 from . import models
 
 logger = logging.getLogger(__name__)
 
 
-def generate_teams(
-    hackathon,
-    team_size=3,
-    max_team_size=6,
-    max_teams=13,
-):
-    logger.info(
-        "Generating Teams Size: %s Max: %s Max teams: %s",
-        team_size,
-        max_team_size,
-        max_teams,
+def can_participate(user, hackathon):
+    if not user.is_active or not user.is_student or user.failed_or_dropped:
+        return False
+    if not user.admissions_requires_exam:
+        from portal.academy.services import progression_block_reason
+
+        return not progression_block_reason(user)
+    from portal.academy.models import Specialization
+    from portal.academy.services import check_complete_specialization
+
+    spec = Specialization.objects.filter(code="S" + hackathon.code[-2:]).first()
+    return spec is not None and check_complete_specialization(user, spec)
+
+
+@transaction.atomic
+def generate_teams(hackathon, team_size=3, max_team_size=6, max_teams=13):
+    if not (1 <= team_size <= max_team_size and max_teams >= 1):
+        raise ValidationError("Invalid team size or team capacity.")
+    models.Hackathon.objects.select_for_update().get(pk=hackathon.pk)
+    present = list(
+        models.Attendance.objects.filter(
+            hackathon=hackathon,
+            present=True,
+            user__is_student=True,
+            user__is_active=True,
+            user__failed_or_dropped=False,
+        ).select_related("user")
     )
-    present = models.Attendance.objects.filter(hackathon=hackathon, present=True)
-    present = [p.user for p in present]
-    logger.debug("Present %s", present)
-
-    for _i in range(team_size, max_team_size + 1):
-        present_teams = get_groups(present, team_size)
-
-        if len(present_teams) > max_teams:
-            team_size += 1
-            continue
-
-    create_teams(hackathon, present_teams)
+    students = list({a.user_id: a.user for a in present}.values())
+    students = [u for u in students if can_participate(u, hackathon)]
+    for size in range(team_size, max_team_size + 1):
+        groups = get_groups(students, size)
+        if len(groups) <= max_teams:
+            break
+    else:
+        raise ValidationError("Not enough team capacity for the present students.")
+    if models.Submission.objects.filter(hackathon=hackathon).exists():
+        raise ValidationError("Teams cannot be regenerated after submissions exist.")
+    hackathon.teams.all().delete()
+    create_teams(hackathon, groups)
 
 
 def create_teams(hackathon, present_teams):
@@ -104,30 +120,19 @@ def create_teams_with_remote(hackathon, present_teams, remote_teams):
 
 
 def get_groups(items, size, max_diff=1):
-    if not len(items):
+    if size < 1:
+        raise ValidationError("Team size must be positive.")
+    items = list(items)
+    if not items:
         return []
-
-    logger.debug("Creating groups...")
     random.shuffle(items)
-    iterators = [iter(items)] * size
-    groups = [
-        [item for item in group if item is not None]
-        for group in zip_longest(*iterators)
-    ]
-    logger.debug(groups)
-
-    logger.debug("Reshaping groups...")
-    idx = 0
-    while (size - len(groups[-1])) > max_diff:
-        item = groups[-2 - idx].pop()
-        groups[-1].append(item)
-        idx += 1
-    logger.debug(groups)
-
-    return groups
+    count = (len(items) + size - 1) // size
+    return [items[i::count] for i in range(count)]
 
 
+@transaction.atomic
 def submission(hackathon, user, file):
+    hackathon = models.Hackathon.objects.select_for_update().get(pk=hackathon.pk)
     if user.is_student:
         if hackathon.status not in ("submissions_open", "complete"):
             msg = "Hackathon closed"
@@ -136,6 +141,10 @@ def submission(hackathon, user, file):
         # Replace students with team
         if hackathon.status == "submissions_open":
             team = models.Team.objects.filter(users=user, hackathon=hackathon).first()
+            if team is None:
+                raise ValidationError(
+                    "You must belong to a team to submit during the hackathon."
+                )
             if team:
                 user = team
 

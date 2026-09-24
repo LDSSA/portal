@@ -1,29 +1,7 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="container">
-    <h2 class="py-5">Select Your Preferred Academy Attendance Type</h2>
-    <p>
-        Both in-person and remote academy modes will have the same content and schedule.
-        The only difference is that <br> the in-person academy will have the hackathons in-person. Hackathons last a full day and are scheduled for Sundays.<br>
-        We will try to accommodate to your preference, but we cannot guarantee it as there are limited spots for each type of academy.
-    </p>
-    <div class="card">
-        <div class="card-body">
-            <form method="post">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="academy_type">Please choose your preferred academy type:</label>
-                    <select class="form-control" id="academy_type" name="academy_type">
-                        <option value="in_person_then_remote">Prefer in-person but can also do remote</option>
-                        <option value="remote_then_in_person">Prefer remote but can also do in-person</option>
-                        <option value="remote_only">Remote only</option>
-                        <option value="in_person_only">In-person only</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-        </div>
-    </div>
-</div>
+<h2>Attendance preference</h2>
+<p>Please choose your preference. Available attendance arrangements are described on the admissions page.</p>
+<p>Your answer records a preference; it does not guarantee an in-person place. The arrangements announced for this edition apply.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">Save preference</button></form>
 {% endblock %}

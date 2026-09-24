@@ -2,11 +2,33 @@ import uuid
 from pathlib import Path
 
 from django.db import models
+from django.utils import timezone
 
 from .status import SelectionStatus
 
 
+class ScholarshipStatus(models.TextChoices):
+    NOT_REQUESTED = "not_requested", "Not requested"
+    PENDING = "pending", "Pending"
+    APPROVED = "approved", "Approved"
+    REJECTED = "rejected", "Rejected"
+
+
 class Selection(models.Model):
+    scholarship_status = models.CharField(
+        max_length=20,
+        choices=ScholarshipStatus.choices,
+        default=ScholarshipStatus.NOT_REQUESTED,
+    )
+    scholarship_decided_at = models.DateTimeField(null=True, blank=True)
+    scholarship_decided_by = models.ForeignKey(
+        "users.User",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="scholarship_decisions",
+    )
+
     user = models.OneToOneField("users.User", on_delete=models.CASCADE, editable=False)
 
     status = models.CharField(
@@ -64,3 +86,20 @@ class SelectionLogs(models.Model):
     message = models.TextField(null=False, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class EnrollmentEmail(models.Model):
+    """Durable notifications committed with the enrollment change they describe."""
+
+    selection = models.ForeignKey(
+        Selection, on_delete=models.CASCADE, related_name="emails"
+    )
+    event_key = models.CharField(max_length=150, unique=True)
+    recipient = models.EmailField()
+    subject = models.CharField(max_length=255)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    attempts = models.PositiveIntegerField(default=0)
+    next_attempt_at = models.DateTimeField(default=timezone.now)
+    last_error = models.TextField(blank=True)

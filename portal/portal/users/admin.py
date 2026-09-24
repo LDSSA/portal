@@ -16,12 +16,16 @@ class UserWhitelistAdmin(admin.ModelAdmin):
 @admin.register(User)
 class UserAdmin(auth_admin.UserAdmin):
     add_form = UserCreationForm
+    readonly_fields = ("admissions_mode", "registration_completed_at")
     fieldsets = (
         ("User", {"fields": ("name",)}),
         (
             "Status",
             {
                 "fields": (
+                    "admissions_mode",
+                    "registration_completed_at",
+                    "academy_type_preference",
                     "is_student",
                     "is_instructor",
                     "code_of_conduct_accepted",
@@ -41,6 +45,7 @@ class UserAdmin(auth_admin.UserAdmin):
         *auth_admin.UserAdmin.fieldsets,
     )
     list_display = [
+        "admissions_mode",
         "username",
         "is_student",
         "is_instructor",
@@ -52,6 +57,7 @@ class UserAdmin(auth_admin.UserAdmin):
     ]
     search_fields = ["username", "name"]
     list_filter = (
+        "admissions_mode",
         "is_student",
         "is_instructor",
         "is_staff",
