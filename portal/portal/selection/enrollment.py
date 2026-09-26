@@ -151,6 +151,8 @@ def record_registration_step(user, step, value):
         "scholarship": "applying_for_scholarship",
         "academy_type": "academy_type_preference",
     }
+    if step == "academy_type" and not config.ADMISSIONS_ASK_ATTENDANCE_PREFERENCE:
+        raise ValidationError("The attendance preference survey is disabled.")
     if step not in fields:
         raise ValidationError("Unknown registration step.")
     if step == "coc" and value is not True:

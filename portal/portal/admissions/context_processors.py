@@ -4,7 +4,11 @@ from zoneinfo import ZoneInfo
 from constance import config
 from django.conf import settings
 
-from portal.admissions.policy import academy_open, registration_changes_open
+from portal.admissions.policy import (
+    academy_open,
+    attendance_preference_satisfied,
+    registration_changes_open,
+)
 from portal.selection.models import Selection
 from portal.users.models import User
 
@@ -19,6 +23,7 @@ def user_has_payment(user: User) -> bool:
 def admissions_context_processor(request):
     my_dict = {
         "PORTAL_STATUS": config.PORTAL_STATUS,
+        "ask_attendance_preference": config.ADMISSIONS_ASK_ATTENDANCE_PREFERENCE,
         "STUDENT_REPO_NAME": settings.STUDENT_REPO_NAME,
         "no_exam_scheduled": config.NO_EXAM_USE_SCHEDULE,
         "no_exam_payments_start": config.NO_EXAM_PAYMENTS_START.astimezone(
@@ -39,6 +44,13 @@ def admissions_context_processor(request):
         "ADMISSIONS_APPLICATIONS_STARTED_STATUSES": settings.ADMISSIONS_APPLICATIONS_STARTED_STATUSES,
     }
     if request.user.is_authenticated:
+        attendance_satisfied = attendance_preference_satisfied(request.user)
+        my_dict["attendance_preference_satisfied"] = attendance_satisfied
+        my_dict[
+            "show_attendance_survey"
+        ] = config.ADMISSIONS_ASK_ATTENDANCE_PREFERENCE and (
+            bool(request.user.academy_type_preference) or not attendance_satisfied
+        )
         if request.user.is_student:
             from portal.academy.services import progression_block_reason
 
