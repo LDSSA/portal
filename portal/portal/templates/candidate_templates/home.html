@@ -74,6 +74,7 @@
         </div>
         {% endif %}
 
+        {% if show_attendance_survey %}
         <!-- academy type preference -->
         <h4>
             3. Choose your preference for remote or in-person mode
@@ -96,9 +97,11 @@
         </div>
         {% endif %}
 
+        {% endif %}
+
         <!-- admission test -->
         <h4>
-            4. The admission tests
+            {% if show_attendance_survey %}4{% else %}3{% endif %}. The admission tests
         </h4>
         <div class="card">
             <div class="card-header" id="headingFour">

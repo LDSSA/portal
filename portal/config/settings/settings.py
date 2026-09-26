@@ -469,6 +469,11 @@ CONSTANCE_ADDITIONAL_FIELDS = {
     ],
 }
 CONSTANCE_CONFIG = {
+    "ADMISSIONS_ASK_ATTENDANCE_PREFERENCE": (
+        True,
+        "Show and require the attendance preference survey in both modes. "
+        "Completed registrations remain valid when re-enabled.",
+    ),
     "NO_EXAM_USE_SCHEDULE": (
         False,
         "Apply the no-exam calendar in addition to the manual switches.",

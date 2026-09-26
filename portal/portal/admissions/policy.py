@@ -17,6 +17,21 @@ def email_verified(user):
     ).exists()
 
 
+def attendance_preference_satisfied(user):
+    """Waive only the survey requirement for already-completed registrations."""
+    if (
+        not config.ADMISSIONS_ASK_ATTENDANCE_PREFERENCE
+        or user.academy_type_preference in AcademyTypePreference.values
+        or user.registration_completed_at is not None
+        or user.is_student
+    ):
+        return True
+    # Legacy exam selections may predate registration_completed_at.
+    from portal.selection.models import Selection
+
+    return Selection.objects.filter(user=user).exists()
+
+
 def registration_ready(user):
     return bool(
         user.is_active
@@ -27,7 +42,7 @@ def registration_ready(user):
         and email_verified(user)
         and user.code_of_conduct_accepted
         and user.applying_for_scholarship is not None
-        and user.academy_type_preference in AcademyTypePreference.values
+        and attendance_preference_satisfied(user)
     )
 
 
