@@ -187,6 +187,10 @@ class ExamCandidateRequiredMixin:
                 raise Http404
             if not registration_ready(request.user):
                 return redirect("admissions:candidate:home")
+            # An applicant may have finished the first two steps before staff
+            # disabled the survey. Preserve that completion before exam access.
+            if request.user.registration_completed_at is None:
+                complete_registration(request.user)
         return super().dispatch(request, *args, **kwargs)
 
 

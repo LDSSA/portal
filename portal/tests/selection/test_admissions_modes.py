@@ -48,6 +48,7 @@ def admissions_settings(settings, tmp_path):
     now = timezone.now()
     with override_config(
         ADMISSIONS_MODE="exam",
+        ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=True,
         NO_EXAM_REGISTRATION_OPEN=True,
         NO_EXAM_ACADEMY_ACCESS_OPEN=False,
         ACCOUNT_ALLOW_REGISTRATION=True,
@@ -826,3 +827,176 @@ def test_staff_cannot_read_stale_no_exam_submission(
         ).status_code
         == 404
     )
+
+
+@pytest.mark.parametrize("mode", AdmissionsMode.values)
+@pytest.mark.parametrize("enabled", [True, False])
+def test_attendance_toggle_controls_steps_and_registration(
+    mode, enabled, candidate_factory, client, challenges
+):
+    from portal.admissions.policy import registration_ready
+
+    user = candidate_factory(mode=mode)
+    client.force_login(user)
+    with override_config(ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=enabled):
+        client.post(reverse("admissions:candidate:codeofconduct"), {"accepted": "on"})
+        client.post(reverse("admissions:candidate:scholarship"), {"decision": "no"})
+        user.refresh_from_db()
+        assert not user.academy_type_preference
+        assert registration_ready(user) is not enabled
+        assert (user.registration_completed_at is not None) is not enabled
+        home = client.get(reverse("admissions:candidate:home"))
+        body = home.content.decode()
+        assert ("3. Choose your preference" in body) is enabled
+        if mode == "exam":
+            assert f"{4 if enabled else 3}. The admission tests" in body
+            response = client.post(
+                reverse("admissions:candidate:confirmation-coding-test")
+            )
+            assert response.status_code == 302
+            assert (
+                Application.objects.get(user=user).coding_test_started_at is not None
+            ) is not enabled
+        else:
+            assert "The admission tests" not in body
+            assert Selection.objects.filter(user=user).exists() is not enabled
+
+
+@pytest.mark.parametrize("mode", AdmissionsMode.values)
+def test_disabled_attendance_blocks_direct_writes_and_preserves_answer(
+    mode, candidate_factory, client
+):
+    user = candidate_factory(
+        mode=mode,
+        code_of_conduct_accepted=True,
+        applying_for_scholarship=False,
+        academy_type_preference="remote_only",
+    )
+    client.force_login(user)
+    with override_config(ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=False):
+        url = reverse("admissions:candidate:academy_type")
+        for response in (
+            client.get(url),
+            client.post(url, {"academy_type": "in_person_only"}),
+        ):
+            assert response.status_code == 302
+            assert response.url == reverse("admissions:candidate:home")
+        with pytest.raises(ValidationError, match="survey is disabled"):
+            record_registration_step(user, "academy_type", "in_person_only")
+    user.refresh_from_db()
+    assert user.academy_type_preference == "remote_only"
+
+
+@pytest.mark.parametrize("scholarship", [False, True])
+def test_disabling_survey_unblocks_existing_registration_once(
+    scholarship, candidate_factory, client
+):
+    user = candidate_factory()
+    record_registration_step(user, "coc", True)
+    record_registration_step(user, "scholarship", scholarship)
+    assert not Selection.objects.filter(user=user).exists()
+    client.force_login(user)
+    with override_config(ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=False):
+        body = client.get(reverse("admissions:candidate:home")).content.decode()
+        assert "Complete registration</button>" in body
+        for _ in range(2):
+            response = client.post(
+                reverse("admissions:candidate:complete-registration")
+            )
+            assert response.status_code == 302
+        selection = Selection.objects.get(user=user)
+        assert selection.status == (S.INTERVIEW if scholarship else S.SELECTED)
+        assert EnrollmentEmail.objects.filter(selection=selection).count() == 1
+    user.refresh_from_db()
+    assert not user.academy_type_preference
+
+
+@pytest.mark.parametrize("mode", AdmissionsMode.values)
+def test_reenabling_survey_preserves_completed_registration(
+    mode, candidate_factory, client, staff, challenges
+):
+    from portal.admissions.policy import registration_ready
+
+    user = candidate_factory(mode=mode)
+    with override_config(ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=False):
+        record_registration_step(user, "coc", True)
+        record_registration_step(user, "scholarship", False)
+    user.refresh_from_db()
+    with override_config(ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=True):
+        assert registration_ready(user)
+        client.force_login(user)
+        body = client.get(reverse("admissions:candidate:home")).content.decode()
+        assert "3. Choose your preference" not in body
+        if mode == "exam":
+            client.post(reverse("admissions:candidate:confirmation-coding-test"))
+            assert Application.objects.get(user=user).coding_test_started_at is not None
+        else:
+            proof(user)
+            review_payment(user, staff, "accept")
+            user.refresh_from_db()
+            assert user.is_student
+        assert not user.academy_type_preference
+
+
+@pytest.mark.parametrize("mode", AdmissionsMode.values)
+def test_reenabled_survey_still_required_for_unfinished_applicant(
+    mode, candidate_factory
+):
+    from portal.admissions.policy import registration_ready
+
+    user = candidate_factory(
+        mode=mode, code_of_conduct_accepted=True, applying_for_scholarship=False
+    )
+    with override_config(ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=False):
+        assert registration_ready(user)
+    with override_config(ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=True):
+        assert not registration_ready(user)
+        record_registration_step(user, "academy_type", "remote_only")
+        user.refresh_from_db()
+        assert registration_ready(user)
+
+
+def test_survey_bypass_does_not_bypass_registration_closure(candidate_factory):
+    user = candidate_factory(
+        code_of_conduct_accepted=True, applying_for_scholarship=False
+    )
+    with override_config(
+        ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=False, NO_EXAM_REGISTRATION_OPEN=False
+    ):
+        assert complete_registration(user) is None
+        assert not Selection.objects.filter(user=user).exists()
+
+
+def test_existing_exam_applicant_completes_when_survey_is_disabled(
+    candidate_factory, client, challenges
+):
+    user = candidate_factory(mode="exam")
+    record_registration_step(user, "coc", True)
+    record_registration_step(user, "scholarship", False)
+    user.refresh_from_db()
+    assert user.registration_completed_at is None
+    client.force_login(user)
+    client.get(reverse("admissions:candidate:home"))
+    with override_config(ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=False):
+        response = client.post(reverse("admissions:candidate:confirmation-coding-test"))
+        assert response.status_code == 302
+    user.refresh_from_db()
+    assert user.registration_completed_at is not None
+    assert not user.academy_type_preference
+    assert Application.objects.get(user=user).coding_test_started_at is not None
+    with override_config(ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=True):
+        response = client.get(reverse("admissions:candidate:coding-test"))
+        assert response.status_code == 200
+
+
+def test_legacy_selected_applicant_does_not_need_survey(candidate_factory):
+    from portal.admissions.policy import registration_ready
+
+    user = candidate_factory(
+        mode="exam", code_of_conduct_accepted=True, applying_for_scholarship=False
+    )
+    Selection.objects.create(user=user, status=S.SELECTED)
+    with override_config(ADMISSIONS_ASK_ATTENDANCE_PREFERENCE=True):
+        assert registration_ready(user)
+        user.code_of_conduct_accepted = False
+        assert not registration_ready(user)

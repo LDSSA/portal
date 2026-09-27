@@ -22,7 +22,11 @@ from django.views.generic import TemplateView
 from rest_framework.settings import import_string
 
 from portal.admissions import emails
-from portal.admissions.policy import academy_open, registration_changes_open
+from portal.admissions.policy import (
+    academy_open,
+    attendance_preference_satisfied,
+    registration_changes_open,
+)
 from portal.applications.domain import Domain, Status
 from portal.applications.models import (
     Application,
@@ -98,7 +102,7 @@ class HomeView(AdmissionsCandidateViewMixin, TemplateView):
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
 
-        elif not state.academy_type:
+        elif not attendance_preference_satisfied(self.request.user):
             action_point = "decided_academy_type"
             accordion_enabled_status["accepted_coc"] = True
             accordion_enabled_status["decided_scholarship"] = True
@@ -220,6 +224,11 @@ class AcademyTypeView(CandidateAcceptedCoCMixin, RegistrationStepView):
     form_class = AcademyTypeForm
     step = "academy_type"
     value_field = "academy_type"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not config.ADMISSIONS_ASK_ATTENDANCE_PREFERENCE:
+            return redirect("admissions:candidate:home")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_initial(self):
         return {"academy_type": self.request.user.academy_type_preference}
