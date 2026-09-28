@@ -449,14 +449,16 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 # CONSTANCE_DATABASE_CACHE_BACKEND ='default'
 #
-# * Admissions
-#   - Sign up                     -> admissions
-#   - Applications                -> admissions:applications
-#     - CoC
-#     - Scholarship
-#     - Challenge/Submissions
-#   - Selection                   -> admissions:selection
-# * Academy                       -> academy
+# Admissions phases and applicant workflows:
+#   - Sign up                      -> admissions
+#   - Applications                 -> admissions:applications
+#     - Code of conduct and scholarship choice are shared by both modes.
+#     - Attendance preference is included only when configured.
+#     - Challenges and submissions apply only to exam-mode applicants.
+#     - No-exam applicants proceed to payment or scholarship review after
+#       registration.
+#   - Exam selection               -> admissions:selection
+#   - Academy                      -> academy
 #
 
 CONSTANCE_SUPERUSER_ONLY = True

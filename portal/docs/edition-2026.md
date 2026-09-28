@@ -34,8 +34,9 @@ python manage.py configure_edition
 python manage.py configure_edition --apply
 ```
 
-This sets the no-exam default, scheduled registration/payment gates, academy
-access date, all six specialization dates and all six hackathon dates. It resets
+This sets the no-exam default, disables the attendance preference survey, sets
+the scheduled registration/payment gates, academy access date, all six
+specialization dates and all six hackathon dates. It resets
 hackathons to `closed` only when there are no grades, hackathon submissions,
 teams or attendance records. It never removes records. Existing accounts keep
 their admissions mode; prepare the edition before accepting applicants. Preview
@@ -124,8 +125,11 @@ original value or invent a historical justification.
 
 ## Enrollment operation
 
-Applicants confirm the link in their email, complete their profile and steps 1–3,
-then receive normal payment instructions or enter scholarship review. No-exam
+Applicants confirm the link in their email, complete their profile, accept the
+code of conduct and make their scholarship choice, then receive normal payment
+instructions or enter scholarship review. The attendance preference survey is
+disabled for this fully remote edition (`ADMISSIONS_ASK_ATTENDANCE_PREFERENCE =
+False`). No-exam
 normal applicants need no exam approval or draw. Scholarship refusal ends
 admission; it never converts to a normal ticket. Scholarship interviews remain
 staff-operated, scheduled for 12–16 October.
@@ -170,15 +174,15 @@ Production still requires the updated image, migrations, scheduler, prepared
 edition metadata/calendar and final end-to-end verification. No production
 readiness claim follows solely from local regression tests.
 
-## Verification record
+## Required verification
 
-The completed local implementation passed **111 tests** against an isolated
-PostgreSQL 18 database. This includes exam/no-exam admission flows, concurrent
-enrollment/payment operations, migrations, calendar boundaries, Lisbon DST,
-optional units, S01/Hackathon 1 progression, deadline overrides and hackathon
-operation. Django system checks pass and `makemigrations --check --dry-run`
-reports no missing migrations. Whitespace checks pass in all three edited
-repositories. These checks did not send production emails or run live graders.
+Before deployment, run the current automated test suite, Django system checks,
+`makemigrations --check --dry-run`, and whitespace checks. Verify both exam and
+no-exam admission flows in staging, including registration boundaries, payment
+uploads, scholarship decisions, S01/Hackathon 1 progression and deadline
+overrides. Confirm the deployed edition configuration and curriculum records
+before opening signups. These checks do not replace live verification of grader
+images, Kubernetes callbacks, email delivery or GitHub publication.
 
 Final confirmed dates: both signup and registration completion end on
 15 October 2026; scholarship interviews may continue on 16 October; payment

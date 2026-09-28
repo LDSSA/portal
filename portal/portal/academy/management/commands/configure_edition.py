@@ -73,7 +73,9 @@ class Command(BaseCommand):
                 f"{code}: {day}; status closed until staff operate the event"
             )
         self.stdout.write(
-            "SLU01–17 mandatory; SLU18/19/32/64 optional. Mode: no_exam; manual switches enabled; date windows enforced."
+            "SLU01–17 mandatory; SLU18/19/32/64 optional. Mode: no_exam; "
+            "attendance preference disabled; manual switches enabled; date windows "
+            "enforced."
         )
         if not options["apply"]:
             self.stdout.write("Preview only. No database changes.")
@@ -131,6 +133,7 @@ class Command(BaseCommand):
         for key, value in values.items():
             setattr(config, key, value)
         config.ADMISSIONS_MODE = "no_exam"
+        config.ADMISSIONS_ASK_ATTENDANCE_PREFERENCE = False
         config.NO_EXAM_USE_SCHEDULE = True
         config.ACCOUNT_ALLOW_REGISTRATION = True
         config.NO_EXAM_REGISTRATION_OPEN = True

@@ -221,6 +221,7 @@ def test_edition_preview_and_apply(instructor):
     assert Unit.objects.get(pk="SLU01").due_date == date(2026, 11, 21)
     assert Unit.objects.get(pk="BLU15").due_date == date(2027, 4, 24)
     assert config.ADMISSIONS_MODE == "no_exam"
+    assert not config.ADMISSIONS_ASK_ATTENDANCE_PREFERENCE
     assert config.NO_EXAM_USE_SCHEDULE
     assert config.NO_EXAM_REGISTRATION_END.astimezone(LISBON) == datetime(
         2026, 10, 16, tzinfo=LISBON
