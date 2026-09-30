@@ -5,11 +5,10 @@
 <div class="container">
     <h2 class="py-5">Events</h2>
     <p>
-        End applications: use after the admission tests are over. Sends an email with the result to the users and <br> 
-        creates Selection objects. Can be used only when the portal is in admissions:selection state.
+        <strong>End applications (exam mode only):</strong> use after the admission tests are over. It finalizes exam results, emails candidates and creates selection records for candidates who passed. It can be used only while the portal is in the <code>admissions:selection</code> phase.
     </p>
     <p>
-        End admissions: sends emails ending admissions. Check exactly what else it does.
+        <strong>End admissions (exam mode only):</strong> use after all selection records are closed. It activates accepted applicants, then marks and emails passing applicants who were not selected as unsuccessful. Batch 10 no-exam admissions do not use either event.
     </p>
 
     <hr>
