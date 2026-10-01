@@ -11,6 +11,12 @@ The deployment workflow builds the release image, publishes the environment's co
 runs a release-specific Kubernetes migration Job, waits for success, replaces the application
 and workers, and marks that release ready. Deployment never queues a reset.
 
+The Helm release intentionally does not wait for every chart dependency. In particular, the
+legacy optional Redis StatefulSets have historically remained unavailable and do not gate a
+portal release. Deployment readiness is instead based on successful database migration and
+the explicit `ldsa-portal` Django deployment rollout. This change does not repair or otherwise
+reconfigure Redis.
+
 The migrations are:
 
 - `academy/0016_alter_unit_instructor`: allows blank/NULL instructor values and uses Django
