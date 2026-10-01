@@ -1,0 +1,49 @@
+.edition-summary {
+    cursor: pointer;
+}
+
+.edition-summary h2 {
+    display: inline-block;
+    width: calc(100% - 2.5rem);
+}
+
+.edition-info-body,
+.edition-copy {
+    padding: 10px;
+}
+
+.edition-info-body table,
+.edition-table {
+    width: 100%;
+}
+
+.edition-dialog {
+    width: min(36rem, calc(100% - 2rem));
+    padding: 0;
+    color: var(--body-fg);
+    background: var(--body-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.edition-dialog::backdrop {
+    background: rgb(0 0 0 / 40%);
+}
+
+.edition-dialog .submit-row {
+    margin: 0;
+}
+
+.edition-danger {
+    background: var(--delete-button-bg) !important;
+}
+
+.edition-danger:hover,
+.edition-danger:focus {
+    background: var(--delete-button-hover-bg) !important;
+}
+
+.edition-result {
+    margin: 0;
+    white-space: pre-wrap;
+}

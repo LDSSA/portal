@@ -24,6 +24,8 @@ It also provides independent database snapshots and controlled deletion of saved
   browser. Repeated confirmation of the same operation does not rerun a completed reset.
 - Leave the portal prepared and publicly closed after success, with a separate confirmed
   **Open prepared edition** action and basic curriculum/calendar readiness checks.
+- Use Django admin's native modules, tables, form rows, submit rows, breadcrumbs, buttons and
+  responsive spacing across the reset controls, previews, reports and confirmation dialog.
 
 ### Reset execution and account relationships
 
@@ -71,6 +73,9 @@ It also provides independent database snapshots and controlled deletion of saved
 - Add PostgreSQL shared/exclusive advisory locking around portal HTTP requests, scheduler
   activity, enrollment-email delivery, simulator outbound requests/results, grading launches
   and mutating portal management commands.
+- Configure the Django and edition-worker containers with explicit Kubernetes and AWS
+  configuration paths, allowing the reset preflight to inspect external graders even though
+  the system `django` user's home directory is `/nonexistent`.
 - Track external graders and discover existing legacy grading containers; block reset
   while grading is pending, running or cannot be verified complete.
 - Add a dedicated worker with release heartbeat and single-worker locking. Reject stale

@@ -20,3 +20,12 @@
       name: {{ .configMapName }}
 {{- end }}
 {{- end -}}
+
+{{- define "ldsa-portal.graderEnvironment" -}}
+- name: KUBECONFIG
+  value: /home/django/.kube/config
+- name: AWS_CONFIG_FILE
+  value: /home/django/.aws/config
+- name: AWS_SHARED_CREDENTIALS_FILE
+  value: /home/django/.aws/credentials
+{{- end -}}

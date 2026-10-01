@@ -1,19 +1,110 @@
 {% extends "admin/base_site.html" %}
-{% block content %}
-<p><a href="{% url 'admin:edition_control' %}">Back to edition management</a></p>
-<p><strong>{{ environment }} · {{ database }}</strong><br>{{ run.kind }} · {{ run.status }} · {{ run.created }} · Operator: {{ run.actor_username }}</p>
-<p><strong>Temporary server backup directory:</strong> <code>{{ backup_dir|default:"NOT CONFIGURED" }}</code></p>
-{% include "admin/edition_management/info.html" %}
-{% if run.error %}<p class="errornote">{{ run.error }}</p>{% endif %}
-{% if run.backup_name and not run.backup_deleted %}<p><a href="{% url 'admin:edition_download' run.pk %}">Download dump to this computer</a><br><code>{{ run.backup_name }}</code> ({{ run.backup_bytes }} bytes)<br>SHA-256: <code>{{ run.backup_sha256 }}</code></p>{% endif %}
-{% if run.kind == 'reset' %}
-<h2>Accounts retained</h2><p>{{ run.plan.retained_names|join:", " }}</p>
-<h2>Accounts deleted, including their database credentials</h2><p>{{ run.plan.deleted_names|join:", "|default:"None" }}</p>
-{% if run.plan.review %}<p class="errornote">Review these non-student registrations explicitly: {{ run.plan.review|join:", " }}. If any belongs to the incoming edition, cancel preparation. The portal cannot determine whether an account is a genuine applicant or a test.</p>{% endif %}
-<h2>Records in this preview</h2><table><tr><th>Model</th><th>Current records</th><th>Delete</th><th>Retain</th><th>Close / clear assignments</th></tr>{% for row in run.plan.rows %}<tr><td>{{ row.model }}</td><td>{{ row.count }}</td><td>{{ row.delete }}</td><td>{{ row.keep }}</td><td>{{ row.configure|default_if_none:"—" }}</td></tr>{% endfor %}</table>
-{% if run.status == 'draft' %}<h2>Confirm this environment's reset</h2><p>All clear-all rows in the information table will be emptied, including exam activity, Datapoint and DueDatapoint. Existing schedules are retained and public gates are closed.</p>
-<form method="post">{% csrf_token %}<p>“Back up before reset” creates a timestamped dump in the server directory shown above. If backup creation fails, the reset stops. Download the dump afterward to retain a local copy.</p>{{ form.as_p }}<button type="submit">Reset {{ environment }} database</button></form>{% endif %}
-{% endif %}
-{% if run.status == 'queued' or run.status == 'running' %}<p>The background worker is processing this request. You can close this page; the operation continues. Reset completion signs everyone out.</p><script>setTimeout(() => location.reload(), 5000);</script>{% endif %}
-{% if run.status == 'succeeded' %}<p>Operation completed. A reset leaves public access closed until separately reopened.</p><pre>{{ run.result }}</pre>{% endif %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'admin/css/edition_management.css' %}">
 {% endblock %}
+{% block coltype %}colM{% endblock %}
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:edition_management_editionrun_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; <a href="{% url 'admin:edition_control' %}">Edition management</a>
+  &rsaquo; {{ run.kind|capfirst }} operation
+</div>
+{% endblock %}
+
+{% block content %}<div id="content-main">
+  <div class="module">
+    <h2>Operation details</h2>
+    <table class="edition-table">
+      <tbody>
+        <tr><th scope="row">Environment</th><td>{{ environment }}</td></tr>
+        <tr><th scope="row">Database</th><td><code>{{ database }}</code></td></tr>
+        <tr><th scope="row">Operation</th><td>{{ run.kind }}</td></tr>
+        <tr><th scope="row">Status</th><td>{{ run.status }}</td></tr>
+        <tr><th scope="row">Created</th><td>{{ run.created }}</td></tr>
+        <tr><th scope="row">Operator</th><td>{{ run.actor_username }}</td></tr>
+        <tr><th scope="row">Temporary server backup directory</th><td><code>{{ backup_dir|default:"NOT CONFIGURED" }}</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  {% include "admin/edition_management/info.html" %}
+
+  {% if run.error %}<p class="errornote">{{ run.error }}</p>{% endif %}
+
+  {% if run.backup_name and not run.backup_deleted %}
+    <div class="module">
+      <h2>Database snapshot</h2>
+      <table class="edition-table">
+        <tbody>
+          <tr><th scope="row">Filename</th><td><code>{{ run.backup_name }}</code></td></tr>
+          <tr><th scope="row">Size</th><td>{{ run.backup_bytes }} bytes</td></tr>
+          <tr><th scope="row">SHA-256</th><td><code>{{ run.backup_sha256 }}</code></td></tr>
+        </tbody>
+      </table>
+      <div class="submit-row"><a class="button" href="{% url 'admin:edition_download' run.pk %}">Download dump to this computer</a></div>
+    </div>
+  {% endif %}
+
+  {% if run.kind == 'reset' %}
+    <div class="module">
+      <h2>Account changes</h2>
+      <table class="edition-table">
+        <tbody>
+          <tr><th scope="row">Accounts retained</th><td>{{ run.plan.retained_names|join:", " }}</td></tr>
+          <tr><th scope="row">Accounts deleted, including database credentials</th><td>{{ run.plan.deleted_names|join:", "|default:"None" }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    {% if run.plan.review %}<p class="errornote">Review these non-student registrations explicitly: {{ run.plan.review|join:", " }}. If any belongs to the incoming edition, cancel preparation. The portal cannot determine whether an account is a genuine applicant or a test.</p>{% endif %}
+
+    <div class="module">
+      <h2>Records in this preview</h2>
+      <table class="edition-table">
+        <thead><tr><th scope="col">Model</th><th scope="col">Current records</th><th scope="col">Delete</th><th scope="col">Retain</th><th scope="col">Close / clear assignments</th></tr></thead>
+        <tbody>{% for row in run.plan.rows %}<tr><th scope="row">{{ row.model }}</th><td>{{ row.count }}</td><td>{{ row.delete }}</td><td>{{ row.keep }}</td><td>{{ row.configure|default_if_none:"—" }}</td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+
+    {% if run.status == 'draft' %}
+      <div class="module aligned">
+        <h2>Confirm this environment's reset</h2>
+        <div class="form-row">
+          <p>All clear-all rows in the information table will be emptied, including exam activity, Datapoint and DueDatapoint. Existing schedules are retained and public gates are closed.</p>
+          <p class="help">“Back up before reset” creates a timestamped dump in the server directory shown above. If backup creation fails, the reset stops.</p>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="form-row checkbox-row{% if field.errors %} errors{% endif %}">
+              {{ field.errors }}{{ field }} {{ field.label_tag }}
+              {% if field.help_text %}<div class="help">{{ field.help_text|safe }}</div>{% endif %}
+            </div>
+          {% endfor %}
+          <div class="submit-row"><input type="submit" value="Reset {{ environment }} database" class="default"></div>
+        </form>
+      </div>
+    {% endif %}
+  {% endif %}
+
+  {% if run.status == 'queued' or run.status == 'running' %}
+    <div class="module"><h2>Operation in progress</h2><div class="edition-copy"><p>The background worker is processing this request. You can close this page; the operation continues. Reset completion signs everyone out.</p></div></div>
+    <script>setTimeout(() => location.reload(), 5000);</script>
+  {% endif %}
+
+  {% if run.status == 'succeeded' %}
+    <div class="module">
+      <h2>Operation result</h2>
+      <div class="edition-copy">
+        <p>Operation completed. A reset leaves public access closed until separately reopened.</p>
+        <pre class="edition-result">{{ run.result }}</pre>
+      </div>
+    </div>
+  {% endif %}
+</div>{% endblock %}
