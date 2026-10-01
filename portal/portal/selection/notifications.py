@@ -1,4 +1,5 @@
 """Deliver the enrollment outbox, retrying provider failures without losing decisions."""
+
 import logging
 from datetime import timedelta
 
@@ -8,11 +9,14 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.html import escape
 
+from portal.edition_management.maintenance import guarded
+
 from .models import EnrollmentEmail
 
 logger = logging.getLogger(__name__)
 
 
+@guarded
 def deliver_pending_emails(limit=50):
     sent = 0
     for _ in range(limit):

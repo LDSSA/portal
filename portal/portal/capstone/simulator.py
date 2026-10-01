@@ -11,6 +11,7 @@ from django.conf import settings
 from django.db import DatabaseError, close_old_connections, transaction
 
 from portal.capstone import models
+from portal.edition_management.maintenance import MaintenanceBusy, operation
 
 logger = logging.getLogger(__name__)
 WORKERS = 50
@@ -37,12 +38,14 @@ def run_simulator():
         close_old_connections()
 
         try:
-            with transaction.atomic():
+            with operation(), transaction.atomic():
                 simulators = models.Simulator.objects.select_for_update().all()
                 for simulator in simulators:
                     simulator.reset()
                     simulator.start()
 
+        except MaintenanceBusy:
+            pass
         except Exception:
             logger.exception("Exception in simulator")
 
@@ -64,30 +67,33 @@ def run_producer():
             continue
 
         try:
-            # Retrieve a due datapoints
-            with transaction.atomic():
-                # Lock due datapoints
-                # prevent multiple producers from repeating datapoints
-                now = datetime.now(timezone.utc)
-                try:
-                    due_datapoint = (
-                        models.DueDatapoint.objects.select_for_update(nowait=True)
-                        .order_by("due")
-                        .filter(state="queued")
-                        .filter(simulator__status="started")
-                        .filter(due__lte=now)
-                        .first()
-                    )
-                except DatabaseError:
-                    logger.debug("Unable to aquire lock")
-                    continue
-                if due_datapoint is None:
-                    continue
-                logger.debug("Locked %s", due_datapoint.id)
-                due_datapoint.state = "due"
-                due_datapoint.save()
+            with operation():
+                # Retrieve a due datapoints
+                with transaction.atomic():
+                    # Lock due datapoints
+                    # prevent multiple producers from repeating datapoints
+                    now = datetime.now(timezone.utc)
+                    try:
+                        due_datapoint = (
+                            models.DueDatapoint.objects.select_for_update(nowait=True)
+                            .order_by("due")
+                            .filter(state="queued")
+                            .filter(simulator__status="started")
+                            .filter(due__lte=now)
+                            .first()
+                        )
+                    except DatabaseError:
+                        logger.debug("Unable to aquire lock")
+                        continue
+                    if due_datapoint is None:
+                        continue
+                    logger.debug("Locked %s", due_datapoint.id)
+                    due_datapoint.state = "due"
+                    due_datapoint.save()
 
-            send_datapoint(due_datapoint)
+                send_datapoint(due_datapoint)
+        except MaintenanceBusy:
+            pass
         except Exception:
             logger.exception("Exception in producer")
 

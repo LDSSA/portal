@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p><a href="{% url 'admin:edition_control' %}">Back to edition management</a></p>
+<p><strong>{{ environment }} · {{ database }}</strong><br>{{ run.kind }} · {{ run.status }} · {{ run.created }} · Operator: {{ run.actor_username }}</p>
+<p><strong>Temporary server backup directory:</strong> <code>{{ backup_dir|default:"NOT CONFIGURED" }}</code></p>
+{% include "admin/edition_management/info.html" %}
+{% if run.error %}<p class="errornote">{{ run.error }}</p>{% endif %}
+{% if run.backup_name and not run.backup_deleted %}<p><a href="{% url 'admin:edition_download' run.pk %}">Download dump to this computer</a><br><code>{{ run.backup_name }}</code> ({{ run.backup_bytes }} bytes)<br>SHA-256: <code>{{ run.backup_sha256 }}</code></p>{% endif %}
+{% if run.kind == 'reset' %}
+<h2>Accounts retained</h2><p>{{ run.plan.retained_names|join:", " }}</p>
+<h2>Accounts deleted, including their database credentials</h2><p>{{ run.plan.deleted_names|join:", "|default:"None" }}</p>
+{% if run.plan.review %}<p class="errornote">Review these non-student registrations explicitly: {{ run.plan.review|join:", " }}. If any belongs to the incoming edition, cancel preparation. The portal cannot determine whether an account is a genuine applicant or a test.</p>{% endif %}
+<h2>Records in this preview</h2><table><tr><th>Model</th><th>Current records</th><th>Delete</th><th>Retain</th><th>Close / clear assignments</th></tr>{% for row in run.plan.rows %}<tr><td>{{ row.model }}</td><td>{{ row.count }}</td><td>{{ row.delete }}</td><td>{{ row.keep }}</td><td>{{ row.configure|default_if_none:"—" }}</td></tr>{% endfor %}</table>
+{% if run.status == 'draft' %}<h2>Confirm this environment's reset</h2><p>All clear-all rows in the information table will be emptied, including exam activity, Datapoint and DueDatapoint. Existing schedules are retained and public gates are closed.</p>
+<form method="post">{% csrf_token %}<p>“Back up before reset” creates a timestamped dump in the server directory shown above. If backup creation fails, the reset stops. Download the dump afterward to retain a local copy.</p>{{ form.as_p }}<button type="submit">Reset {{ environment }} database</button></form>{% endif %}
+{% endif %}
+{% if run.status == 'queued' or run.status == 'running' %}<p>The background worker is processing this request. You can close this page; the operation continues. Reset completion signs everyone out.</p><script>setTimeout(() => location.reload(), 5000);</script>{% endif %}
+{% if run.status == 'succeeded' %}<p>Operation completed. A reset leaves public access closed until separately reopened.</p><pre>{{ run.result }}</pre>{% endif %}
+{% endblock %}

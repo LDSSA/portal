@@ -1,8 +1,10 @@
 """Safely convert a pristine existing account; never rewrite an active application."""
+
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from portal.applications.models import Application, Submission
+from portal.edition_management.maintenance import guarded
 from portal.selection.models import Selection
 from portal.users.models import AdmissionsMode, User
 
@@ -15,6 +17,7 @@ class Command(BaseCommand):
         parser.add_argument("--mode", choices=AdmissionsMode.values, required=True)
         parser.add_argument("--apply", action="store_true")
 
+    @guarded
     @transaction.atomic
     def handle(self, *args, **options):
         try:

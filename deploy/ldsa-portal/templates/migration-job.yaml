@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    meta.helm.sh/release-name: {{ .Release.Name | quote }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: {{ include "ldsa-portal.fullname" . }}-migrate-{{ .Values.image.tag }}
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 900
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          args: ["poetry", "run", "python", "manage.py", "migrate-portal"]
+          env:
+{{ include "ldsa-portal.environment" . | indent 12 }}

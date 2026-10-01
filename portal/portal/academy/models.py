@@ -27,7 +27,9 @@ class Unit(models.Model):
     code = models.CharField(max_length=255, primary_key=True)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    instructor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    instructor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+    )
     due_date = models.DateField(default=timezone.localdate)
     required_for_certificate = models.BooleanField(default=True)
     open = models.BooleanField(default=False)

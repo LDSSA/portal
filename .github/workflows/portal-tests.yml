@@ -86,6 +86,11 @@ jobs:
           pip install poetry
           poetry install
       - name: Run tests
+        # Snapshot tests create and restore an isolated PostgreSQL database.
+        # Install the client explicitly instead of relying on runner image contents.
+        # The service account above owns the disposable PostgreSQL service.
         run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
           cp ci.env .env
           poetry run pytest

@@ -1,0 +1,30 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p><strong>Environment: {{ environment }} · Database: {{ database }}</strong><br>Release: {{ release }} · State: {{ state.phase }} · Completed resets: {{ state.generation }}</p>
+<p><strong>Deployment readiness:</strong> {{ readiness }}</p>
+{% include "admin/edition_management/info.html" %}
+<fieldset class="module aligned"><h2>Database snapshots</h2>
+<p><strong>Temporary server directory:</strong> <code>{{ backup_dir|default:"NOT CONFIGURED — backups unavailable" }}</code></p>
+<p>This is a path inside the remote portal pod, not your computer. When ready, use <strong>Download dump to this computer</strong> on the result page. Filenames contain UTC timestamps. Files are lost if the pod is replaced.</p>
+<form method="post">{% csrf_token %}<button type="submit" name="action" value="backup">Save snapshot</button></form>
+<button type="button" id="purge-open">Delete saved dumps…</button>
+<dialog id="purge-dialog"><h2>Delete all saved database dumps?</h2><p>All generated database dump files in <code>{{ backup_dir }}</code> will be erased. This cannot be undone. Download any backups you need first.</p>
+<form method="post">{% csrf_token %}<input type="hidden" name="confirmed" value="yes"><button type="submit" name="action" value="purge">Yes, erase the dump files</button><button type="button" id="purge-cancel">Cancel</button></form></dialog>
+</fieldset>
+<fieldset class="module aligned"><h2>Prepare a new edition</h2>
+<p>The current admission mode is <strong>{{ mode }}</strong>. Connection settings, file paths and configuration are detected automatically. No database IDs, credentials or calendar values need to be typed here.</p>
+{% if state.phase == 'open' %}
+<p>Enter maintenance to pause writes and obtain a final preview. Existing grading jobs must finish first.</p>
+<form method="post">{% csrf_token %}<button type="submit" name="action" value="maintenance">Enter maintenance and prepare reset</button></form>
+{% elif state.phase == 'maintenance' %}
+<p>The operator and configured service accounts are always retained. Other organizers are preselected below. Uncheck an organizer only if their account and credentials should be deleted. All other participant accounts appear on the final deletion list.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit" name="action" value="preview">Review reset preview</button></form>
+<form method="post">{% csrf_token %}<button type="submit" name="action" value="cancel">Cancel preparation and resume previous edition</button></form>
+{% else %}
+<p>The reset is complete. The portal remains closed. Review dates and switches in Constance, unit availability and hackathon/capstone settings in their admin sections. Missing curriculum is not created by the reset.</p>
+<form method="post">{% csrf_token %}<label><input type="checkbox" name="confirmed" value="yes" required> I reviewed the calendar, curriculum and integrations and want to reopen this environment.</label><p><button type="submit" name="action" value="open">Open prepared edition</button></p></form>
+{% endif %}</fieldset>
+<h2>Recent operations</h2><table><tr><th>Created</th><th>Operation</th><th>Status</th><th>Operator</th></tr>
+{% for run in runs %}<tr><td><a href="{% url 'admin:edition_run' run.pk %}">{{ run.created }}</a></td><td>{{ run.kind }}</td><td>{{ run.status }}</td><td>{{ run.actor_username }}</td></tr>{% endfor %}</table>
+<script>const dialog = document.getElementById('purge-dialog'); document.getElementById('purge-open').addEventListener('click', () => dialog.showModal()); document.getElementById('purge-cancel').addEventListener('click', () => dialog.close());</script>
+{% endblock %}
