@@ -4,6 +4,7 @@ import dateutil.parser
 from django.core.management.base import BaseCommand, CommandError
 
 from portal.academy.models import Specialization, Unit
+from portal.edition_management.maintenance import guarded
 from portal.users.models import User
 
 
@@ -28,6 +29,7 @@ class Command(BaseCommand):
         )
         parser.add_argument("--open", action="store_true")
 
+    @guarded
     def handle(self, *args, **options):
         # TODO: revisit uniqueness of primary key
         unit = Unit.objects.filter(code=options["code"]).first()
@@ -41,7 +43,7 @@ class Command(BaseCommand):
             if instructor_opt:
                 instructor = User.objects.get(username=instructor_opt)
             else:
-                instructor = User.objects.first()
+                instructor = None
         except Exception as e:
             msg = f"Could not create unit: dependency not met ({e})"
             raise CommandError(msg) from e

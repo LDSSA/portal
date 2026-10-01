@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
+from portal.edition_management.maintenance import guarded
 from portal.users.management.commands._create_user import add_user_options, create_user
 
 
@@ -9,6 +10,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         add_user_options(parser)
 
+    @guarded
     def handle(self, *args, **options):
         try:
             user = create_user(user_type="instructor", **options)

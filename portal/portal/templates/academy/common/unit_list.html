@@ -39,7 +39,7 @@
         </td>
         <td>{{ unit.name }}{% if not unit.required_for_certificate %} (optional){% endif %}</td>
         <td>{{ unit.due_date|date:"F j, Y"  }}</td>
-        <td>{{ unit.instructor.name|default:unit.instructor.username }}</td>
+        <td>{% if unit.instructor %}{{ unit.instructor.name|default:unit.instructor.username }}{% else %}Unassigned{% endif %}</td>
         <td>
           {% show_grade grade %}
         </td>

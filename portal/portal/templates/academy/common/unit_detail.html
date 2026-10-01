@@ -54,7 +54,7 @@
             </div>
             <div class="mb-3">
               <h5>Instructor:</h5>
-              <p>{{ unit.instructor.name }}</p>
+              <p>{% if unit.instructor %}{{ unit.instructor.name|default:unit.instructor.username }}{% else %}Unassigned{% endif %}</p>
             </div>
           </div>
 

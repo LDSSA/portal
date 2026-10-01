@@ -6,11 +6,13 @@ from django.core.management.base import BaseCommand
 from django.db import close_old_connections
 from django.utils import timezone
 
+from portal.edition_management.maintenance import MaintenanceBusy, guarded
 from portal.selection.notifications import deliver_pending_emails
 
 logger = logging.getLogger(__name__)
 
 
+@guarded
 def update_portal_status():
     """Advance the exam calendar even while new signups use no-exam admissions."""
     now = timezone.now()
@@ -28,6 +30,7 @@ def update_portal_status():
     # signup flag: doing so would also close no-exam registrations.
 
 
+@guarded
 def refresh_certificates():
     from portal.academy.services import refresh_certificate_eligibility
     from portal.users.models import User
@@ -45,6 +48,8 @@ class Command(BaseCommand):
             for operation in (update_portal_status, deliver_pending_emails):
                 try:
                     operation()
+                except MaintenanceBusy:
+                    pass
                 except Exception:
                     logger.exception(
                         "Scheduler operation failed: %s", operation.__name__
@@ -54,6 +59,8 @@ class Command(BaseCommand):
             if cycles % 360 == 0:
                 try:
                     refresh_certificates()
+                except MaintenanceBusy:
+                    pass
                 except Exception:
                     logger.exception("Certificate refresh failed")
                 finally:

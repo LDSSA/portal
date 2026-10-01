@@ -6,6 +6,7 @@ from cryptography.hazmat.primitives import (
 )
 from cryptography.hazmat.primitives.asymmetric import rsa
 from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -54,6 +55,8 @@ class AdmissionsMode(models.TextChoices):
 
 # TODO: custom user manager to filter out users with unverified email addresses
 class User(AbstractUser):
+    hackathon_submissions = GenericRelation("hackathons.Submission")
+
     email = models.EmailField(unique=True, null=False)
     # First Name and Last Name do not cover name patterns
     # around the globe.

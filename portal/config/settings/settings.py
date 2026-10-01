@@ -141,6 +141,7 @@ THIRD_PARTY_APPS = [
     "crispy_bootstrap4",
 ]
 LOCAL_APPS = [
+    "portal.edition_management.apps.EditionManagementConfig",
     "portal.users.apps.UsersAppConfig",
     "portal.academy.apps.AcademyConfig",
     "portal.hackathons.apps.HackathonsConfig",
@@ -207,6 +208,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "portal.edition_management.middleware.EditionMaintenanceMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -678,3 +680,12 @@ LOGGING = {
 # SLACK
 # ------------------------------------------------------------------------------
 SLACK_WORKSPACE = env.str("SLACK_WORKSPACE")
+
+# Database-local maintenance. No production connection settings are inferred from dev.
+EDITION_RELEASE = env.str("EDITION_RELEASE", default="local")
+EDITION_ENVIRONMENT = env.str(
+    "EDITION_ENVIRONMENT", default="development" if IN_DEV else "production"
+)
+EDITION_SERVICE_USERS = env.list("EDITION_SERVICE_USERS", default=[GRADING_USERNAME])
+EDITION_BACKUP_DIR = env.str("EDITION_BACKUP_DIR", default="/tmp/ldsa-portal-backups")
+EDITION_BACKUP_TIMEOUT = env.int("EDITION_BACKUP_TIMEOUT", default=1800)
