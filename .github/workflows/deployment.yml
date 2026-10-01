@@ -105,8 +105,11 @@ jobs:
           --show-only templates/migration-job.yaml | kubectl apply -f -
         kubectl wait --for=condition=complete job/ldsa-portal-migrate-${{ env.short_sha }} --timeout=900s
 
+        # Do not use Helm --wait here. The chart contains a legacy optional Redis
+        # dependency whose unavailable StatefulSets must not block portal releases.
+        # The migration Job above and the Django rollout below are the required gates.
         helm upgrade --install ldsa-portal ./ldsa-portal \
-          --values ./ldsa-portal/values.yaml --wait --timeout=900s \
+          --values ./ldsa-portal/values.yaml --timeout=900s \
           --set image.tag=${{ env.short_sha }} --set environment=$cluster_name \
           --set postgres.db=$postgres_db --set ingress.host=$ingress_host
         kubectl rollout status deployment/ldsa-portal --timeout=900s

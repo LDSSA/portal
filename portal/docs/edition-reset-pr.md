@@ -93,6 +93,9 @@ It also provides independent database snapshots and controlled deletion of saved
 - Serialize deployments by branch; run one release-specific Kubernetes migration Job
   before updating web/workers; require migration success and completed deployment before
   enabling that release's reset controls.
+- Keep the legacy optional Redis StatefulSets outside the deployment readiness gate. Helm
+  applies the chart without waiting for Redis, while the workflow explicitly waits for the
+  migration Job and the `ldsa-portal` Django deployment. Redis itself is not reconfigured.
 - Change production web startup to verify migrations instead of applying them; add startup
   migration checks for scheduler/simulator and the new edition worker.
 - Add the worker sidecar and shared temporary backup volume. Enforce one application pod
