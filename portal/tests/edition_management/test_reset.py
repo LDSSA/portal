@@ -275,6 +275,10 @@ def test_admin_preview_requires_review_and_confirmation(client, operator, studen
         and b"capstone.Datapoint" in response.content
     )
     assert b"purge-dialog" in response.content
+    assert b"admin/css/edition_management.css" in response.content
+    assert b'class="module aligned"' in response.content
+    assert b'class="submit-row"' in response.content
+    assert b'class="default"' in response.content
     client.post(url, {"action": "maintenance"})
     response = client.post(url, {"action": "preview"})
     assert response.status_code == 302

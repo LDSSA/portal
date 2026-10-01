@@ -43,19 +43,23 @@ spec:
               mountPath: /home/django/.kube/
             - name: aws-volume
               mountPath: /home/django/.aws/
-          env: &portalEnv
+          env:
 {{ include "ldsa-portal.environment" . | indent 12 }}
+{{ include "ldsa-portal.graderEnvironment" . | indent 12 }}
         - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           name: admissions-scheduler
           resources: {}
           args:
             - /app/bin/start_scheduler.sh
-          env: *portalEnv
+          env:
+{{ include "ldsa-portal.environment" . | indent 12 }}
         - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           name: edition-worker
           args:
             - /app/bin/start_edition_worker.sh
-          env: *portalEnv
+          env:
+{{ include "ldsa-portal.environment" . | indent 12 }}
+{{ include "ldsa-portal.graderEnvironment" . | indent 12 }}
           volumeMounts:
             - name: edition-backups
               mountPath: /tmp/ldsa-portal-backups

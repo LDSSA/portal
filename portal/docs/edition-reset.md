@@ -30,6 +30,13 @@ Web, scheduler and simulator startup check that migrations are complete. The new
 The admin refuses reset execution when migrations, release readiness or the matching
 worker heartbeat are missing. No migration runs inside an admin request or after a reset.
 
+The Django and edition worker containers use the mounted grader configuration through
+explicit paths: `KUBECONFIG=/home/django/.kube/config`,
+`AWS_CONFIG_FILE=/home/django/.aws/config` and
+`AWS_SHARED_CREDENTIALS_FILE=/home/django/.aws/credentials`. This is required because the
+system `django` user has `HOME=/nonexistent`; relying on home-directory discovery would make
+the external-grader safety check fail before a reset can enter maintenance.
+
 Deploy and test on development first. Merge the tested code and migration files into `main`
 to deploy production. Then prepare a fresh preview and separately trigger the production
 reset in production admin. No database contents or retained-user selections are transferred.

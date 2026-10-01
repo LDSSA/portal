@@ -53,7 +53,8 @@ jobs:
 
   tests:
     needs: requirements
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: ./portal
@@ -85,12 +86,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install poetry
           poetry install
-      - name: Run tests
+      - name: Verify PostgreSQL client
         # Snapshot tests create and restore an isolated PostgreSQL database.
-        # Install the client explicitly instead of relying on runner image contents.
-        # The service account above owns the disposable PostgreSQL service.
+        # Ubuntu 24.04 runners include compatible PostgreSQL client tools.
         run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql-client
+          pg_dump --version
+          pg_restore --version
+      - name: Run tests
+        timeout-minutes: 10
+        run: |
           cp ci.env .env
           poetry run pytest
