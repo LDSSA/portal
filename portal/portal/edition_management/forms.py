@@ -7,7 +7,7 @@ class PrepareForm(forms.Form):
     retained = forms.ModelMultipleChoiceField(
         queryset=None,
         required=False,
-        label="Organizers to keep",
+        label="Organizers to retain",
         widget=forms.CheckboxSelectMultiple,
     )
 
@@ -26,7 +26,7 @@ class ConfirmForm(forms.Form):
         required=False, initial=True, label="Back up before reset"
     )
     reviewed = forms.BooleanField(
-        label="I have reviewed all accounts listed for deletion, including unverified/recent registrations, and confirm they may be deleted."
+        label="I have reviewed all accounts scheduled for deletion, including potential applicants and unclassified accounts, and confirm they may be deleted."
     )
     confirmed = forms.BooleanField(
         label="I confirm the reset of this environment. This cannot be undone without restoring a backup."
