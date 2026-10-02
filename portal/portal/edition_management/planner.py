@@ -13,6 +13,9 @@ from .maintenance import deployment_ready, state, superuser
 from .models import EditionRun, GradingJob
 from .policy import CLEAR, KEEP, SELECTIVE, UPDATED_FIELDS, model
 
+PENDING_GRADING = ("sent", "grading")
+GRADING_MODELS = ("academy.Grade", "applications.Submission")
+
 
 def database_identity():
     db = settings.DATABASES["default"]
@@ -34,7 +37,19 @@ def protected_ids(actor):
     }
 
 
+def unfinished_grading_records():
+    rows = [
+        {
+            "model": label,
+            "count": model(label).objects.filter(status__in=PENDING_GRADING).count(),
+        }
+        for label in GRADING_MODELS
+    ]
+    return {"total": sum(row["count"] for row in rows), "rows": rows}
+
+
 def validate_jobs():
+    """Block active or unverifiable graders, then report abandoned database states."""
     from .jobs import scan_existing_jobs
 
     scan_existing_jobs()
@@ -42,11 +57,7 @@ def validate_jobs():
         raise ValidationError(
             "External grading jobs have not finished. Wait for the worker's job check."
         )
-    for label in ("academy.Grade", "applications.Submission"):
-        if model(label).objects.filter(status__in=("sent", "grading")).exists():
-            raise ValidationError(
-                "Pending grading records exist. Resolve them before entering maintenance."
-            )
+    return unfinished_grading_records()
 
 
 def snapshot_digest(labels, excluded_fields=None):
@@ -128,6 +139,7 @@ def plan(actor, retained):
         "deleted_names": [u["username"] for u in delete],
         "review": review,
         "rows": rows,
+        "unfinished_grading": unfinished_grading_records(),
         "mode": mode,
         "digest": snapshot_digest(
             set(CLEAR + KEEP + SELECTIVE) - {"sessions.Session", "admin.LogEntry"}

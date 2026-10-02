@@ -103,6 +103,9 @@ def execute_reset(run):
         run.finished = timezone.now()
         run.result = {
             "deleted": deleted,
+            "unfinished_grading_records_deleted": run.plan.get(
+                "unfinished_grading", {"total": 0, "rows": []}
+            ),
             "curriculum_preserved": True,
             "public_access": "closed",
         }

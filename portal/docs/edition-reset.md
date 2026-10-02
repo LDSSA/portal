@@ -65,8 +65,10 @@ do not participate in the maintenance protocol. Do not run them during reset.
 2. Optionally use **Save snapshot**, independently of reset. Its result page offers
    **Download dump to this computer**.
 3. Choose **Enter maintenance and prepare reset**. In-flight portal work must finish first.
-   Unfinished or unverifiable grading jobs block preparation, including legacy external
-   graders discovered from their running containers. A busy gate asks you to retry.
+   Active or unverifiable grading jobs block preparation, including legacy external graders
+   discovered from their running containers. Old `sent` or `grading` database records with
+   no active external job are reported in the preview and removed by the reset. A busy gate
+   asks you to retry.
 4. Select organizers to retain. Existing organizers are preselected; the operator and
    configured service accounts are always retained. Ordinary student/applicant accounts are
    deleted. Deselected organizers also lose their database credentials.
@@ -133,8 +135,11 @@ A PostgreSQL shared/exclusive advisory gate spans HTTP requests and session writ
 scheduler work, email delivery, simulator network calls/results, grading launch and the
 portal's mutating edition/user/capstone management commands. Maintenance prevents new work.
 External graders are tracked and scanned before deletion. Monitoring failure blocks reset
-rather than assuming a grader finished. Do not manually mark jobs finished without verifying
-their containers have stopped; investigate stuck grade statuses before entering maintenance.
+rather than assuming a grader finished. Once the scan verifies that no external job remains,
+abandoned `sent` or `grading` records no longer block maintenance. They remain unchanged for
+the optional pre-reset snapshot, appear in the preview and are deleted with previous-edition
+activity. Do not manually mark tracked jobs finished without verifying their containers have
+stopped.
 
 The reset runs in one database transaction after any requested backup succeeds. It empties
 explicit activity querysets, clears all unit instructors, closes course definitions, deletes
