@@ -76,8 +76,9 @@ It also provides independent database snapshots and controlled deletion of saved
 - Configure the Django and edition-worker containers with explicit Kubernetes and AWS
   configuration paths, allowing the reset preflight to inspect external graders even though
   the system `django` user's home directory is `/nonexistent`.
-- Track external graders and discover existing legacy grading containers; block reset
-  while grading is pending, running or cannot be verified complete.
+- Track external graders and discover existing legacy grading containers; block reset while
+  external grading is active or cannot be verified complete. Report and clear abandoned
+  `sent` or `grading` database records after verifying that no external job remains.
 - Add a dedicated worker with release heartbeat and single-worker locking. Reject stale
   previews, incompatible releases and concurrent queued/running operations.
 - Preserve the paused state after reset failure. On worker restart, mark interrupted runs

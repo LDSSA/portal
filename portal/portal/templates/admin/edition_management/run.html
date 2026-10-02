@@ -64,6 +64,20 @@
 
     {% if run.plan.review %}<p class="errornote">Review these non-student registrations explicitly: {{ run.plan.review|join:", " }}. If any belongs to the incoming edition, cancel preparation. The portal cannot determine whether an account is a genuine applicant or a test.</p>{% endif %}
 
+    {% if run.plan.unfinished_grading.total %}
+      <div class="module">
+        <h2>Unfinished grading records</h2>
+        <div class="edition-copy">
+          <p>The external grader check found no active job for these records. Their abandoned <code>sent</code> or <code>grading</code> statuses do not block maintenance; the reset will remove them with the other previous-edition activity.</p>
+        </div>
+        <table class="edition-table">
+          <thead><tr><th scope="col">Model</th><th scope="col">Records to delete</th></tr></thead>
+          <tbody>{% for row in run.plan.unfinished_grading.rows %}{% if row.count %}<tr><th scope="row">{{ row.model }}</th><td>{{ row.count }}</td></tr>{% endif %}{% endfor %}</tbody>
+          <tfoot><tr><th scope="row">Total</th><td>{{ run.plan.unfinished_grading.total }}</td></tr></tfoot>
+        </table>
+      </div>
+    {% endif %}
+
     <div class="module">
       <h2>Records in this preview</h2>
       <table class="edition-table">

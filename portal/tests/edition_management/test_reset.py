@@ -320,6 +320,50 @@ def test_maintenance_blocks_requests_workers_and_grading(operator, client):
     validate_jobs()
 
 
+def test_abandoned_grading_records_are_reported_and_removed(client, operator, student):
+    activity(student)
+    Grade.objects.update(status="sent")
+    ExamSubmission.objects.update(status="grading")
+    client.force_login(operator)
+
+    response = client.post(
+        reverse("admin:edition_control"),
+        {"action": "maintenance"},
+        follow=True,
+    )
+    assert response.status_code == 200
+    assert state().phase == "maintenance"
+    assert (
+        b"Unfinished grading records with no active external grader" in response.content
+    )
+
+    response = client.post(reverse("admin:edition_control"), {"action": "preview"})
+    assert response.status_code == 302
+    run = EditionRun.objects.get(kind="reset")
+    assert run.plan["unfinished_grading"] == {
+        "total": 2,
+        "rows": [
+            {"model": "academy.Grade", "count": 1},
+            {"model": "applications.Submission", "count": 1},
+        ],
+    }
+    preview_response = client.get(reverse("admin:edition_run", args=[run.pk]))
+    assert b"Unfinished grading records" in preview_response.content
+    assert b"do not block maintenance" in preview_response.content
+
+    run.status = "queued"
+    run.backup_first = False
+    run.save(update_fields=["status", "backup_first"])
+    process(run)
+    run.refresh_from_db()
+    assert run.status == "succeeded", run.error
+    assert (
+        run.result["unfinished_grading_records_deleted"]
+        == run.plan["unfinished_grading"]
+    )
+    assert not Grade.objects.exists() and not ExamSubmission.objects.exists()
+
+
 def test_private_backup_names_and_purge_do_not_follow_symlinks(operator, tmp_path):
     directory = backups.directory()
     innocent = tmp_path / "keep.txt"
@@ -396,6 +440,20 @@ def test_external_grader_discovery_blocks_even_after_grade_callback(operator, se
         with pytest.raises(ValidationError):
             validate_jobs()
     assert GradingJob.objects.get(name="old-slu01-job").remote_seen
+
+
+def test_grader_monitoring_failure_still_blocks_maintenance(operator, settings):
+    from types import SimpleNamespace
+
+    settings.GRADING_CLASS = "portal.grading.services.AcademyKubernetesGrading"
+    with patch(
+        "portal.edition_management.jobs.subprocess.run",
+        return_value=SimpleNamespace(returncode=1, stdout=b""),
+    ):
+        with pytest.raises(
+            ValidationError, match="Cannot verify external grading jobs"
+        ):
+            validate_jobs()
 
 
 @pytest.mark.django_db(transaction=True)

@@ -110,13 +110,20 @@ class EditionRunAdmin(admin.ModelAdmin):
                             )
                         current = state()
                         if action == "maintenance":
-                            validate_jobs()
+                            unfinished = validate_jobs()
                             if current.phase == "prepared":
                                 raise ValidationError(
                                     "This edition was already reset. Review and open it before starting another edition."
                                 )
                             current.phase = "maintenance"
                             current.save(update_fields=["phase"])
+                            if unfinished["total"]:
+                                messages.warning(
+                                    request,
+                                    "Unfinished grading records with no active external grader "
+                                    f'were found ({unfinished["total"]}). They will be listed '
+                                    "in the preview and removed by the reset.",
+                                )
                         elif action == "cancel":
                             if current.phase != "maintenance":
                                 raise ValidationError(
