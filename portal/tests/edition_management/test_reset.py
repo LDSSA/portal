@@ -191,7 +191,7 @@ def test_stale_preview_is_rejected(operator, student):
     run.refresh_from_db()
     assert run.status == "failed" and "changed" in run.error
     assert Grade.objects.exists() and Datapoint.objects.exists()
-    assert state().phase == "maintenance"
+    assert state().phase == "open"
 
 
 def test_failure_rolls_back_every_deletion(operator, student):
@@ -208,7 +208,7 @@ def test_failure_rolls_back_every_deletion(operator, student):
     assert unit.instructor_id == student.pk and unit.open
     assert Datapoint.objects.count() == 1 and DueDatapoint.objects.count() == 1
     assert Grade.objects.exists() and User.objects.filter(pk=student.pk).exists()
-    assert state().generation == 0
+    assert state().generation == 0 and state().phase == "open"
 
 
 def test_failed_backup_prevents_reset(operator, student):
@@ -224,6 +224,7 @@ def test_failed_backup_prevents_reset(operator, student):
     run.refresh_from_db()
     assert run.status == "failed" and run.error == "backup failed"
     assert DueDatapoint.objects.exists() and User.objects.filter(pk=student.pk).exists()
+    assert state().phase == "open"
 
 
 def test_credentials_of_deselected_organizer_are_deleted(operator):
@@ -377,8 +378,14 @@ def test_account_review_explains_retention_and_cancel_preserves_data(
     assert cancel_response.status_code == 302
     run.refresh_from_db()
     assert state().phase == "open" and run.status == "cancelled"
+    assert run.finished is not None
     assert set(User.objects.values_list("pk", flat=True)) == original_user_ids
     assert Application.objects.filter(pk=application.pk, user=completed).exists()
+
+    cancelled_response = client.get(run_url)
+    assert b"previous edition resumed normal operation automatically" in (
+        cancelled_response.content
+    )
 
 
 def test_historical_account_preview_without_structured_rows_still_renders(
@@ -713,12 +720,18 @@ def test_worker_restart_preserves_success_and_marks_interruption(operator):
     from django.core.management import call_command
 
     committed = EditionRun.objects.create(status="succeeded", kind="reset")
-    interrupted = EditionRun.objects.create(status="running", kind="reset")
+    current = state()
+    current.phase = "maintenance"
+    current.save(update_fields=["phase"])
+    interrupted = EditionRun.objects.create(
+        status="running", kind="reset", generation=current.generation
+    )
     call_command("run-edition-resets", once=True)
     committed.refresh_from_db()
     interrupted.refresh_from_db()
     assert committed.status == "succeeded"
     assert interrupted.status == "failed"
+    assert state().phase == "open"
     assert state().worker_seen is not None
 
 

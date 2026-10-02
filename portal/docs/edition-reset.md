@@ -152,10 +152,12 @@ switches. It checks empty tables, retained users/tokens, curriculum identities a
 preserved curriculum/configuration values. The successful report and prepared state commit
 with those changes. No sequence reset, `flush`, outgoing email or uploaded-file cleanup runs.
 
-A failed reset rolls back business data and leaves maintenance active. Correct the cause and
-prepare a new preview, or cancel preparation to resume the previous edition. On restart the
-worker marks interrupted runs failed and does not replay committed successes. Inspect an
-interrupted snapshot directory before purging partial files. A failed deployment migration
+A failed reset rolls back business data and automatically resumes the previous edition.
+Cancelling a draft reset also marks the draft cancelled and resumes the previous edition in
+the same database transaction. On restart the worker marks interrupted runs failed, resumes
+the previous edition when no other reset is active, and does not replay committed successes.
+Correct the cause and prepare a new preview. Inspect an interrupted snapshot directory before
+purging partial files. A failed deployment migration
 Job must be diagnosed and recreated before retrying the same release; never bypass migration
 or release-readiness checks to run a reset.
 

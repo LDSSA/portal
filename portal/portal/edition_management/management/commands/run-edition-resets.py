@@ -2,6 +2,7 @@ import time
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+from django.db import transaction
 from django.utils import timezone
 
 from portal.edition_management.executor import process
@@ -25,11 +26,32 @@ class Command(BaseCommand):
         schema_ready()
         # A dedicated session owns the worker lock for its entire lifetime.
         with lock(WORKER, exclusive=True):
-            EditionRun.objects.filter(status="running").update(
-                status="failed",
-                finished=timezone.now(),
-                error="Worker interrupted. A committed reset remains successful; an uncommitted reset rolled back. Review maintenance state and prepare a new preview.",
-            )
+            with lock(exclusive=True), transaction.atomic():
+                PortalState.objects.get_or_create(pk=1)
+                current = PortalState.objects.select_for_update().get(pk=1)
+                interrupted_resets = EditionRun.objects.filter(
+                    kind="reset",
+                    generation=current.generation,
+                    status="running",
+                )
+                reset_was_interrupted = interrupted_resets.exists()
+                EditionRun.objects.filter(status="running").update(
+                    status="failed",
+                    finished=timezone.now(),
+                    error="Worker interrupted. A committed reset remains successful; an uncommitted reset rolled back and the previous edition resumed.",
+                )
+                another_reset_is_active = EditionRun.objects.filter(
+                    kind="reset",
+                    generation=current.generation,
+                    status__in=("draft", "queued", "running"),
+                ).exists()
+                if (
+                    reset_was_interrupted
+                    and current.phase == "maintenance"
+                    and not another_reset_is_active
+                ):
+                    current.phase = "open"
+                    current.save(update_fields=["phase"])
             while True:
                 PortalState.objects.filter(pk=1).update(
                     worker_seen=timezone.now(), worker_release=settings.EDITION_RELEASE

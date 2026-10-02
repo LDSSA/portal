@@ -10,7 +10,14 @@ from django.urls import path
 from . import backups
 from .configuration import CLOSED_SWITCHES, readiness_issues
 from .forms import ConfirmForm, PrepareForm
-from .maintenance import MaintenanceBusy, deployment_ready, lock, state, superuser
+from .maintenance import (
+    MaintenanceBusy,
+    cancel_preparation,
+    deployment_ready,
+    lock,
+    state,
+    superuser,
+)
 from .models import EditionRun
 from .planner import create_preview, database_identity, require_worker, validate_jobs
 from .policy import policy_rows
@@ -125,15 +132,7 @@ class EditionRunAdmin(admin.ModelAdmin):
                                     "in the preview and removed by the reset.",
                                 )
                         elif action == "cancel":
-                            if current.phase != "maintenance":
-                                raise ValidationError(
-                                    "No maintenance preparation to cancel."
-                                )
-                            current.phase = "open"
-                            current.save(update_fields=["phase"])
-                            EditionRun.objects.filter(status="draft").update(
-                                status="cancelled"
-                            )
+                            cancel_preparation()
                         elif action == "open":
                             if (
                                 current.phase != "prepared"

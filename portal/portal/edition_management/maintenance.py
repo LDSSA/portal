@@ -6,8 +6,9 @@ from functools import wraps
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import connection
+from django.db import connection, transaction
 from django.db.migrations.executor import MigrationExecutor
+from django.utils import timezone
 
 from .models import PortalState
 
@@ -22,6 +23,23 @@ class MaintenanceBusy(Exception):
 
 def state():
     return PortalState.objects.get_or_create(pk=1)[0]
+
+
+def cancel_preparation():
+    """Cancel draft resets and resume the current edition atomically."""
+    from .models import EditionRun
+
+    with transaction.atomic():
+        PortalState.objects.get_or_create(pk=1)
+        current = PortalState.objects.select_for_update().get(pk=1)
+        if current.phase != "maintenance":
+            raise ValidationError("No maintenance preparation to cancel.")
+        EditionRun.objects.filter(
+            kind="reset",
+            status="draft",
+        ).update(status="cancelled", finished=timezone.now())
+        current.phase = "open"
+        current.save(update_fields=["phase"])
 
 
 def superuser(user):
