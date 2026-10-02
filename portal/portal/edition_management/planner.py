@@ -48,6 +48,10 @@ def unfinished_grading_records():
     return {"total": sum(row["count"] for row in rows), "rows": rows}
 
 
+def display_datetime(value):
+    return timezone.localtime(value).strftime("%Y-%m-%d %H:%M:%S %Z") if value else None
+
+
 def validate_jobs():
     """Block active or unverifiable graders, then report abandoned database states."""
     from .jobs import scan_existing_jobs
@@ -79,7 +83,8 @@ def snapshot_digest(labels, excluded_fields=None):
 def plan(actor, retained):
     superuser(actor)
     deployment_ready()
-    retained = set(map(int, retained)) | protected_ids(actor)
+    selected = set(map(int, retained))
+    retained = selected | protected_ids(actor)
     allowed = set(organizers().values_list("pk", flat=True)) | protected_ids(actor)
     if retained - allowed:
         raise ValidationError(
@@ -95,9 +100,47 @@ def plan(actor, retained):
             "is_staff",
             "is_superuser",
             "is_instructor",
+            "admissions_mode",
+            "registration_completed_at",
         )
     )
     delete = [u for u in users if u["id"] not in retained]
+    service_users = set(settings.EDITION_SERVICE_USERS)
+    retained_accounts = []
+    deleted_accounts = []
+    for user in users:
+        if user["id"] in retained:
+            reason = (
+                "Current operator — automatically retained"
+                if user["id"] == actor.pk
+                else "Service account — automatically retained"
+                if user["username"] in service_users
+                else "Selected organizer"
+            )
+            retained_accounts.append({"username": user["username"], "reason": reason})
+        else:
+            is_organizer = (
+                user["is_staff"] or user["is_superuser"] or user["is_instructor"]
+            )
+            deleted_accounts.append(
+                {
+                    "username": user["username"],
+                    "classification": (
+                        "Deselected organizer"
+                        if is_organizer
+                        else "Previous student account"
+                        if user["is_student"]
+                        else "Non-organizer account requiring review"
+                    ),
+                    "date_joined": display_datetime(user["date_joined"]),
+                    "admissions_mode": user["admissions_mode"]
+                    .replace("_", " ")
+                    .title(),
+                    "registration_completed_at": display_datetime(
+                        user["registration_completed_at"]
+                    ),
+                }
+            )
     rows = []
     owner_fields = {
         "users.User": "pk",
@@ -130,6 +173,11 @@ def plan(actor, retained):
         )
     # All non-student candidates are explicitly reviewed, including recent signups.
     review = [u["username"] for u in delete if not u["is_student"]]
+    review_accounts = [
+        account
+        for account in deleted_accounts
+        if account["classification"] == "Non-organizer account requiring review"
+    ]
     result = {
         "database": database_identity(),
         "release": settings.EDITION_RELEASE,
@@ -137,7 +185,10 @@ def plan(actor, retained):
         "retained": sorted(retained),
         "retained_names": [u["username"] for u in users if u["id"] in retained],
         "deleted_names": [u["username"] for u in delete],
+        "retained_accounts": retained_accounts,
+        "deleted_accounts": deleted_accounts,
         "review": review,
+        "review_accounts": review_accounts,
         "rows": rows,
         "unfinished_grading": unfinished_grading_records(),
         "mode": mode,

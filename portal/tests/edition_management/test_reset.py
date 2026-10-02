@@ -294,6 +294,116 @@ def test_admin_preview_requires_review_and_confirmation(client, operator, studen
     assert EditionRun.objects.filter(status="queued").count() == 1
 
 
+def test_account_review_explains_retention_and_cancel_preserves_data(
+    client, operator, student, settings
+):
+    service = User.objects.create_user(
+        username=settings.EDITION_SERVICE_USERS[0],
+        email="service@example.com",
+        is_staff=True,
+    )
+    organizer = User.objects.create_user(
+        username="organizer",
+        email="organizer@example.com",
+        is_instructor=True,
+    )
+    deselected_organizer = User.objects.create_user(
+        username="former-organizer",
+        email="former-organizer@example.com",
+        is_staff=True,
+    )
+    completed = User.objects.create_user(
+        username="new-applicant",
+        email="incoming@example.com",
+        admissions_mode="no_exam",
+        registration_completed_at=timezone.now(),
+    )
+    incomplete = User.objects.create_user(
+        username="unclassified",
+        email="unclassified@example.com",
+        admissions_mode="exam",
+    )
+    application = Application.objects.create(user=completed)
+    original_user_ids = set(User.objects.values_list("pk", flat=True))
+    client.force_login(operator)
+    control_url = reverse("admin:edition_control")
+
+    response = client.post(control_url, {"action": "maintenance"}, follow=True)
+    assert response.status_code == 200
+    assert b"Organizers to retain" in response.content
+    assert b"Only staff, superusers and instructors" in response.content
+    assert organizer.username.encode() in response.content
+    assert completed.username.encode() not in response.content
+
+    response = client.post(
+        control_url, {"action": "preview", "retained": [organizer.pk]}
+    )
+    assert response.status_code == 302
+    run = EditionRun.objects.get(kind="reset")
+    retained = {
+        account["username"]: account["reason"]
+        for account in run.plan["retained_accounts"]
+    }
+    assert retained == {
+        operator.username: "Current operator — automatically retained",
+        service.username: "Service account — automatically retained",
+        organizer.username: "Selected organizer",
+    }
+    deleted = {account["username"]: account for account in run.plan["deleted_accounts"]}
+    assert deleted[student.username]["classification"] == "Previous student account"
+    assert (
+        deleted[deselected_organizer.username]["classification"]
+        == "Deselected organizer"
+    )
+    assert deleted[completed.username]["registration_completed_at"]
+    assert deleted[incomplete.username]["registration_completed_at"] is None
+    assert deselected_organizer.username not in {
+        account["username"] for account in run.plan["review_accounts"]
+    }
+
+    run_url = reverse("admin:edition_run", args=[run.pk])
+    preview_response = client.get(run_url)
+    assert b"Potential applicant or unclassified accounts" in preview_response.content
+    assert b"cannot be retained by this reset" in preview_response.content
+    assert b"Completed:" in preview_response.content
+    assert b"Incomplete / not recorded" in preview_response.content
+    assert b'name="retained"' not in preview_response.content
+    assert (
+        b"Cancel reset preparation and keep the current database"
+        in preview_response.content
+    )
+
+    cancel_response = client.post(control_url, {"action": "cancel"})
+    assert cancel_response.status_code == 302
+    run.refresh_from_db()
+    assert state().phase == "open" and run.status == "cancelled"
+    assert set(User.objects.values_list("pk", flat=True)) == original_user_ids
+    assert Application.objects.filter(pk=application.pk, user=completed).exists()
+
+
+def test_historical_account_preview_without_structured_rows_still_renders(
+    client, operator, settings
+):
+    run = EditionRun.objects.create(
+        kind="reset",
+        status="cancelled",
+        actor=operator,
+        actor_username=operator.username,
+        database="historical",
+        release=settings.EDITION_RELEASE,
+        plan={
+            "retained_names": [operator.username],
+            "deleted_names": ["legacy-account"],
+            "review": ["legacy-account"],
+        },
+    )
+    client.force_login(operator)
+    response = client.get(reverse("admin:edition_run", args=[run.pk]))
+    assert response.status_code == 200
+    assert b"legacy-account" in response.content
+    assert b"historical preview without registration details" in response.content
+
+
 def test_purge_requires_server_side_confirmation(client, operator):
     client.force_login(operator)
     client.post(reverse("admin:edition_control"), {"action": "purge"})

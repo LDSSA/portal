@@ -54,15 +54,42 @@
   {% if run.kind == 'reset' %}
     <div class="module">
       <h2>Account changes</h2>
-      <table class="edition-table">
-        <tbody>
-          <tr><th scope="row">Accounts retained</th><td>{{ run.plan.retained_names|join:", " }}</td></tr>
-          <tr><th scope="row">Accounts deleted, including database credentials</th><td>{{ run.plan.deleted_names|join:", "|default:"None" }}</td></tr>
-        </tbody>
-      </table>
+      {% if run.plan.retained_accounts %}
+        <h3>Accounts retained</h3>
+        <table class="edition-table">
+          <thead><tr><th scope="col">Account</th><th scope="col">Why retained</th></tr></thead>
+          <tbody>{% for account in run.plan.retained_accounts %}<tr><th scope="row">{{ account.username }}</th><td>{{ account.reason }}</td></tr>{% endfor %}</tbody>
+        </table>
+      {% else %}
+        <p><strong>Accounts retained:</strong> {{ run.plan.retained_names|join:", " }}</p>
+      {% endif %}
+      {% if run.plan.deleted_accounts %}
+        <h3>Accounts deleted, including database credentials</h3>
+        <table class="edition-table">
+          <thead><tr><th scope="col">Account</th><th scope="col">Classification</th><th scope="col">Reset action</th></tr></thead>
+          <tbody>{% for account in run.plan.deleted_accounts %}<tr><th scope="row">{{ account.username }}</th><td>{{ account.classification }}</td><td>Delete</td></tr>{% endfor %}</tbody>
+        </table>
+      {% else %}
+        <p><strong>Accounts deleted, including database credentials:</strong> {{ run.plan.deleted_names|join:", "|default:"None" }}</p>
+      {% endif %}
     </div>
 
-    {% if run.plan.review %}<p class="errornote">Review these non-student registrations explicitly: {{ run.plan.review|join:", " }}. If any belongs to the incoming edition, cancel preparation. The portal cannot determine whether an account is a genuine applicant or a test.</p>{% endif %}
+    {% if run.plan.review_accounts %}
+      <div class="module">
+        <h2>Potential applicant or unclassified accounts scheduled for deletion</h2>
+        <p class="errornote">These accounts are not organizers and cannot be retained by this reset. Proceed only if every account may be deleted. If any account belongs to the incoming edition, cancel the reset because its admissions records would also be removed.</p>
+        <table class="edition-table">
+          <thead><tr><th scope="col">Account</th><th scope="col">Created</th><th scope="col">Admissions mode</th><th scope="col">Registration state</th><th scope="col">Reset action</th></tr></thead>
+          <tbody>
+            {% for account in run.plan.review_accounts %}
+              <tr><th scope="row">{{ account.username }}</th><td>{{ account.date_joined }}</td><td>{{ account.admissions_mode }}</td><td>{% if account.registration_completed_at %}Completed: {{ account.registration_completed_at }}{% else %}Incomplete / not recorded{% endif %}</td><td>Delete</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% elif run.plan.review %}
+      <p class="errornote">These accounts are scheduled for deletion and cannot be retained by this reset: {{ run.plan.review|join:", " }}. This is a historical preview without registration details. If any account belongs to the incoming edition, cancel the reset.</p>
+    {% endif %}
 
     {% if run.plan.unfinished_grading.total %}
       <div class="module">
@@ -102,6 +129,11 @@
             </div>
           {% endfor %}
           <div class="submit-row"><input type="submit" value="Reset {{ environment }} database" class="default"></div>
+        </form>
+        <form method="post" action="{% url 'admin:edition_control' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="cancel">
+          <div class="submit-row"><input type="submit" value="Cancel reset preparation and keep the current database"></div>
         </form>
       </div>
     {% endif %}

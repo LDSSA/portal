@@ -81,7 +81,13 @@
         <div class="submit-row"><input type="submit" value="Enter maintenance and prepare reset" class="default"></div>
       </form>
     {% elif state.phase == 'maintenance' %}
-      <div class="form-row"><p>The operator and configured service accounts are always retained. Other organizers are selected below. Uncheck an organizer only if their account and credentials should be deleted.</p></div>
+      <div class="form-row">
+        <div>
+          <p><strong>Only staff, superusers and instructors can be retained individually.</strong> The current operator and configured service accounts are retained automatically, so they do not appear below.</p>
+          <p>All other users, including students, applicants, test accounts and unclassified accounts, are scheduled for deletion and will be shown in the preview. If the preview identifies anyone from the incoming edition, cancel the reset because their admissions records would also be removed.</p>
+          <p>Uncheck an organizer only if their account and database credentials should be deleted.</p>
+        </div>
+      </div>
       <form method="post">
         {% csrf_token %}
         {% for field in form %}

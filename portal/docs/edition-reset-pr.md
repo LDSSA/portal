@@ -18,8 +18,11 @@ It also provides independent database snapshots and controlled deletion of saved
 - Add maintenance entry, organizer selection, a final preview with per-model delete/retain
   counts, explicit account-deletion review, and CSRF-protected reset confirmation.
 - Preselect existing organizers for retention; always retain the initiating administrator
-  and configured service accounts. Review non-student registrations explicitly before
-  confirming. No independent per-model deletion toggles are provided.
+  and configured service accounts. Explain why each retained account survives, classify
+  deleted accounts, and display registration details for potential applicants or unclassified
+  accounts. These accounts cannot be retained independently because their admissions records
+  are cleared; provide a direct action to cancel without changing data. No independent
+  per-model deletion toggles are provided.
 - Add background operation status/result pages. A queued operation continues without the
   browser. Repeated confirmation of the same operation does not rerun a completed reset.
 - Leave the portal prepared and publicly closed after success, with a separate confirmed

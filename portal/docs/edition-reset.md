@@ -69,13 +69,17 @@ do not participate in the maintenance protocol. Do not run them during reset.
    discovered from their running containers. Old `sent` or `grading` database records with
    no active external job are reported in the preview and removed by the reset. A busy gate
    asks you to retry.
-4. Select organizers to retain. Existing organizers are preselected; the operator and
-   configured service accounts are always retained. Ordinary student/applicant accounts are
-   deleted. Deselected organizers also lose their database credentials.
-5. Review the final preview: deletion/retention counts, accounts retained/deleted, and
-   flagged non-student registrations. The administrator must explicitly confirm that all
-   listed accounts may be removed. If a genuine incoming registration appears, cancel;
-   the software cannot infer whether it is a test account.
+4. Select organizers to retain. Only staff, superusers and instructors are selectable.
+   Existing organizers are preselected; the operator and configured service accounts are
+   always retained and therefore do not appear as choices. Ordinary students, applicants,
+   test accounts and unclassified accounts are scheduled for deletion. Deselected organizers
+   also lose their database credentials.
+5. Review the final preview. It explains why each retained account survives, classifies every
+   account scheduled for deletion, and gives registration details for potential applicants or
+   unclassified accounts. These non-organizer accounts cannot be retained individually because
+   the reset also clears their admissions records. If any belongs to the incoming edition, use
+   **Cancel reset preparation and keep the current database**. Otherwise explicitly confirm
+   that every listed account may be removed.
 6. Leave **Back up before reset** checked to create a fresh snapshot before any deletion.
    A missing/unusable server directory or failed dump prevents deletion. Unchecking it
    deliberately relies on your separately secured backup.
@@ -160,6 +164,12 @@ environment's independently secured backup using an operator-controlled recovery
 with writers stopped. Review the restored maintenance state/history before starting workers.
 There is deliberately no automatic restore button. Reversing the instructor migration is
 unsafe while units have NULL instructors; restoration is not schema reversal.
+
+The account review is intentionally a whole-reset decision. Preserving only a potential
+applicant's `users.User` row would not preserve the application, selection, submission and
+other admissions records cleared by the reset. Complete the reset only before genuine
+incoming-edition registrations exist; if the preview finds one, cancel without changing the
+database.
 
 ## Complete model policy
 
