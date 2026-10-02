@@ -4,7 +4,7 @@
     <p>A reset deletes previous-edition activity in <strong>both exam and no-exam modes</strong>. It keeps existing curriculum, clears every unit's instructor and leaves the portal closed. Dates and the current admission mode are preserved; configure the new calendar before reopening.</p>
     <p>Development and production are independent. This operation only affects the database shown above. Deploying code never executes a reset. Deleted users lose their database tokens and credentials. Retained users' credentials are unchanged.</p>
     <p>All Datapoint and DueDatapoint records are deleted, along with simulator runs. No uploaded files, S3 objects or GitHub resources are deleted. Sessions are invalidated; you will need to sign in again.</p>
-    <p>The reset runs in a database transaction. Failure rolls back its data changes and leaves maintenance active. A completed reset can only be undone by restoring a backup; reverting application code is not an undo.</p>
+    <p>The reset runs in a database transaction. Failure rolls back its data changes and resumes the previous edition automatically. A completed reset can only be undone by restoring a backup; reverting application code is not an undo.</p>
     <p>Backups are complete PostgreSQL custom-format dumps, including sensitive account data. Download them securely. Server storage is temporary and can disappear when the pod is replaced. Archive validation is not a test restore. Dumps do not include uploaded files.</p>
     <table>
       <thead><tr><th scope="col">Model</th><th scope="col">Action</th><th scope="col">Details</th></tr></thead>
