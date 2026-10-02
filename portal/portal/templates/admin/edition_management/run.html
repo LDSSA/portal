@@ -152,5 +152,15 @@
         <pre class="edition-result">{{ run.result }}</pre>
       </div>
     </div>
+  {% elif run.kind == 'reset' and run.status == 'cancelled' %}
+    <div class="module">
+      <h2>Operation result</h2>
+      <div class="edition-copy"><p>This reset preparation was cancelled. No reset changes were applied, and the previous edition resumed normal operation automatically.</p></div>
+    </div>
+  {% elif run.kind == 'reset' and run.status == 'failed' %}
+    <div class="module">
+      <h2>Operation result</h2>
+      <div class="edition-copy"><p>The reset was not committed. Its database transaction was rolled back, and the previous edition resumed normal operation automatically.</p></div>
+    </div>
   {% endif %}
 </div>{% endblock %}

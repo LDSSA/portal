@@ -142,8 +142,7 @@ def process(run):
             run.status, run.result = "succeeded", result
         except Exception as exc:
             # No credential-bearing subprocess stderr or raw exception text in reports.
-            run.status = "failed"
-            run.error = (
+            error = (
                 "; ".join(exc.messages)
                 if isinstance(exc, ValidationError)
                 else "Operation failed. No reset transaction was committed. Consult the server logs."
@@ -153,5 +152,30 @@ def process(run):
             logging.getLogger(__name__).error(
                 "Edition operation %s failed (%s)", run.pk, type(exc).__name__
             )
+            with transaction.atomic():
+                run = EditionRun.objects.select_for_update().get(pk=run.pk)
+                run.status = "failed"
+                run.error = error
+                run.finished = timezone.now()
+                run.save(update_fields=["status", "error", "finished"])
+                if run.kind == "reset":
+                    current = type(state()).objects.select_for_update().get(pk=1)
+                    another_reset_is_active = (
+                        EditionRun.objects.exclude(pk=run.pk)
+                        .filter(
+                            kind="reset",
+                            generation=current.generation,
+                            status__in=("draft", "queued", "running"),
+                        )
+                        .exists()
+                    )
+                    if (
+                        current.phase == "maintenance"
+                        and current.generation == run.generation
+                        and not another_reset_is_active
+                    ):
+                        current.phase = "open"
+                        current.save(update_fields=["phase"])
+            return
         run.finished = timezone.now()
-        run.save(update_fields=["status", "error", "result", "finished"])
+        run.save(update_fields=["status", "result", "finished"])
