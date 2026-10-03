@@ -6,7 +6,9 @@ from cryptography.hazmat.primitives import (
 )
 from cryptography.hazmat.primitives.asymmetric import rsa
 from django.contrib.auth.models import AbstractUser
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -47,8 +49,15 @@ class AcademyTypePreference(models.TextChoices):
     in_person_only = "in_person_only", _("In-person only")
 
 
+class AdmissionsMode(models.TextChoices):
+    EXAM = "exam", _("Exam")
+    NO_EXAM = "no_exam", _("No exam")
+
+
 # TODO: custom user manager to filter out users with unverified email addresses
 class User(AbstractUser):
+    hackathon_submissions = GenericRelation("hackathons.Submission")
+
     email = models.EmailField(unique=True, null=False)
     # First Name and Last Name do not cover name patterns
     # around the globe.
@@ -57,12 +66,40 @@ class User(AbstractUser):
     # Academy
     is_student = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
+    retain_student_account_on_next_edition_reset = models.BooleanField(
+        null=True,
+        blank=True,
+        default=None,
+        verbose_name=_("Retain student account on next edition reset"),
+        help_text=_(
+            "Student-only accounts: select to preserve the complete user account "
+            "and student status during the next edition reset. Academic and "
+            "admissions activity is still deleted. After a successful reset, "
+            "this setting returns to unselected and must be authorized again for "
+            "a later reset. This does not apply to staff, superusers, instructors, "
+            "or other non-student accounts."
+        ),
+    )
     slack_member_id = models.TextField(blank=True)
     github_username = models.TextField(blank=True)
     deploy_private_key = models.TextField(blank=True)
     deploy_public_key = models.TextField(blank=True)
 
-    # Admissions
+    # Admissions: snapshot the mode at signup; changing the default is not a migration.
+    admissions_mode = models.CharField(
+        max_length=10,
+        choices=AdmissionsMode.choices,
+        default=AdmissionsMode.EXAM,
+        editable=False,
+    )
+    registration_completed_at = models.DateTimeField(
+        null=True, blank=True, editable=False
+    )
+
+    @property
+    def admissions_requires_exam(self):
+        return self.admissions_mode == AdmissionsMode.EXAM
+
     code_of_conduct_accepted = models.BooleanField(default=False)
     applying_for_scholarship = models.BooleanField(default=None, null=True)
     academy_type_preference = models.CharField(
@@ -86,10 +123,60 @@ class User(AbstractUser):
 
     failed_or_dropped = models.BooleanField(default=False)
 
+    class Meta(AbstractUser.Meta):
+        constraints = [
+            models.CheckConstraint(
+                name="users_student_reset_retention_matches_role",
+                check=(
+                    Q(
+                        is_student=True,
+                        is_staff=False,
+                        is_superuser=False,
+                        is_instructor=False,
+                        retain_student_account_on_next_edition_reset__isnull=False,
+                    )
+                    | (
+                        ~Q(
+                            is_student=True,
+                            is_staff=False,
+                            is_superuser=False,
+                            is_instructor=False,
+                        )
+                        & Q(retain_student_account_on_next_edition_reset__isnull=True)
+                    )
+                ),
+            )
+        ]
+
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
 
+    @property
+    def is_student_only(self):
+        return self.is_student and not (
+            self.is_staff or self.is_superuser or self.is_instructor
+        )
+
+    def _normalize_reset_retention(self):
+        previous = self.retain_student_account_on_next_edition_reset
+        if self.is_student_only:
+            if previous is None:
+                self.retain_student_account_on_next_edition_reset = False
+        else:
+            self.retain_student_account_on_next_edition_reset = None
+        return previous != self.retain_student_account_on_next_edition_reset
+
+    def clean(self):
+        super().clean()
+        self._normalize_reset_retention()
+
     def save(self, *args, **kwargs):
+        retention_changed = self._normalize_reset_retention()
+        if retention_changed and kwargs.get("update_fields") is not None:
+            kwargs["update_fields"] = {
+                *kwargs["update_fields"],
+                "retain_student_account_on_next_edition_reset",
+            }
         if not self.deploy_private_key and not self.deploy_public_key:
             key = rsa.generate_private_key(
                 backend=crypto_default_backend(),

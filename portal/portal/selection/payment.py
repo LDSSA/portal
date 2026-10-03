@@ -1,7 +1,11 @@
 from datetime import datetime, timedelta, timezone
 from logging import getLogger
 
-from .domain import SelectionDomain
+from constance import config
+from django.core.exceptions import ValidationError
+
+from portal.admissions.policy import payment_window_open
+
 from .logs import SelectionEvent, log_selection_event
 from .models import Selection, SelectionDocument
 from .status import SelectionStatus
@@ -21,7 +25,13 @@ class PaymentExceptionError(Exception):
     pass
 
 
-def load_payment_data(selection, staff=None):
+def load_payment_data(selection, staff=None, *, reset=False):
+    if selection.payment_value is not None and not reset:
+        return
+    if config.ADMISSIONS_PAYMENT_DAYS < 1:
+        raise ValidationError("Payment days must be positive.")
+    if selection.user.ticket_type not in PRICE_TABLE:
+        raise ValidationError("Choose a valid ticket type before issuing payment.")
     old_ticket_type = selection.ticket_type
     old_value = selection.payment_value
 
@@ -30,12 +40,18 @@ def load_payment_data(selection, staff=None):
 
     selection.ticket_type = ticket_type
     selection.payment_value = value
-    selection.payment_due_date = datetime.now(timezone.utc) + timedelta(days=7)
+    selection.payment_due_date = datetime.now(timezone.utc) + timedelta(
+        days=config.ADMISSIONS_PAYMENT_DAYS
+    )
+    if not selection.user.admissions_requires_exam and config.NO_EXAM_USE_SCHEDULE:
+        selection.payment_due_date = config.NO_EXAM_PAYMENTS_END
     selection.save()
 
     log_selection_event(
         selection,
-        SelectionEvent.payment_data_populated,
+        SelectionEvent.payment_data_reset
+        if reset
+        else SelectionEvent.payment_data_populated,
         data={
             "old-ticket-type": old_ticket_type,
             "new-ticket-type": ticket_type,
@@ -76,4 +92,10 @@ def add_note(selection, note, user=None):
 
 
 def can_be_updated(selection: Selection) -> bool:
-    return SelectionDomain.get_status(selection) not in SelectionStatus.FINAL_STATUS
+    return bool(
+        config.ADMISSIONS_ACCEPTING_PAYMENT_PROFS
+        and payment_window_open(selection.user)
+        and selection.payment_value is not None
+        and selection.status
+        in (SelectionStatus.SELECTED, SelectionStatus.TO_BE_ACCEPTED)
+    )

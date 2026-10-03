@@ -1,0 +1,138 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+  <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'admin/css/edition_management.css' %}">
+{% endblock %}
+{% block coltype %}colM{% endblock %}
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-form{% endblock %}
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+  &rsaquo; <a href="{% url 'admin:edition_management_editionrun_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+  &rsaquo; Edition management
+</div>
+{% endblock %}
+
+{% block content %}<div id="content-main">
+  <div class="module">
+    <h2>Current environment</h2>
+    <table class="edition-table">
+      <tbody>
+        <tr><th scope="row">Environment</th><td>{{ environment }}</td></tr>
+        <tr><th scope="row">Database</th><td><code>{{ database }}</code></td></tr>
+        <tr><th scope="row">Release</th><td><code>{{ release }}</code></td></tr>
+        <tr><th scope="row">State</th><td>{{ state.phase }}</td></tr>
+        <tr><th scope="row">Completed resets</th><td>{{ state.generation }}</td></tr>
+        <tr><th scope="row">Deployment readiness</th><td>{{ readiness }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  {% include "admin/edition_management/info.html" %}
+
+  <div class="module aligned">
+    <h2>Database snapshots</h2>
+    <div class="form-row">
+      <div>
+        <p><strong>Temporary server directory:</strong> <code>{{ backup_dir|default:"NOT CONFIGURED — backups unavailable" }}</code></p>
+        <p class="help">This path is inside the remote portal pod. Download completed dumps to your computer before replacing the pod. Filenames contain UTC timestamps.</p>
+      </div>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="backup">
+      <div class="submit-row">
+        <input type="submit" value="Save snapshot" class="default">
+        <input type="button" value="Delete saved dumps…" id="purge-open">
+      </div>
+    </form>
+  </div>
+
+  <dialog id="purge-dialog" class="module edition-dialog">
+    <h2>Delete all saved database dumps?</h2>
+    <div class="edition-copy">
+      <p>All generated database dump files in <code>{{ backup_dir }}</code> will be erased. This cannot be undone.</p>
+      <p>Download any backups you need before continuing.</p>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="purge">
+      <input type="hidden" name="confirmed" value="yes">
+      <div class="submit-row">
+        <input type="submit" value="Yes, delete saved dumps" class="edition-danger">
+        <input type="button" value="No, take me back" id="purge-cancel">
+      </div>
+    </form>
+  </dialog>
+
+  <div class="module aligned">
+    <h2>Prepare a new edition</h2>
+    <div class="form-row">
+      <p>The current admission mode is <strong>{{ mode }}</strong>. Connection settings, file paths and configuration are detected automatically.</p>
+    </div>
+    {% if state.phase == 'open' %}
+      <div class="form-row"><p>Enter maintenance to pause writes and obtain a final preview. Existing grading jobs must finish first.</p></div>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="maintenance">
+        <div class="submit-row"><input type="submit" value="Enter maintenance and prepare reset" class="default"></div>
+      </form>
+    {% elif state.phase == 'maintenance' %}
+      <div class="form-row">
+        <div>
+          <p><strong>Only staff, superusers and instructors can be retained individually.</strong> The current operator and configured service accounts are retained automatically, so they do not appear below.</p>
+          <p>Students marked in their user record for retention during the next edition reset are retained automatically and shown in the preview; they do not appear as organizer choices. Their accounts and student status remain unchanged, while their academic and admissions activity is deleted. The retention setting returns to unselected after a successful reset. All other students, applicants, test accounts and unclassified accounts are scheduled for deletion. If the preview identifies anyone from the incoming edition, cancel the reset because their admissions records would also be removed.</p>
+          <p>Uncheck an organizer only if their account and database credentials should be deleted.</p>
+        </div>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="form-row{% if field.errors %} errors{% endif %}">
+            {{ field.errors }}
+            <div class="flex-container">{{ field.label_tag }} {{ field }}</div>
+            {% if field.help_text %}<div class="help">{{ field.help_text|safe }}</div>{% endif %}
+          </div>
+        {% endfor %}
+        <div class="submit-row">
+          <button type="submit" name="action" value="preview" class="button default">Review reset preview</button>
+          <button type="submit" name="action" value="cancel" class="button" formnovalidate>Cancel preparation and resume previous edition</button>
+        </div>
+      </form>
+    {% else %}
+      <div class="form-row"><p>The reset is complete and the portal remains closed. Review dates and switches in Constance, unit availability, hackathons, capstones and integrations before reopening.</p></div>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="open">
+        <div class="form-row checkbox-row">
+          <input type="checkbox" name="confirmed" value="yes" id="id_open_confirmed" required>
+          <label for="id_open_confirmed">I reviewed the calendar, curriculum and integrations and want to reopen this environment.</label>
+        </div>
+        <div class="submit-row"><input type="submit" value="Open prepared edition" class="default"></div>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="module">
+    <h2>Recent operations</h2>
+    <table class="edition-table">
+      <thead><tr><th scope="col">Created</th><th scope="col">Operation</th><th scope="col">Status</th><th scope="col">Operator</th></tr></thead>
+      <tbody>
+        {% for run in runs %}
+          <tr><th scope="row"><a href="{% url 'admin:edition_run' run.pk %}">{{ run.created }}</a></th><td>{{ run.kind }}</td><td>{{ run.status }}</td><td>{{ run.actor_username }}</td></tr>
+        {% empty %}
+          <tr><td colspan="4">No edition operations have been recorded.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+<script>
+  const purgeDialog = document.getElementById("purge-dialog");
+  document.getElementById("purge-open").addEventListener("click", () => purgeDialog.showModal());
+  document.getElementById("purge-cancel").addEventListener("click", () => purgeDialog.close());
+</script>
+{% endblock %}

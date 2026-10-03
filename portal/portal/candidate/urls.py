@@ -5,6 +5,11 @@ from portal.candidate import views
 app_name = "candidate"
 
 urlpatterns = [
+    path(
+        "complete-registration",
+        views.CompleteRegistrationView.as_view(),
+        name="complete-registration",
+    ),
     path("", views.HomeView.as_view(), name="home"),
     path("contact", views.ContactView.as_view(), name="contact"),
     path(

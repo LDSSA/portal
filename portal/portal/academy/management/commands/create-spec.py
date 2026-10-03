@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 
 from portal.academy.models import Specialization
+from portal.edition_management.maintenance import guarded
 
 
 class Command(BaseCommand):
@@ -11,6 +12,7 @@ class Command(BaseCommand):
         parser.add_argument("-n", "--name", type=str, required=True)
         parser.add_argument("-d", "--description", type=str, default="")
 
+    @guarded
     def handle(self, *args, **options):
         # TODO: revisit uniqueness of primary key
         spec = Specialization.objects.filter(code=options["code"]).first()

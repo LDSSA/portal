@@ -4,7 +4,10 @@ from django.http import HttpResponse
 from rest_framework import generics
 
 from portal.academy import models
-from portal.academy.services import check_complete_specialization
+from portal.academy.services import (
+    check_complete_specialization,
+    refresh_certificate_eligibility,
+)
 from portal.applications.models import Challenge, Submission
 
 from . import serializers
@@ -31,8 +34,13 @@ class AcademyGradingView(generics.RetrieveUpdateAPIView):
         spec = grade.unit.specialization
 
         # Check attendance for next hackathon based on last grade received
-        user.can_attend_next = check_complete_specialization(user, spec)
-        user.save()
+        user.can_attend_next = (
+            check_complete_specialization(user, spec)
+            if user.admissions_requires_exam
+            else True
+        )
+        user.save(update_fields=["can_attend_next", "updated_at"])
+        refresh_certificate_eligibility(user)
 
         return update_result
 
@@ -79,7 +87,9 @@ class AdmissionsGradingView(
 ):
     """Receive notebook grade."""
 
-    queryset = Submission.objects.all()
+    queryset = Submission.objects.filter(
+        user__admissions_mode="exam", application__user__admissions_mode="exam"
+    )
     serializer_class = serializers.AdmissionsGradeSerializer
 
 
@@ -97,7 +107,9 @@ class AdmissionsNotebookDownload(
 ):
     """Receive and retrieve notebook checksum."""
 
-    queryset = Submission.objects.all()
+    queryset = Submission.objects.filter(
+        user__admissions_mode="exam", application__user__admissions_mode="exam"
+    )
 
     def get(
         self,

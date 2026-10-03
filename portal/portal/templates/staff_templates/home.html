@@ -5,6 +5,13 @@
 <div class="container">
     <h2 class="py-5">Staff Home</h2>
 
+    <p>Default for new applicants: <strong>{{ admissions_mode }}</strong>. Existing applicants retain their saved mode.</p>
+    <p>New signups are currently {{ signups_effectively_open|yesno:"open,closed" }}. No-exam signups also depend on their calendar when scheduled mode is enabled. Manual switches are permissions, not a report of the effective date window.</p>
+    {% if request.user.is_superuser %}
+    <form method="post">{% csrf_token %}<input type="hidden" name="key" value="admissions_mode">{{ mode_form.as_p }}<button class="btn btn-primary">Update admissions mode</button></form>
+    <p>Set the academy start date, no-exam calendar and payment deadline length in <a href="{% url 'admin:constance_config_changelist' %}">Constance settings</a>.</p>
+    {% endif %}
+    <p>Dates below control the exam submission window and are displayed in Europe/Lisbon time. The no-exam calendar is configured separately in Constance.</p>
     <hr>
     {% for f in datetime_flags %}
     <div class="row">

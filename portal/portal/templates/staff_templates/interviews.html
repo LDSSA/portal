@@ -4,7 +4,7 @@
 
 <div class="container">
     <h2 class="py-5">
-        Selection Interviews
+        Scholarship Reviews
     </h2>
     <div class="row">
         <div class="col-md-12 text-center">
@@ -12,7 +12,7 @@
                 <thead>
                 <tr>
                     <th scope="col">User</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">Admissions mode</th><th scope="col">Status</th>
                     <th scope="col">Update At</th>
                 </tr>
                 </thead>
@@ -20,7 +20,7 @@
                 {% for s in selections %}
                 <tr>
                     <td><a href="{% url 'admissions:staff:candidate-detail' s.user.id %}">{{ s.user.email }}</a></td>
-                    <td><a href="{% url 'admissions:staff:interview-detail' s.user.id %}">
+                    <td>{{ s.user.get_admissions_mode_display }}</td><td><a href="{% url 'admissions:staff:interview-detail' s.user.id %}">
                         <span class="badge badge-info">{{ s.status }}</span>
                     </a></td>
                     <td>{{ s.updated_at }}</td>

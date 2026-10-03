@@ -5,7 +5,7 @@ import nbformat
 
 from portal.applications.domain import ApplicationStatus, SubmissionStatus
 from portal.applications.domain import Domain as ApplicationsDomain
-from portal.applications.models import Application, Challenge
+from portal.applications.models import Application
 from portal.selection.domain import SelectionDomain
 from portal.selection.models import Selection
 from portal.selection.status import SelectionStatusType
@@ -48,15 +48,20 @@ class Domain:
         state["applying_for_scholarship"] = candidate.applying_for_scholarship
         state["academy_type"] = candidate.academy_type_preference
 
-        application, _ = Application.objects.get_or_create(user=candidate)
-        status = ApplicationsDomain.get_application_detailed_status(application)
-        state["application_status"] = status["application"]
-        state["coding_test_status"] = status[
-            Challenge.objects.get(code="coding_test").code
-        ]
-        state["slu01_status"] = status[Challenge.objects.get(code="slu01").code]
-        state["slu02_status"] = status[Challenge.objects.get(code="slu02").code]
-        state["slu03_status"] = status[Challenge.objects.get(code="slu03").code]
+        for key in (
+            "application_status",
+            "coding_test_status",
+            "slu01_status",
+            "slu02_status",
+            "slu03_status",
+        ):
+            state[key] = None
+        if candidate.admissions_requires_exam:
+            application, _ = Application.objects.get_or_create(user=candidate)
+            status = ApplicationsDomain.get_application_detailed_status(application)
+            state["application_status"] = status["application"]
+            for code in ("coding_test", "slu01", "slu02", "slu03"):
+                state[f"{code}_status"] = status.get(code, SubmissionStatus.not_started)
 
         try:
             state["selection_status"] = SelectionDomain.get_status(candidate.selection)

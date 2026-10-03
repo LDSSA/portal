@@ -1,3 +1,7 @@
+from django.db import transaction
+
+from portal.users.models import User
+
 from .logs import SelectionEvent, log_selection_event
 from .models import Selection
 from .status import SelectionStatusType
@@ -5,7 +9,13 @@ from .status import SelectionStatusType
 
 class SelectionDomain:
     @staticmethod
+    @transaction.atomic
     def create(user):
+        user = User.objects.select_for_update().get(pk=user.pk)
+        if not user.admissions_requires_exam:
+            raise ValueError(
+                "No-exam selections are created by registration completion."
+            )
         return Selection.objects.get_or_create(user=user)[0]
 
     @staticmethod

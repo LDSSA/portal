@@ -4,11 +4,12 @@
 
 <div class="container">
     <h2 class="py-5">
-        Candidate <a href="{% url 'admissions:staff:candidate-detail' s.user.id %}">{{ s.user.email }}</a> Interview
+        Candidate <a href="{% url 'admissions:staff:candidate-detail' s.user.id %}">{{ s.user.email }}</a> Scholarship review
 
         <span class="badge badge-info">{{ s.status }}</span>
     </h2>
 
+    <p>Admissions mode: {{ s.user.get_admissions_mode_display }}. Refusing a scholarship ends the application.</p>
     <div class="row justify-content-md-center">
         <div class="col text-center">
             <form method="post">
@@ -25,10 +26,10 @@
         <div class="col text-center">
             <form method="post">
                 {% csrf_token %}
-                <label for="rejectMsg">Explain why the candidate did not pass the interview</label>
+                <label for="rejectMsg">Explain why the candidate was refused a scholarship</label>
                 <textarea class="form-control" id="rejectMsg" name="msg" rows="3" required></textarea>
                 <input type="hidden" id="hiddenReject" name="action" value="reject">
-                <button type="submit" class="btn btn-danger">Fail Interview</button>
+                <button type="submit" class="btn btn-danger">Reject scholarship and admission</button>
             </form>
         </div>
 
@@ -36,7 +37,7 @@
             <form method="post">
                 {% csrf_token %}
                 <input type="hidden" id="hiddenAccept" name="action" value="accept">
-                <button type="submit" class="btn btn-success">Pass Interview</button>
+                <button type="submit" class="btn btn-success">Approve scholarship</button>
             </form>
         </div>
     </div>

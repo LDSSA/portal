@@ -24,6 +24,8 @@ services:
     depends_on:
       - postgres
       - mailhog
+    env_file:
+      - ./.env
     volumes:
       - .:/app
     command: ./bin/start_scheduler.sh

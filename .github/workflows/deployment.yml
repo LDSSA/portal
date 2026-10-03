@@ -6,6 +6,10 @@ on:
       - main
       - dev
 
+concurrency:
+  group: portal-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -88,8 +92,26 @@ jobs:
         # Define the values file we want to use depending
         # on the branch we are pushing to.
 
+        # Publish non-secret settings first, including on a first installation.
+        helm template ldsa-portal ./ldsa-portal --values ./ldsa-portal/values.yaml \
+          --set image.tag=${{ env.short_sha }} --set environment=$cluster_name \
+          --set postgres.db=$postgres_db --set ingress.host=$ingress_host \
+          --show-only templates/django-configmap.yaml | kubectl apply -f -
+
+        # One migration Job per release, before any new web/worker container starts.
+        helm template ldsa-portal ./ldsa-portal --values ./ldsa-portal/values.yaml \
+          --set image.tag=${{ env.short_sha }} --set environment=$cluster_name \
+          --set postgres.db=$postgres_db --set ingress.host=$ingress_host \
+          --show-only templates/migration-job.yaml | kubectl apply -f -
+        kubectl wait --for=condition=complete job/ldsa-portal-migrate-${{ env.short_sha }} --timeout=900s
+
+        # Do not use Helm --wait here. The chart contains a legacy optional Redis
+        # dependency whose unavailable StatefulSets must not block portal releases.
+        # The migration Job above and the Django rollout below are the required gates.
         helm upgrade --install ldsa-portal ./ldsa-portal \
-          --values ./ldsa-portal/values.yaml  \
-          --set image.tag=${{ env.short_sha }} \
-          --set postgres.db=$postgres_db \
-          --set ingress.host=$ingress_host
+          --values ./ldsa-portal/values.yaml --timeout=900s \
+          --set image.tag=${{ env.short_sha }} --set environment=$cluster_name \
+          --set postgres.db=$postgres_db --set ingress.host=$ingress_host
+        kubectl rollout status deployment/ldsa-portal --timeout=900s
+        kubectl exec deployment/ldsa-portal -c django -- \
+          poetry run python manage.py check-edition-readiness --deployment-complete

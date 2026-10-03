@@ -141,6 +141,7 @@ THIRD_PARTY_APPS = [
     "crispy_bootstrap4",
 ]
 LOCAL_APPS = [
+    "portal.edition_management.apps.EditionManagementConfig",
     "portal.users.apps.UsersAppConfig",
     "portal.academy.apps.AcademyConfig",
     "portal.hackathons.apps.HackathonsConfig",
@@ -207,6 +208,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "portal.edition_management.middleware.EditionMaintenanceMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -449,17 +451,74 @@ CRISPY_TEMPLATE_PACK = "bootstrap4"
 CONSTANCE_BACKEND = "constance.backends.database.DatabaseBackend"
 # CONSTANCE_DATABASE_CACHE_BACKEND ='default'
 #
-# * Admissions                    
-#   - Sign up                     -> admissions
-#   - Applications                -> admissions:applications
-#     - CoC
-#     - Scholarship
-#     - Challenge/Submissions
-#   - Selection                   -> admissions:selection
-# * Academy                       -> academy
+# Admissions phases and applicant workflows:
+#   - Sign up                      -> admissions
+#   - Applications                 -> admissions:applications
+#     - Code of conduct and scholarship choice are shared by both modes.
+#     - Attendance preference is included only when configured.
+#     - Challenges and submissions apply only to exam-mode applicants.
+#     - No-exam applicants proceed to payment or scholarship review after
+#       registration.
+#   - Exam selection               -> admissions:selection
+#   - Academy                      -> academy
 #
 
+CONSTANCE_SUPERUSER_ONLY = True
+CONSTANCE_ADDITIONAL_FIELDS = {
+    "admissions_mode": [
+        "django.forms.fields.ChoiceField",
+        {
+            "choices": (("exam", "Exam"), ("no_exam", "No exam")),
+        },
+    ],
+}
 CONSTANCE_CONFIG = {
+    "ADMISSIONS_ASK_ATTENDANCE_PREFERENCE": (
+        True,
+        "Show and require the attendance preference survey in both modes. "
+        "Completed registrations remain valid when re-enabled.",
+    ),
+    "NO_EXAM_USE_SCHEDULE": (
+        False,
+        "Apply the no-exam calendar in addition to the manual switches.",
+    ),
+    "NO_EXAM_SIGNUPS_START": (
+        datetime(2000, 1, 1, tzinfo=timezone.utc),
+        "No-exam signup opening (inclusive).",
+    ),
+    "NO_EXAM_SIGNUPS_END": (
+        datetime(2000, 1, 1, tzinfo=timezone.utc),
+        "No-exam signup closing (exclusive).",
+    ),
+    "NO_EXAM_REGISTRATION_END": (
+        datetime(2000, 1, 1, tzinfo=timezone.utc),
+        "Existing applicants may complete registration before this instant.",
+    ),
+    "NO_EXAM_PAYMENTS_START": (
+        datetime(2000, 1, 1, tzinfo=timezone.utc),
+        "Payment document submission opens at this instant.",
+    ),
+    "NO_EXAM_PAYMENTS_END": (
+        datetime(2000, 1, 1, tzinfo=timezone.utc),
+        "Payment document submission closes at this instant.",
+    ),
+    "ADMISSIONS_MODE": (
+        "exam",
+        "Mode for NEW applicants; existing accounts retain their mode.",
+        "admissions_mode",
+    ),
+    "NO_EXAM_REGISTRATION_OPEN": (
+        False,
+        "Allow no-exam applicants to complete registration.",
+    ),
+    "NO_EXAM_ACADEMY_ACCESS_OPEN": (
+        False,
+        "Allow paid no-exam students into the academy after ACADEMY_START.",
+    ),
+    "ADMISSIONS_PAYMENT_DAYS": (
+        7,
+        "Days to pay after payment instructions are issued.",
+    ),
     # Portal config
     "ACCOUNT_ALLOW_REGISTRATION": (True, "Allow Sign Ups"),  # Allow sign ups
     "PORTAL_STATUS": (
@@ -621,3 +680,12 @@ LOGGING = {
 # SLACK
 # ------------------------------------------------------------------------------
 SLACK_WORKSPACE = env.str("SLACK_WORKSPACE")
+
+# Database-local maintenance. No production connection settings are inferred from dev.
+EDITION_RELEASE = env.str("EDITION_RELEASE", default="local")
+EDITION_ENVIRONMENT = env.str(
+    "EDITION_ENVIRONMENT", default="development" if IN_DEV else "production"
+)
+EDITION_SERVICE_USERS = env.list("EDITION_SERVICE_USERS", default=[GRADING_USERNAME])
+EDITION_BACKUP_DIR = env.str("EDITION_BACKUP_DIR", default="/tmp/ldsa-portal-backups")
+EDITION_BACKUP_TIMEOUT = env.int("EDITION_BACKUP_TIMEOUT", default=1800)

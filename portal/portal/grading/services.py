@@ -10,6 +10,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 from rest_framework.reverse import reverse
 
+from portal.edition_management.maintenance import guarded
+
 logger = logging.getLogger(__name__)
 pattern = re.compile("[^a-zA-Z0-9-]+")
 
@@ -61,14 +63,17 @@ class Grading:
 
         self.success_message()
 
+    @guarded
     def run_grading(self):
         image = self.get_image()
         name = self.get_name()
         env = self.get_env()
         cmd = self.get_command(image, name, env)
         self.start_message()
-        logger.info(cmd)
-        subprocess.Popen(cmd)
+        logger.info("Launching grading image=%s job=%s", image, name)
+        from portal.edition_management.jobs import launch
+
+        launch(name, "docker" if isinstance(self, DockerGrading) else "kubernetes", cmd)
 
 
 class KubernetesGrading(Grading):

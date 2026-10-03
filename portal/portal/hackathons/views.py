@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -163,6 +164,9 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
                 attendance_form.save()
 
         elif "team" in request.POST:
+            if team is None or hackathon.status not in hackathon.can_update_team_data:
+                messages.error(request, "Team editing is unavailable.")
+                return HttpResponseRedirect(self.get_success_url())
             team_form = forms.TeamForm(request.POST, instance=team)
             if team_form.is_valid():
                 team_form.save()
@@ -173,13 +177,12 @@ class StudentHackathonDetailView(StudentViewsMixin, generic.DetailView):
                     hackathon, request.user, request.FILES["data"]
                 )
             except Exception as exc:
-                messages.add_message(
+                messages.error(
                     request,
-                    messages.ERROR,
-                    request,
-                    messages.ERROR,
-                    str(exc.__cause__ or exc),
-                )  # Use root exception if defined
+                    str(exc)
+                    if isinstance(exc, ValidationError)
+                    else "Unable to process the submission. Contact an instructor.",
+                )
 
                 if not isinstance(exc, ValidationError):
                     logger.exception("Unhandled Exception during scoring")
@@ -219,13 +222,19 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
 
     def get_object_list(self):
         object_list = []
-        attendance = models.Attendance.objects.filter(hackathon=self.object)
+        attendance = models.Attendance.objects.filter(
+            hackathon=self.object,
+            user__is_student=True,
+            user__is_active=True,
+            user__failed_or_dropped=False,
+        )
         for att in attendance:
             try:
                 team = att.user.hackathon_teams.get(hackathon=att.hackathon)
             except ObjectDoesNotExist:
                 team = None
 
+            att.user.can_attend_next = services.can_participate(att.user, self.object)
             object_list.append(
                 {
                     "hackathon_team_id": team.hackathon_team_id
@@ -242,7 +251,12 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
 
     @staticmethod
     def _filter_can_attend_next(object_list):
-        return [item for item in object_list if item["student"].can_attend_next]
+        return [
+            item
+            for item in object_list
+            if not item["student"].admissions_requires_exam
+            or item["student"].can_attend_next
+        ]
 
     def get(
         self,
@@ -258,13 +272,16 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
         context = self.get_context_data(object=self.object, object_list=object_list)
         return self.render_to_response(context)
 
+    @transaction.atomic
     def post(
         self,
         request,
         *args,
         **kwargs,
     ):
-        self.object = self.get_object()
+        self.object = get_object_or_404(
+            models.Hackathon.objects.select_for_update(), pk=self.kwargs["pk"]
+        )
         object_list = self.get_object_list()
 
         if request.GET.get("filter_eligible"):
@@ -274,6 +291,30 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
         cur_status = self.object.status
         logger.debug("new_status: %s cur_status: %s", new_status, cur_status)
 
+        allowed = {
+            "closed": {"closed", "marking_presences"},
+            "marking_presences": {"marking_presences", "generating_teams", "closed"},
+            "generating_teams": {"generating_teams", "ready", "marking_presences"},
+            "ready": {"ready", "submissions_open", "generating_teams"},
+            "submissions_open": {"submissions_open", "submissions_closed", "ready"},
+            "submissions_closed": {
+                "submissions_closed",
+                "submissions_open",
+                "complete",
+            },
+            "complete": {"complete", "submissions_closed"},
+        }
+        if new_status not in allowed.get(cur_status, set()):
+            messages.error(request, "Invalid hackathon status transition.")
+            return HttpResponseRedirect(self.get_success_url())
+        if new_status == "ready" and not self.object.teams.exists():
+            messages.error(request, "Generate teams before opening the hackathon.")
+            return HttpResponseRedirect(self.get_success_url())
+        if new_status == "submissions_open" and not (
+            self.object.script_file and self.object.data_file
+        ):
+            messages.error(request, "Upload scoring code and target data first.")
+            return HttpResponseRedirect(self.get_success_url())
         self.object.status = new_status
         self.object.save()
 
@@ -289,15 +330,17 @@ class InstructorHackathonAdminView(InstructorViewsMixin, generic.DetailView):
                 item["attendance"].save()
 
         elif new_status == "generating_teams" and cur_status == "generating_teams":
-            self.object.teams.all().delete()
-            services.generate_teams(
-                self.object,
-                self.object.team_size,
-                self.object.max_team_size,
-                self.object.max_teams,
-            )
+            try:
+                services.generate_teams(
+                    self.object,
+                    self.object.team_size,
+                    self.object.max_team_size,
+                    self.object.max_teams,
+                )
+            except ValidationError as exc:
+                messages.error(request, str(exc))
 
-        elif new_status == "taking_attendance":
+        elif new_status == "marking_presences":
             for user in get_user_model().objects.filter(
                 is_student=True, failed_or_dropped=False
             ):

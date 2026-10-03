@@ -1,3 +1,6 @@
+{{- if ne (int .Values.replicaCount) 1 }}
+{{- fail "Edition backup downloads currently require replicaCount=1 (shared temporary pod storage)." }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -5,9 +8,7 @@ metadata:
 spec:
   replicas: {{ .Values.replicaCount }}
   strategy:
-    rollingUpdate:
-      maxSurge: {{ .Values.strategy.rollingUpdate.maxSurge }}
-      maxUnavailable: {{ .Values.strategy.rollingUpdate.maxUnavailable }}
+    type: Recreate
   selector:
     matchLabels:
       app: {{ include "ldsa-portal.name" . }}
@@ -18,7 +19,11 @@ spec:
         environment: {{ .Values.environment }}
     spec:
       restartPolicy: Always
+      securityContext:
+        fsGroup: 10001
       volumes:
+        - name: edition-backups
+          emptyDir: {}
         - name: kubeconfig-volume
           configMap:
             name: {{ .Values.kubeconfigConfigMapName }}
@@ -32,45 +37,33 @@ spec:
           args:
             - {{ .Values.startScript }}
           volumeMounts:
+            - name: edition-backups
+              mountPath: /tmp/ldsa-portal-backups
             - name: kubeconfig-volume
               mountPath: /home/django/.kube/
             - name: aws-volume
               mountPath: /home/django/.aws/
           env:
-            - name: DJANGO_SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: django-secrets
-                  key: DJANGO_SECRET_KEY
-            - name: ELASTICMAIL_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: django-secrets
-                  key: ELASTICMAIL_API_KEY
-            - name: DJANGO_AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: django-secrets
-                  key: DJANGO_AWS_ACCESS_KEY_ID
-            - name: DJANGO_AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: django-secrets
-                  key: DJANGO_AWS_SECRET_ACCESS_KEY
-            - name: POSTGRES_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: django-secrets
-                  key: POSTGRES_HOST
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: django-secrets
-                  key: POSTGRES_PASSWORD
-{{- range .Values.env }}
-            - name: {{ .name }}
-              valueFrom:
-                configMapKeyRef:
-                  key: {{ .key }}
-                  name: {{ .configMapName }}
-{{- end }}
+{{ include "ldsa-portal.environment" . | indent 12 }}
+{{ include "ldsa-portal.graderEnvironment" . | indent 12 }}
+        - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          name: admissions-scheduler
+          resources: {}
+          args:
+            - /app/bin/start_scheduler.sh
+          env:
+{{ include "ldsa-portal.environment" . | indent 12 }}
+        - image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          name: edition-worker
+          args:
+            - /app/bin/start_edition_worker.sh
+          env:
+{{ include "ldsa-portal.environment" . | indent 12 }}
+{{ include "ldsa-portal.graderEnvironment" . | indent 12 }}
+          volumeMounts:
+            - name: edition-backups
+              mountPath: /tmp/ldsa-portal-backups
+            - name: kubeconfig-volume
+              mountPath: /home/django/.kube/
+            - name: aws-volume
+              mountPath: /home/django/.aws/

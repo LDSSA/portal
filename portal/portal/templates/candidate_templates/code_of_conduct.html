@@ -22,7 +22,7 @@
         <p>Please read this code of conduct carefully, and consider whether you feel comfortable abiding by these rules. It is a binding agreement, not a set of guidelines.</p>
         <p>We believe that for a community centered on education to thrive, there must be a set of common principles, and there must be emotional safety for all those involved. On occasion, those will collide with values such as freedom of speech, or with cultural norms that vary between cultures and communities.</p>
         <p>This code of conduct aims to clarify the expectation. It is both binding and enforced, meaning that anyone can be expelled for breaches of the code of conduct. It explains what the expected behavior is, rather than attempting to list all unacceptable behaviors. Students and all staff are expected to follow the LDSA Code of Conduct, in letter and in spirit.</p>
-        <p>Enforcement is done by a <a href="https://github.com/LDSSA/wiki/wiki/Disciplinary-action/1ffebbcf0633abc201547a108aaa05d0b7b5735a#disciplinary-commission">disciplinary commission</a>, which has the power to issue warnings or expulsion orders. Multiple warnings may result in expulsion. In situations where there is ambiguity, this commission has the final word. Students who are expelled from any activity of the Academy will be denied access to future activities, and will not obtain any refunds.</p>
+        <p>Enforcement follows our <a href="https://ldssa.github.io/wiki/About%20us/Disciplinary-action/">disciplinary process</a>. The Executive Team may issue warnings or expulsion orders, and multiple warnings may result in expulsion. In ambiguous situations, the Executive Team has the final word. Students who are expelled from any activity of the Academy will be denied access to future activities and will not receive a refund.</p>
         <br>
         <h4>1. Academic integrity is expected of everyone</h4>
         <p>Your answers to assignments must be your own work (except for assignments that explicitly permit collaboration).</p>
@@ -60,15 +60,15 @@
         <br>
         <h4>Epilogue</h4>
         <p>The code of conduct is strict, and goes way beyond what many organizations expect. Please understand that by accepting it, you are agreeing that you will be bound by it.</p>
-        <p>If you are found to have violated this code of conduct, you may receive a <a href="https://ldssa.github.io/wiki/About%20us/Disciplinary-action/">warnings or an expulsion order</a>, depending on the severity, and the interpretation of the disciplinary commission is final.</p>
+        <p>If you are found to have violated this code of conduct, you may receive a <a href="https://ldssa.github.io/wiki/About%20us/Disciplinary-action/">warning or an expulsion order</a>, depending on the severity. The Executive Team's interpretation is final.</p>
         <br>
         <br>
         <h3>Lisbon Data Science Academy Refund Policy</h3>
         <br>
-        <p>As students of Lisbon Data Science Starter Academy, you are eligible for a <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/07-Refund-Policy/">full refund</a> within 14 days after the Bootcamp start date.</p>
+        <p>As students of the Lisbon Data Science Starters Academy, you are eligible for a <a href="https://ldssa.github.io/wiki/Starters%20Academy%20(LDSSA)/07-Refund-Policy/">full refund</a> during the 14-day period that starts with the first Bootcamp day on 25 October 2026. The refund period ends on 8 November 2026.</p>
         <br>
         <h4>Refund Process</h4>
-        <p>If the refund deadline has not passed, you can ask for a refund by sending an email to <code>info@lisbondatascience.org</code>.</p>
+        <p>If the refund deadline has not passed, you can ask for a refund by sending an email to <code>studentsuccess@lisbondatascience.org</code>.</p>
         <p>Within 30 days, you will receive an answer on whether your refund has been accepted.</p>
         <p>In the email, please make sure that you include the following information:</p>
         <ul>
@@ -89,42 +89,14 @@
 
     {% if not code_of_conduct_accepted %}
         <div class="jumbotron p-3">
-            <form method="post" class="needs-validation m-0" novalidate>
-                {% csrf_token %}
-                <div class="form-group">
-                    <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" id="invalidCheck" required>
-                    <label class="form-check-label" for="invalidCheck">
-                        I've read and agree to follow the LDSA code of conduct and refund policy.<br>
-                        I understand that not complying with any of these terms can lead to my expulsion without a refund.
-                    </label>
-                    <div class="invalid-feedback">
-                        You must agree to follow the code of conduct and refund policy before submitting
-                    </div>
-                    </div>
-                </div>
-                <button class="btn btn-primary" type="submit">Submit</button>
+            <form method="post">
+                {% csrf_token %}{{ form.as_p }}
+                <button class="btn btn-primary" type="submit">Accept</button>
             </form>
         </div>
     {% endif %}
 </div>
 
-<script>
-    (function() {
-      'use strict';
-      window.addEventListener('load', function() {
-        var forms = document.getElementsByClassName('needs-validation');
-        var validation = Array.prototype.filter.call(forms, function(form) {
-          form.addEventListener('submit', function(event) {
-            if (form.checkValidity() === false) {
-              event.preventDefault();
-              event.stopPropagation();
-            }
-            form.classList.add('was-validated');
-          }, false);
-        });
-      }, false);
-    })();
-</script>
+
 
 {% endblock %}

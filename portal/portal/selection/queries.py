@@ -8,14 +8,17 @@ from .status import SelectionStatus, SelectionStatusType
 
 class SelectionQueries:
     @staticmethod
-    def get_all():
-        return Selection.objects.all()
+    def get_all(mode="exam"):
+        query = Selection.objects.all()
+        return query if mode is None else query.filter(user__admissions_mode=mode)
 
     @staticmethod
     def filter_by_status_in(
         status_list: list[SelectionStatusType],
+        *,
+        mode="exam",
     ):
-        return Selection.objects.filter(status__in=status_list)
+        return SelectionQueries.get_all(mode=mode).filter(status__in=status_list)
 
     @staticmethod
     def draw_filter(
@@ -23,7 +26,8 @@ class SelectionQueries:
         forbidden_ticket_types: list[TicketType],
     ):
         return (
-            Selection.objects.filter(status=SelectionStatus.PASSED_TEST)
+            SelectionQueries.get_all()
+            .filter(status=SelectionStatus.PASSED_TEST)
             .exclude(user__gender__in=forbidden_genders)
             .exclude(user__ticket_type__in=forbidden_ticket_types)
         )

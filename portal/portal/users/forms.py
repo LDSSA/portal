@@ -28,16 +28,24 @@ class UserChangeForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Remove fields based on portal status
-        if config.PORTAL_STATUS == "academy":
+        # Course profile requirements follow the account role, not the exam calendar.
+        if (
+            self.instance.is_student
+            or self.instance.is_instructor
+            or self.instance.is_staff
+        ):
             fields_to_remove = ["gender", "profession", "company", "ticket_type"]
         else:
             fields_to_remove = ["github_username", "slack_member_id"]
-            if config.PORTAL_STATUS not in ("admissions", "admissions:applications"): #maybe during the whole admissions?
-                self.fields["ticket_type"] = forms.ChoiceField(
-                    choices=TicketType.choices,
-                    disabled=True,
-                )
+            locked = (
+                self.instance.applying_for_scholarship is True
+                or hasattr(self.instance, "selection")
+                or self.instance.registration_completed_at is not None
+            )
+            self.fields["ticket_type"] = forms.ChoiceField(
+                choices=TicketType.choices if locked else TicketTypeSelectable.choices,
+                disabled=locked,
+            )
         for field in fields_to_remove:
             del self.fields[field]
 
@@ -83,6 +91,7 @@ class PortalSignupForm(forms.Form):
         self.fields["company"] = forms.CharField(max_length=100, required=False)
 
     def signup(self, request, user) -> None:
+        user.admissions_mode = config.ADMISSIONS_MODE
         user.name = self.cleaned_data["name"]
         user.gender = self.cleaned_data["gender"]
         user.ticket_type = self.cleaned_data["ticket_type"]

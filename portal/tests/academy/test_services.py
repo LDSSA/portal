@@ -11,7 +11,7 @@ from portal.academy.services import (
     get_best_grade,
     get_last_grade,
 )
-from portal.hackathons.models import Attendance
+from portal.hackathons.models import Attendance, Hackathon
 
 PASSING_SCORE = 16
 MAX_SCORE = 20
@@ -156,6 +156,7 @@ def test_check_graduation_status_fail_missed_first(
 
     Test case when student has missed first hackathon
     """
+    Hackathon.objects.update(status="complete")
     assert check_graduation_status(student) is False
 
 
@@ -172,6 +173,7 @@ def test_check_graduation_status_fail_missed_too_many(
 
     Test case when student has missed more than one hackathon (even if not first)
     """
+    Hackathon.objects.update(status="complete")
     assert check_graduation_status(student) is False
 
 

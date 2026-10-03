@@ -1,7 +1,5 @@
 import logging
-from datetime import datetime, timezone
 
-from constance import config
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -13,7 +11,14 @@ from django.views.generic import DetailView, ListView, RedirectView
 from rest_framework.settings import import_string
 
 from portal.academy import models, serializers
-from portal.academy.services import csvdata, get_best_grade, get_last_grade
+from portal.academy.services import (
+    csvdata,
+    get_best_grade,
+    get_last_grade,
+    refresh_certificate_eligibility,
+    unit_deadline,
+)
+from portal.admissions.policy import academy_open
 from portal.users.views import InstructorViewsMixin, StudentViewsMixin
 
 logger = logging.getLogger(__name__)
@@ -22,19 +27,13 @@ logger = logging.getLogger(__name__)
 # noinspection PyUnresolvedReferences
 class HomeRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
-        if config.PORTAL_STATUS == "academy":
-            if self.request.user.is_student:
-                self.pattern_name = "academy:student-unit-list"
-            elif (
-                self.request.user.is_instructor
-                or self.request.user.is_superuser
-                or self.request.user.is_staff
-            ):
-                self.pattern_name = "academy:instructor-user-list"
-            else:
-                self.handle_no_permission()
-        elif self.request.user.is_staff:
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
             self.pattern_name = "admissions:staff:home"
+        elif user.is_instructor:
+            self.pattern_name = "academy:instructor-user-list"
+        elif user.is_student and academy_open(user):
+            self.pattern_name = "academy:student-unit-list"
         else:
             self.pattern_name = "admissions:candidate:home"
 
@@ -55,6 +54,7 @@ class BaseUnitListView(ListView):
         **kwargs,
     ):
         self.object_list = self.get_queryset()
+        refresh_certificate_eligibility(request.user)
         data = []
         for unit in self.object_list:
             grade = get_best_grade(unit, request.user)
@@ -95,17 +95,16 @@ class BaseUnitDetailView(DetailView):
         **kwargs,
     ):
         unit, _, _ = self.get_object()
+        if not unit.submissions_open:
+            messages.error(request, "This unit is not open for submissions.")
+            return HttpResponseRedirect(request.path_info)
         grade = models.Grade(user=self.request.user, unit=unit)
 
         if not unit.checksum:
-            msg = "Not checksum present for this unit"
-            raise RuntimeError(msg)
-
-        # Grade sent on time?
-        due_date = datetime.combine(
-            unit.due_date, datetime.max.time(), tzinfo=timezone.utc
-        )
-        grade.on_time = datetime.now(timezone.utc) <= due_date
+            messages.error(
+                request, "This unit is not ready for grading. Contact an instructor."
+            )
+            return HttpResponseRedirect(request.path_info)
 
         # Clear grade
         grade.status = "sent"
@@ -113,6 +112,9 @@ class BaseUnitDetailView(DetailView):
         grade.notebook = None
         grade.message = ""
         grade.save()
+        # Classify the exact stored submission timestamp, including the deadline boundary.
+        grade.on_time = grade.created < unit_deadline(unit)
+        grade.save(update_fields=["on_time"])
 
         # Send to grading
         grading = import_string(settings.GRADING_CLASS)
@@ -129,12 +131,26 @@ class BaseUnitDetailView(DetailView):
         return HttpResponseRedirect(request.path_info)
 
 
-class StudentUnitListView(StudentViewsMixin, BaseUnitListView):
+class CourseUnitAccessMixin:
+    requires_course_progression = False
+
+    def get_queryset(self):
+        from portal.academy.services import progression_block_reason
+
+        queryset = super().get_queryset()
+        if progression_block_reason(self.request.user):
+            return queryset.filter(specialization_id="S01")
+        return queryset
+
+
+class StudentUnitListView(CourseUnitAccessMixin, StudentViewsMixin, BaseUnitListView):
     template_name = "academy/student/unit_list.html"
     detail_view_name = "academy:student-unit-detail"
 
 
-class StudentUnitDetailView(StudentViewsMixin, BaseUnitDetailView):
+class StudentUnitDetailView(
+    CourseUnitAccessMixin, StudentViewsMixin, BaseUnitDetailView
+):
     template_name = "academy/student/unit_detail.html"
 
 
@@ -204,6 +220,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
         object_list = []
         for user in self.object_list:
             total_score = 0
+            submission_date = None
             user_data = {"user": user, "grades": [], "total_score": 0}
             for unit in unit_list:
                 if unit is None:
@@ -211,6 +228,10 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
 
                 else:
                     grade = get_best_grade(unit, user)
+                    if grade.pk and (
+                        submission_date is None or grade.created > submission_date
+                    ):
+                        submission_date = grade.created
                     if grade_status and grade.status != grade_status:
                         user_data["grades"].append(None)
                         continue
@@ -222,7 +243,7 @@ class InstructorUserListView(InstructorViewsMixin, ListView):
             if score__lte and total_score > score__lte:
                 continue
             user_data["total_score"] = total_score
-            user_data["submission_date"] = grade.created
+            user_data["submission_date"] = submission_date
             user_data["can_graduate"] = user.can_graduate
             object_list.append(user_data)
 

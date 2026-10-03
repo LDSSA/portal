@@ -3,6 +3,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  annotations:
+    meta.helm.sh/release-name: {{ .Release.Name | quote }}
+    meta.helm.sh/release-namespace: {{ .Release.Namespace | quote }}
+  labels:
+    app.kubernetes.io/managed-by: Helm
   name: django-configmap
 data:
 
@@ -16,7 +21,7 @@ data:
   DJANGO_SETTINGS_MODULE: config.settings.settings
 
   # GRADING
-  STUDENT_REPO_NAME: batch9-workspace
+  STUDENT_REPO_NAME: batch10-workspace
   GRADING_USERNAME: portal-api
 
   # DJANGO CACHES

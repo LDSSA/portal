@@ -2,37 +2,49 @@ import csv
 from datetime import datetime, timedelta, timezone
 from logging import getLogger
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from constance import config
 from dateutil import tz
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 from django.http import (
     Http404,
     HttpResponseServerError,
 )
-from django.http.response import FileResponse, HttpResponse
+from django.http.response import (
+    FileResponse,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+)
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import TemplateView, View
 
-from portal.admissions import emails
+from portal.admissions.policy import new_signups_open
 from portal.applications.domain import Domain as ApplicationDomain
 from portal.applications.domain import Status
 from portal.applications.models import Application, Challenge, Submission
 from portal.candidate.domain import notebook_to_html
 from portal.selection.domain import SelectionDomain
 from portal.selection.draw import default_draw_params, draw, reject_draw
+from portal.selection.enrollment import (
+    reset_payment,
+    review_payment,
+    review_scholarship,
+)
 from portal.selection.logs import get_selection_logs
 from portal.selection.models import Selection
 from portal.selection.payment import (
-    add_note,
     can_be_updated,
-    load_payment_data,
 )
 from portal.selection.queries import SelectionQueries
 from portal.selection.select import select
 from portal.selection.status import SelectionStatus
 from portal.staff.domain import Events, EventsExceptionError
 from portal.staff.export import get_all_candidates
+from portal.staff.forms import AdmissionsModeForm
 from portal.users.models import Gender, TicketType, User
 from portal.users.views import AdmissionsStaffViewMixin
 
@@ -49,19 +61,26 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         ctx = {
             "user": self.request.user,
+            "mode_form": AdmissionsModeForm(
+                initial={"admissions_mode": config.ADMISSIONS_MODE}
+            ),
+            "admissions_mode": config.ADMISSIONS_MODE,
+            "signups_effectively_open": new_signups_open(),
             "datetime_fmt": DATETIME_FMT,
             "time_fmt": TIME_FMT,
             "datetime_flags": [
                 {
                     "key": "applications_opening_date",
-                    "value": config.ADMISSIONS_APPLICATIONS_START.strftime(
-                        DATETIME_FMT
-                    ),
+                    "value": config.ADMISSIONS_APPLICATIONS_START.astimezone(
+                        ZoneInfo("Europe/Lisbon")
+                    ).strftime(DATETIME_FMT),
                     "label": "Challenge Submissions Opening Date",
                 },
                 {
                     "key": "applications_closing_date",
-                    "value": config.ADMISSIONS_SELECTION_START.strftime(DATETIME_FMT),
+                    "value": config.ADMISSIONS_SELECTION_START.astimezone(
+                        ZoneInfo("Europe/Lisbon")
+                    ).strftime(DATETIME_FMT),
                     "label": "Challenge Submissions Closing Date",
                 },
             ],
@@ -73,6 +92,16 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
                 },
             ],
             "bool_flags": [
+                {
+                    "key": "no_exam_registration",
+                    "value": config.NO_EXAM_REGISTRATION_OPEN,
+                    "label": "No-exam registration",
+                },
+                {
+                    "key": "no_exam_access",
+                    "value": config.NO_EXAM_ACADEMY_ACCESS_OPEN,
+                    "label": "No-exam academy access (also requires academy start date)",
+                },
                 {
                     "key": "signups_are_open",
                     "value": config.ACCOUNT_ALLOW_REGISTRATION,
@@ -94,19 +123,71 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
         **kwargs,
     ):
         if not request.user.is_superuser:
-            return HttpResponseServerError(
+            return HttpResponseForbidden(
                 b"error updating admin variables. Only admins can update these variables",
             )
 
-        key = request.POST["key"]
+        key = request.POST.get("key")
+        if key in (
+            "applications_opening_date",
+            "applications_closing_date",
+            "coding_test_duration",
+        ):
+            try:
+                parsed = datetime.strptime(
+                    request.POST.get("date_s", ""),
+                    TIME_FMT if key == "coding_test_duration" else DATETIME_FMT,
+                )
+            except ValueError:
+                return HttpResponseBadRequest(
+                    "Enter a valid date/time in the displayed format (Lisbon time)."
+                )
+            if key != "coding_test_duration":
+                local = parsed.replace(tzinfo=tz.gettz("Europe/Lisbon"))
+                if not tz.datetime_exists(local) or tz.datetime_ambiguous(local):
+                    return HttpResponseBadRequest(
+                        "This Lisbon time is ambiguous or does not exist during the clock change. Use Constance with an explicit UTC time."
+                    )
+            elif not (parsed.hour or parsed.minute or parsed.second):
+                return HttpResponseBadRequest("Duration must be positive.")
+        if key in ("signups_are_open", "accepting_payment_profs") and request.POST.get(
+            "action"
+        ) not in ("open", "close"):
+            return HttpResponseBadRequest("Choose open or close.")
 
-        if key == "applications_opening_date":
+        if key == "admissions_mode":
+            form = AdmissionsModeForm(request.POST)
+            if not form.is_valid():
+                return HttpResponseBadRequest("Choose Exam or No exam.")
+            old = config.ADMISSIONS_MODE
+            config.ADMISSIONS_MODE = form.cleaned_data["admissions_mode"]
+            logger.info(
+                "Admissions default changed by user=%s from=%s to=%s",
+                request.user.pk,
+                old,
+                config.ADMISSIONS_MODE,
+            )
+            messages.success(
+                request,
+                "Default admissions mode updated. Existing applicants retain their mode.",
+            )
+        elif key in ("no_exam_registration", "no_exam_access"):
+            action = request.POST.get("action")
+            if action not in ("open", "close"):
+                return HttpResponseBadRequest("Choose open or close.")
+            flag = (
+                "NO_EXAM_REGISTRATION_OPEN"
+                if key == "no_exam_registration"
+                else "NO_EXAM_ACADEMY_ACCESS_OPEN"
+            )
+            setattr(config, flag, action == "open")
+        elif key == "applications_opening_date":
             date_s = request.POST["date_s"]
             opening_date = datetime.strptime(date_s, DATETIME_FMT).replace(
                 tzinfo=tz.gettz("Europe/Lisbon")
             )
-            if opening_date > config.ADMISSIONS_SELECTION_START:
-                return HttpResponseServerError(
+            if opening_date >= config.ADMISSIONS_SELECTION_START:
+                return HttpResponseBadRequest(
                     b"error setting opening date. opening date must be before closing date",
                 )
             config.ADMISSIONS_APPLICATIONS_START = opening_date
@@ -116,8 +197,8 @@ class HomeView(AdmissionsStaffViewMixin, TemplateView):
             closing_date = datetime.strptime(date_s, DATETIME_FMT).replace(
                 tzinfo=tz.gettz("Europe/Lisbon")
             )
-            if closing_date < config.ADMISSIONS_APPLICATIONS_START:
-                return HttpResponseServerError(
+            if closing_date <= config.ADMISSIONS_APPLICATIONS_START:
+                return HttpResponseBadRequest(
                     b"error setting closing date. closing date must be after opening date",
                 )
 
@@ -182,7 +263,7 @@ class EventsView(AdmissionsStaffViewMixin, TemplateView):
         **kwargs,
     ):
         if not request.user.is_superuser:
-            return HttpResponseServerError(
+            return HttpResponseForbidden(
                 b"error triggering event. Only admins can trigger events",
             )
 
@@ -228,6 +309,11 @@ class CandidateDetailView(AdmissionsStaffViewMixin, TemplateView):
         except User.DoesNotExist as exc:
             raise Http404 from exc
 
+        if not user.admissions_requires_exam:
+            return super().get_context_data(
+                candidate=user, total_submissions=None, application_best_scores={}
+            )
+
         try:
             application = user.application
             total_submissions = Submission.objects.filter(
@@ -256,7 +342,7 @@ class CandidateDetailView(AdmissionsStaffViewMixin, TemplateView):
             application_best_scores = {}
 
         ctx = {
-            "user": user,
+            "candidate": user,
             "total_submissions": total_submissions,
             "application_best_scores": application_best_scores,
         }
@@ -269,7 +355,9 @@ class ApplicationView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/applications.html"
 
     def get_context_data(self, **kwargs):
-        query = Application.objects.all().order_by("user__email")
+        query = Application.objects.filter(user__admissions_mode="exam").order_by(
+            "user__email"
+        )
 
         filter_by_application_status = self.request.GET.get("application_status")
 
@@ -377,7 +465,9 @@ class SubmissionView(AdmissionsStaffViewMixin, TemplateView):
     template_name = "staff_templates/submissions.html"
 
     def get_context_data(self, **kwargs):
-        query = Submission.objects.all().order_by("-created_at")
+        query = Submission.objects.filter(
+            user__admissions_mode="exam", application__user__admissions_mode="exam"
+        ).order_by("-created_at")
 
         user_email = self.request.GET.get("user_email", None)
         if user_email is not None:
@@ -405,7 +495,11 @@ class SubmissionDownloadView(AdmissionsStaffViewMixin, View):
         **kwargs,
     ):
         try:
-            submission: Submission = Submission.objects.get(id=kwargs["pk"])
+            submission: Submission = Submission.objects.get(
+                id=kwargs["pk"],
+                application__user__admissions_mode="exam",
+                user__admissions_mode="exam",
+            )
         except Submission.DoesNotExist as exc:
             raise Http404 from exc
 
@@ -423,7 +517,11 @@ class SubmissionFeedbackDownloadView(AdmissionsStaffViewMixin, View):
         **kwargs,
     ):
         try:
-            submission: Submission = Submission.objects.get(id=kwargs["pk"])
+            submission: Submission = Submission.objects.get(
+                id=kwargs["pk"],
+                application__user__admissions_mode="exam",
+                user__admissions_mode="exam",
+            )
         except Submission.DoesNotExist as exc:
             raise Http404 from exc
 
@@ -607,7 +705,7 @@ class SelectionRejectView(AdmissionsStaffViewMixin, View):
         *args,
         **kwargs,
     ):
-        selection = Selection.objects.get(id=kwargs["candidate_id"])
+        selection = SelectionQueries.get_all().get(id=kwargs["candidate_id"])
         reject_draw(selection)
         return redirect("admissions:staff:selection-list")
 
@@ -629,7 +727,7 @@ class InterviewListView(AdmissionsStaffViewMixin, TemplateView):
     def get_context_data(self, **kwargs):
         ctx = {
             "selections": SelectionQueries.filter_by_status_in(
-                [SelectionStatus.INTERVIEW]
+                [SelectionStatus.INTERVIEW], mode=None
             ),
             "selection_status": SelectionStatus,
         }
@@ -644,7 +742,7 @@ def _get_user_selection(user_id):
 
     try:
         selection = Selection.objects.get(user=candidate)
-    except User.DoesNotExist as exc:
+    except Selection.DoesNotExist as exc:
         raise Http404 from exc
 
     return candidate, selection
@@ -672,48 +770,17 @@ class InterviewDetailView(AdmissionsStaffViewMixin, TemplateView):
             return redirect("admissions:staff:interview-list")
         return super().get(request, *args, **kwargs)
 
-    def post(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):
-        _, selection = _get_user_selection(kwargs["pk"])
-        staff_user = request.user
-        action = request.POST["action"]
-        msg = request.POST.get("msg", None)
-
-        if action == "note":
-            add_note(selection, msg, staff_user)
-        elif action == "reject":
-            SelectionDomain.manual_update_status(
-                selection,
-                SelectionStatus.REJECTED,
-                staff_user,
-                msg=msg,
+    def post(self, request, *args, **kwargs):
+        candidate, _ = _get_user_selection(kwargs["pk"])
+        try:
+            review_scholarship(
+                candidate,
+                request.user,
+                request.POST.get("action"),
+                request.POST.get("msg", ""),
             )
-            emails.send_interview_failed_email(
-                to_email=selection.user.email,
-                to_name=selection.user.name,
-                message=msg,
-            )
-        elif action == "accept":
-            SelectionDomain.manual_update_status(
-                selection,
-                SelectionStatus.SELECTED,
-                staff_user,
-                msg=msg,
-            )
-            load_payment_data(selection)
-
-            payment_due_date = selection.payment_due_date.strftime("%Y-%m-%d")
-            emails.send_interview_passed_email(
-                to_email=selection.user.email,
-                to_name=selection.user.name,
-                payment_value=selection.payment_value,
-                payment_due_date=payment_due_date,
-            )
-
+        except ValidationError as exc:
+            messages.error(request, "; ".join(exc.messages))
         return redirect(request.path_info)
 
 
@@ -729,6 +796,7 @@ class PaymentListView(AdmissionsStaffViewMixin, TemplateView):
                     SelectionStatus.ACCEPTED,
                     SelectionStatus.REJECTED,
                 ],
+                mode=None,
             ),
             "selection_status": SelectionStatus,
         }
@@ -760,75 +828,32 @@ class PaymentDetailView(AdmissionsStaffViewMixin, TemplateView):
         }
         return super().get_context_data(**ctx)
 
-    def post(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):
-        _, selection = _get_user_selection(kwargs["pk"])
-        staff_user = request.user
-        action = request.POST["action"]
-        msg = request.POST.get("msg", None)
-
-        if action == "note":
-            add_note(selection, msg, staff_user)
-        elif action == "reject":
-            SelectionDomain.manual_update_status(
-                selection,
-                SelectionStatus.REJECTED,
-                staff_user,
-                msg=msg,
+    def post(self, request, *args, **kwargs):
+        candidate, _ = _get_user_selection(kwargs["pk"])
+        try:
+            review_payment(
+                candidate,
+                request.user,
+                request.POST.get("action"),
+                request.POST.get("msg", ""),
             )
-            emails.send_payment_refused_proof_email(
-                to_email=selection.user.email,
-                to_name=selection.user.name,
-                message=msg,
-            )
-        elif action == "ask_additional":
-            SelectionDomain.manual_update_status(
-                selection,
-                SelectionStatus.SELECTED,
-                staff_user,
-                msg=msg,
-            )
-            emails.send_payment_need_additional_proof_email(
-                to_email=selection.user.email,
-                to_name=selection.user.name,
-                message=msg,
-            )
-        elif action == "accept":
-            SelectionDomain.manual_update_status(
-                selection,
-                SelectionStatus.ACCEPTED,
-                staff_user,
-                msg=msg,
-            )
-            emails.send_payment_accepted_proof_email(
-                to_email=selection.user.email,
-                to_name=selection.user.name,
-                message=msg,
-            )
-
+        except ValidationError as exc:
+            messages.error(request, "; ".join(exc.messages))
         return redirect(request.path_info)
 
 
 class PaymentResetView(AdmissionsStaffViewMixin, View):
-    def post(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):
-        _, selection = _get_user_selection(kwargs["pk"])
+    def post(self, request, *args, **kwargs):
+        candidate, _ = _get_user_selection(kwargs["pk"])
         try:
-            load_payment_data(selection, request.user)
-            SelectionDomain.update_status(
-                selection, SelectionStatus.SELECTED, user=request.user
+            reset_payment(
+                candidate,
+                request.user,
+                request.POST.get("reason", ""),
+                request.POST.get("ticket_type"),
             )
-        except Exception as exc:
-            raise Http404 from exc
-
+        except ValidationError as exc:
+            messages.error(request, "; ".join(exc.messages))
         return redirect("admissions:staff:payment-detail", pk=kwargs["pk"])
 
 

@@ -33,7 +33,7 @@
                     <tr>
                         <td>{{ s.user.name }}</td>
                         <td><a href="{% url 'admissions:staff:candidate-detail' s.user.id %}">{{ s.user.email }}</a></td>
-                        <td>{{ s.user.ticket_type }}</td>
+                        <td>{{ s.ticket_type }}</td>
                         <td>{{ s.payment_value }}€</td>
                     </tr>
                 </tbody>
@@ -69,8 +69,9 @@
         <div class="card-body">
             <h4 class="pb-4 pt-2">Actions</h4>
 
-            {% if can_update %}
+            {% if s.status == selection_status.TO_BE_ACCEPTED %}
             <h5 class="pb-4 pt-2">Decide on payment proof</h5>
+            <p>{% if s.user.admissions_requires_exam %}Student status is granted by the End Admissions event.{% else %}Accepting verified payment completes enrollment and grants student status. Course access also requires its opening date and staff switch.{% endif %}</p>
 
             <div class="row ">
                 <div class="col">
@@ -106,22 +107,18 @@
             <hr>
             <br>
 
-            <h5 class="pb-4 pt-2">Reset payment</h5>
-            <p>
-                If the candidate wants to change their ticket type, they should do it on their Profile.
-                Then, we must reset their payment, in order to generate new payment details with the right amount.
-                <br>
-                Note: candidates are not allowed to switch to or from the Scholarship ticket type.
-            </p>
-
-            <form action="{% url 'admissions:staff:payment-reset' candidate_id %}" enctype="multipart/form-data" method="POST" class="m-0 mt-auto">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-info">Reset Payment</button>
+            {% endif %}
+            {% if s.status == selection_status.SELECTED %}
+            <h5>Reset payment</h5>
+            <p>Reset only to correct payment instructions. This starts a new payment deadline.</p>
+            <form action="{% url 'admissions:staff:payment-reset' candidate_id %}" method="post">
+              {% csrf_token %}
+              <label for="resetReason">Reason</label><textarea id="resetReason" name="reason" required class="form-control"></textarea>
+              {% if not s.user.applying_for_scholarship %}
+              <label for="resetTicket">Ticket type</label><select name="ticket_type" id="resetTicket"><option value="">Keep current type</option value="student">Student</option><option value="regular">Regular</option><option value="company">Company</option></select>
+              {% endif %}
+              <button class="btn btn-info">Reset payment instructions</button>
             </form>
-            
-            <br>
-            <hr>
-            <br>
             {% endif %}
 
             <h5 class="pb-4 pt-2">Add note</h5>

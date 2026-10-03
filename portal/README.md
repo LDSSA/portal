@@ -7,3 +7,6 @@ Your friendly neighborhood LDSA Academy portal.
 ## Documentation
 
 You will find the complete documentation at [Notion](https://marble-van-259.notion.site/DevOps-Documentation-9b98a4d496524d9ea16824febeb0fec9?pvs=4).
+
+
+Admissions workflow configuration and rollout instructions: [Exam and no-exam admissions](docs/admissions-modes.md).

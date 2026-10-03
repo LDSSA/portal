@@ -4,6 +4,7 @@ from pathlib import Path
 from django.core.management.base import BaseCommand
 
 from portal.capstone import models
+from portal.edition_management.maintenance import guarded
 
 
 class Command(BaseCommand):
@@ -14,6 +15,7 @@ class Command(BaseCommand):
         parser.add_argument("--data", required=True)
         parser.add_argument("--batch-size", type=int, default=1000)
 
+    @guarded
     def handle(self, *args, **options):
         simulator = models.Simulator.objects.get(name=options["simulator_name"])
 
