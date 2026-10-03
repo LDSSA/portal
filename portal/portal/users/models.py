@@ -66,18 +66,18 @@ class User(AbstractUser):
     # Academy
     is_student = models.BooleanField(default=False)
     is_instructor = models.BooleanField(default=False)
-    retain_student_account_on_next_edition_reset = models.BooleanField(
+    retain_account_on_next_edition_reset = models.BooleanField(
         null=True,
         blank=True,
         default=None,
-        verbose_name=_("Retain student account on next edition reset"),
+        verbose_name=_("Retain account on next edition reset"),
         help_text=_(
-            "Student-only accounts: select to preserve the complete user account "
-            "and student status during the next edition reset. Academic and "
-            "admissions activity is still deleted. After a successful reset, "
-            "this setting returns to unselected and must be authorized again for "
-            "a later reset. This does not apply to staff, superusers, instructors, "
-            "or other non-student accounts."
+            "Student-only and roleless accounts: select to preserve the complete "
+            "user account during the next edition reset. The student's role, when "
+            "present, is preserved, but academic and admissions activity is still "
+            "deleted. After a successful reset, this setting returns to unselected "
+            "and must be authorized again for a later reset. Staff, superusers, "
+            "instructors, and mixed-role accounts use the organizer policy instead."
         ),
     )
     slack_member_id = models.TextField(blank=True)
@@ -126,23 +126,21 @@ class User(AbstractUser):
     class Meta(AbstractUser.Meta):
         constraints = [
             models.CheckConstraint(
-                name="users_student_reset_retention_matches_role",
+                name="users_reset_retention_matches_role",
                 check=(
                     Q(
-                        is_student=True,
                         is_staff=False,
                         is_superuser=False,
                         is_instructor=False,
-                        retain_student_account_on_next_edition_reset__isnull=False,
+                        retain_account_on_next_edition_reset__isnull=False,
                     )
                     | (
                         ~Q(
-                            is_student=True,
                             is_staff=False,
                             is_superuser=False,
                             is_instructor=False,
                         )
-                        & Q(retain_student_account_on_next_edition_reset__isnull=True)
+                        & Q(retain_account_on_next_edition_reset__isnull=True)
                     )
                 ),
             )
@@ -152,19 +150,17 @@ class User(AbstractUser):
         return reverse("users:detail", kwargs={"username": self.username})
 
     @property
-    def is_student_only(self):
-        return self.is_student and not (
-            self.is_staff or self.is_superuser or self.is_instructor
-        )
+    def can_choose_reset_retention(self):
+        return not (self.is_staff or self.is_superuser or self.is_instructor)
 
     def _normalize_reset_retention(self):
-        previous = self.retain_student_account_on_next_edition_reset
-        if self.is_student_only:
+        previous = self.retain_account_on_next_edition_reset
+        if self.can_choose_reset_retention:
             if previous is None:
-                self.retain_student_account_on_next_edition_reset = False
+                self.retain_account_on_next_edition_reset = False
         else:
-            self.retain_student_account_on_next_edition_reset = None
-        return previous != self.retain_student_account_on_next_edition_reset
+            self.retain_account_on_next_edition_reset = None
+        return previous != self.retain_account_on_next_edition_reset
 
     def clean(self):
         super().clean()
@@ -175,7 +171,7 @@ class User(AbstractUser):
         if retention_changed and kwargs.get("update_fields") is not None:
             kwargs["update_fields"] = {
                 *kwargs["update_fields"],
-                "retain_student_account_on_next_edition_reset",
+                "retain_account_on_next_edition_reset",
             }
         if not self.deploy_private_key and not self.deploy_public_key:
             key = rsa.generate_private_key(

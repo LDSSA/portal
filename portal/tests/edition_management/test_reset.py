@@ -254,7 +254,7 @@ def test_service_account_and_mixed_role_organizer(operator, settings):
     mixed.refresh_from_db()
     service.refresh_from_db()
     assert not mixed.is_student and mixed.is_instructor
-    assert mixed.retain_student_account_on_next_edition_reset is None
+    assert mixed.retain_account_on_next_edition_reset is None
     assert all(not model(label).objects.exists() for label in CLEAR)
     assert service.is_staff and Token.objects.get(user=service).key == key
 
@@ -277,16 +277,16 @@ def test_marked_student_account_is_retained_without_academic_activity(
     student_fields = [
         field.attname
         for field in User._meta.concrete_fields
-        if field.name != "retain_student_account_on_next_edition_reset"
+        if field.name != "retain_account_on_next_edition_reset"
     ]
-    student.retain_student_account_on_next_edition_reset = True
-    student.save(update_fields=["retain_student_account_on_next_edition_reset"])
+    student.retain_account_on_next_edition_reset = True
+    student.save(update_fields=["retain_account_on_next_edition_reset"])
     student_before = User.objects.values(*student_fields).get(pk=student.pk)
     assert student not in PrepareForm(actor=operator).fields["retained"].queryset
 
     client.force_login(operator)
     run = preview(operator)
-    assert run.plan["retained_students"] == [student.pk]
+    assert run.plan["retained_participants"] == [student.pk]
     assert {
         account["username"]: account["reason"]
         for account in run.plan["retained_accounts"]
@@ -299,17 +299,70 @@ def test_marked_student_account_is_retained_without_academic_activity(
     student.refresh_from_db()
     assert run.status == "succeeded", run.error
     assert student.is_student
-    assert student.retain_student_account_on_next_edition_reset is False
+    assert student.retain_account_on_next_edition_reset is False
     assert User.objects.values(*student_fields).get(pk=student.pk) == student_before
     assert EmailAddress.objects.filter(pk=email.pk, user=student).exists()
     assert Token.objects.get(pk=token.pk, user=student).key == token.key
     assert all(not model(label).objects.exists() for label in CLEAR)
-    assert student.pk not in plan(operator, [operator.pk])["retained_students"]
+    assert student.pk not in plan(operator, [operator.pk])["retained_participants"]
     client.force_login(operator)
     response = client.get(reverse("admin:edition_run", args=[run.pk]))
-    assert b"Student accounts retained" in response.content
-    assert b"student status and database credentials will survive" in response.content
+    assert b"Student and roleless accounts retained" in response.content
+    assert (
+        b"existing role state and database credentials will survive" in response.content
+    )
     assert b"retention setting returns to unselected" in response.content
+
+
+def test_marked_roleless_account_is_retained_without_edition_activity(client, operator):
+    from allauth.account.models import EmailAddress
+
+    from portal.edition_management.forms import PrepareForm
+
+    account = User.objects.create_user(
+        username="incomplete-applicant",
+        email="incomplete@example.com",
+        name="Incomplete Applicant",
+    )
+    activity(account)
+    email = EmailAddress.objects.create(
+        user=account,
+        email=account.email,
+        verified=False,
+        primary=True,
+    )
+    token = Token.objects.create(user=account)
+    account_fields = [
+        field.attname
+        for field in User._meta.concrete_fields
+        if field.name != "retain_account_on_next_edition_reset"
+    ]
+    account.retain_account_on_next_edition_reset = True
+    account.save(update_fields=["retain_account_on_next_edition_reset"])
+    account_before = User.objects.values(*account_fields).get(pk=account.pk)
+    assert account not in PrepareForm(actor=operator).fields["retained"].queryset
+
+    client.force_login(operator)
+    run = preview(operator)
+    assert run.plan["retained_participants"] == [account.pk]
+    assert {item["username"]: item["reason"] for item in run.plan["retained_accounts"]}[
+        account.username
+    ] == "Roleless account marked for retention during the next edition reset"
+
+    process(run)
+    run.refresh_from_db()
+    account.refresh_from_db()
+    assert run.status == "succeeded", run.error
+    assert not account.is_student
+    assert not account.is_staff
+    assert not account.is_superuser
+    assert not account.is_instructor
+    assert account.retain_account_on_next_edition_reset is False
+    assert User.objects.values(*account_fields).get(pk=account.pk) == account_before
+    assert EmailAddress.objects.filter(pk=email.pk, user=account).exists()
+    assert Token.objects.get(pk=token.pk, user=account).key == token.key
+    assert all(not model(label).objects.exists() for label in CLEAR)
+    assert account.pk not in plan(operator, [operator.pk])["retained_participants"]
 
 
 def test_api_and_staff_cannot_control_reset(client, operator, student):
@@ -757,7 +810,10 @@ def test_instructor_migration_preserves_existing_assignments_and_grades():
     try:
         executor.migrate(before)
         old = executor.loader.project_state(before).apps
-        user = old.get_model("users", "User").objects.create(username="legacy-teacher")
+        user = old.get_model("users", "User").objects.create(
+            username="legacy-teacher",
+            retain_account_on_next_edition_reset=False,
+        )
         spec = old.get_model("academy", "Specialization").objects.create(code="S01")
         unit = old.get_model("academy", "Unit").objects.create(
             code="SLU01", specialization=spec, instructor=user, checksum="unchanged"

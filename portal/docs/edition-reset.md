@@ -71,11 +71,11 @@ do not participate in the maintenance protocol. Do not run them during reset.
    asks you to retry.
 4. Select organizers to retain. Only staff, superusers and instructors are selectable.
    Existing organizers are preselected; the operator and configured service accounts are
-   always retained and therefore do not appear as choices. Student-only accounts marked for
-   retention during the next edition reset are also retained automatically and do not appear as choices.
-   Their complete user account and student status remain unchanged, but all previous-edition
-   academic and admissions activity is cleared. Ordinary students, applicants, test accounts and
-   unclassified accounts are scheduled for deletion. Deselected organizers also lose their
+   always retained and therefore do not appear as choices. Student-only and roleless accounts
+   marked for retention during the next edition reset are also retained automatically and do not
+   appear as choices. Their complete user account and existing role state remain unchanged, but
+   all previous-edition academic and admissions activity is cleared. Unmarked students,
+   applicants, test accounts and unclassified accounts are scheduled for deletion. Deselected organizers also lose their
    database credentials. Mixed-role students follow their staff/superuser/instructor role and
    remain selectable; their previous-edition academic activity is always cleared.
 5. Review the final preview. It explains why each retained account survives, classifies every
@@ -177,13 +177,13 @@ other admissions records cleared by the reset. Complete the reset only before ge
 incoming-edition registrations exist; if the preview finds one, cancel without changing the
 database.
 
-Exceptionally, an authorized administrator can mark a student-only user record for retention
-during the next edition reset. The reset leaves that user's student status, login,
-email/social identity, database token, profile values and deployment keys unchanged, while
-still deleting every academic and admissions record covered by the reset policy. After success,
-the marker resets to false and must be explicitly authorized again for a later reset. Staff,
-superusers and instructors use the organizer selection even when they also have student status;
-the retention marker is always null for those mixed roles.
+Exceptionally, an authorized administrator can mark a student-only or roleless user record for
+retention during the next edition reset. The reset leaves that user's existing role state, login,
+email/social identity, database token, profile values and deployment keys unchanged, while still
+deleting every academic and admissions record covered by the reset policy. After success, the
+marker resets to false and must be explicitly authorized again for a later reset. Staff,
+superusers and instructors use the organizer selection; the retention marker is always null for
+those accounts, including mixed-role students.
 
 ## Complete model policy
 
@@ -223,7 +223,7 @@ the retention marker is always null for those mixed roles.
 | `socialaccount.SocialAccount` | Selective / configure | Keep records associated with retained accounts. |
 | `socialaccount.SocialApp` | Keep all | Preserve reusable configuration. |
 | `socialaccount.SocialToken` | Selective / configure | Keep records associated with retained accounts. |
-| `users.User` | Selective / configure | Keep the operator, configured service accounts, selected organizers and student-only accounts marked for retention during the next edition reset; delete all other users and their database credentials. Marked students keep their student status, while all previous-edition academic activity is cleared and their retention setting resets to false. |
+| `users.User` | Selective / configure | Keep the operator, configured service accounts, selected organizers, and student-only or roleless accounts marked for retention during the next edition reset; delete all other users and their database credentials. Marked accounts keep their existing role state, while all previous-edition academic and admissions activity is cleared and their retention setting resets to false. |
 | `users.UserWhitelist` | Clear all | Remove previous-edition activity in both admission modes. |
 | `authtoken.TokenProxy` | No separate operation | Proxy of Token; not another table. |
 | `django_migrations` | Keep all | Migration history is never reset. |

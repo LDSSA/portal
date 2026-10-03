@@ -74,10 +74,10 @@
       {% endif %}
     </div>
 
-    {% if run.plan.retained_students %}
+    {% if run.plan.retained_participants or run.plan.retained_students %}
       <div class="module">
-        <h2>Student accounts retained</h2>
-        <p class="errornote">These complete user accounts, student status and database credentials will survive. All of their grades, submissions, applications, selections, teams, reports, simulator activity and other previous-edition records will be deleted. After success, their retention setting returns to unselected and must be authorized again for a later reset.</p>
+        <h2>Student and roleless accounts retained</h2>
+        <p class="errornote">These complete user accounts, existing role state and database credentials will survive. All of their grades, submissions, applications, selections, teams, reports, simulator activity and other previous-edition records will be deleted. After success, their retention setting returns to unselected and must be authorized again for a later reset.</p>
       </div>
     {% endif %}
 
