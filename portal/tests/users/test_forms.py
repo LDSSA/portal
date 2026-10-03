@@ -43,4 +43,4 @@ def test_student_cannot_edit_reset_retention_in_profile():
         is_student=True,
     )
     form = UserChangeForm(instance=student)
-    assert "retain_student_account_on_next_edition_reset" not in form.fields
+    assert "retain_account_on_next_edition_reset" not in form.fields
