@@ -31,7 +31,7 @@ from portal.edition_management.maintenance import (
     state,
 )
 from portal.edition_management.models import EditionRun, GradingJob
-from portal.edition_management.planner import create_preview, validate_jobs
+from portal.edition_management.planner import create_preview, plan, validate_jobs
 from portal.edition_management.policy import CLEAR, model
 from portal.hackathons.models import Attendance, Hackathon, Submission, Team
 from portal.selection.models import (
@@ -247,13 +247,69 @@ def test_service_account_and_mixed_role_organizer(operator, settings):
     mixed = User.objects.create_user(
         username="mixed", email="mixed@example.com", is_student=True, is_instructor=True
     )
+    activity(mixed)
     key = Token.objects.create(user=service).key
     run = preview(operator, [mixed.pk])
     process(run)
     mixed.refresh_from_db()
     service.refresh_from_db()
     assert not mixed.is_student and mixed.is_instructor
+    assert mixed.retain_student_account_on_next_edition_reset is None
+    assert all(not model(label).objects.exists() for label in CLEAR)
     assert service.is_staff and Token.objects.get(user=service).key == key
+
+
+def test_marked_student_account_is_retained_without_academic_activity(
+    client, operator, student
+):
+    from allauth.account.models import EmailAddress
+
+    from portal.edition_management.forms import PrepareForm
+
+    activity(student)
+    email = EmailAddress.objects.create(
+        user=student,
+        email=student.email,
+        verified=True,
+        primary=True,
+    )
+    token = Token.objects.create(user=student)
+    student_fields = [
+        field.attname
+        for field in User._meta.concrete_fields
+        if field.name != "retain_student_account_on_next_edition_reset"
+    ]
+    student.retain_student_account_on_next_edition_reset = True
+    student.save(update_fields=["retain_student_account_on_next_edition_reset"])
+    student_before = User.objects.values(*student_fields).get(pk=student.pk)
+    assert student not in PrepareForm(actor=operator).fields["retained"].queryset
+
+    client.force_login(operator)
+    run = preview(operator)
+    assert run.plan["retained_students"] == [student.pk]
+    assert {
+        account["username"]: account["reason"]
+        for account in run.plan["retained_accounts"]
+    }[
+        student.username
+    ] == "Student account marked for retention during the next edition reset"
+
+    process(run)
+    run.refresh_from_db()
+    student.refresh_from_db()
+    assert run.status == "succeeded", run.error
+    assert student.is_student
+    assert student.retain_student_account_on_next_edition_reset is False
+    assert User.objects.values(*student_fields).get(pk=student.pk) == student_before
+    assert EmailAddress.objects.filter(pk=email.pk, user=student).exists()
+    assert Token.objects.get(pk=token.pk, user=student).key == token.key
+    assert all(not model(label).objects.exists() for label in CLEAR)
+    assert student.pk not in plan(operator, [operator.pk])["retained_students"]
+    client.force_login(operator)
+    response = client.get(reverse("admin:edition_run", args=[run.pk]))
+    assert b"Student accounts retained" in response.content
+    assert b"student status and database credentials will survive" in response.content
+    assert b"retention setting returns to unselected" in response.content
 
 
 def test_api_and_staff_cannot_control_reset(client, operator, student):

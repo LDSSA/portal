@@ -37,6 +37,18 @@ def protected_ids(actor):
     }
 
 
+def retained_student_ids():
+    return set(
+        User.objects.filter(
+            is_student=True,
+            is_staff=False,
+            is_superuser=False,
+            is_instructor=False,
+            retain_student_account_on_next_edition_reset=True,
+        ).values_list("pk", flat=True)
+    )
+
+
 def unfinished_grading_records():
     rows = [
         {
@@ -84,8 +96,12 @@ def plan(actor, retained):
     superuser(actor)
     deployment_ready()
     selected = set(map(int, retained))
-    retained = selected | protected_ids(actor)
-    allowed = set(organizers().values_list("pk", flat=True)) | protected_ids(actor)
+    protected = protected_ids(actor)
+    retained_students = retained_student_ids()
+    retained = selected | protected | retained_students
+    allowed = (
+        set(organizers().values_list("pk", flat=True)) | protected | retained_students
+    )
     if retained - allowed:
         raise ValidationError(
             "Only existing organizers and protected accounts can be retained."
@@ -100,6 +116,7 @@ def plan(actor, retained):
             "is_staff",
             "is_superuser",
             "is_instructor",
+            "retain_student_account_on_next_edition_reset",
             "admissions_mode",
             "registration_completed_at",
         )
@@ -115,6 +132,8 @@ def plan(actor, retained):
                 if user["id"] == actor.pk
                 else "Service account — automatically retained"
                 if user["username"] in service_users
+                else "Student account marked for retention during the next edition reset"
+                if user["id"] in retained_students
                 else "Selected organizer"
             )
             retained_accounts.append({"username": user["username"], "reason": reason})
@@ -183,6 +202,7 @@ def plan(actor, retained):
         "release": settings.EDITION_RELEASE,
         "generation": state().generation,
         "retained": sorted(retained),
+        "retained_students": sorted(retained_students),
         "retained_names": [u["username"] for u in users if u["id"] in retained],
         "deleted_names": [u["username"] for u in delete],
         "retained_accounts": retained_accounts,

@@ -28,6 +28,7 @@ class UserAdmin(auth_admin.UserAdmin):
                     "academy_type_preference",
                     "is_student",
                     "is_instructor",
+                    "retain_student_account_on_next_edition_reset",
                     "code_of_conduct_accepted",
                     "can_graduate",
                     "applying_for_scholarship",
@@ -49,6 +50,7 @@ class UserAdmin(auth_admin.UserAdmin):
         "username",
         "is_student",
         "is_instructor",
+        "retain_student_account_on_next_edition_reset",
         "name",
         "is_superuser",
         "can_graduate",
@@ -62,8 +64,15 @@ class UserAdmin(auth_admin.UserAdmin):
         "is_instructor",
         "is_staff",
         "is_superuser",
+        "retain_student_account_on_next_edition_reset",
         "is_active",
         "groups",
         "can_graduate",
         "failed_or_dropped",
     )
+
+    def get_readonly_fields(self, request, obj=None):
+        fields = list(super().get_readonly_fields(request, obj))
+        if obj is None or not obj.is_student_only:
+            fields.append("retain_student_account_on_next_edition_reset")
+        return fields
