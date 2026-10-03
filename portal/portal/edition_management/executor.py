@@ -48,6 +48,18 @@ def execute_reset(run):
                 "user_id", "key"
             )
         )
+        users = model("users.User")
+        retained_student_ids = set(run.plan.get("retained_students", ()))
+        user_fields = [
+            field.attname
+            for field in users._meta.concrete_fields
+            if field.name != "retain_student_account_on_next_edition_reset"
+        ]
+        retained_student_values = list(
+            users.objects.filter(pk__in=retained_student_ids)
+            .order_by("pk")
+            .values(*user_fields)
+        )
         model("academy.Unit").objects.update(instructor=None, open=False)
         model("hackathons.Hackathon").objects.update(status="closed")
         model("capstone.Capstone").objects.update(
@@ -57,13 +69,13 @@ def execute_reset(run):
         for label in CLEAR:
             count, _ = model(label).objects.all().delete()
             deleted[label] = count
-        users = model("users.User")
         count, _ = users.objects.exclude(pk__in=run.plan["retained"]).delete()
         deleted["users.User and dependencies"] = count
         users.objects.filter(pk__in=run.plan["retained"]).exclude(
             username__in=settings.EDITION_SERVICE_USERS
-        ).update(
+        ).exclude(pk__in=retained_student_ids).update(
             is_student=False,
+            retain_student_account_on_next_edition_reset=None,
             registration_completed_at=None,
             code_of_conduct_accepted=False,
             applying_for_scholarship=None,
@@ -73,6 +85,9 @@ def execute_reset(run):
             can_attend_next=True,
             failed_or_dropped=False,
             admissions_mode=config.ADMISSIONS_MODE,
+        )
+        users.objects.filter(pk__in=retained_student_ids).update(
+            retain_student_account_on_next_edition_reset=False
         )
         close_public_access()
         for label in CLEAR:
@@ -96,6 +111,26 @@ def execute_reset(run):
             raise ValidationError("Retained API credentials changed.")
         if set(users.objects.values_list("pk", flat=True)) != set(run.plan["retained"]):
             raise ValidationError("Retained accounts changed.")
+        if (
+            list(
+                users.objects.filter(pk__in=retained_student_ids)
+                .order_by("pk")
+                .values(*user_fields)
+            )
+            != retained_student_values
+        ):
+            raise ValidationError(
+                "Retained student accounts changed during the edition reset."
+            )
+        if users.objects.filter(
+            pk__in=retained_student_ids,
+            is_student=True,
+            retain_student_account_on_next_edition_reset=False,
+        ).count() != len(retained_student_ids):
+            raise ValidationError(
+                "Retained student accounts lost their student role or were not "
+                "prepared for a future reset."
+            )
         current.phase = "prepared"
         current.generation += 1
         current.save(update_fields=["phase", "generation"])

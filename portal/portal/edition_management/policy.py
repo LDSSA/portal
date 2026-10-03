@@ -55,7 +55,7 @@ UPDATED_FIELDS = {
     },
 }
 NOTES = {
-    "users.User": "Keep the operator, configured service accounts and selected organizers; delete all other users and their database credentials.",
+    "users.User": "Keep the operator, configured service accounts, selected organizers and student accounts marked for retention during the next edition reset; delete all other users and their database credentials. Marked students remain students, but all previous-edition academic activity is cleared. Their retention setting resets to false after success.",
     "academy.Unit": "Keep every unit, clear instructor, close submissions; preserve dates, checksum and curriculum metadata.",
     "hackathons.Hackathon": "Keep definitions and files; set status to closed. Preserve dates and scoring settings.",
     "capstone.Capstone": "Keep definitions and scoring references; close all three report submission switches.",

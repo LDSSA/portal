@@ -74,6 +74,13 @@
       {% endif %}
     </div>
 
+    {% if run.plan.retained_students %}
+      <div class="module">
+        <h2>Student accounts retained</h2>
+        <p class="errornote">These complete user accounts, student status and database credentials will survive. All of their grades, submissions, applications, selections, teams, reports, simulator activity and other previous-edition records will be deleted. After success, their retention setting returns to unselected and must be authorized again for a later reset.</p>
+      </div>
+    {% endif %}
+
     {% if run.plan.review_accounts %}
       <div class="module">
         <h2>Potential applicant or unclassified accounts scheduled for deletion</h2>
