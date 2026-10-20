@@ -12,6 +12,30 @@ from django.db.models import Q
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+DEPLOY_RSA_KEY_SIZE = 4096
+
+
+def generate_deploy_key_pair():
+    key = rsa.generate_private_key(
+        backend=crypto_default_backend(),
+        public_exponent=65537,
+        key_size=DEPLOY_RSA_KEY_SIZE,
+    )
+    private_key = key.private_bytes(
+        crypto_serialization.Encoding.PEM,
+        crypto_serialization.PrivateFormat.PKCS8,
+        crypto_serialization.NoEncryption(),
+    ).decode("utf8")
+    public_key = (
+        key.public_key()
+        .public_bytes(
+            crypto_serialization.Encoding.OpenSSH,
+            crypto_serialization.PublicFormat.OpenSSH,
+        )
+        .decode("utf8")
+    )
+    return private_key, public_key
+
 
 class UserWhitelist(models.Model):
     username = models.CharField(_("Username"), max_length=255, unique=True)
@@ -174,24 +198,9 @@ class User(AbstractUser):
                 "retain_account_on_next_edition_reset",
             }
         if not self.deploy_private_key and not self.deploy_public_key:
-            key = rsa.generate_private_key(
-                backend=crypto_default_backend(),
-                public_exponent=65537,
-                key_size=2048,
-            )
-            self.deploy_private_key = key.private_bytes(
-                crypto_serialization.Encoding.PEM,
-                crypto_serialization.PrivateFormat.PKCS8,
-                crypto_serialization.NoEncryption(),
-            ).decode("utf8")
-
-            self.deploy_public_key = (
-                key.public_key()
-                .public_bytes(
-                    crypto_serialization.Encoding.OpenSSH,
-                    crypto_serialization.PublicFormat.OpenSSH,
-                )
-                .decode("utf8")
-            )
+            (
+                self.deploy_private_key,
+                self.deploy_public_key,
+            ) = generate_deploy_key_pair()
 
         super().save(*args, **kwargs)
