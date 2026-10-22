@@ -220,6 +220,20 @@ def test_edition_preview_and_apply(instructor):
     )
     assert Unit.objects.get(pk="SLU01").due_date == date(2026, 11, 21)
     assert Unit.objects.get(pk="BLU15").due_date == date(2027, 4, 24)
+    # Confirm the corrected winter calendar in the persisted records, including
+    # the January/February hackathons immediately after their unit deadlines.
+    for code, release, deadline in (
+        ("BLU04", date(2027, 1, 4), date(2027, 1, 30)),
+        ("BLU05", date(2027, 1, 4), date(2027, 1, 30)),
+        ("BLU06", date(2027, 1, 4), date(2027, 1, 30)),
+        ("BLU07", date(2027, 2, 1), date(2027, 2, 27)),
+        ("BLU10", date(2027, 3, 1), date(2027, 3, 27)),
+    ):
+        unit = Unit.objects.get(pk=code)
+        assert unit.available_on == release
+        assert unit.due_date == deadline
+    assert Hackathon.objects.get(pk="HCKT03").due_date == date(2027, 1, 31)
+    assert Hackathon.objects.get(pk="HCKT04").due_date == date(2027, 2, 28)
     assert config.ADMISSIONS_MODE == "no_exam"
     assert not config.ADMISSIONS_ASK_ATTENDANCE_PREFERENCE
     assert config.NO_EXAM_USE_SCHEDULE

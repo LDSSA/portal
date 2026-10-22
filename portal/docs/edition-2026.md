@@ -89,6 +89,56 @@ meetings, send Slack invitations, publish notebooks, or configure detailed
 capstone report/API deadlines. The supplied capstone range is documented as
 3 May–28 June 2027; its detailed milestones require the usual capstone setup.
 
+### Production calendar audit — 18 October 2026
+
+The corrected source calendar does not update existing database records on
+deployment. A read-only production inspection found all 36 units with no
+`available_on` date and `open=False`, and these previous-edition deadlines:
+
+| Units | Existing deadline | Required available-on date | Required deadline |
+| --- | --- | --- | --- |
+| SLU01–19, SLU32, SLU64 | 18 Oct 2025 | 25 Oct 2026 | 21 Nov 2026 |
+| BLU01–03 | 15 Nov 2025 | 23 Nov 2026 | 19 Dec 2026 |
+| BLU04–06 | 13 Dec 2025 | 4 Jan 2027 | 30 Jan 2027 |
+| BLU07–09 | 31 Jan 2026 | 1 Feb 2027 | 27 Feb 2027 |
+| BLU10–12 | 28 Feb 2026 | 1 Mar 2027 | 27 Mar 2027 |
+| BLU13–15 | 28 Mar 2026 | 29 Mar 2027 | 24 Apr 2027 |
+
+All six hackathons were `closed`. Their existing deadlines were 19 Oct 2025,
+16 Nov 2025, 14 Dec 2025, 1 Feb 2026, 2 Mar 2026 and 30 Mar 2026 respectively.
+Their required dates are 22 Nov 2026, 20 Dec 2026, 31 Jan 2027, 28 Feb 2027,
+28 Mar 2027 and 25 Apr 2027.
+
+For an already active edition, apply a separately reviewed, transactional update
+to those unit `available_on`/`due_date` fields and hackathon `due_date` fields.
+Before applying, capture the existing values, recheck unit assignments and any
+grades affected by deadline changes, and abort if the reviewed state has changed.
+Verify all 36 units and six hackathons after the update. Changing a deadline does
+not rewrite the recorded `on_time` result of existing grades.
+
+Preserve hackathon states and unit open flags during a date-only correction.
+Because every unit is currently closed, staff must also enable `open` for units
+once their grading setup is ready; dates alone do not enable submissions.
+GitHub material publication remains separate from portal submission availability.
+Do not run `configure_edition --apply` as an in-place calendar repair: it also
+changes admissions configuration, resets hackathon states and refuses existing
+course activity.
+
+Live admissions already have an operational extension. At this inspection, in
+Europe/Lisbon, signup and registration closed at **23 Oct 2026 00:00** (including
+22 October), and payments closed at **24 Oct 2026 00:00** (including 23 October,
+not 24 October). Preserve these separately managed settings during the course
+date correction. To include all of 24 October, the payment cutoff would instead
+need to be **25 Oct 2026 00:00 Europe/Lisbon**; that is a separate decision.
+
+There were no capstone simulators. Capstone report stages were closed and are
+controlled by manual flags, not course start/end date fields. No simulator or
+report milestone dates can be inferred from the overall 3 May–28 June range.
+Setup, bootcamp meetings, breaks and the 29 June graduation announcement likewise
+require staff operation rather than a database deadline for each event.
+
+This audit and the source correction made no production database changes.
+
 ## Progression and certification
 
 - SLU01–17 are mandatory S01 units, including SLU01–03. SLU18, SLU19, SLU32 and
