@@ -24,8 +24,8 @@ real checksum. **Do not use an invented checksum as evidence that grading is rea
 All SLU01–19 plus SLU32/64 must belong to S01, and BLU01–15 to S02–06 in groups of three.
 
 Hackathon 2 is confirmed for **20 December 2026**. Both new signups and
-registration completion close at the end of **15 October**, leaving 16 October
-for the final scholarship interviews. Payments remain open through 17 October.
+registration completion close at the end of **24 October**, leaving 24 October
+for the final scholarship interviews. Payments remain open through 24 October.
 
 Preview first, then apply the reviewed calendar:
 
@@ -44,12 +44,23 @@ is read-only; `--apply` is an explicit operational action, not part of deploymen
 
 The prepared calendar interprets date ranges as whole Lisbon calendar days:
 
-| Activity | Opens, Europe/Lisbon | Closes, exclusive, Europe/Lisbon | Manual permission |
-| --- | --- | --- | --- |
-| New no-exam accounts | 24 Sep 2026 00:00 | 16 Oct 2026 00:00 | `ACCOUNT_ALLOW_REGISTRATION` and `NO_EXAM_REGISTRATION_OPEN` |
-| Existing applicants' registration steps | 24 Sep 2026 00:00 | 16 Oct 2026 00:00 | `NO_EXAM_REGISTRATION_OPEN` |
-| Payment documents | 12 Oct 2026 00:00 | 18 Oct 2026 00:00 | `ADMISSIONS_ACCEPTING_PAYMENT_PROFS` |
-| Paid students' course access | 18 Oct 2026 00:00 | No scheduled end | `NO_EXAM_ACADEMY_ACCESS_OPEN` |
+**Original::**
+
+| Activity                                | Opens, Europe/Lisbon | Closes, exclusive, Europe/Lisbon | Manual permission                                            |
+| --------------------------------------- | -------------------- | -------------------------------- | ------------------------------------------------------------ |
+| New no-exam accounts                    | 24 Sep 2026 00:00    | 16 Oct 2026 00:00                | `ACCOUNT_ALLOW_REGISTRATION` and `NO_EXAM_REGISTRATION_OPEN` |
+| Existing applicants' registration steps | 24 Sep 2026 00:00    | 16 Oct 2026 00:00                | `NO_EXAM_REGISTRATION_OPEN`                                  |
+| Payment documents                       | 12 Oct 2026 00:00    | 17 Oct 2026 00:00                | `ADMISSIONS_ACCEPTING_PAYMENT_PROFS`                         |
+| Paid students' course access            | 18 Oct 2026 00:00    | No scheduled end                 | `NO_EXAM_ACADEMY_ACCESS_OPEN`                                |
+
+**After extending the enrollment deadline:**
+
+| Activity                                | Opens, Europe/Lisbon | Closes, exclusive, Europe/Lisbon | Manual permission                                            |
+| --------------------------------------- | -------------------- | -------------------------------- | ------------------------------------------------------------ |
+| New no-exam accounts                    | 24 Sep 2026 00:00    | 25 Oct 2026 00:00                | `ACCOUNT_ALLOW_REGISTRATION` and `NO_EXAM_REGISTRATION_OPEN` |
+| Existing applicants' registration steps | 24 Sep 2026 00:00    | 25 Oct 2026 00:00                | `NO_EXAM_REGISTRATION_OPEN`                                  |
+| Payment documents                       | 12 Oct 2026 00:00    | 25 Oct 2026 00:00                | `ADMISSIONS_ACCEPTING_PAYMENT_PROFS`                         |
+| Paid students' course access            | 18 Oct 2026 00:00    | No scheduled end                 | `NO_EXAM_ACADEMY_ACCESS_OPEN`                                |
 
 Dates are interpreted as complete Lisbon calendar days. No production dates
 have been applied. Closing at 00:00 the next day includes the entire final day,
@@ -57,14 +68,14 @@ without a gap for fractional seconds. These September/October instants are one
 hour ahead of UTC. On 25 October Lisbon changes to UTC; on 28 March 2027 it changes
 back to UTC+1. Conversion uses `Europe/Lisbon`, never a fixed UTC offset.
 
-| Specialization | Submission release date | Certificate deadline (end of Lisbon day) | Hackathon |
-| --- | --- | --- | --- |
-| S01 | 25 Oct 2026 | 21 Nov 2026 | 22 Nov 2026 |
-| S02 | 23 Nov 2026 | 19 Dec 2026 | 20 Dec 2026 |
-| S03 | 5 Jan 2027 | 31 Jan 2027 | 1 Feb 2027 |
-| S04 | 2 Feb 2027 | 28 Feb 2027 | 1 Mar 2027 |
-| S05 | 2 Mar 2027 | 27 Mar 2027 | 28 Mar 2027 |
-| S06 | 29 Mar 2027 | 24 Apr 2027 | 25 Apr 2027 |
+| Specialization | Submission release date | Certificate deadline (end of Lisbon day) | Hackathon   |
+| -------------- | ----------------------- | ---------------------------------------- | ----------- |
+| S01            | 25 Oct 2026             | 21 Nov 2026                              | 22 Nov 2026 |
+| S02            | 23 Nov 2026             | 19 Dec 2026                              | 20 Dec 2026 |
+| S03            | 5 Jan 2027              | 31 Jan 2027                              | 1 Feb 2027  |
+| S04            | 2 Feb 2027              | 28 Feb 2027                              | 1 Mar 2027  |
+| S05            | 2 Mar 2027              | 27 Mar 2027                              | 28 Mar 2027 |
+| S06            | 29 Mar 2027             | 24 Apr 2027                              | 25 Apr 2027 |
 
 Release dates above govern the portal's submission button; GitHub publication is
 separate. Instructors can edit each unit's **available on**, **due date**, **open**
@@ -80,23 +91,23 @@ capstone report/API deadlines. The supplied capstone range is documented as
 
 ## Progression and certification
 
-* SLU01–17 are mandatory S01 units, including SLU01–03. SLU18, SLU19, SLU32 and
+- SLU01–17 are mandatory S01 units, including SLU01–03. SLU18, SLU19, SLU32 and
   SLU64 are optional. A passing exercise score is at least 16/20 with status `graded`.
-* In no-exam mode, passing every mandatory S01 unit by its deadline is required
+- In no-exam mode, passing every mandatory S01 unit by its deadline is required
   for Hackathon 1 and later activities. Failing this requirement leaves S01
   results and support accessible, but later units, hackathons and capstone are
   blocked. Timely submissions still being graded must finish before access opens.
-* Once Hackathon 1 is marked complete, missing its attendance also blocks further
+- Once Hackathon 1 is marked complete, missing its attendance also blocks further
   progression. Correcting an erroneous attendance record restores eligibility.
-* Later mandatory unit deadlines and Hackathon 6 affect certification. Missing
+- Later mandatory unit deadlines and Hackathon 6 affect certification. Missing
   them does not by itself stop continued study. The existing allowance of at most
   one missed non-mandatory hackathon is preserved.
-* Certificate eligibility ignores future hackathons and not-yet-due units. Timely
+- Certificate eligibility ignores future hackathons and not-yet-due units. Timely
   grading in progress is provisionally pending, not a failure. Eligibility is
   recalculated on course-list access, grading results, overrides and hourly by
   the scheduler. This flag is **eligibility**, not automatic certificate issuance
   or a replacement for final capstone assessment.
-* Exam admission tests, selection/draw and staff finalization remain distinct
+- Exam admission tests, selection/draw and staff finalization remain distinct
   from no-exam enrollment. Exam hackathon eligibility is calculated for that
   hackathon's specialization rather than the specialization of the last callback.
 
@@ -132,10 +143,11 @@ disabled for this fully remote edition (`ADMISSIONS_ASK_ATTENDANCE_PREFERENCE =
 False`). No-exam
 normal applicants need no exam approval or draw. Scholarship refusal ends
 admission; it never converts to a normal ticket. Scholarship interviews remain
-staff-operated, scheduled for 12–16 October.
+staff-operated, scheduled for 12–16 October originally, and 12–24 October after
+enrollment extension.
 
 Payment instructions may be issued before 12 October; document submission opens
-on 12 October. Staff can verify already-submitted payments after 17 October.
+on 12 October. Staff can verify already-submitted payments after 24 October.
 No automatic rejection deletes applications at the cutoff. New documents are
 blocked by the calendar; a justified operational extension requires changing the
 calendar in Constance. Granting additional-proof requests after the cutoff does
@@ -184,7 +196,7 @@ overrides. Confirm the deployed edition configuration and curriculum records
 before opening signups. These checks do not replace live verification of grader
 images, Kubernetes callbacks, email delivery or GitHub publication.
 
-Final confirmed dates: both signup and registration completion end on
-15 October 2026; scholarship interviews may continue on 16 October; payment
-ends on 17 October; Hackathon 2 is 20 December 2026. The calendar command uses
+Final confirmed dates after enrollment deadline extension: both signup and registration completion end on
+24 October 2026; scholarship interviews may continue on 24 October; payment
+ends on 24 October; Hackathon 2 is 20 December 2026. The calendar command uses
 exclusive midnight cutoffs immediately after those final days.
